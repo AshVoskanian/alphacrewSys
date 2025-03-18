@@ -67,3 +67,11 @@ export interface PageSizeOptions {
   value: number;
   selected?: boolean;
 }
+
+export interface ApiResponse<T> {
+  data: T;
+  errors: {
+    errorCode: string,
+    message: string
+  };
+}

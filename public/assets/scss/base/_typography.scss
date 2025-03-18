@@ -1,0 +1,350 @@
+/**=====================
+    1.2 Typography CSS start
+==========================**/
+//Custom css Start
+body {
+    font-size: $body-font-size;
+    overflow-x: hidden;
+    font-family: $font-rubik, $font-serif;
+    color: $theme-body-font-color;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+}
+
+h1 {
+    font-size: 26px;
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 22px;
+}
+
+h4 {
+    font-size: 20px;
+}
+
+h5 {
+    font-size: 18px;
+}
+
+h6 {
+    font-size: 16px;
+}
+
+
+ul {
+    padding-left: $ul-padding-left;
+    list-style-type: none;
+    margin-bottom: 0;
+}
+
+ul,
+ol,
+dl,
+p {
+    color: $theme-body-font-color;
+
+    li,
+    dt,
+    dd {
+        color: $theme-body-font-color;
+    }
+}
+
+* a {
+    color: var(--theme-default);
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.d-flex {
+    align-items: flex-start;
+
+    .flex-grow-1 {
+        flex: 1;
+    }
+}
+
+.f-m-light {
+    margin: 0;
+    color: var(--f-lighter);
+}
+
+a {
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--theme-default);
+    transition: 0.5s all;
+
+    &:hover {
+        color: var(--theme-default);
+        transition: all 0.5s all;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    &:any-link,
+    &:-webkit-any-link {
+        cursor: pointer;
+    }
+}
+
+.btn {
+    font-size: 14px;
+}
+
+*.btn:focus {
+    box-shadow: $btn-focus-box-shadow !important;
+}
+
+button {
+    &:focus {
+        outline: none !important;
+    }
+}
+
+p {
+    font-size: $paragraph-font-size;
+    line-height: $paragraph-line-height;
+    letter-spacing: $paragraph-letter-spacing;
+}
+
+code {
+    color: $code-tag-color !important;
+    border-radius: $code-tag-border-radius;
+}
+
+span {
+    display: inline-block;
+}
+
+.d-flex {
+    display: flex;
+    align-items: flex-start;
+
+    .flex-grow-1 {
+        flex: 1;
+    }
+}
+
+blockquote {
+    border-left: $blockquote-border;
+    padding: 18px;
+}
+
+.figure {
+    &.text-center {
+        blockquote {
+            border: none !important;
+        }
+    }
+
+    &.text-end {
+        blockquote {
+            border-left: none !important;
+            border-right: $blockquote-border;
+        }
+    }
+}
+
+.row {
+    >div {
+        position: relative;
+    }
+}
+
+:focus {
+    outline-color: $all-focus-outline-color;
+}
+
+.disabled,
+*:disabled {
+    cursor: not-allowed;
+    opacity: 0.8 !important;
+    pointer-events: inherit !important;
+}
+
+svg {
+    vertical-align: baseline;
+}
+
+input {
+    &:focus {
+        outline-color: $transparent-color;
+    }
+}
+
+label {
+    margin-bottom: .5rem;
+}
+
+.media-widgets {
+    .flex-grow-1 {
+        margin-bottom: 30px;
+    }
+}
+
+//Custom Css end
+
+//Typography CSS start
+.typography {
+
+    h1,
+    .h1,
+    h2,
+    .h2,
+    h3,
+    .h3,
+    h4,
+    .h4,
+    h5,
+    .h5,
+    h6,
+    .h6 {
+        margin: 18px 0;
+        margin-top: 0;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    small {
+        padding-left: $small-tag-padding;
+        color: $small-tag-color;
+    }
+}
+
+pre {
+    background-color: $pre-tag-bg-color;
+    padding: $pre-tag-padding;
+}
+
+.typography-list {
+    ul {
+        li {
+            ul {
+                padding-left: 32px;
+                list-style-type: circle;
+
+                [dir="rtl"] & {
+                    padding-left: unset;
+                    padding-right: 32px;
+                }
+            }
+        }
+    }
+}
+
+// Typography CSS end
+// index page notify
+.toast-container {
+    .ng-trigger {
+        &.ngx-toastr {
+            background-color: $white;
+            color: var(--theme-default);
+            border-radius: 4px;
+            box-shadow: 0 2px 14px -3px rgba($black, 0.2);
+            margin: 0;
+            padding: 20px;
+
+            &:hover {
+                box-shadow: 0 2px 14px -3px rgba($black, 0.2);
+            }
+
+            .toast-close-button {
+                color: var(--theme-default);
+                height: 0;
+
+                span {
+                    font-size: 20px;
+                }
+            }
+
+            .toast-message {
+                i {
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+}
+
+.editor-toolbar {
+    width: 100% !important;
+
+    &.fullscreen {
+        z-index: 100;
+    }
+}
+
+.CodeMirror {
+    top: 0 !important;
+}
+
+.CodeMirror-fullscreen {
+    top: 50px !important;
+}
+
+// table
+table {
+    tbody {
+        tr {
+            vertical-align: middle;
+        }
+    }
+}
+
+.common-flex {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.common-align {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.typography-table {
+    thead {
+        tr {
+            th {
+                font-size: 16px;
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            td {
+                &:last-child {
+                    min-width: 280px;
+                }
+
+                &:first-child {
+                    min-width: 100px;
+                }
+            }
+        }
+    }
+}
+
+/**=====================
+    1.2 Typography CSS Ends
+==========================**/

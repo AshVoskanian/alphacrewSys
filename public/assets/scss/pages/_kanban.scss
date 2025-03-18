@@ -1,0 +1,35 @@
+/**=====================
+  3.37 Kanban CSS start
+==========================**/
+.jkanban-container {
+  .kanban-board{
+    .kanban-column{
+      h5{
+        font-size: 17px;
+      }
+      .kanban-task{
+        margin-bottom: 12px;
+        &:last-child{
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+footer {
+  margin: 0;
+  padding: 0;
+}
+
+@media only screen and (max-width: 480px) {
+  .jkanban-container {
+    .card-body {
+      padding: 20px 15px !important;
+    }
+  }
+}
+
+/**=====================
+   3.37 Kanban CSS ends
+==========================**/

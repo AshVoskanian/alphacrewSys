@@ -1,0 +1,42 @@
+// /**=====================
+//    2.26 Range-slider CSS Start
+// ==========================**/
+.ngx-slider {
+    .ngx-slider-selection {
+        background: var(--theme-default) !important;
+    }
+
+    .ngx-slider-pointer {
+        background-color: var(--theme-default) !important;
+    }
+
+    &.animate {
+        .ngx-slider-pointer {
+            background-color: var(--theme-default);
+
+            &.ngx-slider-active {
+                &::after {
+                    background-color: $body-color;
+                }
+            }
+        }
+
+        .ngx-slider-selection-bar {
+            .ngx-slider-selection {
+                background: var(--theme-default);
+            }
+        }
+    }
+
+    .ngx-slider-ticks {
+        .ngx-slider-tick {
+            &.ngx-slider-selected {
+                background-color: var(--theme-default);
+            }
+        }
+    }
+}
+
+// /**=====================
+//     2.26 Range-slider CSS Ends
+// ==========================**/

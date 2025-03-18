@@ -1,0 +1,54 @@
+// Bootstrap
+@import '../../../node_modules/bootstrap/scss/bootstrap.scss';
+
+// Leaflet Map
+@import 'leaflet/dist/leaflet.css';
+
+// Dropzone
+//@import '../node_modules/dropzone/dist/min/basic.min.css';
+
+// Date Time Picker
+//@import "@danielmoncada/angular-datetime-picker/assets/style/picker.min.css";
+
+// Sweet alert2
+//@import 'sweetalert2/src/sweetalert2.scss';
+@import "@angular/cdk/overlay-prebuilt.css";
+
+// gallery
+@import '../node_modules/@angular/cdk/overlay-prebuilt.css';
+
+// calender
+//@import "../node_modules/angular-calendar/css/angular-calendar.css";
+
+// Carousel
+//@import 'ngx-owl-carousel-o/lib/styles/scss/owl.carousel';
+//@import 'ngx-owl-carousel-o/lib/styles/scss/owl.theme.default';
+
+// Chartist Chart
+@import "./vendors/chartist/chartist-settings";
+@import "./vendors/chartist/chartist";
+
+// rating scss
+//@import"../../../node_modules/ngx-bar-rating/themes/br-default-theme.scss";
+//@import"../../../node_modules/ngx-bar-rating/themes/br-horizontal-theme.scss";
+//@import"../../../node_modules/ngx-bar-rating/themes/br-movie-theme.scss";
+//@import"../../../node_modules/ngx-bar-rating/themes/br-square-theme.scss";
+//@import"../../../node_modules/ngx-bar-rating/themes/br-stars-theme.scss";
+//@import"../../../node_modules/ngx-bar-rating/themes/br-vertical-theme.scss";
+
+// swiper
+@import 'swiper/swiper.scss';
+@import 'swiper/swiper-bundle.css';
+
+
+// Icons
+@import './font-awesome/fontawesome.scss';
+@import './vendors/flag-icon.scss';
+@import './vendors/icofont.scss';
+@import './vendors/themify.scss';
+@import './vendors/animate.scss';
+@import '../scss/vendors/whether-icon.scss';
+
+// Style
+@import './style.scss';
+@import './responsive.scss';

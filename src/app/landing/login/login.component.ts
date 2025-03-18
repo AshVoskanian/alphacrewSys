@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LayoutService } from "../../shared/services/layout.service";
+import { ApiBase } from "../../shared/bases/api-base";
 
 @Component({
   selector: 'app-login',
@@ -12,19 +13,25 @@ import { LayoutService } from "../../shared/services/layout.service";
   styleUrl: './login.component.scss'
 })
 
-export class LoginComponent {
+export class LoginComponent extends ApiBase implements OnInit {
 
   public show: boolean = false;
   public loginForm: FormGroup;
   public validate: boolean = false;
 
   private _layoutService = inject(LayoutService);
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private toast = inject(ToastrService);
 
-  constructor(private fb: FormBuilder, public router: Router, private toast: ToastrService) {
+  ngOnInit() {
+    this.initForm();
+  }
 
+  initForm() {
     const userDetails = localStorage.getItem('user');
     if (userDetails?.length != null) {
-      router.navigate([ '/dashboard/default' ])
+      this.router.navigate([ '/dashboard/default' ])
     }
 
     this.loginForm = new FormGroup({
@@ -34,7 +41,7 @@ export class LoginComponent {
   }
 
   showPassword() {
-    this.show = !this.show;
+
   }
 
   login() {
@@ -42,10 +49,18 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this._layoutService.loading = true;
 
-      setTimeout(() => {
-        this._layoutService.loading = false;
-        this.router.navigate([ '/dashboard/default' ])
-      }, 2000)
+      const data = this.loginForm.getRawValue();
+
+      this.post('Account/login', data).subscribe({
+        next: (res) => {
+          this._layoutService.loading = false;
+          if (res.errors) {
+            this.toast.error(res.errors.message)
+          } else {
+
+          }
+        }
+      });
     }
   }
 }

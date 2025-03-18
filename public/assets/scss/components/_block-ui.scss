@@ -1,0 +1,57 @@
+/**=====================
+    2.9 BlockUi CSS start
+==========================**/
+//  freeze ui start
+
+.block-main-wrapper,
+.card-block-wrapper {
+    p {
+        display: block;
+        display: -webkit-box;
+        height: 68px;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.block-main-wrapper {
+    position: relative;
+
+    .block-wrapper {
+        padding: 12px;
+        margin-bottom: 12px;
+        position: relative;
+        border: 1px solid var(--chart-dashed-border);
+
+        p {
+            margin: 0;
+        }
+    }
+}
+
+.card-img-top1,
+.card-img-top2 {
+    @include pixelstrap-size(100%, 100px);
+    object-fit: cover;
+    object-position: bottom;
+    border-radius: 0;
+}
+
+.form-main-wrapper {
+    .form-block-wrapper {
+        position: relative;
+        margin-bottom: 12px;
+    }
+}
+
+.user-profile {
+    .ngx-spinner-overlay {
+        z-index: 2 !important;
+    }
+}
+
+/**=====================
+    2.9 BlockUi CSS start
+==========================**/
