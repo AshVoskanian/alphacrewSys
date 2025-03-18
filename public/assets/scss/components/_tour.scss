@@ -1,0 +1,57 @@
+/**=====================
+  2.32 Tour CSS Start
+==========================**/
+
+.info {
+  h6 {
+    font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+  }
+
+  span {
+    font-size: calc(13px + (14 - 13) * ((100vw - 320px) / (1920 - 320)));
+  }
+}
+
+.profile-img-style {
+  h5 {
+    line-height: 25px;
+  }
+}
+
+.list-inline {
+  .list-inline-item {
+    &.b-r-gray {
+      border-right: 1px solid $gray-60;
+    }
+  }
+}
+
+.like-comment {
+  .list-inline {
+    justify-content: flex-start;
+
+    @media (max-width:324px) {
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+
+    .list-inline-item {
+      [dir="rtl"] & {
+        border-right: 0;
+        border-left: 1px solid $gray-60;
+      }
+
+      &:last-child {
+        [dir="rtl"] & {
+          border-right: 0;
+          border-left: unset;
+        }
+      }
+    }
+  }
+}
+
+/**=====================
+  2.32 Tour CSS Ends
+==========================**/

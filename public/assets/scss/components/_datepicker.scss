@@ -1,0 +1,532 @@
+/**=====================
+    2.13 Data picker CSS Start
+==========================**/
+.datepicker {
+  z-index: 99;
+}
+
+.datepicker--day-name {
+  color: $primary-color;
+  font-weight: bold;
+}
+
+.datepicker--cell {
+  &.-current- {
+    color: $black;
+    border-radius: 5px;
+    font-weight: bold;
+    border: 2px solid var(--theme-default);
+  }
+
+  &.-focus- {
+    background: var(--theme-default);
+    color: $white;
+  }
+
+  &.-selected- {
+    background: var(--theme-default) !important;
+  }
+
+  &-day {
+    width: 14.2857142857%;
+  }
+}
+
+.datepickers-container {
+  z-index: 7;
+}
+
+.datetime-picker {
+
+  .input-group-text i {
+    line-height: 1.3;
+  }
+}
+
+.bootstrap-calendar {
+  .form-control {
+    font-size: 14px;
+    color: $dark-gray;
+  }
+}
+
+// timepicker
+.clockpicker-popover {
+  border: none;
+  box-shadow: $card-box-shadow;
+  z-index: 7;
+
+  .popover-content {
+    background-color: rgba($primary-color, 0.05);
+  }
+}
+
+.clockpicker-canvas-bg {
+  fill: lighten($primary-color, 38%);
+}
+
+.clockpicker-tick {
+  &:hover {
+    color: inherit;
+    background-color: lighten($primary-color, 38%);
+  }
+}
+
+// calendar
+.calendar-basic {
+  .md-sidebar-aside {
+    background-color: $white;
+    box-shadow: 0px 9px 20px rgba(46, 35, 94, 0.08);
+
+    @media (max-width:1199px) and (min-width:775px) {
+      height: 400px;
+      overflow-y: scroll;
+    }
+
+    @media (max-width:774px) {
+      height: 275px;
+      overflow-y: scroll;
+    }
+  }
+
+  .fc-event {
+    i {
+      font-size: 14px;
+    }
+  }
+
+  #external-events {
+    padding: 20px;
+    border: 1px solid $light-background;
+
+    h6 {
+      margin-bottom: 14px;
+    }
+
+    p {
+      margin-top: 12px;
+    }
+
+    .fc-h-event {
+      padding: 12px;
+      background-color: rgba($secondary-color, 0.1);
+      border: 1px solid rgba($secondary-color, 0.1);
+      cursor: pointer;
+
+      .fc-event-main {
+        color: var(--body-font-color);
+        @include pixelstrap-ellipsis;
+      }
+
+      +.fc-h-event {
+        margin-top: 10px;
+      }
+
+      .fc-event-main {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .create-event {
+
+    .form-control {
+      font-size: 14px;
+      color: rgba($badge-light-color, 0.8);
+    }
+  }
+
+  .calendar-default {
+    .fc-event-main-frame {
+      padding: 2px 6px;
+      font-size: 13px;
+      color: var(--body-font-color);
+    }
+
+    .fc {
+      .fc-highlight {
+        background: rgba($dark-color, 0.2);
+      }
+    }
+
+    .fc-daygrid-dot-event {
+      font-size: 13px;
+
+      .fc-event-time {
+        color: var(--body-font-color);
+      }
+
+      .fc-event-title {
+        text-overflow: ellipsis;
+        color: var(--body-font-color);
+        font-weight: 400;
+      }
+    }
+
+    .fc {
+      td[role="presentation"] {
+        border: 0;
+      }
+
+      .fc-daygrid-day-number,
+      .fc-col-header-cell-cushion {
+        color: $theme-body-font-color;
+        font-weight: 500;
+      }
+
+      .fc-button {
+        &:focus {
+          box-shadow: unset;
+        }
+
+        .fc-icon {
+          height: 23px;
+        }
+      }
+    }
+
+    .fc-h-event {
+      padding: 2px;
+      background-color: rgba($secondary-color, 0.1);
+      border: 1px solid rgba($secondary-color, 0.1);
+
+      .fc-event-title {
+        color: var(--body-font-color);
+      }
+
+      .fc-event-time {
+        font-weight: 400;
+      }
+
+      .fc-event-time {
+        color: var(--body-font-color);
+      }
+    }
+
+    .fc-toolbar-chunk {
+      .fc-button-group {
+        button {
+          text-transform: capitalize;
+        }
+
+        ~.fc-today-button {
+          margin: 0 8px;
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+
+  p {
+    label {
+      cursor: pointer;
+    }
+  }
+}
+
+.fc-event-dragging {
+  padding: 10px;
+  background-color: rgba($secondary-color, 0.1);
+  border: 1px solid var(--theme-secondary);
+
+  .fc-event-main {
+    color: var(--body-font-color);
+    font-size: 14px;
+  }
+}
+
+.fc-v-event {
+  background-color: rgba($secondary-color, 0.1);
+  border: 1px solid var(--theme-secondary);
+}
+
+.fc-timegrid-event-harness-inset {
+  .fc-timegrid-event {
+    box-shadow: unset;
+  }
+}
+
+.fc {
+  .fc-toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .fc-button-primary {
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.5);
+    }
+  }
+}
+
+// flatpickr
+.main-inline-calender {
+  &.input-group {
+    flex-direction: column;
+
+    .form-control {
+      width: 100%;
+      border-radius: 6px !important;
+
+      &:focus {
+        box-shadow: unset;
+        border-color: var(--recent-border);
+      }
+    }
+  }
+}
+
+.flatpicker-calender {
+  .form-control {
+    @media (max-width:768px) {
+      font-size: 14px;
+    }
+  }
+}
+
+.timepicker-wrapper {
+  .row {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .input-group {
+      .form-control {
+        font-size: 14px;
+        color: $dark-gray;
+
+        &.input {
+          border-top-left-radius: 5px !important;
+          border-bottom-left-radius: 5px !important;
+        }
+      }
+    }
+  }
+}
+
+// Angular calender
+.calender-wrapper {
+  .card-body {
+    .cal-month-view {
+      .cal-days {
+        .cal-day-number {
+          color: $theme-body-font-color;
+          font-weight: 500;
+          opacity: 1;
+          font-size: 14px;
+          padding: 4px;
+        }
+
+        .cal-day-cell {
+          .cal-day-badge {
+            background-color: var(--theme-default);
+            padding: 0;
+            @include pixelstrap-size(20px, 20px);
+            @include pixelstrap-flex(flex, center, center);
+          }
+
+          &.cal-out-month {
+            .cal-day-number {
+              opacity: 0.6;
+            }
+          }
+        }
+      }
+
+      .cal-open-day-events {
+        background-color: rgba($primary-color, 0.08);
+        color: $theme-body-font-color;
+        box-shadow: unset;
+
+        [ng-reflect-drag-active-class="cal-drag-active"] {
+          display: flex;
+          gap: 6px;
+
+          mwl-calendar-event-actions {
+            margin-left: auto;
+
+            .cal-event-actions {
+              display: flex;
+              gap: 10px;
+
+              .cal-event-action {
+                @include pixelstrap-size(28px, 28px);
+                background: $light;
+                @include pixelstrap-flex(flex, center, center);
+                border-radius: 4px;
+              }
+            }
+
+            [dir="rtl"] & {
+              margin-left: unset;
+              margin-right: auto;
+            }
+          }
+
+          +[ng-reflect-drag-active-class="cal-drag-active"] {
+            margin-top: 8px;
+          }
+        }
+      }
+
+      .cal-day-cell {
+        &.cal-today {
+          background-color: $light-success;
+        }
+      }
+    }
+
+    .cal-week-view {
+      .cal-event {
+        color: var(--theme-default);
+        background-color: var(--white) !important;
+      }
+    }
+  }
+
+  // Datatable 
+  .table-responsive {
+    table {
+
+      thead,
+      tbody {
+        tr {
+
+          th,
+          td {
+            min-width: auto;
+
+            @media (max-width:1199px) {
+              &:first-child {
+                min-width: 185px;
+              }
+
+              &:nth-child(2) {
+                min-width: 118px;
+              }
+
+              &:nth-child(3) {
+                min-width: 185px;
+              }
+
+              &:nth-child(4) {
+                min-width: 138px;
+              }
+
+              &:nth-child(5) {
+                min-width: 170px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.calendar-event {
+  .modal-header {
+    justify-content: space-between;
+  }
+
+  .modal-body {
+    >div {
+      font-weight: 500;
+
+      pre {
+        padding: calc(12px + (20 - 12) * ((100vw - 320px) / (1920 - 320)));
+      }
+    }
+  }
+}
+
+.date-picker {
+  .dropdown-menu {
+    width: 30%;
+
+    @media (max-width:1599px) and (min-width:992) {
+      width: 40%;
+    }
+
+    @media (max-width:991px) and (min-width:531px) {
+      width: 50%;
+    }
+
+    @media (max-width:530px) {
+      width: calc(100% - 10%);
+    }
+  }
+
+  .btn {
+    &.calendar {
+      padding: 6px 12px;
+
+      svg {
+        @include pixelstrap-size(16px, 16px);
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .digits {
+    .dropdown-menu {
+      width: 100%;
+    }
+  }
+}
+.datepicker-page{
+  .date-picker{
+    .dropdown-menu{
+      z-index: 6;
+    }
+  }
+}
+
+.range-datepicker {
+  .dropdown-menu {
+    width: calc(30rem + (34 - 30) * ((100vw - 320px) / (1920 - 320)));
+    @include pixelstrap-ngb-datepicker;
+    .ngb-dp-months{
+      .ngb-dp-month{
+        .ngb-dp-week{
+          .ngb-dp-day{
+            &.ngb-dp-today{
+              .range{
+                &.custom-day{
+                  &:not(.faded){
+                    color: $white;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width:575px) {
+    .dropdown-menu {
+      width: auto;
+    }
+
+    .ngb-dp-content {
+      &.ngb-dp-months {
+        flex-direction: column;
+
+        .ngb-dp-week {
+          .ngb-dp-day {
+            width: auto;
+            height: auto;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**=====================
+   2.13 Data picker CSS End
+==========================**/
