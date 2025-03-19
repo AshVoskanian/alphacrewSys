@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { SamplePage2Component } from './sample-page2/sample-page2.component';
+import { SamplePage2Component } from './dashboard/sample-page2/sample-page2.component';
 import { DefaultComponent } from "./dashboard/default/default.component";
 
 export const pages: Routes = [
@@ -15,11 +15,11 @@ export const pages: Routes = [
             }
           },
           {
-            path: 'sample-page2',
+            path: 'dashboard2',
             component: SamplePage2Component,
             data: {
-              title: "Sample-page2",
-              breadcrumb: "Sample-page2",
+              title: "dashboard2",
+              breadcrumb: "dashboard2",
             }
           },
         ]

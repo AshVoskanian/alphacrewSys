@@ -1544,6 +1544,16 @@
 
           .logo-icon-wrapper {
             display: none;
+            .img-fluid {
+              width: 32px;
+              height: 32px;
+            }
+          }
+
+          .logo-wrapper {
+            .img-fluid {
+              max-width: 75%;
+            }
           }
 
           &.close_icon {

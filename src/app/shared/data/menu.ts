@@ -13,7 +13,7 @@ export const menuItems: Menu[] = [
     level: 1,
     children: [
       { path: '/dashboard/default', title: 'Default', type: 'link' },
-      { path: '/dashboard/sample-page2', title: 'Other dashboard data', type: 'link' },
+      { path: '/dashboard/dashboard2', title: 'Other dashboard data', type: 'link' },
     ],
   },
   {

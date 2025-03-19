@@ -14,7 +14,6 @@ export const content: Routes = [
         data: {
             title: "sample-page",
             breadcrumb: "sample-page",
-
         },
         loadChildren: () => import('../../components/sample-page/sample-pages.routes').then(r => r.samplePages)
     },

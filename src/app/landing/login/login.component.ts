@@ -41,7 +41,7 @@ export class LoginComponent extends ApiBase implements OnInit {
   }
 
   showPassword() {
-
+    this.show = !this.show;
   }
 
   login() {
@@ -54,10 +54,10 @@ export class LoginComponent extends ApiBase implements OnInit {
       this.post('Account/login', data).subscribe({
         next: (res) => {
           this._layoutService.loading = false;
-          if (res.errors) {
+          if (res.errors?.errorCode) {
             this.toast.error(res.errors.message)
           } else {
-
+            this.router.navigateByUrl('dashboard/default')
           }
         }
       });

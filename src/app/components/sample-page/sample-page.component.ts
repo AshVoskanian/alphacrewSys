@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SamplePage2Component } from "../pages/sample-page2/sample-page2.component";
+import { SamplePage2Component } from "../pages/dashboard/sample-page2/sample-page2.component";
 
 @Component({
   selector: 'app-sample-page',

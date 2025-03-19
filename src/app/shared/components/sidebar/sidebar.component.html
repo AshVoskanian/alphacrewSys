@@ -6,8 +6,8 @@
     </app-header-logo>
 
     <div class="logo-icon-wrapper">
-        <a href="javascript:void(0)" [routerLink]="['/']">
-            <img class="img-fluid" src="assets/images/logo/logo-icon.png" alt="">
+        <a href="javascript:void(0)" [routerLink]="['/dashboard/default']">
+            <img class="img-fluid" sty src="assets/images/logo/favicon.png" alt="">
         </a>
     </div>
 
@@ -21,7 +21,7 @@
         <div id="sidebar-menu" [ngStyle]="{ 'margin-left': layoutService.margin + 'px' }">
             <ul class="sidebar-links sidebar-scroll d-flex flex-column" id="simple-bar" #sidebar>
                 <li class="back-btn">
-                    <a href="javascript:void(0)" [routerLink]="['/']">
+                    <a href="javascript:void(0)" [routerLink]="['/dashboard/default']">
                         <img class="img-fluid" src="assets/images/logo/logo-icon.png" alt="">
                     </a>
                     <div class="mobile-back text-end">
@@ -60,11 +60,11 @@
                                       {{ menu.title | translate }}
                                     </a>
                                 } @else {
-                                    <a 
-                                        [ngClass]="{ 'sidebar-link sidebar-title': menu.level == 1, 'submenu-title': menu.type == 'sub' && menu.level == 2, 'link-nav': menu.type == 'link' && menu.level == 1 }" 
+                                    <a
+                                        [ngClass]="{ 'sidebar-link sidebar-title': menu.level == 1, 'submenu-title': menu.type == 'sub' && menu.level == 2, 'link-nav': menu.type == 'link' && menu.level == 1 }"
                                         [class.enable-active]="menu.active"
-                                        routerLinkActive="active" 
-                                        [routerLink]="menu.path" 
+                                        routerLinkActive="active"
+                                        [routerLink]="menu.path"
                                         [queryParams]="layoutService.config.settings.layout ? { layout: layoutService.config.settings.layout } : {}"
                                         (click)="toggleMenu(menu)">
                                         @if(menu.icon) {
