@@ -7,6 +7,7 @@ import { CardToggleOptions } from '../../../interface/common';
 
 @Component({
   selector: 'app-card',
+  standalone: true,
   imports: [CommonModule, RouterModule, CardDropdownButtonComponent],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss'

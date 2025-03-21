@@ -5,6 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LayoutService } from "../../shared/services/layout.service";
 import { ApiBase } from "../../shared/bases/api-base";
+import { LocalStorageService } from "../../shared/services/local-storage.service";
+import { AuthService } from "../../shared/services/auth.service";
 
 @Component({
   selector: 'app-login',
@@ -20,9 +22,9 @@ export class LoginComponent extends ApiBase implements OnInit {
   public validate: boolean = false;
 
   private _layoutService = inject(LayoutService);
-  private fb = inject(FormBuilder);
   private router = inject(Router);
   private toast = inject(ToastrService);
+  private _authService = inject(AuthService);
 
   ngOnInit() {
     this.initForm();
@@ -51,12 +53,13 @@ export class LoginComponent extends ApiBase implements OnInit {
 
       const data = this.loginForm.getRawValue();
 
-      this.post('Account/login', data).subscribe({
+      this.post<any>('Account/login', data).subscribe({
         next: (res) => {
           this._layoutService.loading = false;
           if (res.errors?.errorCode) {
             this.toast.error(res.errors.message)
           } else {
+            this._authService.setToken(res.data?.token)
             this.router.navigateByUrl('dashboard/default')
           }
         }

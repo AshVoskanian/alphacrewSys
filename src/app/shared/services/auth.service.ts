@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { SessionStorageService } from "./session-storage.service";
 import { Router } from "@angular/router";
 import { BehaviorSubject, Observable } from "rxjs";
+import { LocalStorageService } from "./local-storage.service";
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ export class AuthService {
 
   private router = inject(Router);
   private sessionStorageService = inject(SessionStorageService);
+  private localStorageService = inject(LocalStorageService);
 
   get newlyCreatedUser(): Observable<string> {
     return this.newlyCreatedUser$.asObservable()
@@ -23,15 +25,16 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return this.sessionStorageService.getItem<string>(this.tokenKey);
+    return this.localStorageService.getItem<string>(this.tokenKey);
   }
 
   logout() {
     this.sessionStorageService.clear();
+    this.localStorageService.clear();
     this.router.navigateByUrl('landing/auth').then();
   }
 
   setToken(token: string) {
-    this.sessionStorageService.setItem<string>(this.tokenKey, token);
+    this.localStorageService.setItem<string>(this.tokenKey, token);
   }
 }

@@ -386,7 +386,7 @@
     }
   }
 
-  // Datatable 
+  // Datatable
   .table-responsive {
     table {
 
@@ -445,6 +445,7 @@
 .date-picker {
   .dropdown-menu {
     width: 30%;
+    min-width: 250px !important;
 
     @media (max-width:1599px) and (min-width:992) {
       width: 40%;
@@ -473,12 +474,14 @@
   .digits {
     .dropdown-menu {
       width: 100%;
+      min-width: 250px !important;
     }
   }
 }
 .datepicker-page{
   .date-picker{
     .dropdown-menu{
+      min-width: 250px !important;
       z-index: 6;
     }
   }
@@ -487,6 +490,7 @@
 .range-datepicker {
   .dropdown-menu {
     width: calc(30rem + (34 - 30) * ((100vw - 320px) / (1920 - 320)));
+    min-width: 250px !important;
     @include pixelstrap-ngb-datepicker;
     .ngb-dp-months{
       .ngb-dp-month{
@@ -509,6 +513,7 @@
 
   @media (max-width:575px) {
     .dropdown-menu {
+      min-width: 250px !important;
       width: auto;
     }
 

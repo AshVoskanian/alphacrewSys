@@ -1,0 +1,23 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <app-card>
+        <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="col-md-3 col-xxl-2" >
+            <label class="form-label" for="datetime-local">From: </label>
+            <input class="form-control digits" id="datetime-local"
+                   placeholder="yyyy-mm-dd" name="from"
+                   value="2025-02-26"
+                   formControlName="date"
+                   ngbDatepicker #fromDate="ngbDatepicker"
+                   (click)="fromDate.toggle()">
+          </div>
+          <div class="col d-flex justify-content-start align-items-center m-t-40">
+            <button class="btn btn-primary" type="submit">Load Shifts</button></div>
+        </form>
+      </app-card>
+
+      <app-schedule-list [list]="scheduleData()" [loading]="loading()"></app-schedule-list>
+    </div>
+  </div>
+</div>

@@ -10,11 +10,11 @@ export const content: Routes = [
         loadChildren: () => import('../../components/pages/pages.routes').then(r => r.pages)
     },
     {
-        path: 'sample-page',
+        path: 'schedule',
         data: {
-            title: "sample-page",
-            breadcrumb: "sample-page",
+            title: "Schedule",
+            breadcrumb: "schedule",
         },
-        loadChildren: () => import('../../components/sample-page/sample-pages.routes').then(r => r.samplePages)
+        loadComponent: () => import('../../components/pages/schedule/schedule.component').then(r => r.ScheduleComponent)
     },
 ];

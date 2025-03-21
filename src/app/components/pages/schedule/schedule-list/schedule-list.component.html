@@ -1,0 +1,11 @@
+@if (true) {
+  <div class="width-300 height-equal">
+    <img ngSrc="../../../../../../public/assets/images/loaders/spinner.png" alt="" height="291" width="441">
+  </div>
+} @else {
+  @for (schedule of list(); track schedule.jobPartId) {
+    <app-card>
+      <p>{{ schedule.jobPartId }}</p>
+    </app-card>
+  }
+}
