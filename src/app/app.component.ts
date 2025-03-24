@@ -16,10 +16,10 @@ import { filter, map } from 'rxjs';
 
 export class AppComponent {
 
-  constructor(private config: NgbRatingConfig, 
-    public layoutService: LayoutService, 
-    private router: Router, 
-    private titleService: Title, 
+  constructor(private config: NgbRatingConfig,
+    public layoutService: LayoutService,
+    private router: Router,
+    private titleService: Title,
     private activatedRoute: ActivatedRoute) {
     this.config.max = 5;
     this.config.readonly = true;
@@ -34,14 +34,14 @@ export class AppComponent {
           while (route?.firstChild) {
             route = route.firstChild;
           }
-  
+
           const pageTitle = route?.snapshot.data['pageTitle'] || route?.snapshot.data['title'];
-          return pageTitle ? `${pageTitle} | Cuba Angular` : 'Cuba Angular';
+          return pageTitle ? `Sys | ${pageTitle}` : 'Sys';
         })
       )
       .subscribe(title => {
         this.titleService.setTitle(title);
       });
   }
-  
+
 }

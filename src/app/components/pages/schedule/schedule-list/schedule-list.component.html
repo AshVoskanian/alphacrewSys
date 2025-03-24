@@ -1,11 +1,130 @@
-@if (true) {
-  <div class="width-300 height-equal">
-    <img ngSrc="../../../../../../public/assets/images/loaders/spinner.png" alt="" height="291" width="441">
+@if (loading()) {
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-primary" role="status"></div>
   </div>
 } @else {
   @for (schedule of list(); track schedule.jobPartId) {
-    <app-card>
-      <p>{{ schedule.jobPartId }}</p>
+    <app-card [headerTitle]="cardTitle(schedule)" [padding]="false"
+              [options]="[]" [headerClass]="'txt-warning size-20'">
+      <div class="row g-3">
+        <div class="col">
+          <div class="vertical-ribbon-animate">
+            <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light">
+              <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-success"
+                   [ngStyle]="{'backgroundColor' : schedule.statusColour}">
+                <div>
+                  <i class="fa fa-bolt"></i>
+                  <span>{{ schedule.statusText }}</span>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="badge-flex col-8">
+                  <p>Lorem ipsum dolor sit amet.</p>
+                </div>
+
+                @if (schedule?.crews?.length) {
+                  <div class="list-wrapper col-4">
+                    <ol class="list-group main-lists-content scrollbar-wrapper custom-scrollbar p-0">
+                  <span class="position-absolute rounded-pill bg-success"
+                        [class.bg-danger]="schedule?.crews?.length === 0">
+                    {{ schedule?.crews?.length }}
+                  </span>
+                      @for (crew of schedule.crews; track crew.jobPartCrewId) {
+                        <li class="list-group-item fw-bold">
+                          <img class="rounded-circle object-fit-cover"
+                               [src]="'https://alphacrew.eu/Crew/CrewImage/' + crew.crewId" alt="">
+                          {{ crew.name }}
+                        </li>
+                      }
+                    </ol>
+                  </div>
+                } @else {
+                  <div class="list-wrapper col-4">
+                    <ol class="list-group main-lists-content scrollbar-wrapper custom-scrollbar p-0">
+                      <span class="position-absolute rounded-pill bg-warning add">+</span>
+                      <li class="list-group-item">
+                        <p class="txt-warning">No crew assigned</p>
+                      </li>
+                    </ol>
+                  </div>
+                }
+              </div>
+
+              <div class="main-divider">
+                <div class="divider-body divider-body-1 divider-primary">
+                  <div class="divider-p-primary }}">
+                    <i class="fa-solid fa-comments me-2 txt-primary f-20"></i>
+                    <span class="txt-primary">Comments</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row justify-content-between">
+                <div class="col-sm-5">
+                  <label class="form-label">Job Part Comments:</label>
+                  @if (false) {
+                    <textarea rows="3" class="form-control btn-square"></textarea>
+                  } @else {
+                    <div class="row justify-content-between align-items-center">
+                      <p class="txt-warning m-0 col-10">No comment provided</p>
+                      <div class="col-2 row justify-content-end">
+                        <app-feather-icon style="width: 24px;height: 24px; padding: 0;"
+                                          [icon]="'plus-circle'"></app-feather-icon>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="col-sm-5">
+                  <label class="form-label">Crew Notes:</label>
+                  @if (true) {
+                    <textarea rows="3" class="form-control btn-square"></textarea>
+                  } @else {
+                    <div class="row justify-content-between align-items-center">
+                      <p class="txt-warning col-10">No comment provided</p>
+                      <div class="col-2 row justify-content-end">
+                        <app-feather-icon style="width: 24px;height: 24px; padding: 0;"
+                                          [icon]="'plus-circle'"></app-feather-icon>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </app-card>
   }
 }
+<!--<div class="row gy-3">-->
+<!--  <div class="col-sm-6">-->
+<!--    <div class="placeholder-body">-->
+<!--      <div class="placeholder-start">-->
+<!--        <div class="square"></div>-->
+<!--      </div>-->
+<!--      <div class="placeholder-end">-->
+<!--        <div class="placeholder-line placeholder-h-17 w-25 mb-2"></div>-->
+<!--        <div class="placeholder-line"></div>-->
+<!--        <div class="placeholder-line placeholder-h-8 w-50"></div>-->
+<!--        <div class="placeholder-line w-75"></div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="col-sm-6">-->
+<!--    <div class="placeholder-body">-->
+<!--      <div class="placeholder-start">-->
+<!--        <div class="square circle"></div>-->
+<!--      </div>-->
+<!--      <div class="placeholder-end">-->
+<!--        <div class="placeholder-line placeholder-h-17 w-25 mb-2"></div>-->
+<!--        <div class="placeholder-line"></div>-->
+<!--        <div class="placeholder-line placeholder-h-8 w-50"></div>-->
+<!--        <div class="placeholder-line w-75"></div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+

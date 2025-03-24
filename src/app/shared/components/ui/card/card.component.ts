@@ -19,7 +19,7 @@ export class CardComponent {
   @Input() cardBodyClass: string;
   @Input() headerTitle: string | number;
   @Input() headerTitle2: string | number;
-  @Input() dropdownType: string;
+  @Input() dropdownType: string = 'simple'
   @Input() options: CardToggleOptions[];
   @Input() padding: boolean = true;
   @Input() rightSideDetails: boolean = false;

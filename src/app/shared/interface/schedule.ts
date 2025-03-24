@@ -4,11 +4,13 @@ export interface Schedule {
   crewChiefNumber: number;
   crewNotes: string;
   crewNumber: number;
-  crews: any[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
+  crews: JobPartCrew[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   hours: number;
   importantNotes: boolean;
   isJobActive: boolean;
   jobId: number;
+  shiftCount: number;
+  shiftNumber: number;
   jobNotifications: any[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   jobPartId: number;
   jobPartTypeId: number;
@@ -23,4 +25,15 @@ export interface Schedule {
   vehicles: any[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   venueId: number;
   venueName: string;
+}
+
+export interface JobPartCrew {
+  jobId: number;
+  crewId: number;
+  jobPartCrewId: number;
+  jobPartCrewRoleId: number;
+  jobPartCrewStatusId: number;
+  jobPartId: number;
+  name: string;
+  regionId: number;
 }

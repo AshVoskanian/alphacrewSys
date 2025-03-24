@@ -270,7 +270,7 @@ $ribbon-color in (primary, $primary-color),
   transform: translate(20deg);
 }
 
-//  animation ribbons 
+//  animation ribbons
 .animated-ribbon {
   position: relative;
 
@@ -541,11 +541,6 @@ $ribbon-color in (primary, $primary-color),
 
 // Vertical ribbon animate
 .vertical-ribbon-animate {
-  &:hover {
-    .ribbon-vertical-right {
-      animation: shrink .3s ease;
-    }
-  }
 
   .ribbon-vertical-right {
     width: 115px;

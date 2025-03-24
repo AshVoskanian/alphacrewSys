@@ -1,11 +1,11 @@
 <div class="card" [ngClass]="cardClass">
 
-  @if(cardType == 'simple') {
-    @if(headerTitle) {
+  @if (cardType == 'simple') {
+    @if (headerTitle) {
       <div class="card-header" [class.card-no-border]="!border" [class.pb-2]="padding" [ngClass]="header">
-        @if(dropdownType && options || rightSideDetails) {
+        @if (dropdownType && options || rightSideDetails) {
           <div class="header-top">
-            @if(headerTitle) {
+            @if (headerTitle) {
               <h5 [ngClass]="headerClass">{{ headerTitle }}
                 <ng-content select="[header]"></ng-content>
               </h5>
@@ -14,8 +14,9 @@
 
             <div class="card-header-right-icon">
               <ng-content select="[header3]"></ng-content>
-              @if(dropdownType && options) {
-                <app-card-dropdown-button [dropdownType]="dropdownType" [options]="options" [dropdownClass]="dropdownClass"></app-card-dropdown-button>
+              @if (dropdownType && options) {
+                <app-card-dropdown-button [dropdownType]="dropdownType" [options]="options"
+                                          [dropdownClass]="dropdownClass"></app-card-dropdown-button>
               }
             </div>
           </div>
@@ -32,14 +33,14 @@
     }
   }
 
-  @if(cardType == 'classic') {
+  @if (cardType == 'classic') {
     <div class="card-header card-no-border">
-      @if(headerTitle) {
+      @if (headerTitle) {
         <div class="common-space">
           <div class="left-header-content">
             <h5>{{ headerTitle }}</h5>
 
-            @if(sortDescription) {
+            @if (sortDescription) {
               <p class="m-0 c-o-light">{{ sortDescription }}</p>
             }
           </div>
@@ -54,8 +55,8 @@
     </div>
   }
 
-  @if(cardType == 'dataTable') {
-    @if(headerTitle) {
+  @if (cardType == 'dataTable') {
+    @if (headerTitle) {
       <div class="card-header" [class.card-no-border]="!border" [class.pb-2]="padding">
         <div class="header-top">
           <h5 [ngClass]="headerClass">{{ headerTitle }}
@@ -68,8 +69,8 @@
   }
 
   <div class="card-body" [ngClass]="cardBodyClass">
-        <ng-content></ng-content>
-    </div>
+    <ng-content></ng-content>
+  </div>
 
-    <ng-content select="[details]"></ng-content>
+  <ng-content select="[details]"></ng-content>
 </div>

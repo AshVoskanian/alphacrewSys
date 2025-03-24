@@ -1,0 +1,44 @@
+.ribbon-vertical-right-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 61px 50px 28px 28px;
+
+  .row {
+    display: flex;
+
+    .list-wrapper {
+      position: relative;
+
+      .list-group {
+        width: 100%;
+
+        .position-absolute {
+          line-height: 30px;
+          text-align: center;
+          height: 30px;
+          width: 30px;
+          right: 0;
+          top: -15px;
+          z-index: 12;
+
+          &.add {
+            cursor: pointer;
+          }
+        }
+
+        .list-group-item {
+          padding: 3px 16px;
+        }
+      }
+    }
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  svg {
+    width: 100% !important;
+  }
+}

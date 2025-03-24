@@ -9,11 +9,12 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
 import { delay } from "rxjs";
+import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon/feather-icon.component";
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [ CardComponent, Select2Module, NgbInputDatepicker, ScheduleListComponent ],
+  imports: [ CardComponent, Select2Module, NgbInputDatepicker, ScheduleListComponent, FeatherIconComponent ],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
@@ -25,6 +26,33 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   loading: WritableSignal<boolean> = signal(false);
 
   form: FormGroup;
+
+  sidebar: any = [
+    {
+      id: 2,
+      title: 'Completed',
+      value: 'completed',
+      icon: 'check-circle',
+      color: 'success',
+      count: 10
+    },
+    {
+      id: 3,
+      title: 'Pending',
+      value: 'pending',
+      icon: 'cast',
+      color: 'danger',
+      count: 8
+    },
+    {
+      id: 4,
+      title: 'In Process',
+      value: 'in_progress',
+      icon: 'activity',
+      color: 'info',
+      count: 133
+    }
+  ]
 
   ngOnInit() {
     this.initForm();
@@ -55,7 +83,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     }
 
     this.post<Array<Schedule>>('schedule/getschedule', params)
-      .pipe(delay(3000))
       .subscribe({
         next: (res) => {
           this.loading.set(false);
@@ -63,7 +90,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) {
             this._toast.error(res.errors.message)
           } else {
-            this.scheduleData.set(res.data);
+            this.scheduleData.set(res.data.sort((a, b) => (b.crews?.length > 0 ? 1 : 0) - (a.crews?.length > 0 ? 1 : 0)));
             console.log(res.data);
           }
         }

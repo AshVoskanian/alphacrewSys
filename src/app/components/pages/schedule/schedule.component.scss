@@ -1,0 +1,26 @@
+.container-fluid {
+  .row {
+    .col {
+      .main-menu {
+        display: flex;
+        justify-content: flex-end;
+        gap: 24px;
+        align-items: center;
+
+        li {
+          display: flex;
+          align-items: center;
+
+          .title {
+            margin: 0 8px;
+          }
+
+          a {
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+    }
+  }
+}
