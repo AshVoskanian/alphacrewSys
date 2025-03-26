@@ -3,11 +3,11 @@ import { Routes } from '@angular/router';
 export const landingRouts: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard/auth',
+    redirectTo: 'landing/auth',
     pathMatch: 'full'
   },
   {
-    path: 'dashboard/auth',
+    path: 'landing/auth',
     loadComponent: () => import('../landing/login/login.component').then(c => c.LoginComponent)
   },
 ];
