@@ -5,10 +5,11 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { DatePipe, NgStyle } from "@angular/common";
 import { TranslateService } from "@ngx-translate/core";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
+import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 
 @Component({
   selector: 'app-schedule-list',
-  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent ],
+  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, UkCarNumComponent ],
   providers: [DatePipe],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
@@ -19,7 +20,4 @@ export class ScheduleListComponent {
   loading = input<boolean>(false);
   list = input<Array<Schedule>>([]);
 
-  cardTitle(schedule: Schedule) {
-    return `${this._datePipe.transform(schedule.startDate)}\u00A0 \u00A0${schedule.shiftNumber} of ${schedule.shiftCount}\u00A0 \u00A0 \u00A0${schedule.venueName}`
-  }
 }

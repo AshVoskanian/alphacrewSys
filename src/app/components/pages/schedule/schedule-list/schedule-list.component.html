@@ -4,8 +4,7 @@
   </div>
 } @else {
   @for (schedule of list(); track schedule.jobPartId) {
-    <app-card [headerTitle]="cardTitle(schedule)" [padding]="false"
-              [options]="[]" [headerClass]="'txt-warning size-20'">
+    <app-card>
       <div class="row g-3">
         <div class="col">
           <div class="vertical-ribbon-animate">
@@ -19,33 +18,88 @@
               </div>
 
               <div class="row g-3">
-                <div class="badge-flex col-8">
-                  <p>Lorem ipsum dolor sit amet.</p>
+                <div class="col-6">
+                  <div class="flex-no-wrap">
+                    <div class="col-9 display-flex">
+                      <div class="flex-no-wrap">
+                        <div class="calendar">
+                          <div class="date bg-light">
+                            <em>Saturday</em>
+                            <strong>September</strong>
+                            <span>20</span>
+                          </div>
+
+                          <div class="time bg-danger p-1 b-r-10">
+                            <h1 class="f-40 fw-bold text-white">05:47</h1>
+                          </div>
+                        </div>
+
+                        <div class="info-icons">
+                          <div>
+                            <i class="fa-solid fa-car me-2 txt-primary f-20"></i>
+                          </div>
+                          <div>
+                            <i class="far fa-moon me-2 text-success f-20"></i>
+                          </div>
+                        </div>
+
+                        <div class="additional-info">
+                          <h6>07:00 - 10:00 (Cr: 4, Hrs:3 )</h6>
+                          <h6>Client Name</h6>
+                          <h6>Venue Name</h6>
+                          <h6>Address</h6>
+                          <h6>Onsite Contact</h6>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-3">
+                      <h6 style="white-space: nowrap">
+                        {{ schedule.statusText + ' ' + schedule.jobId }}
+                      </h6>
+                      <h6>2 of 5</h6>
+                    </div>
+                  </div>
+
+                  <div class="row g-1 row-gap-1 m-t-20">
+                    <div class="car-nums col-8">
+                      <div class="car-num">
+                        <app-uk-car-num>
+                          ABCD 012
+                        </app-uk-car-num>
+                      </div>
+
+                      <div class="car-num">
+                        <app-uk-car-num>
+                          ABCD 012
+                        </app-uk-car-num>
+                      </div>
+                      <div class="car-num">
+                        <app-uk-car-num>
+                          ABCD 012
+                        </app-uk-car-num>
+                      </div>
+                    </div>
+
+                    <div class="skills col-4">
+                      <div>
+                        <i class="fa-solid fa-truck me-2 txt-primary f-20"></i>
+                      </div>
+                      <div>
+                        <i class="fa-solid fa-wrench me-2 text-danger f-20"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 @if (schedule?.crews?.length) {
-                  <div class="list-wrapper col-4">
+                  <div class="list-wrapper col-6">
                     <ol class="list-group main-lists-content scrollbar-wrapper custom-scrollbar p-0">
-                  <span class="position-absolute rounded-pill bg-success"
-                        [class.bg-danger]="schedule?.crews?.length === 0">
-                    {{ schedule?.crews?.length }}
-                  </span>
                       @for (crew of schedule.crews; track crew.jobPartCrewId) {
                         <li class="list-group-item fw-bold">
-                          <img class="rounded-circle object-fit-cover"
-                               [src]="'https://alphacrew.eu/Crew/CrewImage/' + crew.crewId" alt="">
                           {{ crew.name }}
                         </li>
                       }
-                    </ol>
-                  </div>
-                } @else {
-                  <div class="list-wrapper col-4">
-                    <ol class="list-group main-lists-content scrollbar-wrapper custom-scrollbar p-0">
-                      <span class="position-absolute rounded-pill bg-warning add">+</span>
-                      <li class="list-group-item">
-                        <p class="txt-warning">No crew assigned</p>
-                      </li>
                     </ol>
                   </div>
                 }

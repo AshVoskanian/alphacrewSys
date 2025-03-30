@@ -28,12 +28,12 @@ export interface Schedule {
 }
 
 export interface JobPartCrew {
-  jobId: number;
-  crewId: number;
-  jobPartCrewId: number;
-  jobPartCrewRoleId: number;
-  jobPartCrewStatusId: number;
-  jobPartId: number;
-  name: string;
-  regionId: number;
+  jobId?: number;
+  crewId?: number;
+  jobPartCrewId?: number;
+  jobPartCrewRoleId?: number;
+  jobPartCrewStatusId?: number;
+  jobPartId?: number;
+  name?: string;
+  regionId?: number;
 }

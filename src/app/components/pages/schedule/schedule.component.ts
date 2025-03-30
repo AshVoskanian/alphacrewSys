@@ -4,11 +4,10 @@ import { Select2Module } from "ng-select2-component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
 import { ScheduleListComponent } from "./schedule-list/schedule-list.component";
 import { ApiBase } from "../../../shared/bases/api-base";
-import { Schedule } from "../../../shared/interface/schedule";
+import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
-import { delay } from "rxjs";
 import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon/feather-icon.component";
 
 @Component({
@@ -91,10 +90,20 @@ export class ScheduleComponent extends ApiBase implements OnInit {
             this._toast.error(res.errors.message)
           } else {
             this.scheduleData.set(res.data.sort((a, b) => (b.crews?.length > 0 ? 1 : 0) - (a.crews?.length > 0 ? 1 : 0)));
+            this.scheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
             console.log(res.data);
           }
         }
       })
+  }
+
+  fillArray(arr: Array<JobPartCrew>, length: number): void {
+    while (arr.length < length) {
+      arr.push({
+        name: `Name${ arr.length + 1 }`,
+        crewId: length + 1
+      });
+    }
   }
 
   submit() {
