@@ -2,41 +2,89 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 40px 50px 28px 28px;
+  padding: 50px 50px 28px 28px;
 
   .row {
     display: flex;
 
     * {
-      padding: 0;
+      //padding: 0;
     }
 
     .list-wrapper {
-      position: relative;
+      display: block;
 
       .list-group {
         width: 100%;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
         flex-wrap: wrap;
 
-        .position-absolute {
-          line-height: 30px;
-          text-align: center;
-          height: 30px;
-          width: 30px;
-          right: 0;
-          top: -15px;
-          z-index: 12;
-
-          &.add {
-            cursor: pointer;
-          }
-        }
-
         .list-group-item {
-          padding: 3px 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 2px;
+          flex: 1;
+          border-radius: 5px;
+          //width: 32%;
+          padding: 2px 4px;
+
+          .status {
+            min-width: 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .icon {
+              width: 16px;
+              height: 16px;
+            }
+          }
+
+          p {
+            margin: 0;
+            max-width: 120px;
+            min-width: 55px;
+            white-space: nowrap;
+            overflow-x: auto;
+          }
+
+          .buttons {
+            height: 100%;
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            justify-content: space-between;
+
+
+            .btn {
+              border-radius: 5px;
+              width: 25px;
+              height: 25px;
+              padding: 0;
+
+              svg {
+                width: 20px !important;
+                height: 20px !important;
+              }
+            }
+
+            .dropup {
+              width: 25px;
+              height: 25px;
+
+              .btn {
+                &:after {
+                  content: none;
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -46,6 +94,7 @@
       flex-direction: column;
       gap: 24px;
       align-items: center;
+
       .date {
         display: block;
         position: relative;
@@ -76,7 +125,7 @@
 
         em {
           position: absolute;
-          bottom: 0.3em;
+          bottom: 0.2em;
           color: #fd9f1b;
         }
 
@@ -89,8 +138,8 @@
       }
 
       .time {
-        background: #0f0c29;  /* fallback for old browsers */
-        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);  /* Chrome 10-25, Safari 5.1-6 */
+        background: #0f0c29; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
         background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
       }
     }

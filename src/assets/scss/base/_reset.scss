@@ -573,7 +573,7 @@ $background-color: $primary-color,
     background-color: rgba(nth($background-color, $i), 0.15) !important;
   }
 
-  // common 10% background color 
+  // common 10% background color
 
   .outline-10-#{$var} {
     outline: 2px solid rgba(nth($background-color, $i), 0.1);
@@ -1596,6 +1596,25 @@ $i: 1;
   background-color: var(--white);
   padding: 18px;
   border-radius: 10px;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.w-15 {
+  width: 15px;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 /**=====================

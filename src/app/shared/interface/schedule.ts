@@ -19,10 +19,11 @@ export interface Schedule {
   notes: string | null;
   onsiteContact: string;
   postCode: string | null;
-  startDate: string; // თუ `Date` ტიპით გინდა, გამოიყენე `Date`
+  startDate: string;
+  endDate: string;
   statusColour: string;
   statusText: string;
-  vehicles: any[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
+  vehicles: Vehicle[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   venueId: number;
   venueName: string;
 }
@@ -36,4 +37,10 @@ export interface JobPartCrew {
   jobPartId?: number;
   name?: string;
   regionId?: number;
+}
+
+export interface Vehicle {
+  vehicleId: number;
+  description: string;
+  numberPlate: string;
 }

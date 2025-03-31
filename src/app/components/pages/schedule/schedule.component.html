@@ -1,41 +1,6 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col">
-      <app-card>
-        <div class="row g-3 justify-content-between">
-          <div class="col-4">
-            <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
-              <div class="col">
-                <label class="form-label" for="datetime-local">From: </label>
-                <input class="form-control digits" id="datetime-local"
-                       placeholder="yyyy-mm-dd" name="from"
-                       value="2025-02-26"
-                       formControlName="date"
-                       ngbDatepicker #fromDate="ngbDatepicker"
-                       (click)="fromDate.toggle()">
-              </div>
-              <div class="col d-flex justify-content-start align-items-center m-t-40">
-                <button class="btn btn-primary" type="submit">Load Shifts</button>
-              </div>
-            </form>
-          </div>
-
-          <ul class="col-6 nav main-menu">
-            @for (item of sidebar; track item) {
-              <li class="nav-item">
-                <a href="javascript:void(0)">
-                  <app-feather-icon style="height: 24px" [icon]="item.icon" [class]="'txt-' + item.color"></app-feather-icon>
-                  <span class="title ms-2">{{ item.title }}</span>
-                  @if (item.count) {
-                    <span class="badge badge-{{ item.color }}">{{ item.count }}</span>
-                  }
-                </a>
-              </li>
-            }
-          </ul>
-        </div>
-      </app-card>
-
       <app-schedule-list [list]="scheduleData()" [loading]="loading()"></app-schedule-list>
     </div>
   </div>

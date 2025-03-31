@@ -1,30 +1,29 @@
 import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { CardComponent } from "../../../shared/components/ui/card/card.component";
 import { Select2Module } from "ng-select2-component";
-import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
 import { ScheduleListComponent } from "./schedule-list/schedule-list.component";
 import { ApiBase } from "../../../shared/bases/api-base";
 import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
 import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon/feather-icon.component";
+import { NavService } from "../../../shared/services/nav.service";
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [ CardComponent, Select2Module, NgbInputDatepicker, ScheduleListComponent, FeatherIconComponent ],
+  imports: [ CardComponent, Select2Module, ScheduleListComponent, FeatherIconComponent ],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
 export class ScheduleComponent extends ApiBase implements OnInit {
-  private _fb = inject(FormBuilder);
+
+  private _navService = inject(NavService);
   private _toast = inject(ToastrService);
 
   scheduleData: WritableSignal<Array<Schedule>> = signal([]);
   loading: WritableSignal<boolean> = signal(false);
-
-  form: FormGroup;
 
   sidebar: any = [
     {
@@ -54,30 +53,34 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   ]
 
   ngOnInit() {
-    this.initForm();
-    this.getScheduleData();
-  }
-
-  initForm() {
     const today = new Date();
     const initialDate: NgbDateStruct = {
       year: today.getFullYear(),
       month: today.getMonth() + 1,
       day: today.getDate()
     };
+    this.getScheduleData(initialDate);
+    this.subToDateChange();
+  }
 
-    this.form = this._fb.group({
-      date: [ initialDate, [ Validators.required ] ]
+
+  subToDateChange() {
+    this._navService.date$.subscribe({
+      next: (date) => {
+        if (date) {
+          this.getScheduleData(date);
+        }
+      }
     });
   }
 
-  getScheduleData() {
+  getScheduleData(date: NgbDateStruct) {
     if (this.loading()) return;
 
     this.loading.set(true);
 
     const params = {
-      date: GeneralService.convertToDate(this.form.get('date')?.value),
+      date: GeneralService.convertToDate(date),
       days: 7
     }
 
@@ -89,9 +92,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) {
             this._toast.error(res.errors.message)
           } else {
-            this.scheduleData.set(res.data.sort((a, b) => (b.crews?.length > 0 ? 1 : 0) - (a.crews?.length > 0 ? 1 : 0)));
+            this.scheduleData.set(res.data);
             this.scheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
-            console.log(res.data);
           }
         }
       })
@@ -100,15 +102,9 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   fillArray(arr: Array<JobPartCrew>, length: number): void {
     while (arr.length < length) {
       arr.push({
-        name: `Name${ arr.length + 1 }`,
+        name: '',
         crewId: length + 1
       });
-    }
-  }
-
-  submit() {
-    if (this.form.valid) {
-      this.getScheduleData();
     }
   }
 }

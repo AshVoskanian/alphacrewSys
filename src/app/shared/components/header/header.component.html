@@ -1,39 +1,57 @@
 <div class="header-wrapper row m-0">
-    <app-search></app-search>
-    <div class="header-logo-wrapper col-auto p-0">
-        <app-header-logo [icon]="'align-center'" [type]="'header'"></app-header-logo>
+  <app-search></app-search>
+  <div class="header-logo-wrapper col-auto p-0">
+    <app-header-logo [icon]="'align-center'" [type]="'header'"></app-header-logo>
+  </div>
+
+  @if (isScheduleRoute) {
+    <div class="col-3">
+      <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="col">
+          <label class="form-label" for="datetime-local">From: </label>
+          <input class="form-control digits" id="datetime-local"
+                 placeholder="yyyy-mm-dd" name="from"
+                 value="2025-02-26"
+                 formControlName="date"
+                 ngbDatepicker #fromDate="ngbDatepicker"
+                 (click)="fromDate.toggle()">
+        </div>
+        <div class="col-auto d-flex justify-content-start align-items-center m-t-40">
+          <button class="btn btn-primary" type="submit">Load Shifts</button>
+        </div>
+      </form>
     </div>
+  }
 
-    <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
-        <ul class="nav-menus">
+  <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
+    <ul class="nav-menus">
+      <li class="language-nav" (click)="toggleLanguage()">
+        <app-header-language></app-header-language>
+      </li>
 
-            <li class="language-nav" (click)="toggleLanguage()">
-                <app-header-language></app-header-language>
-            </li>
+      <li class="fullscreen-body">
+        <app-toggle-screen></app-toggle-screen>
+      </li>
 
-            <li class="fullscreen-body">
-                <app-toggle-screen></app-toggle-screen>
-            </li>
+      <!--            <li>-->
+      <!--                <app-svg-icon [icon]="'search'" (click)="openSearch()"></app-svg-icon>-->
+      <!--            </li>-->
 
-            <li>
-                <app-svg-icon [icon]="'search'" (click)="openSearch()"></app-svg-icon>
-            </li>
+      <!--            <li class="onhover-dropdown">-->
+      <!--                <app-header-bookmark></app-header-bookmark>-->
+      <!--            </li>-->
 
-            <li class="onhover-dropdown">
-                <app-header-bookmark></app-header-bookmark>
-            </li>
+      <li>
+        <app-mode></app-mode>
+      </li>
 
-            <li>
-                <app-mode></app-mode>
-            </li>
+      <li class="onhover-dropdown">
+        <app-header-notification></app-header-notification>
+      </li>
 
-            <li class="onhover-dropdown">
-                <app-header-notification></app-header-notification>
-            </li>
-
-            <li class="profile-nav onhover-dropdown pe-0 py-0">
-                <app-profile></app-profile>
-            </li>
-        </ul>
-    </div>
+      <li class="profile-nav onhover-dropdown pe-0 py-0">
+        <app-profile></app-profile>
+      </li>
+    </ul>
+  </div>
 </div>
