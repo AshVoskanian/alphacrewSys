@@ -74,13 +74,19 @@
               }
             }
 
-            .dropup {
+            .btn-group {
               width: 25px;
               height: 25px;
 
               .btn {
+                text-align: center;
+
                 &:after {
-                  content: none;
+                  content: none !important;
+                }
+
+                i {
+                  margin: 0 !important;
                 }
               }
             }

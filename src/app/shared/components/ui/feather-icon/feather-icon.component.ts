@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import feather from 'feather-icons';
 
 @Component({
@@ -12,7 +12,6 @@ export class FeatherIconComponent {
 
   @Input('icon') public icon: string | undefined;
   @Input() class: string;
-
   constructor(  ) {}
 
   ngAfterViewInit() {

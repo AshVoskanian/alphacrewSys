@@ -120,17 +120,19 @@
                               <app-feather-icon [class]="'w-15'" [icon]="'edit'"></app-feather-icon>
                             </button>
 
-                            <div class="btn-group dropup" ngbDropdown [placement]="'top'">
+                            <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
                               <button class="btn b-ln-height btn-info btn-square" ngbDropdownToggle>
                                 <app-feather-icon [class]="'w-15'" [icon]="'settings'"></app-feather-icon>
                               </button>
                               <ul class="dropdown-menu" ngbDropdownMenu>
-                                <li><a class="dropdown-item" href="javascript:void(0)" ngbDropdownItem>Menu item</a>
-                                </li>
-                                <li><a class="dropdown-item" href="javascript:void(0)" ngbDropdownItem>Menu item</a>
-                                </li>
-                                <li><a class="dropdown-item" href="javascript:void(0)" ngbDropdownItem>Menu item</a>
-                                </li>
+                                @for (menu of menu(); track menu) {
+                                  <li>
+                                    <a class="dropdown-item" style="display:flex; align-items: center" href="javascript:void(0)" ngbDropdownItem>
+                                      <i class="{{menu.icon}} {{menu.color}} me-2 f-18"></i>
+                                      {{menu.text}}
+                                    </a>
+                                  </li>
+                                }
                               </ul>
                             </div>
                           </div>

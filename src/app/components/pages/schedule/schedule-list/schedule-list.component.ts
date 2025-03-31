@@ -1,4 +1,4 @@
-import { Component, inject, input, TemplateRef } from '@angular/core';
+import { Component, inject, input, signal, TemplateRef } from '@angular/core';
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { Schedule } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
@@ -26,6 +26,76 @@ export class ScheduleListComponent {
   list = input<Array<Schedule>>([]);
 
 
+  menu = signal([
+    {
+      text: 'Send SMS',
+      action: '',
+      color: 'text-success',
+      icon: 'fa-solid fa-comment'
+    },
+    {
+      text: 'Assigned',
+      action: '',
+      color: 'text-warning',
+      icon: 'fas fa-square'
+    },
+    {
+      text: 'Notified',
+      action: '',
+      color: 'text-success',
+      icon: 'fas fa-square'
+    },
+    {
+      text: 'Reject',
+      action: '',
+      color: 'text-danger',
+      icon: 'fas fa-regular fa-square'
+    },
+    {
+      text: 'Crew Chief',
+      action: '',
+      color: 'text-success',
+      icon: 'fa-regular fa-star'
+    },
+    {
+      text: 'Team Leader',
+      action: '',
+      color: 'text-success',
+      icon: 'fa-solid fa-user-md'
+    },
+    {
+      text: 'Confirmed',
+      action: '',
+      color: 'text-success',
+      icon: 'fas fa-square'
+    },
+    {
+      text: 'Turned Down',
+      action: '',
+      color: 'text-success',
+      icon: 'far fa-thumbs-down'
+    },
+    {
+      text: 'Remove',
+      action: '',
+      color: 'text-success',
+      icon: 'fas fa-times'
+    },
+    {
+      text: 'No Show',
+      action: '',
+      color: 'text-success',
+      icon: 'fa-solid fa-eye-slash'
+    },
+    {
+      text: 'Change',
+      action: '',
+      color: 'text-success',
+      icon: 'fa-solid fa-retweet'
+    }
+  ])
+
+
   constructor(private modal: NgbModal){}
 
   openModal(value: TemplateRef<NgbModal>){
@@ -39,4 +109,6 @@ export class ScheduleListComponent {
   hoursDifference(startDateIso: string, endDateIso: string) {
     return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
+
+  protected readonly menubar = menubar;
 }
