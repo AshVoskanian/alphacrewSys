@@ -170,7 +170,12 @@
   }
 
   textarea {
-    resize: none;
+    border-radius: 5px;
+    height: fit-content;
+  }
+  textarea:read-only {
+    outline: none;
+    border-color: transparent;
   }
 
   svg {

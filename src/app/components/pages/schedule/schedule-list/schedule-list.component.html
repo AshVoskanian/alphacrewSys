@@ -179,7 +179,7 @@
                     }
                   </label>
                   @if (schedule.notes || schedule.editComment) {
-                    <textarea [(ngModel)]="schedule.notes" rows="3"
+                    <textarea [(ngModel)]="schedule.notes" rows="4"
                               [readonly]="!schedule.editComment" style="background: #FFF7E5;"
                               class="form-control btn-square hide-scrollbar text-warning">
                     </textarea>
@@ -203,7 +203,7 @@
                     }
                   </label>
                   @if (schedule.crewNotes || schedule.editCrewNote) {
-                    <textarea [(ngModel)]="schedule.crewNotes" rows="3"
+                    <textarea [(ngModel)]="schedule.crewNotes" rows="4"
                               [readonly]="!schedule.editCrewNote" style="background: #FFF7E5;"
                               class="form-control btn-square hide-scrollbar text-warning">
                     </textarea>
