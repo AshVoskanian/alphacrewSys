@@ -8,6 +8,8 @@ export interface Schedule {
   hours: number;
   importantNotes: boolean;
   isJobActive: boolean;
+  editComment?: boolean;
+  editCrewNote?: boolean;
   jobId: number;
   shiftCount: number;
   shiftNumber: number;
@@ -37,6 +39,7 @@ export interface JobPartCrew {
   jobPartId?: number;
   name?: string;
   regionId?: number;
+  isActive?: boolean;
 }
 
 export interface Vehicle {

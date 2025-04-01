@@ -100,10 +100,13 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   }
 
   fillArray(arr: Array<JobPartCrew>, length: number): void {
+    arr.forEach(item => item.isActive = true);
+
     while (arr.length < length) {
       arr.push({
         name: '',
-        crewId: length + 1
+        crewId: arr.length + 1,
+        isActive: false
       });
     }
   }

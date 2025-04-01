@@ -22,6 +22,8 @@
         flex-wrap: wrap;
 
         .list-group-item {
+          min-height: 36px;
+          min-width: 33%;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -193,3 +195,5 @@
     flex-shrink: 1;
   }
 }
+
+
