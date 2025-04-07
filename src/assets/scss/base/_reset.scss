@@ -1617,6 +1617,17 @@ $i: 1;
   cursor: pointer;
 }
 
+.custom-off-canvas {
+  width: fit-content !important;
+  padding: 12px;
+}
+
+.border-bottom {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
 /**=====================
     1.1 Reset CSS Ends
 ==========================**/

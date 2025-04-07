@@ -1,0 +1,46 @@
+<div class="offcanvas-header p-0 p-t-10 m-b-20">
+  <h5 class="offcanvas-title" id="offcanvasRightLabel">{{ title }}</h5>
+  <button class="btn-close" type="button" (click)="closeOffcanvas()"></button>
+</div>
+
+<div class="flex-column row g-3 m-b-20 ">
+  <ul class="list-group w-100 align-items-center flex-row">
+    @for (list of regions; track list) {
+      <li class="p-10">
+        <input class="form-check-input me-1 checkbox-{{ list.class }}" [id]="list.id" type="checkbox" value=""
+               [checked]="list.checked">
+        <label class="form-check-label txt-{{ list.class }} mb-0" [for]="list.id">{{ list.title }}</label>
+      </li>
+    }
+  </ul>
+
+  <ul class="list-group w-100 align-items-center flex-row">
+    @for (list of levels; track list) {
+      <li class="p-10">
+        <input class="form-check-input me-1 checkbox-{{ list.class }}" [id]="list.id" type="checkbox" value=""
+               [checked]="list.checked">
+        <label class="form-check-label txt-{{ list.class }} mb-0" [for]="list.id">{{ list.title }}</label>
+      </li>
+    }
+  </ul>
+</div>
+
+
+<ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
+  @for (crew of crewList; track crew.crewId) {
+    <li class="common-flex justify-content-between align-items-center list-group-item border-bottom">
+      <i class="fa-solid fa-tag position-absolute" style="left: 4px; top: 4px"></i>
+      <div>
+        <a href="javascript:void(0)" class="badge badge-primary rounded-circle badge-p-space m-r-10">1</a>
+        <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId" type="checkbox" value=""
+               [checked]="false">
+        <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">{{ crew.name }}</label>
+      </div>
+
+      <div class="common-flex align-items-center gap-1">
+        <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-r-10">PT</a>
+        <i class="fa-solid rounded fa-phone-square text-success pointer f-20"></i>
+      </div>
+    </li>
+  }
+</ul>

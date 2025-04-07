@@ -47,3 +47,20 @@ export interface Vehicle {
   description: string;
   numberPlate: string;
 }
+
+export interface Crew {
+  crewId: number;
+  regionId: number;
+  regionText: string;
+  levelId: number;
+  isFulltime: boolean;
+  levelCode: string;
+  levelText: string;
+  levelShortText: string;
+  name: string;
+  skills: string;
+  totalHours: number;
+  rating: number;
+  warnings: number;
+  jobNotes: string;
+}
