@@ -1,4 +1,5 @@
 .ribbon-vertical-right-wrapper {
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -226,7 +227,7 @@
   .open-crew-panel {
     width: fit-content;
     position: absolute;
-    right: -30px;
+    right: -20px;
     top: 100px;
     z-index: 999;
 
