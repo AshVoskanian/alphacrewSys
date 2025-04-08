@@ -1,6 +1,6 @@
 import { Component, inject, input, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
-import { Crew, Schedule } from "../../../../shared/interface/schedule";
+import { Crew, CrewActionItem, JobPartCrew, JobPartCrewUpdate, Schedule } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { DatePipe, NgStyle } from "@angular/common";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
@@ -18,6 +18,7 @@ import { FormsModule } from "@angular/forms";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { CrewListComponent } from "./crew-list/crew-list.component";
 import { ApiBase } from "../../../../shared/bases/api-base";
+import { CrewAction } from "../../../../shared/interface/enums/schedule";
 
 @Component({
   selector: 'app-schedule-list',
@@ -35,70 +36,81 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   list = input<Array<Schedule>>([]);
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
 
-  menu = signal([
+  menu: WritableSignal<Array<CrewActionItem>> = signal([
     {
       text: 'Send SMS',
-      action: '',
+      action: CrewAction.SEND_SMS,
       color: 'text-success',
       icon: 'fa-solid fa-comment f-18'
     },
     {
+      id: 1,
       text: 'Assigned',
-      action: '',
+      action: CrewAction.ASSIGN,
       color: 'text-warning',
-      icon: 'fas fa-square f-18'
+      icon: 'fas fa-square f-18',
+      actionFn: this.updateStatusOrRole
     },
     {
+      id: 5,
       text: 'Notified',
-      action: '',
+      action: CrewAction.NOTIFY,
       color: 'text-info',
       icon: 'fas fa-square f-18'
     },
     {
+      id: 3,
       text: 'Reject',
-      action: '',
+      action: CrewAction.REJECT,
       color: 'text-danger',
       icon: 'fas fa-regular fa-square f-18'
     },
     {
+      id: 2,
       text: 'Crew Chief',
-      action: '',
+      action: CrewAction.MARK_AS_CREW_CHIEF,
       color: 'text-success',
       icon: 'fa-regular fa-star f-16'
     },
     {
+      id: 4,
       text: 'Team Leader',
-      action: '',
+      action: CrewAction.MARK_AS_TEAM_LEADER,
       color: 'text-success',
       icon: 'fa-solid fa-user-md f-18'
     },
     {
+      id: 2,
       text: 'Confirmed',
-      action: '',
+      action: CrewAction.CONFIRM,
       color: 'text-success',
       icon: 'fas fa-square f-18'
     },
     {
+      id: 2,
       text: 'Turned Down',
-      action: '',
+      action: CrewAction.TURN_DOWN,
       color: 'text-success',
       icon: 'far fa-thumbs-down f-18'
     },
     {
+      id: 2,
       text: 'Remove',
-      action: '',
+      action: CrewAction.REMOVE,
       color: 'text-success',
       icon: 'fas fa-times f-18'
     },
     {
+      id: 2,
       text: 'No Show',
-      action: '',
+      action: CrewAction.MARK_AS_NO_SHOW,
       color: 'text-success',
       icon: 'fa-solid fa-eye-slash f-16'
     },
     {
+      id: 2,
       text: 'Change',
-      action: '',
+      action: CrewAction.CHANGE,
       color: 'text-success',
       icon: 'fa-solid fa-retweet f-18'
     }
@@ -106,7 +118,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getCrewList();
-
   }
 
   openModal(value: TemplateRef<NgbModal>) {
@@ -148,6 +159,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       panelClass: 'common-offcanvas custom-off-canvas'
     });
     offcanvasRef.componentInstance.title = 'Crew';
+    this.crewList().forEach(it => it.isChecked = false);
     offcanvasRef.componentInstance.crewList = this.crewList();
   }
 
@@ -155,9 +167,94 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this.get<Array<Crew>>('Crew/GetCrewList', {}).subscribe({
       next: (res) => {
         this.crewList.set(res.data);
-        console.log(this.crewList())
-        this.openCrewsPanel();
       }
     })
+  }
+
+  updateStatusOrRole(data: JobPartCrewUpdate) {
+    this.post<JobPartCrew>('Schedule/JobPartCrewStatusOrRoleUpdate', data)
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+
+          } else {
+            const jobPartCrew: Array<JobPartCrew> = this.list().find(it => it.jobPartId === res.data.jobPartId)?.crews as Array<JobPartCrew>;
+            const updatedCrew: JobPartCrew = jobPartCrew?.find(it => it.jobPartCrewId === res.data.jobPartCrewId) as JobPartCrew;
+            updatedCrew.jobPartCrewRoleId = res.data.jobPartCrewRoleId;
+            updatedCrew.jobPartCrewStatusId = res.data.jobPartCrewStatusId;
+            updatedCrew.jobPartCrewStatusColour = res.data.jobPartCrewStatusColour;
+          }
+        }
+      })
+  }
+
+  menuAction(menu: CrewActionItem, crew: JobPartCrew, dd: Schedule) {
+    console.log(88, dd)
+    const data:JobPartCrewUpdate = {
+      jobPartCrewId: crew.jobPartCrewId,
+      jobPartCrewRoleId: crew.jobPartCrewRoleId,
+      jobPartCrewStatusid: crew.jobPartCrewStatusId
+    }
+
+    switch (menu.action) {
+      case CrewAction.SEND_SMS:
+        // TODO: handle SEND_SMS
+        break;
+
+      case CrewAction.ASSIGN:
+        data.jobPartCrewStatusid = menu.id;
+
+        this.updateStatusOrRole(data);
+        break;
+
+      case CrewAction.NOTIFY:
+        data.jobPartCrewStatusid = menu.id;
+
+        this.updateStatusOrRole(data);
+        break;
+
+      case CrewAction.REJECT:
+        data.jobPartCrewStatusid = menu.id;
+
+        this.updateStatusOrRole(data);
+        break;
+
+      case CrewAction.MARK_AS_CREW_CHIEF:
+        data.jobPartCrewRoleId = menu.id;
+
+        this.updateStatusOrRole(data);
+        break;
+
+      case CrewAction.MARK_AS_TEAM_LEADER:
+        data.jobPartCrewRoleId = menu.id;
+
+        this.updateStatusOrRole(data);
+        break;
+
+      case CrewAction.CONFIRM:
+        data.jobPartCrewStatusid = menu.id;
+
+        this.updateStatusOrRole(data);
+        break;
+
+      case CrewAction.TURN_DOWN:
+        break;
+
+      case CrewAction.REMOVE:
+        // TODO: handle REMOVE
+        break;
+
+      case CrewAction.MARK_AS_NO_SHOW:
+        // TODO: handle MARK_AS_NO_SHOW
+        break;
+
+      case CrewAction.CHANGE:
+        this.openCrewsPanel();
+        break;
+
+      default:
+        console.warn('Unhandled action:', menu.action);
+        break;
+    }
   }
 }

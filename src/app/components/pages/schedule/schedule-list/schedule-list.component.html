@@ -10,11 +10,10 @@
           <div class="vertical-ribbon-animate">
             <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light">
               <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-success"
+                   style="left: 50%; transform: translateX(-50%); width: fit-content; padding: 0 10px;"
                    [ngStyle]="{'backgroundColor' : schedule.statusColour}">
-                <div>
-                  <i class="fa fa-bolt"></i>
-                  <span>{{ schedule.statusText }}</span>
-                </div>
+                <i class="fa fa-bolt m-r-10"></i>
+                <span>{{ schedule.statusText + ' ' + schedule.jobId }}</span>
               </div>
 
               <div class="row g-3 column-gap-1 justify-content-between">
@@ -67,16 +66,9 @@
                       </div>
                     </div>
 
-                    <div class="col-3">
-                      <h6 style="white-space: nowrap; display:flex; gap: 4px">
-                        <span [ngStyle]="{'color': schedule.statusColour}">
-                          {{ schedule.statusText }}
-                        </span>
-                        <span>{{ schedule.jobId }}</span>
-                      </h6>
-                      <h6 class="fw-bold pointer" style="margin-top: 12px;">{{ schedule.shiftNumber }}
-                        of {{ schedule.shiftCount }}</h6>
-                    </div>
+                    <h6 class="fw-bold pointer m-0" style="margin-top: 12px;">{{ schedule.shiftNumber }}
+                      of {{ schedule.shiftCount }}
+                    </h6>
                   </div>
 
                   <div class="row g-1 row-gap-1 m-t-20">
@@ -107,12 +99,21 @@
                       @for (crew of schedule.crews; let i = $index; track i) {
                         <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}">
                           @if (crew.isActive) {
-                            <div class="status border bg-warning"
+                            <div class="status border"
+                                 [style.background-color]="crew.jobPartCrewStatusColour"
                                  ngbPopover="აქ იქნება ინფორმაცია ქრუს გრაფიკზე ასევე ისტორია, ბექის სერვისი გვჭირდება"
                                  [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
                             >
                               <div class="icon">
-                                <i class="fa-solid fa-flag me-2 text-success f-16"></i>
+                                @if (crew.jobPartCrewRoleId === 1) {
+                                  <i class="fas fa-square me-2 text-success f-16"></i>
+                                }
+                                @if (crew.jobPartCrewRoleId === 2) {
+                                  <i class="far fa-star me-2 text-success f-16"></i>
+                                }
+                                @if (crew.jobPartCrewRoleId === 4) {
+                                  <i class="fa-solid fa-flag me-2 text-success f-16"></i>
+                                }
                               </div>
                             </div>
                           }
@@ -129,11 +130,11 @@
 
                               <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
                                 <button class="btn b-ln-height btn-info btn-square" ngbDropdownToggle>
-                                  <app-feather-icon [class]="'w-15'" [icon]="'settings'"></app-feather-icon>
+                                  <app-feather-icon [class]="'w-15'" [icon]="'loader'"></app-feather-icon>
                                 </button>
                                 <ul class="dropdown-menu" ngbDropdownMenu>
                                   @for (menu of menu(); track menu) {
-                                    <li>
+                                    <li (click)="menuAction(menu, crew, schedule)">
                                       <a class="dropdown-item" style="display:flex; align-items: center"
                                          href="javascript:void(0)" ngbDropdownItem>
                                         <i class="{{menu.icon}} {{menu.color}} me-2"></i>

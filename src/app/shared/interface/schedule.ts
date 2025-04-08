@@ -4,7 +4,7 @@ export interface Schedule {
   crewChiefNumber: number;
   crewNotes: string;
   crewNumber: number;
-  crews: JobPartCrew[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
+  crews: Array<JobPartCrew>; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   hours: number;
   importantNotes: boolean;
   isJobActive: boolean;
@@ -38,6 +38,7 @@ export interface JobPartCrew {
   jobPartCrewStatusId?: number;
   jobPartId?: number;
   name?: string;
+  jobPartCrewStatusColour?: string;
   regionId?: number;
   isActive?: boolean;
 }
@@ -54,6 +55,7 @@ export interface Crew {
   regionText: string;
   levelId: number;
   isFulltime: boolean;
+  isChecked?: boolean;
   levelCode: string;
   levelText: string;
   levelShortText: string;
@@ -63,4 +65,17 @@ export interface Crew {
   rating: number;
   warnings: number;
   jobNotes: string;
+}
+export interface CrewActionItem {
+  text: string;
+  action: any;
+  color: string;
+  id?: number;
+  icon: string;
+}
+
+export interface JobPartCrewUpdate {
+  jobPartCrewId?: number;
+  jobPartCrewRoleId?: number;
+  jobPartCrewStatusid?: number;
 }
