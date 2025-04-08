@@ -97,7 +97,7 @@
                   <div class="list-wrapper col-5">
                     <ol class="list-group p-0">
                       @for (crew of schedule.crews; let i = $index; track i) {
-                        <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}">
+                        <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}" (click)="openCrewsPanel(crew)">
                           @if (crew.isActive) {
                             <div class="status"
                                  [style.background-color]="crew.jobPartCrewStatusColour"
@@ -116,10 +116,10 @@
                                 }
                               </div>
                             </div>
+                            <p class="hide-scrollbar f-14">
+                              {{ crew.name }}
+                            </p>
                           }
-                          <p class="hide-scrollbar f-14">
-                            {{ crew.name }}
-                          </p>
 
                           @if (crew.isActive) {
                             <div class="buttons">
@@ -129,9 +129,11 @@
                               </button>
 
                               <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
-                                <button class="btn b-ln-height btn-info btn-square" style="width: 36px;" ngbDropdownToggle>
+                                <button class="btn b-ln-height btn-info btn-square" style="width: 36px;"
+                                        ngbDropdownToggle>
                                   @if (crew.loading) {
-                                    <app-feather-icon [class]="'w-15 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                                    <app-feather-icon [class]="'w-15 text-white spin'"
+                                                      [icon]="'loader'"></app-feather-icon>
                                   } @else {
                                     <app-feather-icon [class]="'w-15'" [icon]="'settings'"></app-feather-icon>
                                   }
@@ -180,7 +182,8 @@
                        }
                       </span>
                     } @else {
-                      <span class="pointer"><i (click)="edit(schedule, 'comment')" class="fa-solid fa-plus me-2 text-success f-16"></i></span>
+                      <span class="pointer"><i (click)="edit(schedule, 'comment')"
+                                               class="fa-solid fa-plus me-2 text-success f-16"></i></span>
                     }
                   </label>
                   @if (schedule.notes || schedule.editComment) {
@@ -204,7 +207,8 @@
                        }
                       </span>
                     } @else {
-                      <span class="pointer"><i (click)="edit(schedule, 'crewNote')" class="fa-solid fa-plus me-2 text-success f-16"></i></span>
+                      <span class="pointer"><i (click)="edit(schedule, 'crewNote')"
+                                               class="fa-solid fa-plus me-2 text-success f-16"></i></span>
                     }
                   </label>
                   @if (schedule.crewNotes || schedule.editCrewNote) {

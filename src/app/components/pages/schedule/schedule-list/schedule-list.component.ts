@@ -152,7 +152,10 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     }
   }
 
-  openCrewsPanel() {
+  openCrewsPanel(crew?: JobPartCrew) {
+    if (crew && crew.isActive) {
+      return
+    }
     const offcanvasRef = this._offCanvasService.open(CrewListComponent, {
       scroll: false,
       backdrop: false,
