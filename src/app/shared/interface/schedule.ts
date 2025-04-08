@@ -8,6 +8,8 @@ export interface Schedule {
   hours: number;
   importantNotes: boolean;
   isJobActive: boolean;
+  isNightShift: boolean;
+  isNigthShiftPaid: boolean;
   editComment?: boolean;
   editCrewNote?: boolean;
   jobId: number;

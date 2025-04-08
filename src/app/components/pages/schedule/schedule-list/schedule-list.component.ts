@@ -9,7 +9,7 @@ import {
   NgbAlertModule,
   NgbDropdownModule,
   NgbModal,
-  NgbOffcanvas,
+  NgbOffcanvas, NgbOffcanvasRef,
   NgbPopoverModule,
   NgbTooltipModule
 } from "@ng-bootstrap/ng-bootstrap";
@@ -19,6 +19,7 @@ import { GeneralService } from "../../../../shared/services/general.service";
 import { CrewListComponent } from "./crew-list/crew-list.component";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CrewAction } from "../../../../shared/interface/enums/schedule";
+import Swal, { SweetAlertPosition } from 'sweetalert2';
 
 @Component({
   selector: 'app-schedule-list',
@@ -30,7 +31,10 @@ import { CrewAction } from "../../../../shared/interface/enums/schedule";
 })
 export class ScheduleListComponent extends ApiBase implements OnInit {
   private _modal = inject(NgbModal);
-  private _offCanvasService = inject(NgbOffcanvas)
+  private _offCanvasService = inject(NgbOffcanvas);
+
+  private offcanvasRef?: NgbOffcanvasRef;
+  private position: SweetAlertPosition;
 
   loading = input<boolean>(false);
   list = input<Array<Schedule>>([]);
@@ -153,17 +157,22 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   openCrewsPanel(crew?: JobPartCrew) {
-    if (crew && crew.isActive) {
+    if ((crew && crew.isActive) || this.offcanvasRef) {
       return
     }
-    const offcanvasRef = this._offCanvasService.open(CrewListComponent, {
+
+    this.offcanvasRef = this._offCanvasService.open(CrewListComponent, {
       scroll: false,
       backdrop: false,
       panelClass: 'common-offcanvas custom-off-canvas'
     });
-    offcanvasRef.componentInstance.title = 'Crew';
+    this.offcanvasRef.componentInstance.title = 'Crew';
     this.crewList().forEach(it => it.isChecked = false);
-    offcanvasRef.componentInstance.crewList = this.crewList();
+    this.offcanvasRef.componentInstance.crewList = this.crewList();
+
+    this.offcanvasRef.result.finally(() => {
+      this.offcanvasRef = undefined;
+    });
   }
 
   getCrewList() {
@@ -189,6 +198,16 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             updatedCrew.jobPartCrewRoleId = res.data.jobPartCrewRoleId;
             updatedCrew.jobPartCrewStatusId = res.data.jobPartCrewStatusId;
             updatedCrew.jobPartCrewStatusColour = res.data.jobPartCrewStatusColour;
+
+            Swal.fire({
+              title: 'Successfully saved',
+              icon: 'success',
+              toast: true,
+              position: "top-right",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            })
           }
         }
       })

@@ -39,9 +39,15 @@
                         <div>
                           <i class="fa-solid fa-car me-2 txt-primary f-20"></i>
                         </div>
-                        <div>
-                          <i class="far fa-moon me-2 text-success f-20"></i>
-                        </div>
+                        @if (schedule.isNigthShiftPaid) {
+                          <div>
+                            <i class="far fa-moon me-2 text-success f-20"></i>
+                          </div>
+                        } @else if (schedule.isNightShift) {
+                          <div>
+                            <i class="far fa-moon me-2 f-20"></i>
+                          </div>
+                        }
                       </div>
 
                       <div class="additional-info">
@@ -97,7 +103,8 @@
                 <div class="list-wrapper col-5">
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
-                      <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}" (click)="openCrewsPanel(crew)">
+                      <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"
+                          (click)="openCrewsPanel(crew)">
                         @if (crew.isActive) {
                           <div class="status"
                                [style.background-color]="crew.jobPartCrewStatusColour"
@@ -224,7 +231,7 @@
       </div>
 
       <div class="open-crew-panel pointer" (click)="openCrewsPanel()">
-        <i class="fa-solid fa-user-group f-20"></i>
+        <i class="fas fa-list f-20"></i>
       </div>
     </div>
   }
