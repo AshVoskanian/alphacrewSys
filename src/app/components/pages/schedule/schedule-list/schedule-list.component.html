@@ -5,7 +5,7 @@
 } @else {
   @for (schedule of list(); track schedule.jobPartId) {
     <app-card>
-      <div class="row g-3">
+      <div class="row g-3 position-relative card-wrapper">
         <div class="col">
           <div class="vertical-ribbon-animate">
             <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light">
@@ -99,20 +99,20 @@
                       @for (crew of schedule.crews; let i = $index; track i) {
                         <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}">
                           @if (crew.isActive) {
-                            <div class="status border"
+                            <div class="status"
                                  [style.background-color]="crew.jobPartCrewStatusColour"
                                  ngbPopover="აქ იქნება ინფორმაცია ქრუს გრაფიკზე ასევე ისტორია, ბექის სერვისი გვჭირდება"
                                  [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
                             >
                               <div class="icon">
                                 @if (crew.jobPartCrewRoleId === 1) {
-                                  <i class="fas fa-square me-2 text-success f-16"></i>
+                                  <i class="fas fa-square me-2 text-success f-14"></i>
                                 }
                                 @if (crew.jobPartCrewRoleId === 2) {
-                                  <i class="far fa-star me-2 text-success f-16"></i>
+                                  <i class="far fa-star me-2 text-success f-14"></i>
                                 }
                                 @if (crew.jobPartCrewRoleId === 4) {
-                                  <i class="fa-solid fa-flag me-2 text-success f-16"></i>
+                                  <i class="fa-solid fa-flag me-2 text-success f-14"></i>
                                 }
                               </div>
                             </div>
@@ -129,12 +129,16 @@
                               </button>
 
                               <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
-                                <button class="btn b-ln-height btn-info btn-square" ngbDropdownToggle>
-                                  <app-feather-icon [class]="'w-15'" [icon]="'loader'"></app-feather-icon>
+                                <button class="btn b-ln-height btn-info btn-square" style="width: 36px;" ngbDropdownToggle>
+                                  @if (crew.loading) {
+                                    <app-feather-icon [class]="'w-15 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                                  } @else {
+                                    <app-feather-icon [class]="'w-15'" [icon]="'settings'"></app-feather-icon>
+                                  }
                                 </button>
                                 <ul class="dropdown-menu" ngbDropdownMenu>
                                   @for (menu of menu(); track menu) {
-                                    <li (click)="menuAction(menu, crew, schedule)">
+                                    <li (click)="menuAction(menu, crew)">
                                       <a class="dropdown-item" style="display:flex; align-items: center"
                                          href="javascript:void(0)" ngbDropdownItem>
                                         <i class="{{menu.icon}} {{menu.color}} me-2"></i>
@@ -182,7 +186,7 @@
                   @if (schedule.notes || schedule.editComment) {
                     <textarea [(ngModel)]="schedule.notes" rows="4"
                               [readonly]="!schedule.editComment" style="background: #FFF7E5;"
-                              class="form-control btn-square hide-scrollbar text-warning">
+                              class="form-control btn-square hide-scrollbar text-warning f-14">
                     </textarea>
                   }
                 </div>
@@ -206,13 +210,17 @@
                   @if (schedule.crewNotes || schedule.editCrewNote) {
                     <textarea [(ngModel)]="schedule.crewNotes" rows="4"
                               [readonly]="!schedule.editCrewNote" style="background: #FFF7E5;"
-                              class="form-control btn-square hide-scrollbar text-warning">
+                              class="form-control btn-square hide-scrollbar text-warning f-14">
                     </textarea>
                   }
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="open-crew-panel pointer" (click)="openCrewsPanel()">
+          <i class="fa-solid fa-user-group f-20"></i>
         </div>
       </div>
     </app-card>
@@ -222,34 +230,5 @@
 <ng-template #loginModal let-modal>
   <app-edit></app-edit>
 </ng-template>
-
-<!--<div class="row gy-3">-->
-<!--  <div class="col-sm-6">-->
-<!--    <div class="placeholder-body">-->
-<!--      <div class="placeholder-start">-->
-<!--        <div class="square"></div>-->
-<!--      </div>-->
-<!--      <div class="placeholder-end">-->
-<!--        <div class="placeholder-line placeholder-h-17 w-25 mb-2"></div>-->
-<!--        <div class="placeholder-line"></div>-->
-<!--        <div class="placeholder-line placeholder-h-8 w-50"></div>-->
-<!--        <div class="placeholder-line w-75"></div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="col-sm-6">-->
-<!--    <div class="placeholder-body">-->
-<!--      <div class="placeholder-start">-->
-<!--        <div class="square circle"></div>-->
-<!--      </div>-->
-<!--      <div class="placeholder-end">-->
-<!--        <div class="placeholder-line placeholder-h-17 w-25 mb-2"></div>-->
-<!--        <div class="placeholder-line"></div>-->
-<!--        <div class="placeholder-line placeholder-h-8 w-50"></div>-->
-<!--        <div class="placeholder-line w-75"></div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
 
 

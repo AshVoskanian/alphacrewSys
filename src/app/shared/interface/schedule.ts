@@ -41,6 +41,7 @@ export interface JobPartCrew {
   jobPartCrewStatusColour?: string;
   regionId?: number;
   isActive?: boolean;
+  loading?: boolean;
 }
 
 export interface Vehicle {

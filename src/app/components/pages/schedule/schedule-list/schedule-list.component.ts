@@ -171,10 +171,13 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     })
   }
 
-  updateStatusOrRole(data: JobPartCrewUpdate) {
+  updateStatusOrRole(data: JobPartCrewUpdate, crew: JobPartCrew) {
     this.post<JobPartCrew>('Schedule/JobPartCrewStatusOrRoleUpdate', data)
       .subscribe({
         next: (res) => {
+          if (crew) {
+            crew.loading = false;
+          }
           if (res.errors?.errorCode) {
 
           } else {
@@ -188,9 +191,12 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       })
   }
 
-  menuAction(menu: CrewActionItem, crew: JobPartCrew, dd: Schedule) {
-    console.log(88, dd)
-    const data:JobPartCrewUpdate = {
+  menuAction(menu: CrewActionItem, crew: JobPartCrew) {
+    if (crew.loading) {
+      return;
+    }
+
+    const data: JobPartCrewUpdate = {
       jobPartCrewId: crew.jobPartCrewId,
       jobPartCrewRoleId: crew.jobPartCrewRoleId,
       jobPartCrewStatusid: crew.jobPartCrewStatusId
@@ -202,39 +208,45 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         break;
 
       case CrewAction.ASSIGN:
+        crew.loading = true;
         data.jobPartCrewStatusid = menu.id;
 
-        this.updateStatusOrRole(data);
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.NOTIFY:
+        crew.loading = true;
         data.jobPartCrewStatusid = menu.id;
 
-        this.updateStatusOrRole(data);
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.REJECT:
+        crew.loading = true;
         data.jobPartCrewStatusid = menu.id;
 
-        this.updateStatusOrRole(data);
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.MARK_AS_CREW_CHIEF:
+        crew.loading = true;
         data.jobPartCrewRoleId = menu.id;
 
-        this.updateStatusOrRole(data);
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.MARK_AS_TEAM_LEADER:
+        crew.loading = true;
         data.jobPartCrewRoleId = menu.id;
 
-        this.updateStatusOrRole(data);
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.CONFIRM:
+        crew.loading = true;
         data.jobPartCrewStatusid = menu.id;
 
-        this.updateStatusOrRole(data);
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.TURN_DOWN:
