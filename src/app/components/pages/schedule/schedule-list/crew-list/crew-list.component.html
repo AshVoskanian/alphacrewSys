@@ -1,5 +1,4 @@
-<div class="offcanvas-header p-0 p-t-10 m-b-20">
-  <h5 class="offcanvas-title" id="offcanvasRightLabel">{{ title }}</h5>
+<div class="offcanvas-header p-0 p-t-10">
   <button class="btn-close" type="button" (click)="closeOffcanvas()"></button>
 </div>
 
@@ -28,8 +27,8 @@
   </div>
 
   <app-card>
-    <div style="padding-left: 23px; padding-right: 12px;">
-      <div class="common-flex justify-content-between">
+    <div style="padding: 0 12px">
+      <div class="common-flex justify-content-between align-items-center">
         <ng-template #popoverContentAll>
           <ul class="list-group">
             <li class="list-group-item border-bottom pointer">
@@ -48,10 +47,28 @@
                  type="checkbox" [(ngModel)]="allAreSelected" (change)="selectAll()">
           All
         </label>
-        <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
-           [ngbPopover]="popoverContentAll"
-           [popoverTitle]="'Contact'"
-        ></i>
+
+        <div class="common-flex align-items-center">
+          <div class="btn-group m-r-10" role="group">
+            <button class="btn button-light-success dropdown-toggle"
+                    type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false" (click)="showBtnOptions = !showBtnOptions">
+              Save
+            </button>
+            <ul class="dropdown-menu" [class.show]="showBtnOptions">
+              <li>
+                <a class="dropdown-item" href="javascript:void(0)" (click)="saveCrew('current')">Save Current</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="javascript:void(0)" (click)="saveCrew('all')">Save</a>
+              </li>
+            </ul>
+          </div>
+          <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
+             [ngbPopover]="popoverContentAll"
+             [popoverTitle]="'Contact'"
+          ></i>
+        </div>
       </div>
     </div>
   </app-card>

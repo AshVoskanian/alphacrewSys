@@ -16,7 +16,7 @@ export class ModeComponent {
 
   constructor(private layout: LayoutService){
     this.dark = this.layout.config.settings.layout_version == 'dark-only' ? true : false;
-    
+
     if(this.layoutVersion != null){
       this.layout.config.settings.layout_version = this.layoutVersion;
       document.body.classList.add(this.layout.config.settings.layout_version);
@@ -34,5 +34,5 @@ export class ModeComponent {
     }
     localStorage.setItem('layout_version',this.layout.config.settings.layout_version);
   }
-  
+
 }

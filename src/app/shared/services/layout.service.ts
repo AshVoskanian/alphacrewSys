@@ -14,7 +14,7 @@ export class LayoutService {
     settings: {
       layout_type: 'ltr',
       layout_version: 'light-only',
-      sidebar_type: 'compact-wrapper',
+      sidebar_type: 'horizontal-wrapper enterprice-type advance-layout',
       icon: "stroke-svg",
       layout: ''
     },

@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { Crew, CrewActionItem, JobPartCrew, JobPartCrewUpdate, Schedule } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
@@ -9,7 +9,8 @@ import {
   NgbAlertModule,
   NgbDropdownModule,
   NgbModal,
-  NgbOffcanvas, NgbOffcanvasRef,
+  NgbOffcanvas,
+  NgbOffcanvasRef,
   NgbPopoverModule,
   NgbTooltipModule
 } from "@ng-bootstrap/ng-bootstrap";
@@ -19,7 +20,8 @@ import { GeneralService } from "../../../../shared/services/general.service";
 import { CrewListComponent } from "./crew-list/crew-list.component";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CrewAction } from "../../../../shared/interface/enums/schedule";
-import Swal, { SweetAlertPosition } from 'sweetalert2';
+import { ScheduleService } from "../schedule.service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-schedule-list',
@@ -30,14 +32,18 @@ import Swal, { SweetAlertPosition } from 'sweetalert2';
   styleUrl: './schedule-list.component.scss'
 })
 export class ScheduleListComponent extends ApiBase implements OnInit {
+  private _dr = inject(DestroyRef);
   private _modal = inject(NgbModal);
   private _offCanvasService = inject(NgbOffcanvas);
+  private _scheduleService = inject(ScheduleService);
 
   private offcanvasRef?: NgbOffcanvasRef;
-  private position: SweetAlertPosition;
 
-  loading = input<boolean>(false);
   list = input<Array<Schedule>>([]);
+  loading = input<boolean>(false);
+
+  selectedSchedule: Schedule;
+
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
 
   menu: WritableSignal<Array<CrewActionItem>> = signal([
@@ -118,10 +124,48 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       color: 'text-success',
       icon: 'fa-solid fa-retweet f-18'
     }
-  ])
+  ]);
+
+
+  crewNoteLoader: boolean = false;
+  jobNoteLoader: boolean = false;
 
   ngOnInit() {
     this.getCrewList();
+    this.checkIfCrewUpdate();
+  }
+
+  checkIfCrewUpdate() {
+    this._scheduleService.crewUpdate$
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            this.selectedSchedule.crews = this.selectedSchedule.crews.map(crew => {
+              return this.fillCrewFromNewlyAddedCrew(
+                this.selectedSchedule.crews,
+                res
+              )
+            })
+
+            console.log(this.fillCrewFromNewlyAddedCrew(
+              this.selectedSchedule.crews,
+              res
+            ))
+          }
+        }
+      })
+  }
+
+  fillCrewFromNewlyAddedCrew(crew: any, newlyAddedCrew: any): any {
+    crew.jobPartCrewRoleId = newlyAddedCrew.jobPartCrewRoleId;
+    crew.jobPartCrewStatusId = newlyAddedCrew.jobPartCrewStatusId;
+    crew.jobPartCrewStatusColour = newlyAddedCrew.jobPartCrewStatusColour;
+    crew.name = newlyAddedCrew.name ?? crew.name;
+    crew.regionId = newlyAddedCrew.regionId ?? crew.regionId;
+    crew.isActive = true;
+
+    return crew;
   }
 
   openModal(value: TemplateRef<NgbModal>) {
@@ -148,12 +192,59 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   saveNote(schedule: Schedule, type: 'comment' | 'crewNote') {
     if (type === 'comment') {
-      schedule.editComment = false;
+      this.updatePartNote(schedule);
     }
 
     if (type === 'crewNote') {
-      schedule.editCrewNote = false;
+      this.updateCrewNote(schedule);
     }
+  }
+
+  updatePartNote(schedule: Schedule) {
+    if (this.jobNoteLoader) return;
+
+    this.jobNoteLoader = true;
+
+    const data = {
+      jobPartId: schedule.jobPartId,
+      notes: schedule.notes
+    }
+
+    this.post('Schedule/updatejobpartnotes', data).subscribe({
+      next: (res) => {
+        this.jobNoteLoader = false;
+
+        if (res.errors?.errorCode) {
+
+        } else {
+          schedule.editComment = false;
+          GeneralService.showSuccessMessage();
+        }
+      }
+    })
+  }
+
+  updateCrewNote(schedule: Schedule) {
+    if (this.crewNoteLoader) return;
+
+    this.crewNoteLoader = true;
+
+    const data = {
+      jobPartId: schedule.jobPartId,
+      notes: schedule.crewNotes
+    }
+    this.post('Schedule/updatejobpartcrewnotes', data).subscribe({
+      next: (res) => {
+        this.crewNoteLoader = false;
+
+        if (res.errors?.errorCode) {
+
+        } else {
+          schedule.editCrewNote = false;
+          GeneralService.showSuccessMessage();
+        }
+      }
+    })
   }
 
   openCrewsPanel(crew?: JobPartCrew) {
@@ -198,20 +289,40 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             updatedCrew.jobPartCrewRoleId = res.data.jobPartCrewRoleId;
             updatedCrew.jobPartCrewStatusId = res.data.jobPartCrewStatusId;
             updatedCrew.jobPartCrewStatusColour = res.data.jobPartCrewStatusColour;
-
-            Swal.fire({
-              title: 'Successfully saved',
-              icon: 'success',
-              toast: true,
-              position: "top-right",
-              showConfirmButton: false,
-              timer: 2000,
-              timerProgressBar: true,
-            })
+            GeneralService.showSuccessMessage();
           }
         }
       })
   }
+
+  removeCrew(crew: JobPartCrew) {
+    const data = {
+      jobPartId: this.selectedSchedule.jobPartId,
+      crewId: crew.crewId
+    }
+    this.post<any>('Schedule/removeJobPartCrew', data)
+      .subscribe({
+        next: (res) => {
+          if (crew) {
+            crew.loading = false;
+          }
+          if (res.errors?.errorCode) {
+
+          } else {
+            this.selectedSchedule.crews = this.selectedSchedule.crews.map((crew, index) =>
+              crew.jobPartCrewId === res.data
+                ? {
+                  ...crew,
+                  isActive: false
+                }
+                : crew
+            );
+
+          }
+        }
+      })
+  }
+
 
   menuAction(menu: CrewActionItem, crew: JobPartCrew) {
     if (crew.loading) {
@@ -275,7 +386,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         break;
 
       case CrewAction.REMOVE:
-        // TODO: handle REMOVE
+        crew.loading = true;
+        this.removeCrew(crew);
         break;
 
       case CrewAction.MARK_AS_NO_SHOW:
@@ -290,5 +402,11 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         console.warn('Unhandled action:', menu.action);
         break;
     }
+  }
+
+  selectSchedule(schedule: Schedule) {
+    this.selectedSchedule = schedule;
+    this._scheduleService.selectedShift$.next(this.selectedSchedule);
+    console.log(9999, this.selectedSchedule)
   }
 }

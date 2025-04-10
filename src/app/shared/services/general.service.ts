@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
+import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: 'root'
@@ -7,6 +8,18 @@ import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
 export class GeneralService {
 
   constructor() {
+  }
+
+  public static   showSuccessMessage() {
+    Swal.fire({
+      title: 'Successfully saved',
+      icon: 'success',
+      toast: true,
+      position: "top-right",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    })
   }
 
   public static convertToDate(date: NgbDateStruct): Date {

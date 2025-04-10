@@ -1,10 +1,13 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveOffcanvas, NgbPopoverModule } from "@ng-bootstrap/ng-bootstrap";
-import { Crew } from "../../../../../shared/interface/schedule";
+import { Crew, JobPartCrew, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
 import { FormGroup, FormsModule } from "@angular/forms";
+import { ApiBase } from "../../../../../shared/bases/api-base";
+import { ScheduleService } from "../../schedule.service";
+import { GeneralService } from "../../../../../shared/services/general.service";
 
 @Component({
   selector: 'app-crew-list',
@@ -16,8 +19,9 @@ import { FormGroup, FormsModule } from "@angular/forms";
   templateUrl: './crew-list.component.html',
   styleUrl: './crew-list.component.scss'
 })
-export class CrewListComponent implements OnInit {
+export class CrewListComponent extends ApiBase implements OnInit {
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
+  private _scheduleService = inject(ScheduleService);
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
 
   @Input() title: string;
@@ -26,6 +30,8 @@ export class CrewListComponent implements OnInit {
   form: FormGroup;
 
   allAreSelected: boolean = false;
+  showBtnOptions: boolean = false;
+  selectedSchedule: Schedule | null;
 
   regions = [
     { id: 1, title: 'Lon', class: 'primary', checked: true },
@@ -53,19 +59,49 @@ export class CrewListComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.getSelectedSchedule();
+  }
+
+  getSelectedSchedule(): void {
+    this._scheduleService.selectedShift$.subscribe((schedule: Schedule | null) => {
+      if (!schedule) return;
+
+      this.selectedSchedule = schedule;
+
+      const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
+      const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
+
+      // Check existing crews
+      this.crewList.forEach(crew => {
+        crew.isChecked = selectedCrewIds.has(crew.crewId);
+      });
+
+      // Check existing crew level filters
+      this.levels.forEach(level => {
+      })
+
+      // Check existing crew region filters
+      this.regions.forEach(region => {
+        region.checked = selectedCrewRegionIds.has(region.id);
+      })
+    });
   }
 
   closeOffcanvas() {
     this._offcanvasService.close()
   }
 
-  getSelectedData(type: 'regions' | 'levels'): Array<number> {
+  getSelectedData(type: 'regions' | 'levels' | 'crew'): Array<number> {
     if (type === 'regions') {
       return this.regions.filter(it => it.checked).map(it => it.id);
     }
 
     if (type === 'levels') {
       return this.levels.filter(it => it.checked).map(it => it.id);
+    }
+
+    if (type === 'crew') {
+      return this.crewList.filter(it => it.isChecked).map(it => it.crewId);
     }
 
     return [];
@@ -88,5 +124,34 @@ export class CrewListComponent implements OnInit {
       this.getSelectedData('levels')
     )
     this.allAreSelected = this.areAllChecked(transformedCrew);
+  }
+
+  saveCrew(type: 'current' | 'all') {
+    this.showBtnOptions = false;
+
+    if (type === 'current') {
+      this.addCrewToShift();
+    }
+
+    if (type === 'all') {
+
+    }
+  }
+
+  addCrewToShift() {
+    const data = {
+      jobPartId: this.selectedSchedule?.jobPartId,
+      crewId: this.getSelectedData('crew')
+    }
+    this.post<Array<JobPartCrew>>('Schedule/updatejobpartcrew', data).subscribe({
+      next: (res) => {
+        if (res.errors?.errorCode) {
+
+        } else {
+          this._scheduleService.crewUpdate$.next(res.data);
+          GeneralService.showSuccessMessage();
+        }
+      }
+    })
   }
 }

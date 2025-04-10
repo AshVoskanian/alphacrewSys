@@ -4,7 +4,7 @@
   </div>
 } @else {
   @for (schedule of list(); track schedule.jobPartId) {
-    <div class="row g-3 position-relative card-wrapper">
+    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)">
       <div class="col">
         <div class="vertical-ribbon-animate">
           <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"
@@ -113,13 +113,13 @@
                           >
                             <div class="icon">
                               @if (crew.jobPartCrewRoleId === 1) {
-                                <i class="fas fa-square me-2 text-success f-14"></i>
+                                <i class="fas fa-square me-2 text-white f-14"></i>
                               }
                               @if (crew.jobPartCrewRoleId === 2) {
-                                <i class="far fa-star me-2 text-success f-14"></i>
+                                <i class="far fa-solid fa-star me-2 text-white f-14"></i>
                               }
                               @if (crew.jobPartCrewRoleId === 4) {
-                                <i class="fa-solid fa-flag me-2 text-success f-14"></i>
+                                <i class="fa-solid fa-flag me-2 text-white f-14"></i>
                               }
                             </div>
                           </div>
@@ -181,12 +181,16 @@
                   Job Part Comments:
                   @if (schedule.notes || schedule.editComment) {
                     <span class="pointer">
-                       @if (!schedule.editComment) {
-                         <i (click)="edit(schedule, 'comment')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
-                       } @else {
-                         <i (click)="saveNote(schedule, 'comment')"
-                            class="fa-solid fa-check me-2 text-success f-16"></i>
-                       }
+                      @if (!jobNoteLoader) {
+                        @if (!schedule.editComment) {
+                          <i (click)="edit(schedule, 'comment')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
+                        } @else {
+                          <i (click)="saveNote(schedule, 'comment')"
+                             class="fa-solid fa-check me-2 text-success f-16"></i>
+                        }
+                      } @else {
+                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
+                      }
                       </span>
                   } @else {
                     <span class="pointer"><i (click)="edit(schedule, 'comment')"
@@ -206,12 +210,16 @@
                   Crew Notes:
                   @if (schedule.crewNotes || schedule.editCrewNote) {
                     <span class="pointer">
-                       @if (!schedule.editCrewNote) {
-                         <i (click)="edit(schedule, 'crewNote')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
-                       } @else {
-                         <i (click)="saveNote(schedule, 'crewNote')"
-                            class="fa-solid fa-check me-2 text-success f-16"></i>
-                       }
+                      @if (!crewNoteLoader) {
+                        @if (!schedule.editCrewNote) {
+                          <i (click)="edit(schedule, 'crewNote')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
+                        } @else {
+                          <i (click)="saveNote(schedule, 'crewNote')"
+                             class="fa-solid fa-check me-2 text-success f-16"></i>
+                        }
+                      } @else {
+                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
+                      }
                       </span>
                   } @else {
                     <span class="pointer"><i (click)="edit(schedule, 'crewNote')"
