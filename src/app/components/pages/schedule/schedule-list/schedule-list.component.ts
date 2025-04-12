@@ -139,33 +139,25 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._scheduleService.crewUpdate$
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
-        next: (res) => {
+        next: (res: Array<JobPartCrew> | null) => {
           if (res) {
-            this.selectedSchedule.crews = this.selectedSchedule.crews.map(crew => {
-              return this.fillCrewFromNewlyAddedCrew(
-                this.selectedSchedule.crews,
-                res
-              )
-            })
-
-            console.log(this.fillCrewFromNewlyAddedCrew(
-              this.selectedSchedule.crews,
-              res
-            ))
+            this.selectedSchedule.crews = res;
+            this.fillArray(this.selectedSchedule.crews, this.selectedSchedule.crewNumber);
           }
         }
       })
   }
 
-  fillCrewFromNewlyAddedCrew(crew: any, newlyAddedCrew: any): any {
-    crew.jobPartCrewRoleId = newlyAddedCrew.jobPartCrewRoleId;
-    crew.jobPartCrewStatusId = newlyAddedCrew.jobPartCrewStatusId;
-    crew.jobPartCrewStatusColour = newlyAddedCrew.jobPartCrewStatusColour;
-    crew.name = newlyAddedCrew.name ?? crew.name;
-    crew.regionId = newlyAddedCrew.regionId ?? crew.regionId;
-    crew.isActive = true;
+  fillArray(arr: Array<JobPartCrew>, length: number): void {
+    arr.forEach(item => item.isActive = true);
 
-    return crew;
+    while (arr.length < length) {
+      arr.push({
+        name: '',
+        crewId: undefined,
+        isActive: false
+      });
+    }
   }
 
   openModal(value: TemplateRef<NgbModal>) {
@@ -313,11 +305,13 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
               crew.jobPartCrewId === res.data
                 ? {
                   ...crew,
-                  isActive: false
+                  isActive: false,
+                  crewId: undefined,
+                  name: ''
                 }
                 : crew
             );
-
+            this.selectSchedule(this.selectedSchedule);
           }
         }
       })
@@ -407,6 +401,5 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   selectSchedule(schedule: Schedule) {
     this.selectedSchedule = schedule;
     this._scheduleService.selectedShift$.next(this.selectedSchedule);
-    console.log(9999, this.selectedSchedule)
   }
 }

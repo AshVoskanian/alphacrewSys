@@ -34,7 +34,7 @@ export interface Schedule {
 
 export interface JobPartCrew {
   jobId?: number;
-  crewId?: number;
+  crewId?: number | unknown;
   jobPartCrewId?: number;
   jobPartCrewRoleId?: number;
   jobPartCrewStatusId?: number;
@@ -42,6 +42,7 @@ export interface JobPartCrew {
   name?: string;
   jobPartCrewStatusColour?: string;
   regionId?: number;
+  levelId?: number;
   isActive?: boolean;
   loading?: boolean;
 }

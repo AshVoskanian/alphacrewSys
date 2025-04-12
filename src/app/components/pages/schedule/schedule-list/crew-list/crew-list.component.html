@@ -51,8 +51,12 @@
         <div class="common-flex align-items-center">
           <div class="btn-group m-r-10" role="group">
             <button class="btn button-light-success dropdown-toggle"
+                    [disabled]="showLimitError"
                     type="button" data-bs-toggle="dropdown"
                     aria-expanded="false" (click)="showBtnOptions = !showBtnOptions">
+              @if (loading) {
+                <i class="fas fa-spin m-r-10 fa-spinner me-2 text-success f-16"></i>
+              }
               Save
             </button>
             <ul class="dropdown-menu" [class.show]="showBtnOptions">
@@ -76,7 +80,9 @@
   <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
     @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'); track crew.crewId) {
       <li class="common-flex justify-content-between align-items-center list-group-item border-bottom">
-        <i class="fa-solid fa-tag position-absolute" style="left: 4px; top: 4px"></i>
+        @if (crew.jobNotes) {
+          <i class="fa-solid fa-tag position-absolute" style="left: 4px; top: 4px" [ngbTooltip]="crew.jobNotes"></i>
+        }
         <div>
           <a href="javascript:void(0)" class="badge badge-primary rounded-circle badge-p-space m-r-10">1</a>
           <span class="m-r-10">({{ crew.levelShortText }})</span>
@@ -103,6 +109,8 @@
             </ul>
           </ng-template>
 
+          <span class="badge badge-info rounded-pill">{{ crew.skills }}</span>
+
           @if (!crew.isFulltime) {
             <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-r-10">PT</a>
           }
@@ -115,4 +123,10 @@
     }
   </ul>
 </form>
+
+@if (showLimitError) {
+  <h6 class="text-danger m-t-20 shake text-center w-100">
+    The maximum number of crews must be {{ selectedSchedule?.crewNumber }}
+  </h6>
+}
 

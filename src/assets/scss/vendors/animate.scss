@@ -1403,7 +1403,8 @@
 }
 
 .shake {
-  animation-name: shake;
+  animation: shake;
+  animation-duration: 600ms;
 }
 
 .headShake {

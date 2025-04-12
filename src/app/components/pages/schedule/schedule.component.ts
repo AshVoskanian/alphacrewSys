@@ -105,7 +105,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     while (arr.length < length) {
       arr.push({
         name: '',
-        crewId: arr.length + 1,
+        crewId: undefined,
         isActive: false
       });
     }

@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { NgbActiveOffcanvas, NgbPopoverModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbActiveOffcanvas, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import { Crew, JobPartCrew, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
@@ -13,7 +13,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
   selector: 'app-crew-list',
   imports: [
     SvgIconComponent, CardComponent, CrewFilterPipe,
-    FormsModule, NgbPopoverModule
+    FormsModule, NgbPopoverModule, NgbTooltipModule
   ],
   providers: [ CrewFilterPipe ],
   templateUrl: './crew-list.component.html',
@@ -31,6 +31,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   allAreSelected: boolean = false;
   showBtnOptions: boolean = false;
+  showLimitError: boolean | undefined = false;
+  loading: boolean = false;
   selectedSchedule: Schedule | null;
 
   regions = [
@@ -70,6 +72,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
       const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
       const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
+      const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelId));
 
       // Check existing crews
       this.crewList.forEach(crew => {
@@ -78,12 +81,21 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
       // Check existing crew level filters
       this.levels.forEach(level => {
+        level.checked = selectedCrewLevelIds.has(level.id);
       })
 
       // Check existing crew region filters
       this.regions.forEach(region => {
         region.checked = selectedCrewRegionIds.has(region.id);
       })
+
+      if (!this.levels.some(it => it.checked)) {
+        this.levels[0].checked = true;
+      }
+
+      if (!this.regions.some(it => it.checked)) {
+        this.regions[0].checked = true;
+      }
     });
   }
 
@@ -115,15 +127,17 @@ export class CrewListComponent extends ApiBase implements OnInit {
     return !crew.some(it => !it.isChecked);
   }
 
-  crewSelect(crew: Crew) {
+  crewSelect(crew: Crew): void {
     crew.isChecked = !crew.isChecked;
 
-    const transformedCrew = this._filterPipe.transform(
-      this.crewList,
-      this.getSelectedData('regions'),
-      this.getSelectedData('levels')
-    )
-    this.allAreSelected = this.areAllChecked(transformedCrew);
+    const selectedRegions = this.getSelectedData('regions');
+    const selectedLevels = this.getSelectedData('levels');
+
+    const filteredCrew = this._filterPipe.transform(this.crewList, selectedRegions, selectedLevels);
+    this.allAreSelected = this.areAllChecked(filteredCrew);
+
+    const selectedCount = this.crewList.filter(it => it.isChecked).length;
+    this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
   }
 
   saveCrew(type: 'current' | 'all') {
@@ -139,12 +153,16 @@ export class CrewListComponent extends ApiBase implements OnInit {
   }
 
   addCrewToShift() {
+    if (this.loading) return;
+    this.loading = true;
+
     const data = {
       jobPartId: this.selectedSchedule?.jobPartId,
       crewId: this.getSelectedData('crew')
     }
     this.post<Array<JobPartCrew>>('Schedule/updatejobpartcrew', data).subscribe({
       next: (res) => {
+        this.loading = false;
         if (res.errors?.errorCode) {
 
         } else {
