@@ -81,7 +81,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
 
     const params = {
       date: GeneralService.convertToDate(date),
-      days: 7
+      days: 7,
+      jobId: 54580
     }
 
     this.post<Array<Schedule>>('schedule/getschedule', params)

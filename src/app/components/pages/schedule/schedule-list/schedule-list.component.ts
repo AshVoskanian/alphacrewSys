@@ -111,7 +111,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       icon: 'fas fa-times f-18'
     },
     {
-      id: 2,
+      id: 6,
       text: 'No Show',
       action: CrewAction.MARK_AS_NO_SHOW,
       color: 'text-success',
@@ -324,9 +324,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     }
 
     const data: JobPartCrewUpdate = {
-      jobPartCrewId: crew.jobPartCrewId,
-      jobPartCrewRoleId: crew.jobPartCrewRoleId,
-      jobPartCrewStatusid: crew.jobPartCrewStatusId
+      jobPartCrewId: crew.jobPartCrewId
     }
 
     switch (menu.action) {
@@ -385,7 +383,10 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         break;
 
       case CrewAction.MARK_AS_NO_SHOW:
-        // TODO: handle MARK_AS_NO_SHOW
+        crew.loading = true;
+        data.jobPartCrewStatusid = menu.id;
+
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.CHANGE:

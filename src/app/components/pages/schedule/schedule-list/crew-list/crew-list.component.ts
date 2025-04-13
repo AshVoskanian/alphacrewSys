@@ -121,6 +121,9 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   selectAll() {
     this.crewList.forEach(it => it.isChecked = this.allAreSelected);
+
+    const selectedCount = this.crewList.filter(it => it.isChecked).length;
+    this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
   }
 
   areAllChecked(crew: Array<Crew>): boolean {
