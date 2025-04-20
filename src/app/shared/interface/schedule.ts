@@ -20,6 +20,7 @@ export interface Schedule {
   jobPartTypeId: number;
   jobPartVenueName: string;
   jobRegionId: number;
+  ootCost: number;
   notes: string;
   onsiteContact: string;
   postCode: string | null;

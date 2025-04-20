@@ -133,6 +133,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   ngOnInit() {
     this.getCrewList();
     this.checkIfCrewUpdate();
+    this.getCrewInfo();
   }
 
   checkIfCrewUpdate() {
@@ -161,7 +162,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   openModal(value: TemplateRef<NgbModal>) {
-    this._modal.open(value, { centered: true })
+    this._modal.open(value, { centered: true, size: 'xl' })
   }
 
   closeModal() {
@@ -264,6 +265,19 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         this.crewList.set(res.data);
       }
     })
+  }
+
+  getCrewInfo() {
+    this.get<Array<Crew>>('schedule/getjobpartcrewforedit', {jobPartCrewwId: 646377})
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+
+          } else {
+            console.log(res)
+          }
+        }
+      })
   }
 
   updateStatusOrRole(data: JobPartCrewUpdate, crew: JobPartCrew) {

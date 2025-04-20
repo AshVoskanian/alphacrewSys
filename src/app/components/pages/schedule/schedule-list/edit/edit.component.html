@@ -1,25 +1,125 @@
 <div class="modal-content">
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
-      <h3>Edit shift</h3>
-      <p class="f-light">Fill in your information below to continue.</p>
-      <form class="row g-3">
-        <div class="col-md-12">
-          <label class="form-label" for="inputEmailEnter">Email</label>
-          <input class="form-control" id="inputEmailEnter" type="email" placeholder="Enter Your Email">
-        </div>
-        <div class="col-md-12">
-          <label class="form-label" for="inputPasswordEnter">Password</label>
-          <input class="form-control" id="inputPasswordEnter" type="password" placeholder="Enter Your Password">
-        </div>
-        <div class="col-12">
-          <div class="form-check">
-            <input class="form-check-input checkbox-primary" id="checkout" type="checkbox">
-            <label class="form-check-label" for="checkout">Check me out</label>
+      <form>
+        <div class="common-flex justify-content-between align-items-center m-b-10">
+          <h6 class="text-primary">(L4) Adam Taylor N13 4JY</h6>
+
+          <div class="common-flex align-items-center gap-3">
+            <h2 class="text-success">Pay: $133.00</h2>
+            <button class="btn-close py-0 float-end" type="button" (click)="closeModal()"></button>
           </div>
         </div>
-        <div class="col-12">
-          <button class="btn btn-primary" type="submit" data-bs-dismiss="modal">Save </button>
+
+        <div class="row g-3">
+          <div class="col-5">
+            <div class="row g-3">
+              <div class="col w-1-5 align-self-center">
+                <label class="form-label">
+                  Expenses
+                  <input class="form-control" type="text">
+                </label>
+              </div>
+              <div class="col w-1-5">
+                <label class="form-label">
+                  Extra Hours
+                  <input class="form-control" type="text">
+                </label>
+              </div>
+            </div>
+            <div class="row g-3">
+              <div class="col w-1-5">
+                <label class="form-label">
+                  Adjustment
+                  <input class="form-control" type="text">
+                  <input class="form-control" type="text" placeholder="Adjustment text">
+                </label>
+              </div>
+              <div class="col w-1-5">
+                <label class="form-label">
+                  Skills
+                  <input class="form-control" type="text">
+                </label>
+                <label class="form-label">
+                  Last Minute Bonus
+                  <input class="form-control" type="text">
+                </label>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col w-1-5">
+                <label class="form-label w-100">
+                  Status
+                  <select2 [data]="selectState" formControlName="state" [templates]="template" placeholder="Choose..">
+                    <ng-template #template let-item="label">
+                      {{ item }}
+                    </ng-template>
+                  </select2>
+                </label>
+              </div>
+              <div class="col w-1-5">
+                <label class="form-label w-100">
+                  Role
+                  <select2 [data]="selectState" formControlName="state" [templates]="template" placeholder="Choose..">
+                    <ng-template #template let-item="label">
+                      {{ item }}
+                    </ng-template>
+                  </select2>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-7 right">
+            <div class="row g-3">
+              <div class="col-4">
+                <p class="text-nowrap text-primary">Late Night Shift: $12.00</p>
+                <p class="text-nowrap text-primary">Out of Town: $12.00</p>
+              </div>
+              <div class="col-4">
+                <p class="text-nowrap text-primary">Travel: $12.00</p>
+                <p class="text-nowrap text-primary">Bonus: $12.00</p>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col justify-content-between common-flex">
+                <button class="btn btn-primary w-1-5">
+                  Apply Bonus
+                </button>
+
+                <button class="btn btn-primary w-1-5">
+                  Remove Bonus
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="main-divider">
+          <div class="divider-body divider-body-1 divider-primary">
+            <div class="divider-p-primary }}">
+              <i class="fa-solid fa-comments me-2 txt-primary f-20"></i>
+              <span class="txt-primary">Skills</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-cols-6">
+          @for (item of filledCheckbox; track item) {
+            <div class="col form-check checkbox checkbox-{{ item.class }}">
+              <input class="form-check-input" [id]="item.id" type="checkbox" [checked]="item.value">
+              <label class="form-check-label user-select-none" [for]="item.id">{{ item.text }}</label>
+            </div>
+          }
+        </div>
+
+        <div class="row m-t-20">
+          <div class="col justify-content-end">
+            <button class="btn btn-primary float-end">
+              Save
+            </button>
+          </div>
         </div>
       </form>
     </div>

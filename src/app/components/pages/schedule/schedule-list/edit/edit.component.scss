@@ -1,0 +1,30 @@
+.modal-content {
+  .modal-body {
+    .modal-toggle-wrapper {
+      form {
+        display: flex;
+        flex-direction: column;
+
+        .row {
+          .col-7 {
+            &.right {
+              display: flex;
+              flex-direction: column;
+              gap: 24px;
+            }
+          }
+
+          .w-1-5 {
+            flex: 0 0 49%;
+
+            label {
+              input:nth-child(2) {
+                margin-top: 25px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
