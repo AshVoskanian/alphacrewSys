@@ -1,13 +1,17 @@
 <div class="modal-content">
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
-      <form>
+      <form [formGroup]="form">
         <div class="common-flex justify-content-between align-items-center m-b-10">
-          <h6 class="text-primary">(L4) Adam Taylor N13 4JY</h6>
+          <h6 class="text-primary">
+            ({{ crewInfo?.levelShortText }})
+            {{ crewInfo?.name }},
+            {{ crewInfo?.postcode }}
+          </h6>
 
           <div class="common-flex align-items-center gap-3">
-            <h2 class="text-success">Pay: $133.00</h2>
-            <button class="btn-close py-0 float-end" type="button" (click)="closeModal()"></button>
+            <h2 class="text-success">Pay: £{{ crewInfo?.pay }}</h2>
+            <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(true)"></button>
           </div>
         </div>
 
@@ -17,13 +21,13 @@
               <div class="col w-1-5 align-self-center">
                 <label class="form-label">
                   Expenses
-                  <input class="form-control" type="text">
+                  <input class="form-control" formControlName="expences" type="text">
                 </label>
               </div>
               <div class="col w-1-5">
                 <label class="form-label">
                   Extra Hours
-                  <input class="form-control" type="text">
+                  <input class="form-control" formControlName="extraHours" type="text">
                 </label>
               </div>
             </div>
@@ -31,18 +35,19 @@
               <div class="col w-1-5">
                 <label class="form-label">
                   Adjustment
-                  <input class="form-control" type="text">
-                  <input class="form-control" type="text" placeholder="Adjustment text">
+                  <input class="form-control" formControlName="otherPaymentAdjustment" type="text">
+                  <input class="form-control" formControlName="otherPaymentAdjustmentTxt" type="text"
+                         placeholder="Adjustment text">
                 </label>
               </div>
               <div class="col w-1-5">
                 <label class="form-label">
                   Skills
-                  <input class="form-control" type="text">
+                  <input class="form-control" formControlName="skilledCost" type="text">
                 </label>
                 <label class="form-label">
                   Last Minute Bonus
-                  <input class="form-control" type="text">
+                  <input class="form-control" formControlName="lastMinuteBonus" type="text">
                 </label>
               </div>
             </div>
@@ -51,7 +56,8 @@
               <div class="col w-1-5">
                 <label class="form-label w-100">
                   Status
-                  <select2 [data]="selectState" formControlName="state" [templates]="template" placeholder="Choose..">
+                  <select2 [data]="statuses" formControlName="jobPartCrewStatusId" [templates]="template"
+                           placeholder="Choose..">
                     <ng-template #template let-item="label">
                       {{ item }}
                     </ng-template>
@@ -61,7 +67,8 @@
               <div class="col w-1-5">
                 <label class="form-label w-100">
                   Role
-                  <select2 [data]="selectState" formControlName="state" [templates]="template" placeholder="Choose..">
+                  <select2 [data]="roles" formControlName="jobPartCrewRoleId" [templates]="template"
+                           placeholder="Choose..">
                     <ng-template #template let-item="label">
                       {{ item }}
                     </ng-template>
@@ -73,12 +80,12 @@
           <div class="col-7 right">
             <div class="row g-3">
               <div class="col-4">
-                <p class="text-nowrap text-primary">Late Night Shift: $12.00</p>
-                <p class="text-nowrap text-primary">Out of Town: $12.00</p>
+                <p class="text-nowrap text-primary">Late Night Shift: £{{ lateNightShift | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary">Out of Town: £{{ oot | number:'1.2-2' }}</p>
               </div>
               <div class="col-4">
-                <p class="text-nowrap text-primary">Travel: $12.00</p>
-                <p class="text-nowrap text-primary">Bonus: $12.00</p>
+                <p class="text-nowrap text-primary">Travel: £{{ travel | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary">Bonus: £{{ (crewInfo.bonus || 0) | number:'1.2-2' }}</p>
               </div>
             </div>
 

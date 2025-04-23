@@ -133,8 +133,13 @@
                         @if (crew.isActive) {
                           <div class="buttons">
                             <button class="btn b-ln-height btn-primary btn-square" [ngbTooltip]="'Edit'"
-                                    (click)="openModal(loginModal)">
-                              <app-feather-icon [class]="'w-15'" [icon]="'edit'"></app-feather-icon>
+                                    (click)="getCrewInfo(crew)">
+                              @if (crew.editLoading) {
+                                <app-feather-icon [class]="'w-15 text-white spin'"
+                                                  [icon]="'loader'"></app-feather-icon>
+                              } @else {
+                                <app-feather-icon [class]="'w-15'" [icon]="'edit'"></app-feather-icon>
+                              }
                             </button>
 
                             <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
@@ -248,7 +253,7 @@
 }
 
 <ng-template #loginModal let-modal>
-  <app-edit></app-edit>
+  <app-edit [crewInfo]="crewInfo()" (closeModal)="modal.close()"></app-edit>
 </ng-template>
 
 

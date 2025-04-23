@@ -160,6 +160,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.loading = true;
 
     const data = {
+      jobId: this.selectedSchedule.jobId,
       jobPartId: this.selectedSchedule?.jobPartId,
       crewId: this.getSelectedData('crew')
     }

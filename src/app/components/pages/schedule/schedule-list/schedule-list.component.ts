@@ -1,6 +1,24 @@
-import { Component, DestroyRef, inject, input, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  input,
+  OnInit,
+  signal,
+  TemplateRef,
+  ViewChild,
+  WritableSignal
+} from '@angular/core';
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
-import { Crew, CrewActionItem, JobPartCrew, JobPartCrewUpdate, Schedule } from "../../../../shared/interface/schedule";
+import {
+  Crew,
+  CrewActionItem,
+  JobPartCrew,
+  JobPartCrewEdit,
+  JobPartCrewUpdate,
+  Schedule
+} from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { DatePipe, NgStyle } from "@angular/common";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
@@ -37,6 +55,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   private _offCanvasService = inject(NgbOffcanvas);
   private _scheduleService = inject(ScheduleService);
 
+  @ViewChild('loginModal') loginModal: any;
+
   private offcanvasRef?: NgbOffcanvasRef;
 
   list = input<Array<Schedule>>([]);
@@ -44,8 +64,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   selectedSchedule: Schedule;
 
+  crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
-
   menu: WritableSignal<Array<CrewActionItem>> = signal([
     {
       text: 'Send SMS',
@@ -133,7 +153,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   ngOnInit() {
     this.getCrewList();
     this.checkIfCrewUpdate();
-    this.getCrewInfo();
   }
 
   checkIfCrewUpdate() {
@@ -267,14 +286,18 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     })
   }
 
-  getCrewInfo() {
-    this.get<Array<Crew>>('schedule/getjobpartcrewforedit', {jobPartCrewwId: 646377})
+  getCrewInfo(crew: JobPartCrew) {
+    crew.editLoading = true;
+
+    this.get<JobPartCrewEdit>('schedule/getjobpartcrewforedit', { jobPartCrewId: crew.jobPartCrewId })
       .subscribe({
         next: (res) => {
+          crew.editLoading = false;
           if (res.errors?.errorCode) {
 
           } else {
-            console.log(res)
+            this.crewInfo.set(res.data);
+            this.openModal(this.loginModal);
           }
         }
       })

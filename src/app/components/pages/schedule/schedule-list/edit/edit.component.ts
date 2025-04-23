@@ -1,32 +1,73 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { Select2Data, Select2Module } from "ng-select2-component";
+import { FormBuilder, FormGroup } from "@angular/forms";
+import { JobPartCrewEdit } from "../../../../../shared/interface/schedule";
+import { CommonModule } from "@angular/common";
 
 @Component({
   selector: 'app-edit',
-  imports: [ Select2Module ],
+  imports: [ Select2Module, CommonModule ],
   templateUrl: './edit.component.html',
   styleUrl: './edit.component.scss',
   providers: [ NgbActiveModal ]
 })
-export class EditComponent {
-  selectState: Select2Data = [
+export class EditComponent implements OnInit {
+  @Input() crewInfo?: JobPartCrewEdit;
+  @Output() closeModal: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  private readonly _fb: FormBuilder = inject(FormBuilder);
+
+  form!: FormGroup;
+
+  lateNightShift: number = 0;
+  oot: number = 0;
+  travel: number = 0;
+
+  roles: Select2Data = [
     {
-      label: 'U.K',
-      value: 'U.K'
+      label: 'Crew',
+      value: 1
     },
     {
-      label: 'India',
-      value: 'India'
+      label: 'CrewChief',
+      value: 2
     },
     {
-      label: 'Thailand',
-      value: 'Thailand'
+      label: 'TeamLead',
+      value: 4
     },
     {
-      label: 'Newyork',
-      value: 'Newyork'
+      label: 'Skilled',
+      value: 3
+    }
+  ]
+
+  statuses: Select2Data = [
+    {
+      label: 'Assigned',
+      value: 1
     },
+    {
+      label: 'Unassigned',
+      value: 0
+    },
+    {
+      label: 'Confirmed',
+      value: 2
+    },
+    {
+      label: 'Reject',
+      value: 3
+    },
+    {
+      label: 'Notified',
+      value: 5
+    },
+    {
+      label: 'No Show',
+      value: 6
+    }
   ]
 
   filledCheckbox = [
@@ -109,10 +150,27 @@ export class EditComponent {
 
   ]
 
-  constructor(private modal: NgbActiveModal) {
+  ngOnInit() {
+    this.initForm();
+    this.setAdditionalInfo();
   }
 
-  closeModal() {
-    this.modal.close();
+  initForm() {
+    this.form = this._fb.group({
+      expences: [ this.crewInfo?.expences || 0 ],
+      extraHours: [ this.crewInfo?.extraHours || 0 ],
+      jobPartCrewRoleId: [ this.crewInfo?.jobPartCrewRoleId || 0 ],
+      jobPartCrewStatusId: [ this.crewInfo?.jobPartCrewStatusId || 0 ],
+      lastMinuteBonus: [ this.crewInfo?.lastMinuteBonus || 0 ],
+      otherPaymentAdjustment: [ this.crewInfo?.otherPaymentAdjustment || 0 ],
+      otherPaymentAdjustmentTxt: [ this.crewInfo?.otherPaymentAdjustmentTxt || '' ],
+      skilledCost: [ this.crewInfo?.skilledCost || 0 ],
+    });
+  }
+
+  setAdditionalInfo() {
+    this.oot = (this.crewInfo.ootCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber));
+    this.travel = (this.crewInfo.travelHoursCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber));
+    this.lateNightShift = (this.crewInfo.lateShiftCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber)) * 0.8;
   }
 }

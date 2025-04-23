@@ -46,6 +46,7 @@ export interface JobPartCrew {
   levelId?: number;
   isActive?: boolean;
   loading?: boolean;
+  editLoading?: boolean;
 }
 
 export interface Vehicle {
@@ -83,4 +84,30 @@ export interface JobPartCrewUpdate {
   jobPartCrewId?: number;
   jobPartCrewRoleId?: number;
   jobPartCrewStatusid?: number;
+}
+
+export interface JobPartCrewEdit {
+  bonus: number | null;
+  crewId: number;
+  expences: number;
+  extraHours: number | null;
+  jobPartCrewId: number;
+  jobPartCrewRoleId: number;
+  jobPartCrewRoleText: string;
+  jobPartCrewStatusColourMvc: string;
+  jobPartCrewStatusId: number;
+  jobPartCrewStatusText: string;
+  lastMinuteBonus: number;
+  lateShiftCost: number;
+  levelShortText: string;
+  name: string;
+  ootCost: number;
+  otherPaymentAdjustment: number;
+  otherPaymentAdjustmentTxt: string;
+  pay: number;
+  postcode: string;
+  skilledCost: number | null;
+  travelHoursCost: number;
+  crewNumber: number;
+  crewChiefNumber: number;
 }
