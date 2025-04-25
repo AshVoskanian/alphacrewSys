@@ -1,7 +1,20 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col">
-      <app-schedule-list [list]="scheduleData()" [loading]="loading()"></app-schedule-list>
+      <app-schedule-list (openJobsShifts)="openModal($event)" [list]="scheduleData()"
+                         [loading]="loading()" [jobShiftsLoading]="JobScheduleLoading()">
+      </app-schedule-list>
     </div>
   </div>
 </div>
+
+<ng-template #scheduleModal let-modal>
+  <div class="modal-header fixed-top">
+    <h4 class="modal-title">{{ 'title' }}</h4>
+    <button class="btn-close py-0" type="button" (click)="modal.close()"></button>
+  </div>
+
+  <div class="overflow-y-auto">
+    <app-schedule-list [list]="jobScheduleData()"></app-schedule-list>
+  </div>
+</ng-template>

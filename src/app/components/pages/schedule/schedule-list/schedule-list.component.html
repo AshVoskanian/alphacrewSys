@@ -3,7 +3,7 @@
     <div class="spinner-border text-primary" role="status"></div>
   </div>
 } @else {
-  @for (schedule of list(); track schedule.jobPartId) {
+  @for (schedule of list; track schedule.jobPartId) {
     <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)">
       <div class="col">
         <div class="vertical-ribbon-animate">
@@ -74,9 +74,17 @@
                     </div>
                   </div>
 
-                  <h6 class="fw-bold pointer m-0" style="margin-top: 12px;">{{ schedule.shiftNumber }}
-                    of {{ schedule.shiftCount }}
-                  </h6>
+                  @if (jobShiftsLoading() && schedule.jobId === selectedSchedule.jobId) {
+                    <h6 class="fw-bold pointer m-0 common-flex" (click)="openJobShifts(schedule)">
+                      <app-feather-icon [class]="'w-15 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                    </h6>
+                  } @else {
+                    <h6 class="fw-bold pointer m-0" (click)="openJobShifts(schedule)" style="margin-top: 12px;">
+                      {{ schedule.shiftNumber }}
+                      of
+                      {{ schedule.shiftCount }}
+                    </h6>
+                  }
                 </div>
 
                 <div class="row g-1 row-gap-1 m-t-20">
@@ -246,7 +254,7 @@
       </div>
 
       <div class="open-crew-panel pointer" (click)="openCrewsPanel()">
-        <i class="fas fa-list f-20"></i>
+        <i class="fas fa-list f-20 z-3"></i>
       </div>
     </div>
   }

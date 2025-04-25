@@ -1635,6 +1635,9 @@ $i: 1;
 .modal-xl {
   max-width: fit-content;
 }
+.common-offcanvas {
+  z-index: 9999 !important;
+}
 
 @media (min-width: 1200px) {
   .modal-xl {

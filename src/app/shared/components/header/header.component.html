@@ -8,7 +8,6 @@
     <div class="col-3 m-l-20">
       <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
         <div class="col">
-          <label class="form-label" for="datetime-local">From: </label>
           <input class="form-control digits" id="datetime-local"
                  placeholder="yyyy-mm-dd" name="from"
                  value="2025-02-26"
@@ -16,7 +15,7 @@
                  ngbDatepicker #fromDate="ngbDatepicker"
                  (click)="fromDate.toggle()">
         </div>
-        <div class="col-auto d-flex justify-content-start align-items-center m-t-40">
+        <div class="col-auto d-flex justify-content-start align-items-center">
           <button class="btn btn-primary" type="submit">Load Shifts</button>
         </div>
       </form>

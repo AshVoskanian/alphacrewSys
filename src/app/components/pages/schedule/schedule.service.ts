@@ -7,7 +7,7 @@ import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
 })
 export class ScheduleService {
   selectedShift$: BehaviorSubject<Schedule | null> = new BehaviorSubject<Schedule | null>(null);
-  crewUpdate$: BehaviorSubject<Array<JobPartCrew> | null> = new BehaviorSubject<Array<JobPartCrew> | null>(null);
+  crewUpdate$: BehaviorSubject<Array<Schedule> | null> = new BehaviorSubject<Array<Schedule> | null>(null);
 
   constructor() {
   }

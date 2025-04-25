@@ -160,11 +160,11 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.loading = true;
 
     const data = {
-      jobId: this.selectedSchedule.jobId,
+      // jobId: this.selectedSchedule.jobId,
       jobPartId: this.selectedSchedule?.jobPartId,
       crewId: this.getSelectedData('crew')
     }
-    this.post<Array<JobPartCrew>>('Schedule/updatejobpartcrew', data).subscribe({
+    this.post<Array<Schedule>>('Schedule/updatejobpartcrew', data).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.errors?.errorCode) {

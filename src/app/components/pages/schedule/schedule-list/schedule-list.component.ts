@@ -1,10 +1,10 @@
 import {
   Component,
-  DestroyRef,
-  ElementRef,
+  DestroyRef, EventEmitter,
   inject,
+  Input,
   input,
-  OnInit,
+  OnInit, Output,
   signal,
   TemplateRef,
   ViewChild,
@@ -59,8 +59,11 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   private offcanvasRef?: NgbOffcanvasRef;
 
-  list = input<Array<Schedule>>([]);
+  @Input() list: Array<Schedule> = [];
+  @Output() openJobsShifts: EventEmitter<Schedule> = new EventEmitter<Schedule>();
+
   loading = input<boolean>(false);
+  jobShiftsLoading = input<boolean>(false);
 
   selectedSchedule: Schedule;
 
@@ -159,13 +162,21 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._scheduleService.crewUpdate$
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
-        next: (res: Array<JobPartCrew> | null) => {
+        next: (res: Array<Schedule> | null) => {
           if (res) {
-            this.selectedSchedule.crews = res;
-            this.fillArray(this.selectedSchedule.crews, this.selectedSchedule.crewNumber);
+            this.selectedSchedule = res[0];
+
+            this.list = this.list.map(item => {
+              if (item.jobPartId === res[0].jobPartId) {
+                this.fillArray(res[0].crews, this.selectedSchedule.crewNumber);
+                return res[0];
+              } else {
+                return item;
+              }
+            });
           }
         }
-      })
+      });
   }
 
   fillArray(arr: Array<JobPartCrew>, length: number): void {
@@ -267,9 +278,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this.offcanvasRef = this._offCanvasService.open(CrewListComponent, {
       scroll: false,
       backdrop: false,
+      container: null,
       panelClass: 'common-offcanvas custom-off-canvas'
     });
-    this.offcanvasRef.componentInstance.title = 'Crew';
     this.crewList().forEach(it => it.isChecked = false);
     this.offcanvasRef.componentInstance.crewList = this.crewList();
 
@@ -279,6 +290,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   getCrewList() {
+    if (this.crewList()?.length !== 0) return;
+
     this.get<Array<Crew>>('Crew/GetCrewList', {}).subscribe({
       next: (res) => {
         this.crewList.set(res.data);
@@ -313,7 +326,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) {
 
           } else {
-            const jobPartCrew: Array<JobPartCrew> = this.list().find(it => it.jobPartId === res.data.jobPartId)?.crews as Array<JobPartCrew>;
+            const jobPartCrew: Array<JobPartCrew> = this.list.find(it => it.jobPartId === res.data.jobPartId)?.crews as Array<JobPartCrew>;
             const updatedCrew: JobPartCrew = jobPartCrew?.find(it => it.jobPartCrewId === res.data.jobPartCrewId) as JobPartCrew;
             updatedCrew.jobPartCrewRoleId = res.data.jobPartCrewRoleId;
             updatedCrew.jobPartCrewStatusId = res.data.jobPartCrewStatusId;
@@ -439,5 +452,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   selectSchedule(schedule: Schedule) {
     this.selectedSchedule = schedule;
     this._scheduleService.selectedShift$.next(this.selectedSchedule);
+  }
+
+  openJobShifts(schedule: Schedule) {
+    this.openJobsShifts.emit(schedule);
   }
 }

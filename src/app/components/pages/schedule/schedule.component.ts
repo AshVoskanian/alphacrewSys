@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { CardComponent } from "../../../shared/components/ui/card/card.component";
 import { Select2Module } from "ng-select2-component";
-import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDateStruct, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ScheduleListComponent } from "./schedule-list/schedule-list.component";
 import { ApiBase } from "../../../shared/bases/api-base";
 import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
@@ -18,12 +18,16 @@ import { NavService } from "../../../shared/services/nav.service";
   styleUrl: './schedule.component.scss'
 })
 export class ScheduleComponent extends ApiBase implements OnInit {
+  @ViewChild('scheduleModal') scheduleModal: any;
 
+  private _modal = inject(NgbModal);
   private _navService = inject(NavService);
   private _toast = inject(ToastrService);
 
   scheduleData: WritableSignal<Array<Schedule>> = signal([]);
+  jobScheduleData: WritableSignal<Array<Schedule>> = signal([]);
   loading: WritableSignal<boolean> = signal(false);
+  JobScheduleLoading: WritableSignal<boolean> = signal(false);
 
   sidebar: any = [
     {
@@ -59,7 +63,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
       month: today.getMonth() + 1,
       day: today.getDate()
     };
-    this.getScheduleData(initialDate);
+    this.getScheduleData(initialDate, null);
     this.subToDateChange();
   }
 
@@ -68,32 +72,50 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     this._navService.date$.subscribe({
       next: (date) => {
         if (date) {
-          this.getScheduleData(date);
+          this.getScheduleData(date, null);
         }
       }
     });
   }
 
-  getScheduleData(date: NgbDateStruct) {
+  getScheduleData(date: NgbDateStruct, jobId: number) {
     if (this.loading()) return;
 
-    this.loading.set(true);
+
+
+    if (jobId) {
+      this.JobScheduleLoading.set(true);
+    } else {
+      this.loading.set(true);
+    }
 
     const params = {
+      jobId,
       date: GeneralService.convertToDate(date),
       days: 7,
+    }
+
+    if (!jobId) {
+      delete params.jobId;
     }
 
     this.post<Array<Schedule>>('schedule/getschedule', params)
       .subscribe({
         next: (res) => {
           this.loading.set(false);
+          this.JobScheduleLoading.set(false);
 
           if (res.errors?.errorCode) {
             this._toast.error(res.errors.message)
           } else {
-            this.scheduleData.set(res.data);
-            this.scheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
+            if (jobId) {
+              this.jobScheduleData.set(res.data);
+              this.jobScheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
+              this._modal.open(this.scheduleModal, { centered: true, fullscreen: true })
+            } else {
+              this.scheduleData.set(res.data);
+              this.scheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
+            }
           }
         }
       })
@@ -109,5 +131,16 @@ export class ScheduleComponent extends ApiBase implements OnInit {
         isActive: false
       });
     }
+  }
+
+  openModal(schedule: Schedule) {
+    const today = new Date();
+    const initialDate: NgbDateStruct = {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate()
+    };
+
+    this.getScheduleData(initialDate, schedule.jobId);
   }
 }
