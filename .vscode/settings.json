@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/2a1943e1-934b-4789-b056-43a42a5dc4b4/resourceGroups/AlphaCrewResourceGroup/providers/Microsoft.Web/sites/alphacrewsys",
+    "appService.deploySubpath": "."
+}
