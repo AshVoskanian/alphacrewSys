@@ -12,6 +12,7 @@ export interface Schedule {
   isNigthShiftPaid: boolean;
   editComment?: boolean;
   editCrewNote?: boolean;
+  isJobScoped?: boolean;
   jobId: number;
   shiftCount: number;
   shiftNumber: number;

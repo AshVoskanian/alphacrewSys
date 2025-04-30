@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveOffcanvas, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
-import { Crew, JobPartCrew, Schedule } from "../../../../../shared/interface/schedule";
+import { Crew, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
@@ -25,7 +25,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
 
   @Input() title: string;
-  @Input() crewList: Array<Crew> = [];
+  crewList: Array<Crew> = [];
+  isJobScoped: boolean = false;
 
   form: FormGroup;
 
@@ -123,7 +124,9 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.crewList.forEach(it => it.isChecked = this.allAreSelected);
 
     const selectedCount = this.crewList.filter(it => it.isChecked).length;
-    this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
+    if (!this.isJobScoped) {
+      this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
+    }
   }
 
   areAllChecked(crew: Array<Crew>): boolean {
@@ -140,7 +143,9 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.allAreSelected = this.areAllChecked(filteredCrew);
 
     const selectedCount = this.crewList.filter(it => it.isChecked).length;
-    this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
+    if (!this.isJobScoped) {
+      this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
+    }
   }
 
   saveCrew(type: 'current' | 'all') {
@@ -160,16 +165,22 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.loading = true;
 
     const data = {
-      // jobId: this.selectedSchedule.jobId,
+      jobId: this.selectedSchedule.jobId,
       jobPartId: this.selectedSchedule?.jobPartId,
       crewId: this.getSelectedData('crew')
     }
+
+    if (!this.isJobScoped) {
+      delete data.jobId
+    }
+
     this.post<Array<Schedule>>('Schedule/updatejobpartcrew', data).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.errors?.errorCode) {
 
         } else {
+          res.data[0].isJobScoped = this.isJobScoped;
           this._scheduleService.crewUpdate$.next(res.data);
           GeneralService.showSuccessMessage();
         }

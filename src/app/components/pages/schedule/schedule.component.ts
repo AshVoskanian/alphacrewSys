@@ -9,6 +9,7 @@ import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
 import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon/feather-icon.component";
 import { NavService } from "../../../shared/services/nav.service";
+import { ScheduleService } from "./schedule.service";
 
 @Component({
   selector: 'app-schedule',
@@ -23,9 +24,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   private _modal = inject(NgbModal);
   private _navService = inject(NavService);
   private _toast = inject(ToastrService);
+  public scheduleService = inject(ScheduleService);
 
-  scheduleData: WritableSignal<Array<Schedule>> = signal([]);
-  jobScheduleData: WritableSignal<Array<Schedule>> = signal([]);
   loading: WritableSignal<boolean> = signal(false);
   JobScheduleLoading: WritableSignal<boolean> = signal(false);
 
@@ -82,7 +82,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     if (this.loading()) return;
 
 
-
     if (jobId) {
       this.JobScheduleLoading.set(true);
     } else {
@@ -109,12 +108,12 @@ export class ScheduleComponent extends ApiBase implements OnInit {
             this._toast.error(res.errors.message)
           } else {
             if (jobId) {
-              this.jobScheduleData.set(res.data);
-              this.jobScheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
+              this.scheduleService.jobScopedShifts = res.data;
+              this.scheduleService.jobScopedShifts.forEach(it => this.fillArray(it.crews, it.crewNumber));
               this._modal.open(this.scheduleModal, { centered: true, fullscreen: true })
             } else {
-              this.scheduleData.set(res.data);
-              this.scheduleData().forEach(it => this.fillArray(it.crews, it.crewNumber));
+              this.scheduleService.shifts = res.data;
+              this.scheduleService.shifts.forEach(it => this.fillArray(it.crews, it.crewNumber));
             }
           }
         }
@@ -142,5 +141,24 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     };
 
     this.getScheduleData(initialDate, schedule.jobId);
+  }
+
+  protected readonly close = close;
+
+  closeModal(modal: any) {
+    this.setMainListDataFromJobShiftsData();
+    modal.close();
+    console.log(this.scheduleService.shifts)
+  }
+
+  setMainListDataFromJobShiftsData() {
+    // this.scheduleData.set(
+    //   this.scheduleData().map(itemA => {
+    //     const matchingB = this.jobScheduleData().find(itemB => itemB.jobId === itemA.jobId);
+    //     return matchingB ? matchingB : itemA;
+    //   })
+    // );
+    // console.log(this.scheduleData(), 4545)
+    // console.log(this.jobScheduleData(), 2222)
   }
 }

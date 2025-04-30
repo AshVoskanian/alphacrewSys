@@ -1,10 +1,12 @@
 import {
   Component,
-  DestroyRef, EventEmitter,
+  DestroyRef,
+  EventEmitter,
   inject,
   Input,
   input,
-  OnInit, Output,
+  OnInit,
+  Output,
   signal,
   TemplateRef,
   ViewChild,
@@ -60,6 +62,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   private offcanvasRef?: NgbOffcanvasRef;
 
   @Input() list: Array<Schedule> = [];
+  @Input() isJobScoped: boolean = false;
   @Output() openJobsShifts: EventEmitter<Schedule> = new EventEmitter<Schedule>();
 
   loading = input<boolean>(false);
@@ -162,22 +165,37 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._scheduleService.crewUpdate$
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
-        next: (res: Array<Schedule> | null) => {
-          if (res) {
-            this.selectedSchedule = res[0];
+        next: (res: Schedule[] | null) => {
+          if (!res || res.length === 0) return;
 
-            this.list = this.list.map(item => {
-              if (item.jobPartId === res[0].jobPartId) {
-                this.fillArray(res[0].crews, this.selectedSchedule.crewNumber);
-                return res[0];
-              } else {
-                return item;
+          const [ first ] = res;
+
+          if (first.isJobScoped) {
+            this._scheduleService.jobScopedShifts = res;
+
+            this._scheduleService.jobScopedShifts.forEach(it => {
+              this.fillArray(it.crews, it.crewNumber);
+            });
+
+            this._scheduleService.shifts = this._scheduleService.shifts.map(it => {
+              const replacement = res.find(r => r.jobPartId === it.jobPartId);
+              return replacement ?? it;
+            });
+          } else {
+            this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
+              if (item.jobPartId === first.jobPartId) {
+                this.fillArray(first.crews, first.crewNumber);
+                return first;
               }
+              return item;
             });
           }
+
+          this._scheduleService.crewUpdate$.next(null);
         }
       });
   }
+
 
   fillArray(arr: Array<JobPartCrew>, length: number): void {
     arr.forEach(item => item.isActive = true);
@@ -283,6 +301,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     });
     this.crewList().forEach(it => it.isChecked = false);
     this.offcanvasRef.componentInstance.crewList = this.crewList();
+    this.offcanvasRef.componentInstance.isJobScoped = this.isJobScoped;
 
     this.offcanvasRef.result.finally(() => {
       this.offcanvasRef = undefined;
