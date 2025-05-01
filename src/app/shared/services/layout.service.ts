@@ -14,9 +14,9 @@ export class LayoutService {
     settings: {
       layout_type: 'ltr',
       layout_version: 'light-only',
-      sidebar_type: 'horizontal-wrapper enterprice-type advance-layout',
+      sidebar_type: 'horizontal-wrapper',
       icon: "stroke-svg",
-      layout: ''
+      layout: 'singapore'
     },
     color: {
       primary: '#7366ff',

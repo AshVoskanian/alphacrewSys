@@ -6,17 +6,16 @@
 
   @if (isScheduleRoute) {
     <div class="col-3 m-l-20">
-      <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
-        <div class="col">
+      <form class="row" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="col" style="max-width: 150px">
           <input class="form-control digits" id="datetime-local"
                  placeholder="yyyy-mm-dd" name="from"
-                 value="2025-02-26"
                  formControlName="date"
                  ngbDatepicker #fromDate="ngbDatepicker"
                  (click)="fromDate.toggle()">
         </div>
         <div class="col-auto d-flex justify-content-start align-items-center">
-          <button class="btn btn-primary" type="submit">Load Shifts</button>
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
         </div>
       </form>
     </div>

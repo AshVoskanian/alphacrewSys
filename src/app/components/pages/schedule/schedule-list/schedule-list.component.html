@@ -75,7 +75,7 @@
                   </div>
 
                   @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
-                    <h6 class="fw-bold pointer m-0 common-flex" (click)="openJobShifts(schedule)">
+                    <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;" (click)="openJobShifts(schedule)">
                       <app-feather-icon [class]="'w-15 text-white spin'" [icon]="'loader'"></app-feather-icon>
                     </h6>
                   } @else {
