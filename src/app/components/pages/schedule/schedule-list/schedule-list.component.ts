@@ -360,30 +360,35 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     const data = {
       jobPartId: this.selectedSchedule.jobPartId,
       crewId: crew.crewId
-    }
-    this.post<any>('Schedule/removeJobPartCrew', data)
-      .subscribe({
-        next: (res) => {
-          if (crew) {
-            crew.loading = false;
-          }
-          if (res.errors?.errorCode) {
+    };
 
-          } else {
-            this.selectedSchedule.crews = this.selectedSchedule.crews.map((crew, index) =>
-              crew.jobPartCrewId === res.data
-                ? {
-                  ...crew,
-                  isActive: false,
-                  crewId: undefined,
-                  name: ''
-                }
-                : crew
-            );
-            this.selectSchedule(this.selectedSchedule);
-          }
+    this.post<any>('Schedule/removeJobPartCrew', data).subscribe({
+      next: (res) => {
+        if (res.errors?.errorCode) {
+          return;
         }
-      })
+
+        const removedId = res.data;
+
+        const updateAndSortCrews = (crews: JobPartCrew[]) =>
+          crews.map(c =>
+            c.jobPartCrewId === removedId
+              ? { ...c, isActive: false, crewId: undefined, name: '' }
+              : c
+          )
+            .sort((a, b) => Number(b.isActive) - Number(a.isActive));
+
+        this.selectedSchedule.crews = updateAndSortCrews(this.selectedSchedule.crews);
+
+        this._scheduleService.shifts.forEach(shift => {
+          if (shift.jobPartId === this.selectedSchedule.jobPartId) {
+            shift.crews = updateAndSortCrews(shift.crews);
+          }
+        });
+
+        this.selectSchedule(this.selectedSchedule);
+      }
+    });
   }
 
 
