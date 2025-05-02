@@ -1,21 +1,23 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Select2Data, Select2Module } from "ng-select2-component";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { JobPartCrewEdit } from "../../../../../shared/interface/schedule";
 import { CommonModule } from "@angular/common";
+import { ApiBase } from "../../../../../shared/bases/api-base";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 
 @Component({
   selector: 'app-edit',
-  imports: [ Select2Module, CommonModule ],
+  imports: [ Select2Module, CommonModule, FeatherIconComponent ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.scss',
-  providers: [ NgbActiveModal ]
+  styleUrl: './edit.component.scss'
 })
-export class EditComponent implements OnInit {
+export class EditComponent extends ApiBase implements OnInit {
   @Input() crewInfo?: JobPartCrewEdit;
   @Output() closeModal: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  private readonly _dr: DestroyRef = inject(DestroyRef);
   private readonly _fb: FormBuilder = inject(FormBuilder);
 
   form!: FormGroup;
@@ -23,6 +25,9 @@ export class EditComponent implements OnInit {
   lateNightShift: number = 0;
   oot: number = 0;
   travel: number = 0;
+
+  loading: boolean = false;
+  bonusActionType: 'REMOVE' | 'APPLY';
 
   roles: Select2Data = [
     {
@@ -172,5 +177,34 @@ export class EditComponent implements OnInit {
     this.oot = (this.crewInfo.ootCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber));
     this.travel = (this.crewInfo.travelHoursCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber));
     this.lateNightShift = (this.crewInfo.lateShiftCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber)) * 0.8;
+  }
+
+  bonusAction(type: 'REMOVE' | 'APPLY') {
+    if (this.loading) return;
+
+    this.bonusActionType = type;
+    this.loading = true;
+    const data = {
+      bonus: 5,
+      jobPartCrewId: this.crewInfo.jobPartCrewId
+    }
+
+    if (type === 'REMOVE') {
+      delete data.bonus;
+    }
+
+    this.post('/Schedule/AddOrRemoveJobPartCrewBonus', { data })
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          this.loading = false;
+
+          if (res.errors?.errorCode) {
+            return;
+          }
+
+          console.log(res.data)
+        }
+      })
   }
 }

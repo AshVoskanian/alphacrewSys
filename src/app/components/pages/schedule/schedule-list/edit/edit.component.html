@@ -91,12 +91,22 @@
 
             <div class="row g-3">
               <div class="col justify-content-between common-flex">
-                <button class="btn btn-primary w-1-5">
+                <button class="btn btn-primary w-1-5" (click)="bonusAction('APPLY')">
                   Apply Bonus
+                  <span class="d-inline-block" style="width: 30px; height: 13px;">
+                      @if (loading && bonusActionType === 'APPLY') {
+                        <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
+                      }
+                  </span>
                 </button>
 
-                <button class="btn btn-primary w-1-5">
+                <button class="btn btn-primary w-1-5" (click)="bonusAction('REMOVE')">
                   Remove Bonus
+                  <span class="d-inline-block" style="width: 30px; height: 13px;">
+                      @if (loading && bonusActionType === 'REMOVE') {
+                        <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
+                      }
+                  </span>
                 </button>
               </div>
             </div>
