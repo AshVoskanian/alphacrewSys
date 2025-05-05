@@ -10,14 +10,13 @@
           <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"
                [style.background-color]="schedule.statusColour">
             <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-success"
-                 style="left: 50%; transform: translateX(-50%); width: fit-content; padding: 0 10px;"
                  [ngStyle]="{'backgroundColor' : schedule.statusColour}">
               <i class="fa fa-bolt m-r-10"></i>
               <span>{{ schedule.statusText + ' ' + schedule.jobId }}</span>
             </div>
 
             <div class="row g-3 justify-content-between">
-              <div class="col-6">
+              <div class="col-lg-6">
                 <div class="flex-no-wrap">
                   <div class="col-9 display-flex">
                     <div class="flex-no-wrap">
@@ -110,7 +109,7 @@
               </div>
 
               @if (schedule?.crews?.length) {
-                <div class="list-wrapper col-6">
+                <div class="list-wrapper col-lg-6">
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
                       <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"

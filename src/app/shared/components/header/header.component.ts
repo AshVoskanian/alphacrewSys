@@ -32,7 +32,7 @@ export class HeaderComponent {
   constructor(private navService: NavService, private router: Router) {
     this.initForm();
     this.router.events.subscribe(() => {
-      this.isScheduleRoute = this.router.url === '/schedule';
+      this.isScheduleRoute = this.router.url?.includes('/schedule');
     });
   }
 

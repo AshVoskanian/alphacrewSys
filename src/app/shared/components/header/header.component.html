@@ -5,23 +5,21 @@
   </div>
 
   @if (isScheduleRoute) {
-    <div class="col-3 m-l-20">
-      <form class="row" [formGroup]="form" (ngSubmit)="submit()">
-        <div class="col" style="max-width: 150px">
-          <input class="form-control digits" id="datetime-local"
-                 placeholder="yyyy-mm-dd" name="from"
-                 formControlName="date"
-                 ngbDatepicker #fromDate="ngbDatepicker"
-                 (click)="fromDate.toggle()">
-        </div>
-        <div class="col-auto d-flex justify-content-start align-items-center">
-          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
-        </div>
-      </form>
-    </div>
+    <form class="common-flex m-l-20 col-auto" style="max-width: 300px;" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="col" style="max-width: 150px">
+        <input class="form-control digits" id="datetime-local"
+               placeholder="yyyy-mm-dd" name="from"
+               formControlName="date"
+               ngbDatepicker #fromDate="ngbDatepicker"
+               (click)="fromDate.toggle()">
+      </div>
+      <div class="col-auto d-flex justify-content-start align-items-center">
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
+      </div>
+    </form>
   }
 
-  <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
+  <div class="nav-right col-auto pull-right right-header p-0 ms-auto">
     <ul class="nav-menus">
       <li class="language-nav" (click)="toggleLanguage()">
         <app-header-language></app-header-language>

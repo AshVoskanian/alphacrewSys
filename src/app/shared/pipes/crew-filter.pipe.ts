@@ -16,6 +16,6 @@ export class CrewFilterPipe implements PipeTransform {
       const matchesRegion = !regionIds || regionIds.length === 0 || regionIds.includes(member.regionId);
       const matchesLevel = !levelIds || levelIds.length === 0 || levelIds.includes(member.levelId);
       return matchesRegion && matchesLevel;
-    });
+    }).sort((a, b) => Number(b.isChecked) - Number(a.isChecked));
   }
 }

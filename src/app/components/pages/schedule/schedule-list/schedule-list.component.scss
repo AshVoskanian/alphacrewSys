@@ -5,6 +5,22 @@
   gap: 24px;
   padding: 70px 50px 28px 28px;
 
+  .ribbon-bookmark {
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
+    padding: 0 10px;
+
+    @media screen and (max-width: 400px) {
+      & {
+        width: 80%;
+        left: 10%;
+        top: 2px;
+        transform: translateX(0);
+      }
+    }
+  }
+
   .row {
     display: flex;
 
@@ -14,10 +30,34 @@
 
       .list-group {
         display: grid;
-        grid-template-columns: repeat(3,minmax(200px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 8px;
         padding: 0;
         width: 100%;
+
+        @media screen and (max-width: 1200px) {
+          & {
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+          }
+        }
+
+        @media screen and (max-width: 1000px) {
+          & {
+            grid-template-columns: repeat(3, minmax(200px, 1fr));
+          }
+        }
+
+        @media screen and (max-width: 760px) {
+          & {
+            grid-template-columns: repeat(2, minmax(200px, 1fr));
+          }
+        }
+
+        @media screen and (max-width: 500px) {
+          & {
+            grid-template-columns: 1fr;
+          }
+        }
 
         .list-group-item {
           border: none;
@@ -197,6 +237,12 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 6px;
+
+  @media screen and (max-width: 650px) {
+    & {
+      flex-wrap: wrap;;
+    }
+  }
 }
 
 .car-nums, .skills {
@@ -225,7 +271,7 @@
     position: absolute;
     right: 0;
     top: 100px;
-    z-index: 999;
+    z-index: 2;
 
     i {
       display: none;

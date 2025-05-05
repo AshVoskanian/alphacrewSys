@@ -10,11 +10,11 @@
 
 <ng-template #scheduleModal let-modal>
   <div class="modal-header fixed-top">
-    <h4 class="modal-title">{{ 'title' }}</h4>
+    <h4 class="modal-title">Job Sifts</h4>
     <button class="btn-close py-0" type="button" (click)="closeModal(modal)"></button>
   </div>
 
-  <div class="overflow-y-auto">
+  <div class="overflow-y-auto overflow-x-hidden">
     <app-schedule-list [list]="scheduleService.jobScopedShifts" [isJobScoped]="true"></app-schedule-list>
   </div>
 </ng-template>
