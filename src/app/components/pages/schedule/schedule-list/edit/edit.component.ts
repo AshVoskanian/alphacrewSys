@@ -1,16 +1,18 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Select2Data, Select2Module } from "ng-select2-component";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { JobPartCrewEdit } from "../../../../../shared/interface/schedule";
+import { CrewSkill, JobPartCrewEdit } from "../../../../../shared/interface/schedule";
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
+import { ROLES, SKILLS, STATUSES } from "../../../../../shared/data/schedule";
 
 @Component({
   selector: 'app-edit',
   imports: [ Select2Module, CommonModule, FeatherIconComponent ],
   templateUrl: './edit.component.html',
+  standalone: true,
   styleUrl: './edit.component.scss'
 })
 export class EditComponent extends ApiBase implements OnInit {
@@ -29,134 +31,15 @@ export class EditComponent extends ApiBase implements OnInit {
   loading: boolean = false;
   bonusActionType: 'REMOVE' | 'APPLY';
 
-  roles: Select2Data = [
-    {
-      label: 'Crew',
-      value: 1
-    },
-    {
-      label: 'CrewChief',
-      value: 2
-    },
-    {
-      label: 'TeamLead',
-      value: 4
-    },
-    {
-      label: 'Skilled',
-      value: 3
-    }
-  ]
+  skills: Array<CrewSkill> = SKILLS;
 
-  statuses: Select2Data = [
-    {
-      label: 'Assigned',
-      value: 1
-    },
-    {
-      label: 'Unassigned',
-      value: 0
-    },
-    {
-      label: 'Confirmed',
-      value: 2
-    },
-    {
-      label: 'Reject',
-      value: 3
-    },
-    {
-      label: 'Notified',
-      value: 5
-    },
-    {
-      label: 'No Show',
-      value: 6
-    }
-  ]
+  roles: Select2Data = ROLES;
 
-  filledCheckbox = [
-    {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '1'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '12'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '123'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '1234'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '12345'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '123456'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '1234567'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '12345678'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '123456789'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '1234567890'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '12345678907'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '12345678907'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '123456789076r'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '123456789076re'
-    }, {
-      class: 'solid-warning',
-      text: 'Driver',
-      value: true,
-      id: '123456789076rew'
-    }
-
-  ]
+  statuses: Select2Data = STATUSES;
 
   ngOnInit() {
     this.initForm();
+    this.setCrewSkills();
     this.setAdditionalInfo();
   }
 
@@ -179,6 +62,11 @@ export class EditComponent extends ApiBase implements OnInit {
     this.lateNightShift = (this.crewInfo.lateShiftCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber)) * 0.8;
   }
 
+  setCrewSkills() {
+    const crewSkillIds: number[] = this.crewInfo.crewSkills.map(it => it.crewSkillId);
+    this.skills.forEach(it => it.checked = crewSkillIds.includes(it.crewSkillId));
+  }
+
   bonusAction(type: 'REMOVE' | 'APPLY') {
     if (this.loading) return;
 
@@ -193,7 +81,7 @@ export class EditComponent extends ApiBase implements OnInit {
       delete data.bonus;
     }
 
-    this.post('/Schedule/AddOrRemoveJobPartCrewBonus', { data })
+    this.post('/Schedule/AddOrRemoveJobPartCrewBonus', data)
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
@@ -203,7 +91,7 @@ export class EditComponent extends ApiBase implements OnInit {
             return;
           }
 
-          console.log(res.data)
+          this.crewInfo.bonus = type === 'REMOVE' ? 0 : 5;
         }
       })
   }

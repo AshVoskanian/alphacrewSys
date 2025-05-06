@@ -5,6 +5,7 @@ import feather from 'feather-icons';
   selector: 'app-feather-icon',
   imports: [],
   templateUrl: './feather-icon.component.html',
+  standalone: true,
   styleUrl: './feather-icon.component.scss'
 })
 

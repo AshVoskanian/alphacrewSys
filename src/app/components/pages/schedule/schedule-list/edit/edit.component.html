@@ -123,10 +123,10 @@
         </div>
 
         <div class="row row-cols-6">
-          @for (item of filledCheckbox; track item) {
-            <div class="col form-check checkbox checkbox-{{ item.class }}">
-              <input class="form-check-input" [id]="item.id" type="checkbox" [checked]="item.value">
-              <label class="form-check-label user-select-none" [for]="item.id">{{ item.text }}</label>
+          @for (item of skills; track item) {
+            <div class="col form-check checkbox checkbox-solid-warning">
+              <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked">
+              <label class="form-check-label user-select-none" [for]="item.crewSkillId">{{ item.crewSkillText }}</label>
             </div>
           }
         </div>

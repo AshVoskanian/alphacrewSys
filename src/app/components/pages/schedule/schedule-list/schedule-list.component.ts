@@ -314,6 +314,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this.get<Array<Crew>>('Crew/GetCrewList', {}).subscribe({
       next: (res) => {
         this.crewList.set(res.data);
+        console.log(res.data.filter(it => it.crewSkills.length > 3))
       }
     })
   }

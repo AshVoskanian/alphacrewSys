@@ -72,6 +72,7 @@ export interface Crew {
   rating: number;
   warnings: number;
   jobNotes: string;
+  crewSkills: CrewSkill[];
 }
 export interface CrewActionItem {
   text: string;
@@ -111,4 +112,15 @@ export interface JobPartCrewEdit {
   travelHoursCost: number;
   crewNumber: number;
   crewChiefNumber: number;
+  crewSkills: CrewSkill[];
+  jobPartSkills: CrewSkill[];
+}
+
+export interface CrewSkill {
+  crewSkillId: number;
+  crewSkillText: string;
+  crewSkillAbbr: string;
+  isPublic: boolean;
+  checked?: boolean;
+  description: string;
 }
