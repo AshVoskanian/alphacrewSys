@@ -1,7 +1,7 @@
 <div class="modal-content">
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
-      <form [formGroup]="form">
+      <form [formGroup]="form" (ngSubmit)="save()">
         <div class="common-flex justify-content-between align-items-center m-b-10">
           <h6 class="text-primary">
             ({{ crewInfo?.levelShortText }})
@@ -91,7 +91,7 @@
 
             <div class="row g-3">
               <div class="col justify-content-between common-flex">
-                <button class="btn btn-primary w-1-5" (click)="bonusAction('APPLY')">
+                <button type="button" class="btn btn-warning w-1-5" (click)="bonusAction('APPLY')">
                   Apply Bonus
                   <span class="d-inline-block" style="width: 30px; height: 13px;">
                       @if (loading && bonusActionType === 'APPLY') {
@@ -100,7 +100,7 @@
                   </span>
                 </button>
 
-                <button class="btn btn-primary w-1-5" (click)="bonusAction('REMOVE')">
+                <button type="button" class="btn btn-danger w-1-5" (click)="bonusAction('REMOVE')">
                   Remove Bonus
                   <span class="d-inline-block" style="width: 30px; height: 13px;">
                       @if (loading && bonusActionType === 'REMOVE') {
@@ -125,7 +125,7 @@
         <div class="row row-cols-6">
           @for (item of skills; track item) {
             <div class="col form-check checkbox checkbox-solid-warning">
-              <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked">
+              <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked" (change)="item.checked = !item.checked">
               <label class="form-check-label user-select-none" [for]="item.crewSkillId">{{ item.crewSkillText }}</label>
             </div>
           }
@@ -133,8 +133,13 @@
 
         <div class="row m-t-20">
           <div class="col justify-content-end">
-            <button class="btn btn-primary float-end">
+            <button type="submit" class="btn btn-primary float-end" style="padding-left: 60px;">
               Save
+              <span class="d-inline-block" style="width: 30px; height: 13px;">
+                      @if (saveLoading) {
+                        <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
+                      }
+                  </span>
             </button>
           </div>
         </div>

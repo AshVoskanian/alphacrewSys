@@ -28,7 +28,7 @@
                         </div>
 
                         <div class="time bg-danger p-1 b-r-10">
-                          <h1 class="f-40 fw-bold text-white">
+                          <h1 class="f-30 fw-bold text-white" style="font-size: 32px;">
                             {{ schedule.startDate | date: 'HH:mm' }}
                           </h1>
                         </div>
@@ -86,7 +86,7 @@
                   }
                 </div>
 
-                <div class="row g-1 row-gap-1 m-t-20">
+                <div class="row g-1 row-gap-1 m-t-10">
                   <div class="car-nums col-8">
                     @for (vehicle of schedule.vehicles; track vehicle.vehicleId) {
                       <div class="car-num">
@@ -132,7 +132,7 @@
                               }
                             </div>
                           </div>
-                          <p class="hide-scrollbar f-14">
+                          <p class="hide-scrollbar f-10" style="font-size: 12px">
                             {{ crew.name }}
                           </p>
                         }
@@ -182,7 +182,7 @@
 
             <div class="main-divider">
               <div class="divider-body divider-body-1 divider-primary">
-                <div class="divider-p-primary }}">
+                <div class="divider-p-primary" style="padding: 0;">
                   <i class="fa-solid fa-comments me-2 txt-primary f-20"></i>
                   <span class="txt-primary">Comments</span>
                 </div>
@@ -213,7 +213,7 @@
                 </label>
                 @if (schedule.notes || schedule.editComment) {
                   <textarea [(ngModel)]="schedule.notes" rows="4"
-                            [readonly]="!schedule.editComment" style="background: #FFF7E5;"
+                            [readonly]="!schedule.editComment" style="background: #FFF7E5; line-height: 1;"
                             class="form-control btn-square hide-scrollbar text-warning f-14">
                     </textarea>
                 }
@@ -242,7 +242,7 @@
                 </label>
                 @if (schedule.crewNotes || schedule.editCrewNote) {
                   <textarea [(ngModel)]="schedule.crewNotes" rows="4"
-                            [readonly]="!schedule.editCrewNote" style="background: #FFF7E5;"
+                            [readonly]="!schedule.editCrewNote" style="background: #FFF7E5; line-height: 1;"
                             class="form-control btn-square hide-scrollbar text-warning f-14">
                     </textarea>
                 }
@@ -260,7 +260,9 @@
 }
 
 <ng-template #loginModal let-modal>
-  <app-edit [crewInfo]="crewInfo()" (closeModal)="modal.close()"></app-edit>
+  <app-edit [crewInfo]="crewInfo()" [scheduleInfo]="selectedSchedule"
+            (closeModal)="modal.close()"
+            (finish)="onEditFinish($event); modal.close()"></app-edit>
 </ng-template>
 
 

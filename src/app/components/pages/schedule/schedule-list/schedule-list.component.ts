@@ -213,10 +213,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._modal.open(value, { centered: true, size: 'xl' })
   }
 
-  closeModal() {
-    this._modal.dismissAll()
-  }
-
   hoursDifference(startDateIso: string, endDateIso: string) {
     return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
@@ -314,7 +310,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this.get<Array<Crew>>('Crew/GetCrewList', {}).subscribe({
       next: (res) => {
         this.crewList.set(res.data);
-        console.log(res.data.filter(it => it.crewSkills.length > 3))
       }
     })
   }
@@ -344,7 +339,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             crew.loading = false;
           }
           if (res.errors?.errorCode) {
-
+            GeneralService.showErrorMessage(res.errors.message);
           } else {
             const jobPartCrew: Array<JobPartCrew> = this.list.find(it => it.jobPartId === res.data.jobPartId)?.crews as Array<JobPartCrew>;
             const updatedCrew: JobPartCrew = jobPartCrew?.find(it => it.jobPartCrewId === res.data.jobPartCrewId) as JobPartCrew;
@@ -481,5 +476,15 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   openJobShifts(schedule: Schedule) {
     this.openJobsShifts.emit(schedule);
+  }
+
+  onEditFinish(schedule: Schedule) {
+    this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
+      if (item.jobPartId === schedule.jobPartId) {
+        this.fillArray(schedule.crews, schedule.crewNumber);
+        return schedule;
+      }
+      return item;
+    });
   }
 }

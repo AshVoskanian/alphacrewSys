@@ -1,12 +1,13 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Select2Data, Select2Module } from "ng-select2-component";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { CrewSkill, JobPartCrewEdit } from "../../../../../shared/interface/schedule";
+import { CrewSkill, JobPartCrewEdit, Schedule } from "../../../../../shared/interface/schedule";
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { ROLES, SKILLS, STATUSES } from "../../../../../shared/data/schedule";
+import { GeneralService } from "../../../../../shared/services/general.service";
 
 @Component({
   selector: 'app-edit',
@@ -17,7 +18,9 @@ import { ROLES, SKILLS, STATUSES } from "../../../../../shared/data/schedule";
 })
 export class EditComponent extends ApiBase implements OnInit {
   @Input() crewInfo?: JobPartCrewEdit;
+  @Input() scheduleInfo?: Schedule;
   @Output() closeModal: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() finish: EventEmitter<Schedule> = new EventEmitter<Schedule>();
 
   private readonly _dr: DestroyRef = inject(DestroyRef);
   private readonly _fb: FormBuilder = inject(FormBuilder);
@@ -29,6 +32,7 @@ export class EditComponent extends ApiBase implements OnInit {
   travel: number = 0;
 
   loading: boolean = false;
+  saveLoading: boolean = false;
   bonusActionType: 'REMOVE' | 'APPLY';
 
   skills: Array<CrewSkill> = SKILLS;
@@ -63,7 +67,7 @@ export class EditComponent extends ApiBase implements OnInit {
   }
 
   setCrewSkills() {
-    const crewSkillIds: number[] = this.crewInfo.crewSkills.map(it => it.crewSkillId);
+    const crewSkillIds: number[] = this.crewInfo.jobPartSkills.map(it => it.crewSkillId);
     this.skills.forEach(it => it.checked = crewSkillIds.includes(it.crewSkillId));
   }
 
@@ -92,6 +96,45 @@ export class EditComponent extends ApiBase implements OnInit {
           }
 
           this.crewInfo.bonus = type === 'REMOVE' ? 0 : 5;
+          const bonus = type === 'REMOVE' ? -5 : 5;
+          this.crewInfo.pay += bonus;
+        }
+      })
+  }
+
+  save() {
+    if (this.saveLoading) return;
+
+    this.saveLoading = true;
+
+    const data = {
+      jobPartId: this.scheduleInfo.jobPartId,
+      jobPartCrewId: this.crewInfo.jobPartCrewId,
+      drivingBonus: this.form.get('expences').value,
+      extraHours: this.form.get('extraHours').value,
+      otherPaymentAdjustment: this.form.get('otherPaymentAdjustment').value,
+      skilledCost: this.form.get('skilledCost').value,
+      otherPaymentAdjustmentTxt: this.form.get('otherPaymentAdjustmentTxt').value,
+      lastMinuteBonus: this.form.get('lastMinuteBonus').value,
+      jobPartCrewStatusId: this.form.get('jobPartCrewStatusId').value,
+      jobPartCrewRoleId: this.form.get('jobPartCrewRoleId').value,
+      skillId: this.skills.filter(it => it.checked).map(it => it.crewSkillId)
+    }
+
+
+    this.post<Schedule>('/Schedule/jobpartcrewedit', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          this.saveLoading = false;
+
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage();
+          this.finish.emit(res.data);
         }
       })
   }

@@ -2,14 +2,25 @@
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 70px 50px 28px 28px;
+  gap: 4px;
+  padding: 45px 50px 8px 28px;
+
+  h6 {
+    font-size: 14px;
+  }
 
   .ribbon-bookmark {
     left: 50%;
     transform: translateX(-50%);
     width: fit-content;
+    height: 30px;
     padding: 0 10px;
+    line-height: 30px !important;
+
+    span {
+      font-size: 12px;
+      line-height: 30px;
+    }
 
     @media screen and (max-width: 400px) {
       & {
@@ -210,7 +221,7 @@
     .additional-info {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 4px;
 
       p {
         margin: 0;
