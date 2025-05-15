@@ -1,132 +1,134 @@
-<div class="offcanvas-header p-y-10">
-  <button class="btn-close" type="button" (click)="closeOffcanvas()"></button>
-</div>
-
-<form>
-  <div class="flex-column row m-b-20 ">
-    <ul class="list-group w-100 align-items-center flex-row">
-      @for (region of regions; track region.title) {
-        <li class="p-y-0 p-x-5">
-          <input class="form-check-input me-1 checkbox-{{ region.class }}"
-                 type="checkbox"
-                 [(ngModel)]="region.checked" [name]="region.title">
-          <label class="form-check-label txt-{{ region.class }} mb-0">{{ region.title }}</label>
-        </li>
-      }
-    </ul>
-
-    <ul class="list-group w-100 align-items-center flex-row">
-      @for (lvl of levels; track lvl.title) {
-        <li class="p-y-0 p-x-5">
-          <input class="form-check-input me-1 checkbox-{{ lvl.class }}" type="checkbox"
-                 [(ngModel)]="lvl.checked" [name]="lvl.title">
-          <label class="form-check-label txt-{{ lvl.class }} mb-0">{{ lvl.title }}</label>
-        </li>
-      }
-    </ul>
+<div class="div" (click)="$event.stopPropagation()">
+  <div class="offcanvas-header p-y-10">
+    <button class="btn-close" type="button" (click)="closeOffcanvas()"></button>
   </div>
 
-  <app-card [cardBodyClass]="'p-y-10 p-r-0'">
-    <div class="p-x-12">
-      <div class="common-flex justify-content-between align-items-center">
-        <ng-template #popoverContentAll>
-          <ul class="list-group">
-            <li class="list-group-item border-bottom pointer">
-              <i class="fa-solid rounded fa-phone-square"></i>
-              Whatsapp
-            </li>
-          </ul>
-        </ng-template>
-
-        <label class="form-check-label txt-warring mb-0">
-          <input class="form-check-input me-1 checkbox-warring" name="selectAll"
-                 type="checkbox" [(ngModel)]="allAreSelected" (change)="selectAll()">
-          All
-        </label>
-
-        <div class="common-flex align-items-center">
-          <div class="btn-group" ngbDropdown>
-            <button class="btn p-x-33 btn-outline-info position-relative" (click)="saveCrew('current')">
-              @if (loading) {
-                <i class="position-absolute fas fa-spin fa-spinner text-dark f-16"
-                   style="left: 8px; top: 8px;"
-                ></i>
-              }
-              Save
-            </button>
-            <div class="dropdown separated-btn">
-              <button class="btn btn-info dropdown-toggle-split rounded-0 rounded-end p-x-10 p-y-6 dropdown-button" ngbDropdownToggle>
-                <i class="icofont icofont-arrow-down"></i>
-              </button>
-              <ul class="dropdown-menu" ngbDropdownMenu>
-                @for(item of ['Save All Future Parts']; track item) {
-                  <li class="dropdown-item" ngbDropdownItem>
-                    <a href="javascript:void(0)" (click)="saveCrew('all')">{{ item }}</a>
-                  </li>
-                }
-              </ul>
-            </div>
-          </div>
-
-          <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
-             [ngbPopover]="popoverContentAll"
-             [popoverTitle]="'Contact'"
-          ></i>
-        </div>
-      </div>
-    </div>
-  </app-card>
-
-  <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
-    @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'); track crew.crewId) {
-      <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-0 p-y-3">
-        @if (crew.jobNotes) {
-          <i class="fa-solid fa-tag position-absolute" style="left: 10px; top: 2px" [ngbTooltip]="crew.jobNotes"></i>
+  <form>
+    <div class="flex-column row m-b-20 ">
+      <ul class="list-group w-100 align-items-center flex-row">
+        @for (region of regions; track region.title) {
+          <li class="p-y-0 p-x-5">
+            <input class="form-check-input me-1 checkbox-{{ region.class }}"
+                   type="checkbox"
+                   [(ngModel)]="region.checked" [name]="region.title">
+            <label class="form-check-label txt-{{ region.class }} mb-0">{{ region.title }}</label>
+          </li>
         }
-        <div>
-          <a href="javascript:void(0)" class="badge badge-primary rounded-circle badge-p-space m-r-10">1</a>
-          <span class="m-r-10">({{ crew.levelShortText }})</span>
+      </ul>
 
-          <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
-            <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
-                   type="checkbox" (change)="crewSelect(crew)"
-                   [checked]="crew.isChecked">
-            {{ crew.name }}
-          </label>
-        </div>
+      <ul class="list-group w-100 align-items-center flex-row">
+        @for (lvl of levels; track lvl.title) {
+          <li class="p-y-0 p-x-5">
+            <input class="form-check-input me-1 checkbox-{{ lvl.class }}" type="checkbox"
+                   [(ngModel)]="lvl.checked" [name]="lvl.title">
+            <label class="form-check-label txt-{{ lvl.class }} mb-0">{{ lvl.title }}</label>
+          </li>
+        }
+      </ul>
+    </div>
 
-        <div class="common-flex align-items-center gap-1">
-          <ng-template #popoverContent>
+    <app-card [cardBodyClass]="'p-y-10 p-r-10'">
+      <div class="p-x-12">
+        <div class="common-flex justify-content-between align-items-center">
+          <ng-template #popoverContentAll>
             <ul class="list-group">
               <li class="list-group-item border-bottom pointer">
                 <i class="fa-solid rounded fa-phone-square"></i>
-                WhatsApp
-              </li>
-              <li class="list-group-item border-bottom pointer">
-                <i class="fa-solid fa-envelope"></i>
-                Sms
+                Whatsapp
               </li>
             </ul>
           </ng-template>
 
-          <span class="badge badge-info rounded-pill">{{ crew.skills }}</span>
+          <label class="form-check-label txt-warring mb-0">
+            <input class="form-check-input me-1 checkbox-warring" name="selectAll"
+                   type="checkbox" [(ngModel)]="allAreSelected" (change)="selectAll()">
+            All
+          </label>
 
-          @if (!crew.isFulltime) {
-            <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-r-10">PT</a>
-          }
-          <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
-             [ngbPopover]="popoverContent"
-             [popoverTitle]="'Contact'"
-          ></i>
+          <div class="common-flex align-items-center">
+            <div class="btn-group" ngbDropdown>
+              <button class="btn p-x-33 btn-outline-info position-relative" (click)="saveCrew('current')">
+                @if (loading) {
+                  <i class="position-absolute fas fa-spin fa-spinner text-dark f-16"
+                     style="left: 8px; top: 8px;"
+                  ></i>
+                }
+                Save
+              </button>
+              <div class="dropdown separated-btn">
+                <button class="btn btn-info dropdown-toggle-split rounded-0 rounded-end p-x-10 p-y-6 dropdown-button"
+                        ngbDropdownToggle>
+                  <i class="icofont icofont-arrow-down"></i>
+                </button>
+                <ul class="dropdown-menu" ngbDropdownMenu>
+                  @for (item of [ 'Save All Future Parts' ]; track item) {
+                    <li class="dropdown-item" ngbDropdownItem>
+                      <a href="javascript:void(0)" (click)="saveCrew('all')">{{ item }}</a>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </div>
+
+            <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
+               [ngbPopover]="popoverContentAll"
+               [popoverTitle]="'Contact'"
+            ></i>
+          </div>
         </div>
-      </li>
-    }
-  </ul>
-</form>
+      </div>
+    </app-card>
 
-@if (showLimitError) {
-  <h6 class="text-danger m-t-20 shake text-center w-100">
-    The maximum number of crew must be {{ selectedSchedule?.crewNumber }}
-  </h6>
-}
+    <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
+      @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'); track crew.crewId) {
+        <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
+          @if (crew.jobNotes) {
+            <i class="fa-solid fa-tag position-absolute" style="left:0; top:0" [ngbTooltip]="crew.jobNotes"></i>
+          }
+          <div>
+            <a href="javascript:void(0)" class="badge badge-primary rounded-circle badge-p-space m-r-10">1</a>
+            <span class="m-r-10">({{ crew.levelShortText }})</span>
 
+            <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
+              <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
+                     type="checkbox" (change)="crewSelect(crew)"
+                     [checked]="crew.isChecked">
+              {{ crew.name }}
+            </label>
+          </div>
+
+          <div class="common-flex align-items-center gap-1">
+            <ng-template #popoverContent>
+              <ul class="list-group">
+                <li class="list-group-item border-bottom pointer">
+                  <i class="fa-solid rounded fa-phone-square"></i>
+                  WhatsApp
+                </li>
+                <li class="list-group-item border-bottom pointer">
+                  <i class="fa-solid fa-envelope"></i>
+                  Sms
+                </li>
+              </ul>
+            </ng-template>
+
+            <span class="badge badge-info rounded-pill">{{ crew.skills }}</span>
+
+            @if (!crew.isFulltime) {
+              <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-r-10">PT</a>
+            }
+            <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
+               [ngbPopover]="popoverContent"
+               [popoverTitle]="'Contact'"
+            ></i>
+          </div>
+        </li>
+      }
+    </ul>
+  </form>
+
+  @if (showLimitError) {
+    <h6 class="text-danger m-t-20 shake text-center w-100">
+      The maximum number of crew must be {{ selectedSchedule?.crewNumber }}
+    </h6>
+  }
+</div>
