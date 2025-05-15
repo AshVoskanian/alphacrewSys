@@ -1,0 +1,7 @@
+.dropdown-button {
+  width: 36px !important;
+
+  &:after {
+    content: none !important;
+  }
+}

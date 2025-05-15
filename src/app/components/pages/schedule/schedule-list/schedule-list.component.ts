@@ -168,47 +168,52 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res: Schedule[] | null) => {
-          if (!res || res.length === 0) return;
+          if (res && res.length !== 0) {
+            res.forEach(it => {
+              this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
+                if (item.jobPartId === it.jobPartId) {
+                  return {
+                    ...it,
+                    crews: this.fillArray(it.crews, it.crewNumber)
+                  };
+                }
+                return item;
+              });
 
-          const [ first ] = res;
-
-          if (first.isJobScoped) {
-            this._scheduleService.jobScopedShifts = res;
-
-            this._scheduleService.jobScopedShifts.forEach(it => {
-              this.fillArray(it.crews, it.crewNumber);
+              this._scheduleService.jobScopedShifts = this._scheduleService.jobScopedShifts.map(item => {
+                if (item.jobPartId === it.jobPartId) {
+                  return {
+                    ...it,
+                    crews: this.fillArray(it.crews, it.crewNumber)
+                  };
+                }
+                return item;
+              });
             });
 
-            this._scheduleService.shifts = this._scheduleService.shifts.map(it => {
-              const replacement = res.find(r => r.jobPartId === it.jobPartId);
-              return replacement ?? it;
-            });
-          } else {
-            this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
-              if (item.jobPartId === first.jobPartId) {
-                this.fillArray(first.crews, first.crewNumber);
-                return first;
-              }
-              return item;
-            });
+            this._scheduleService.crewUpdate$.next(null);
           }
-
-          this._scheduleService.crewUpdate$.next(null);
         }
       });
   }
 
 
-  fillArray(arr: Array<JobPartCrew>, length: number): void {
-    arr.forEach(item => item.isActive = true);
+  fillArray(arr: Array<JobPartCrew>, length: number): Array<JobPartCrew> {
+    const filled: Array<JobPartCrew> = [];
 
-    while (arr.length < length) {
-      arr.push({
-        name: '',
-        crewId: undefined,
-        isActive: false
-      });
+    for (let i = 0; i < length; i++) {
+      if (i < arr.length) {
+        filled.push({ ...arr[i], isActive: true });
+      } else {
+        filled.push({
+          name: '',
+          crewId: undefined,
+          isActive: false
+        });
+      }
     }
+
+    return filled;
   }
 
   openModal(value: TemplateRef<NgbModal>) {
@@ -481,13 +486,13 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   onEditFinish(schedule: Schedule) {
-    this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
-      if (item.jobPartId === schedule.jobPartId) {
-        this.fillArray(schedule.crews, schedule.crewNumber);
-        return schedule;
-      }
-      return item;
-    });
+    // this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
+    //   if (item.jobPartId === schedule.jobPartId) {
+    //     this.fillArray(schedule.crews, schedule.crewNumber);
+    //     return schedule;
+    //   }
+    //   return item;
+    // });
   }
 
 

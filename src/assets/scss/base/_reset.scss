@@ -1659,27 +1659,27 @@ $i: 1;
   }
 
   .p-l-#{$i} {
-    padding-left: #{$i}px;
+    padding-left: #{$i}px !important;
   }
 
   .p-r-#{$i} {
-    padding-right: #{$i}px;
+    padding-right: #{$i}px !important;
   }
 
   .p-t-#{$i} {
-    padding-top: #{$i}px;
+    padding-top: #{$i}px !important;
   }
 
   .p-b-#{$i} {
-    padding-bottom: #{$i}px;
+    padding-bottom: #{$i}px !important;
   }
   .p-y-#{$i} {
-    padding-top: #{$i}px;
-    padding-bottom: #{$i}px;
+    padding-top: #{$i}px !important;
+    padding-bottom: #{$i}px !important;
   }
   .p-x-#{$i} {
-    padding-left: #{$i}px;
-    padding-right: #{$i}px;
+    padding-left: #{$i}px !important;
+    padding-right: #{$i}px !important;
   }
 
   .gap-#{$i} {

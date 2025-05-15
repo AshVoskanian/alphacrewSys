@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { NgbActiveOffcanvas, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbActiveOffcanvas, NgbDropdownModule, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import { Crew, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
@@ -13,7 +13,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
   selector: 'app-crew-list',
   imports: [
     SvgIconComponent, CardComponent, CrewFilterPipe,
-    FormsModule, NgbPopoverModule, NgbTooltipModule
+    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule
   ],
   providers: [ CrewFilterPipe ],
   templateUrl: './crew-list.component.html',
@@ -60,6 +60,17 @@ export class CrewListComponent extends ApiBase implements OnInit {
     { id: 20, title: 'SS', class: 'warning', checked: false },
     { id: 21, title: 'ES', class: 'warning', checked: false },
   ];
+
+  splitDropdown = [
+    {
+      color : 'success',
+      title : 'Charts',
+      dropdown_item : [
+        { item : 'E-charts' },
+        { item : 'Apex chart' },
+      ]
+    },
+  ]
 
   ngOnInit() {
     this.getSelectedSchedule();
@@ -151,16 +162,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
   saveCrew(type: 'current' | 'all') {
     this.showBtnOptions = false;
 
-    if (type === 'current') {
-      this.addCrewToShift();
-    }
-
-    if (type === 'all') {
-
-    }
+    this.addCrewToShift(type);
   }
 
-  addCrewToShift() {
+  addCrewToShift(type: 'current' | 'all') {
     if (this.loading) return;
     this.loading = true;
 
@@ -170,7 +175,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
       crewId: this.getSelectedData('crew')
     }
 
-    if (!this.isJobScoped) {
+    if (type === 'current') {
       delete data.jobId
     }
 

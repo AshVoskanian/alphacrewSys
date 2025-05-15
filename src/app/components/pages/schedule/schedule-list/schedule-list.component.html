@@ -79,7 +79,7 @@
                       <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
                     </h6>
                   } @else {
-                    <h6 class="fw-bold pointer m-0" (click)="openJobShifts(schedule)" style="margin-top: 12px;">
+                    <h6 class="fw-bold pointer m-0 text-primary" (click)="openJobShifts(schedule)">
                       {{ schedule.shiftNumber }}
                       of
                       {{ schedule.shiftCount }}
@@ -222,7 +222,7 @@
 
             <div class="row justify-content-between">
               <div class="col-sm-5">
-                <label class="form-label justify-content-between common-flex">
+                <label class="form-label justify-content-between common-flex f-12">
                   Job Part Comments:
                   @if (schedule.notes || schedule.editComment) {
                     <span class="pointer">
@@ -251,7 +251,7 @@
               </div>
 
               <div class="col-sm-5">
-                <label class="form-label justify-content-between common-flex">
+                <label class="form-label justify-content-between common-flex f-12">
                   Crew Notes:
                   @if (schedule.crewNotes || schedule.editCrewNote) {
                     <span class="pointer">
