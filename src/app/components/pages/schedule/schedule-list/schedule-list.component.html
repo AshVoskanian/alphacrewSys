@@ -37,16 +37,16 @@
                       <div class="info-icons">
                         <div style="min-width: 28px">
                           @if (schedule.ootCost > 0) {
-                            <i class="fa-solid fa-car me-2 txt-primary f-20"></i>
+                            <i class="fa-solid fa-car me-2 txt-primary f-14"></i>
                           }
                         </div>
                         @if (schedule.isNigthShiftPaid) {
                           <div>
-                            <i class="far fa-moon me-2 text-success f-20"></i>
+                            <i class="far fa-moon me-2 text-success f-14"></i>
                           </div>
                         } @else if (schedule.isNightShift) {
                           <div>
-                            <i class="far fa-moon me-2 f-20"></i>
+                            <i class="far fa-moon me-2 f-14"></i>
                           </div>
                         }
                       </div>
@@ -75,7 +75,7 @@
 
                   @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
                     <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;" (click)="openJobShifts(schedule)">
-                      <app-feather-icon [class]="'w-15 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                      <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
                     </h6>
                   } @else {
                     <h6 class="fw-bold pointer m-0" (click)="openJobShifts(schedule)" style="margin-top: 12px;">
@@ -99,10 +99,10 @@
 
                   <div class="skills col-4">
                     <div>
-                      <i class="fa-solid fa-truck me-2 txt-primary f-20"></i>
+                      <i class="fa-solid fa-truck me-2 txt-primary f-14"></i>
                     </div>
                     <div>
-                      <i class="fa-solid fa-wrench me-2 text-danger f-20"></i>
+                      <i class="fa-solid fa-wrench me-2 text-danger f-14"></i>
                     </div>
                   </div>
                 </div>
@@ -122,17 +122,17 @@
                           >
                             <div class="icon">
                               @if (crew.jobPartCrewRoleId === 1) {
-                                <i class="fas fa-square me-2 text-white f-14"></i>
+                                <i class="fas fa-square me-2 text-white f-10"></i>
                               }
                               @if (crew.jobPartCrewRoleId === 2) {
-                                <i class="far fa-solid fa-star me-2 text-white f-14"></i>
+                                <i class="far fa-solid fa-star me-2 text-white f-10"></i>
                               }
                               @if (crew.jobPartCrewRoleId === 4) {
-                                <i class="fa-solid fa-flag me-2 text-white f-14"></i>
+                                <i class="fa-solid fa-flag me-2 text-white f-10"></i>
                               }
                             </div>
                           </div>
-                          <p class="hide-scrollbar f-10" style="font-size: 12px">
+                          <p class="hide-scrollbar">
                             {{ crew.name }}
                           </p>
                         }
@@ -142,10 +142,10 @@
                             <button class="btn b-ln-height btn-primary btn-square" [ngbTooltip]="'Edit'"
                                     (click)="getCrewInfo(crew)">
                               @if (crew.editLoading) {
-                                <app-feather-icon [class]="'w-15 text-white spin'"
+                                <app-feather-icon [class]="'w-10 h-10 text-white spin'"
                                                   [icon]="'loader'"></app-feather-icon>
                               } @else {
-                                <app-feather-icon [class]="'w-15'" [icon]="'edit'"></app-feather-icon>
+                                <app-feather-icon [class]="'w-10 h-10'" [icon]="'edit'"></app-feather-icon>
                               }
                             </button>
 
@@ -153,10 +153,10 @@
                               <button class="btn b-ln-height btn-info btn-square" style="width: 36px;"
                                       ngbDropdownToggle>
                                 @if (crew.loading) {
-                                  <app-feather-icon [class]="'w-15 text-white spin'"
+                                  <app-feather-icon [class]="'w-10 h-10 text-white spin'"
                                                     [icon]="'loader'"></app-feather-icon>
                                 } @else {
-                                  <app-feather-icon [class]="'w-15'" [icon]="'settings'"></app-feather-icon>
+                                  <app-feather-icon [class]="'w-10 h-10'" [icon]="'settings'"></app-feather-icon>
                                 }
                               </button>
                               <ul class="dropdown-menu" ngbDropdownMenu>
@@ -183,7 +183,7 @@
             <div class="main-divider">
               <div class="divider-body divider-body-1 divider-primary">
                 <div class="divider-p-primary" style="padding: 0;">
-                  <i class="fa-solid fa-comments me-2 txt-primary f-20"></i>
+                  <i class="fa-solid fa-comments me-2 txt-primary f-14"></i>
                   <span class="txt-primary">Comments</span>
                 </div>
               </div>
@@ -213,8 +213,8 @@
                 </label>
                 @if (schedule.notes || schedule.editComment) {
                   <textarea [(ngModel)]="schedule.notes" rows="4"
-                            [readonly]="!schedule.editComment" style="background: #FFF7E5; line-height: 1;"
-                            class="form-control btn-square hide-scrollbar text-warning f-14">
+                            [readonly]="!schedule.editComment"
+                            class="form-control btn-square hide-scrollbar text-warning">
                     </textarea>
                 }
               </div>
@@ -242,8 +242,8 @@
                 </label>
                 @if (schedule.crewNotes || schedule.editCrewNote) {
                   <textarea [(ngModel)]="schedule.crewNotes" rows="4"
-                            [readonly]="!schedule.editCrewNote" style="background: #FFF7E5; line-height: 1;"
-                            class="form-control btn-square hide-scrollbar text-warning f-14">
+                            [readonly]="!schedule.editCrewNote"
+                            class="form-control btn-square hide-scrollbar text-warning">
                     </textarea>
                 }
               </div>
@@ -253,7 +253,7 @@
       </div>
 
       <div class="open-crew-panel pointer" (click)="openCrewsPanel()">
-        <i class="fas fa-list f-20 z-3"></i>
+        <i class="fas fa-list f-14 z-3"></i>
       </div>
     </div>
   }

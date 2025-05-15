@@ -27,9 +27,10 @@ export class EditComponent extends ApiBase implements OnInit {
 
   form!: FormGroup;
 
-  lateNightShift: number = 0;
+  pay: number = 0;
   oot: number = 0;
   travel: number = 0;
+  lateNightShift: number = 0;
 
   loading: boolean = false;
   saveLoading: boolean = false;
@@ -45,6 +46,7 @@ export class EditComponent extends ApiBase implements OnInit {
     this.initForm();
     this.setCrewSkills();
     this.setAdditionalInfo();
+    this.pay = this.crewInfo.pay;
   }
 
   initForm() {
@@ -96,8 +98,8 @@ export class EditComponent extends ApiBase implements OnInit {
           }
 
           this.crewInfo.bonus = type === 'REMOVE' ? 0 : 5;
-          const bonus = type === 'REMOVE' ? -5 : 5;
-          this.crewInfo.pay += bonus;
+          const bonus = this.crewInfo.bonus = type === 'REMOVE' ? -5 : 5;
+          this.pay = this.crewInfo.pay + bonus;
         }
       })
   }
