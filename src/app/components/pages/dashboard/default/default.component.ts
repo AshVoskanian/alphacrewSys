@@ -28,13 +28,13 @@ export class DefaultComponent {
   }
 
   ngOnInit() {
-    this.toast.show('<i class="fa fa-bell"></i> <strong>Loading Inner Data........</strong>', '', {
-     enableHtml: true,
-     closeButton: true,
-     progressBar: true,
-     progressAnimation: 'increasing',
-     timeOut: 5000,
-   });
+   //  this.toast.show('<i class="fa fa-bell"></i> <strong>Loading Inner Data........</strong>', '', {
+   //   enableHtml: true,
+   //   closeButton: true,
+   //   progressBar: true,
+   //   progressAnimation: 'increasing',
+   //   timeOut: 5000,
+   // });
  }
 
   groupDetail(details: Details[], groupSize: number) {

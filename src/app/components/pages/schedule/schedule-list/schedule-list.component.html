@@ -74,7 +74,8 @@
                   </div>
 
                   @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
-                    <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;" (click)="openJobShifts(schedule)">
+                    <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;"
+                        (click)="openJobShifts(schedule)">
                       <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
                     </h6>
                   } @else {
@@ -108,8 +109,8 @@
                 </div>
               </div>
 
-              @if (schedule?.crews?.length) {
-                <div class="list-wrapper col-lg-6">
+              <div class="list-wrapper col-lg-6">
+                @if (schedule?.crews?.length) {
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
                       <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"
@@ -176,8 +177,38 @@
                       </li>
                     }
                   </ol>
+                }
+                <div class="m-t-15">
+                  @if (schedule.notificationCount > 0 && !schedule.notificationsLoader) {
+                    @if (schedule.showNotifications) {
+                      <div class="d-flex justify-content-between">
+                        <ul class="common-flex gap-2">
+                          @for (notification of schedule.notifications; track notification.status + $index) {
+                            <li class="border-primary dashed border-1 rounded p-y-1 p-x-3">
+                              <p class="f-10 p-0 m-0 truncate-100">
+                                {{ notification.sentDate + $index * 100 }}
+                              </p>
+                            </li>
+                          }
+                        </ul>
+                        <button type="button" class="btn-close py-0" (click)="schedule.showNotifications = false"></button>
+                      </div>
+                    } @else {
+                      <div class="notification-box w-fit position-relative pointer"
+                           (click)="getNotifications(schedule)">
+                        <i class="fa-solid fa-bell text-info f-20" style="animation: swing 1.5s ease infinite"></i>
+                        <span
+                          class="badge p-t-0 p-b-0 min-w-15 min-h-15 p-l-2 p-r-2 rounded-pill badge-danger position-absolute"
+                          style="top: -7px; left: 8px; line-height: 15px">
+                      {{ schedule.notificationCount }}
+                    </span>
+                      </div>
+                    }
+                  } @else if (schedule.notificationsLoader && schedule.jobPartId === selectedSchedule.jobPartId) {
+                    <app-feather-icon [class]="'w-17 h-17 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                  }
                 </div>
-              }
+              </div>
             </div>
 
             <div class="main-divider">

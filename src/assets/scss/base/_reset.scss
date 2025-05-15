@@ -1629,6 +1629,70 @@ $i: 1;
   font-size: 10px;
 }
 
+.w-fit {
+  width: fit-content;
+}
+
+@for $i from 0 through 1000 {
+  .w-#{$i} {
+    width: #{$i}px;
+  }
+
+  .h-#{$i} {
+    height: #{$i}px;
+  }
+
+  .min-w-#{$i} {
+    min-width: #{$i}px;
+  }
+
+  .min-h-#{$i} {
+    min-height: #{$i}px;
+  }
+
+  .max-w-#{$i} {
+    max-width: #{$i}px;
+  }
+
+  .max-h-#{$i} {
+    max-height: #{$i}px;
+  }
+
+  .p-l-#{$i} {
+    padding-left: #{$i}px;
+  }
+
+  .p-r-#{$i} {
+    padding-right: #{$i}px;
+  }
+
+  .p-t-#{$i} {
+    padding-top: #{$i}px;
+  }
+
+  .p-b-#{$i} {
+    padding-bottom: #{$i}px;
+  }
+  .p-y-#{$i} {
+    padding-top: #{$i}px;
+    padding-bottom: #{$i}px;
+  }
+  .p-x-#{$i} {
+    padding-left: #{$i}px;
+    padding-right: #{$i}px;
+  }
+
+  .gap-#{$i} {
+    gap: #{$i}px !important;
+  }
+
+  .truncate-#{$i} {
+    max-width: #{$i}px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
 
 .pointer {
   cursor: pointer;
@@ -1652,6 +1716,7 @@ $i: 1;
 .modal-xl {
   max-width: fit-content;
 }
+
 .common-offcanvas {
   z-index: 9999 !important;
 }

@@ -8,20 +8,14 @@ import { LocalStorageService } from "./local-storage.service";
   providedIn: 'root',
 })
 export class AuthService {
-  private newlyCreatedUser$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-
   private tokenKey = 'authToken';
 
   private router = inject(Router);
   private sessionStorageService = inject(SessionStorageService);
   private localStorageService = inject(LocalStorageService);
 
-  get newlyCreatedUser(): Observable<string> {
-    return this.newlyCreatedUser$.asObservable()
-  }
-
-  set newlyCreatedUser(user: string) {
-    this.newlyCreatedUser$.next(user);
+  set userInfo(user: any) {
+    this.localStorageService.setItem<string>('user', JSON.stringify(user));
   }
 
   getToken(): string | null {

@@ -31,11 +31,6 @@ export class LoginComponent extends ApiBase implements OnInit {
   }
 
   initForm() {
-    const userDetails = localStorage.getItem('user');
-    if (userDetails?.length != null) {
-      this.router.navigate([ '/dashboard/default' ])
-    }
-
     this.loginForm = new FormGroup({
       email: new FormControl("", [ Validators.required, Validators.email ]),
       password: new FormControl("", Validators.required)
@@ -59,7 +54,8 @@ export class LoginComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) {
             this.toast.error(res.errors.message)
           } else {
-            this._authService.setToken(res.data?.token)
+            this._authService.setToken(res.data?.token);
+            this._authService.userInfo = res.user;
             this.router.navigateByUrl('dashboard/default')
           }
         }

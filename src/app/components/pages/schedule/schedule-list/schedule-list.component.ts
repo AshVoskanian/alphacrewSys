@@ -19,6 +19,7 @@ import {
   JobPartCrew,
   JobPartCrewEdit,
   JobPartCrewUpdate,
+  Notification,
   Schedule
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
@@ -42,11 +43,12 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { CrewAction } from "../../../../shared/interface/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, NgbPopoverModule, NgbAlertModule,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
@@ -153,8 +155,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   ]);
 
 
-  crewNoteLoader: boolean = false;
   jobNoteLoader: boolean = false;
+  crewNoteLoader: boolean = false;
 
   ngOnInit() {
     this.getCrewList();
@@ -486,5 +488,27 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       }
       return item;
     });
+  }
+
+
+  getNotifications(schedule: Schedule) {
+    if (schedule.notificationsLoader) return;
+
+    schedule.notificationsLoader = true;
+
+    this.get<Array<Notification>>(`Schedule/GetJobNotificationAsync/${ schedule.jobPartId }`)
+      .subscribe({
+        next: (res) => {
+          schedule.notificationsLoader = false;
+
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          schedule.notifications = res.data;
+          schedule.showNotifications = true;
+        }
+      })
   }
 }

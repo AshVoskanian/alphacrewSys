@@ -70,6 +70,7 @@ export interface PageSizeOptions {
 
 export interface ApiResponse<T> {
   data: T;
+  user?: any;
   errors: {
     errorCode: string,
     message: string

@@ -779,7 +779,7 @@
 
         .profile-dropdown {
           width: 160px;
-          top: 57px;
+          top: 36px;
           left: -12px;
           padding: 0 10px;
 
@@ -845,6 +845,12 @@
 
       &:before {
         animation: fadeIn 0.5s ease-in-out;
+      }
+
+      & {
+        @media screen and (min-width: 1000px) {
+          margin-top: 90px !important;
+        }
       }
     }
 
@@ -1039,6 +1045,12 @@
         width: 100vw;
         border-top: 1px solid $light-semi-gray;
         z-index: 3;
+
+        & {
+          @media screen and (min-width: 1000px) {
+            display: none !important;
+          }
+        }
 
         .simplebar-content {
           display: flex;

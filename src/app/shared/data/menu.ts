@@ -8,13 +8,10 @@ export const menuItems: Menu[] = [
   {
     title: 'Dashboard',
     icon: 'home',
-    type: 'sub',
-    active: true,
+    type: 'link',
+    bookmark: true,
+    path: '/dashboard/default',
     level: 1,
-    children: [
-      { path: '/dashboard/default', title: 'Default', type: 'link' },
-      { path: '/dashboard/dashboard2', title: 'Other dashboard data', type: 'link' },
-    ],
   },
   {
     title: 'Schedule',

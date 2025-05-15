@@ -13,15 +13,7 @@ export const pages: Routes = [
               title: "default",
               breadcrumb: "default",
             }
-          },
-          {
-            path: 'dashboard2',
-            component: DefaultComponent,
-            data: {
-              title: "dashboard2",
-              breadcrumb: "dashboard2",
-            }
-          },
+          }
         ]
       }
 ]

@@ -10,11 +10,14 @@ export interface Schedule {
   isJobActive: boolean;
   isNightShift: boolean;
   isNigthShiftPaid: boolean;
+  showNotifications: boolean;
+  notificationsLoader: boolean;
   editComment?: boolean;
   editCrewNote?: boolean;
   isJobScoped?: boolean;
   jobId: number;
   shiftCount: number;
+  notificationCount: number;
   shiftNumber: number;
   jobNotifications: any[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   jobPartId: number;
@@ -32,6 +35,7 @@ export interface Schedule {
   vehicles: Vehicle[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   venueId: number;
   venueName: string;
+  notifications: Array<Notification>;
 }
 
 export interface JobPartCrew {
@@ -123,4 +127,14 @@ export interface CrewSkill {
   isPublic: boolean;
   checked?: boolean;
   description: string;
+}
+
+
+export interface Notification {
+  jobId: number;
+  jobPartId: number;
+  status: number;
+  sentDate: string;
+  sentBy: string;
+  crewId: number;
 }

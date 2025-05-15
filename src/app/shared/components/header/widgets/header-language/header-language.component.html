@@ -1,22 +1,49 @@
 <div class="translate_wrapper" [ngClass]="navService.isLanguage ? 'active' : ''">
-    @if(selectedLanguage) {
-        <div class="current_lang">
-          <div class="lang">
-            <i class="flag-icon flag-icon-{{ selectedLanguage.icon }}"></i>
-            <span class="lang-txt">{{ selectedLanguage.code }}</span>
-            </div>
-        </div>
-    }
-    <div class="more_lang" [ngClass]="navService.isLanguage ? 'active' : ''">
-        @for(language of languages; track language) {
-            <div class="lang selected" (click)="selectLanguage(language)">
-                <i class="flag-icon flag-icon-{{ language.icon }}"></i>
-                <span class="lang-txt">{{ language.name }}
-                    @if(language.country_code) {
-                        <span> ({{ language.country_code }})</span>
-                    }
-                </span>
-            </div>
-        }
+  @if (selectedLanguage) {
+    <!--    <div class="current_lang">-->
+      <!--      <div class="lang">-->
+      <!--        &lt;!&ndash;        <i class="flag-icon flag-icon-{{ selectedLanguage.icon }}"></i>&ndash;&gt;-->
+      <!--        &lt;!&ndash;        <span class="lang-txt">{{ selectedLanguage.code }}</span>&ndash;&gt;-->
+      <!--        <app-svg-icon [icon]="selectedMenuItem?.icon" [change]="true"></app-svg-icon>-->
+      <!--        <span class="lang-txt" style="text-transform: capitalize; mt4">{{ selectedMenuItem?.title | titlecase }}</span>-->
+      <!--      </div>-->
+      <!--    </div>-->
+    <div class="common-flex flex-nowrap align-items-center h-20 m-0">
+      <div>
+        <app-svg-icon [icon]="selectedMenuItem?.icon" [class]="'h-15'" [change]="true"></app-svg-icon>
+      </div>
+      <p class="m-0" style="padding-top: 3px;">
+        {{ selectedMenuItem?.title | titlecase }}
+      </p>
     </div>
+  }
+  <!--  <div class="more_lang" [ngClass]="navService.isLanguage ? 'active' : ''">-->
+  <!--    @for (language of languages; track language) {-->
+  <!--      <div class="lang selected" (click)="selectLanguage(language)">-->
+  <!--        <i class="flag-icon flag-icon-{{ language.icon }}"></i>-->
+  <!--        <span class="lang-txt">{{ language.name }}-->
+  <!--          @if (language.country_code) {-->
+  <!--            <span> ({{ language.country_code }})</span>-->
+  <!--          }-->
+  <!--                  </span>-->
+  <!--      </div>-->
+  <!--    }-->
+  <!--  </div>-->
+
+  <div class="more_lang" [ngClass]="navService.isLanguage ? 'active' : ''">
+    @for (menuItem of menuItems; track menuItem.path + $index) {
+      <div class="lang selected" (click)="selectedMenu(menuItem)">
+        <div class="m-r-10">
+          @if (menuItem.icon) {
+            <app-svg-icon [icon]="menuItem.icon" [change]="true"></app-svg-icon>
+          }
+        </div>
+        @if (menuItem.type === 'extTabLink') {
+          <a [href]="menuItem.path" target="_blank" class="sidebar-link sidebar-title link-nav">{{ menuItem.title }}</a>
+        } @else {
+          <a [routerLink]="menuItem.path" class="sidebar-link sidebar-title link-nav">{{ menuItem.title }}</a>
+        }
+      </div>
+    }
   </div>
+</div>
