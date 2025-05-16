@@ -114,7 +114,7 @@
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
                       <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"
-                          (click)="openCrewsPanel(crew, $event)">
+                          (click)="openCrewsPanel(crew, $event, schedule);">
                         @if (crew.isActive) {
                           <div class="status"
                                [style.background-color]="crew.jobPartCrewStatusColour"
@@ -283,7 +283,7 @@
         </div>
       </div>
 
-      <div class="open-crew-panel pointer" (click)="openCrewsPanel(null, $event)">
+      <div class="open-crew-panel pointer" (click)="openCrewsPanel(null, $event, schedule)">
         <i class="fas fa-list f-14 z-3"></i>
       </div>
     </div>

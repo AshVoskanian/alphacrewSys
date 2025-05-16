@@ -8,11 +8,12 @@ import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
+import { DatePipe } from "@angular/common";
 
 @Component({
   selector: 'app-crew-list',
   imports: [
-    SvgIconComponent, CardComponent, CrewFilterPipe,
+    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe,
     FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule
   ],
   providers: [ CrewFilterPipe ],
@@ -74,6 +75,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getSelectedSchedule();
+  }
+
+  hoursDifference(startDateIso: string, endDateIso: string) {
+    return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
 
   getSelectedSchedule(): void {

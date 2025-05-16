@@ -1,5 +1,20 @@
 <div class="div" (click)="$event.stopPropagation()">
-  <div class="offcanvas-header p-y-10">
+  <div class="offcanvas-header p-y-10 p-x-0 gap-12 align-items-start">
+    <div class="max-w-465">
+      <p class="f-12 m-0 text-warning">
+        {{ selectedSchedule?.startDate |  date: 'dd MMM yyy':'': 'en' }},
+        {{ selectedSchedule?.startDate | date: 'HH:mm' }} -  {{ selectedSchedule?.endDate | date: 'HH:mm' }}
+        (Cr: {{ selectedSchedule?.crewNumber }},
+        Hrs: {{ hoursDifference(selectedSchedule?.startDate, selectedSchedule?.endDate) }} )
+      </p>
+      @if (selectedSchedule.companyName) {
+        <p class="f-10 m-0 text-info">{{ selectedSchedule.companyName }}</p>
+      }
+      @if (selectedSchedule.venueName) {
+        <p class="f-10 m-0 text-info">{{ selectedSchedule.venueName }}</p>
+      }
+    </div>
+
     <button class="btn-close" type="button" (click)="closeOffcanvas()"></button>
   </div>
 
@@ -87,7 +102,6 @@
           }
           <div>
             <a href="javascript:void(0)" class="badge badge-primary rounded-circle badge-p-space m-r-10">1</a>
-            <span class="m-r-10">({{ crew.levelShortText }})</span>
 
             <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
               <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
@@ -95,6 +109,8 @@
                      [checked]="crew.isChecked">
               {{ crew.name }}
             </label>
+
+            <span class="m-l-10">({{ crew.levelShortText }})</span>
           </div>
 
           <div class="common-flex align-items-center gap-1">

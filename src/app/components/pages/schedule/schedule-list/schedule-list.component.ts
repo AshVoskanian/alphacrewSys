@@ -1,7 +1,8 @@
 import {
   Component,
   DestroyRef,
-  EventEmitter, HostListener,
+  EventEmitter,
+  HostListener,
   inject,
   Input,
   input,
@@ -158,10 +159,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   jobNoteLoader: boolean = false;
   crewNoteLoader: boolean = false;
 
-  @HostListener('document:click', ['$event'])
+  @HostListener('document:click', [ '$event' ])
   handleClick(event: MouseEvent) {
-    this.offcanvasRef.close();
-    console.log('Clicked:', event);
+    this.offcanvasRef?.close();
   }
 
   ngOnInit() {
@@ -297,8 +297,12 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     })
   }
 
-  openCrewsPanel(crew: JobPartCrew, e: Event) {
+  openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
+    if (schedule) {
+      this.selectSchedule(schedule);
+    }
     e?.stopPropagation();
+
     if ((crew && crew.isActive) || this.offcanvasRef) {
       return
     }
@@ -474,7 +478,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         break;
 
       case CrewAction.CHANGE:
-        this.openCrewsPanel(null, null);
+        this.openCrewsPanel(null, null, this.selectedSchedule);
         break;
 
       default:
