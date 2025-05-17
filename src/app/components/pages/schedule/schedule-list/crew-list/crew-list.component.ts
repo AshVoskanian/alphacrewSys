@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveOffcanvas, NgbDropdownModule, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
-import { Crew, Schedule } from "../../../../../shared/interface/schedule";
+import { Crew, CrewClashing, CrewManager, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
@@ -8,13 +8,15 @@ import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
-import { DatePipe } from "@angular/common";
+import { AsyncPipe, DatePipe } from "@angular/common";
+import { Observable } from "rxjs";
+import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 
 @Component({
   selector: 'app-crew-list',
   imports: [
-    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe,
-    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule
+    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe,
+    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, FeatherIconComponent
   ],
   providers: [ CrewFilterPipe ],
   templateUrl: './crew-list.component.html',
@@ -31,10 +33,13 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   form: FormGroup;
 
+  loading: boolean = false;
   allAreSelected: boolean = false;
   showBtnOptions: boolean = false;
   showLimitError: boolean | undefined = false;
-  loading: boolean = false;
+  crewManagerLoader: boolean = false;
+  crewClashingLoader: boolean = false;
+  listLoading$: Observable<boolean> = this._scheduleService.crewListLoading.asObservable();
   selectedSchedule: Schedule | null;
 
   regions = [
@@ -62,19 +67,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
     { id: 21, title: 'ES', class: 'warning', checked: false },
   ];
 
-  splitDropdown = [
-    {
-      color : 'success',
-      title : 'Charts',
-      dropdown_item : [
-        { item : 'E-charts' },
-        { item : 'Apex chart' },
-      ]
-    },
-  ]
-
   ngOnInit() {
     this.getSelectedSchedule();
+    this.getCrewManager();
+    this.getCrewClashing();
   }
 
   hoursDifference(startDateIso: string, endDateIso: string) {
@@ -197,5 +193,52 @@ export class CrewListComponent extends ApiBase implements OnInit {
         }
       }
     })
+  }
+
+  getCrewManager() {
+    this.crewManagerLoader = true;
+
+    this.get<Array<CrewManager>>(`Crew/GetCrewManager/${ this.selectedSchedule.jobPartId }`)
+      .subscribe({
+        next: res => {
+          this.crewManagerLoader = false;
+          console.log(res.data.filter(it => it.crewHours > 0))
+
+          for (let crew of this.crewList) {
+            const match = res.data.find(r => r.crewID === crew.crewId);
+            if (match) {
+              crew.crewHours = match.crewHours;
+            }
+          }
+        }
+      })
+  }
+
+  getCrewClashing() {
+    this.crewClashingLoader = true;
+
+    this.get<Array<CrewClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
+      .subscribe({
+        next: res => {
+          this.crewClashingLoader = false;
+
+          const groupedByCrewId = res.data.reduce((acc, job) => {
+            if (!acc[job.crewId]) {
+              acc[job.crewId] = [];
+            }
+            acc[job.crewId].push(job);
+            return acc;
+          }, {} as Record<number, CrewClashing[]>);
+
+          console.log(groupedByCrewId, 9888)
+
+          // for (let crew of this.crewList) {
+          //   const match = res.data.find(r => r.crewId === crew.crewId);
+          //   if (match) {
+          //     crew.crewHours = match.crewHours;
+          //   }
+          // }
+        }
+      })
   }
 }

@@ -45,6 +45,7 @@ import { CrewAction } from "../../../../shared/interface/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
+import { delay } from "rxjs";
 
 @Component({
   selector: 'app-schedule-list',
@@ -324,12 +325,18 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   getCrewList() {
     if (this.crewList()?.length !== 0) return;
+    this._scheduleService.crewListLoading.next(true);
 
-    this.get<Array<Crew>>('Crew/GetCrewList', {}).subscribe({
-      next: (res) => {
-        this.crewList.set(res.data);
-      }
-    })
+    this.get<Array<Crew>>('Crew/GetCrewList', {})
+      .subscribe({
+        next: (res) => {
+          this._scheduleService.crewListLoading.next(false);
+          this.crewList.set(res.data);
+          if (this.offcanvasRef) {
+            this.offcanvasRef.componentInstance.crewList = this.crewList();
+          }
+        }
+      })
   }
 
   getCrewInfo(crew: JobPartCrew) {

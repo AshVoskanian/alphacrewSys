@@ -7,12 +7,15 @@
         (Cr: {{ selectedSchedule?.crewNumber }},
         Hrs: {{ hoursDifference(selectedSchedule?.startDate, selectedSchedule?.endDate) }} )
       </p>
-      @if (selectedSchedule.companyName) {
-        <p class="f-10 m-0 text-info">{{ selectedSchedule.companyName }}</p>
-      }
-      @if (selectedSchedule.venueName) {
-        <p class="f-10 m-0 text-info">{{ selectedSchedule.venueName }}</p>
-      }
+      <p class="f-10 m-0 text-info">
+        @if (selectedSchedule.companyName) {
+          {{ selectedSchedule.companyName }} |
+        }
+        @if (selectedSchedule.venueName) {
+          {{ selectedSchedule.venueName }}
+        }
+      </p>
+
     </div>
 
     <button class="btn-close" type="button" (click)="closeOffcanvas()"></button>
@@ -93,53 +96,62 @@
         </div>
       </div>
     </app-card>
-
-    <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
-      @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'); track crew.crewId) {
-        <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
-          @if (crew.jobNotes) {
-            <i class="fa-solid fa-tag position-absolute" style="left:0; top:0" [ngbTooltip]="crew.jobNotes"></i>
-          }
-          <div>
-            <a href="javascript:void(0)" class="badge badge-primary rounded-circle badge-p-space m-r-10">1</a>
-
-            <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
-              <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
-                     type="checkbox" (change)="crewSelect(crew)"
-                     [checked]="crew.isChecked">
-              {{ crew.name }}
-            </label>
-
-            <span class="m-l-10">({{ crew.levelShortText }})</span>
-          </div>
-
-          <div class="common-flex align-items-center gap-1">
-            <ng-template #popoverContent>
-              <ul class="list-group">
-                <li class="list-group-item border-bottom pointer">
-                  <i class="fa-solid rounded fa-phone-square"></i>
-                  WhatsApp
-                </li>
-                <li class="list-group-item border-bottom pointer">
-                  <i class="fa-solid fa-envelope"></i>
-                  Sms
-                </li>
-              </ul>
-            </ng-template>
-
-            <span class="badge badge-info rounded-pill">{{ crew.skills }}</span>
-
-            @if (!crew.isFulltime) {
-              <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-r-10">PT</a>
+    @if (listLoading$ | async) {
+      Loading...
+    } @else {
+      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
+        @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'); track crew.crewId) {
+          <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
+            @if (crew.jobNotes) {
+              <i class="fa-solid fa-tag position-absolute" style="left:0; top:0" [ngbTooltip]="crew.jobNotes"></i>
             }
-            <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
-               [ngbPopover]="popoverContent"
-               [popoverTitle]="'Contact'"
-            ></i>
-          </div>
-        </li>
-      }
-    </ul>
+            <div>
+              @if (crewManagerLoader) {
+                <i class="fas fa-spin fa-spinner f-15 m-0"></i>
+              } @else {
+                <p class="badge h-15 w-15 text-center badge-primary rounded-circle p-0 m-0 m-r-10" style="line-height: 15px;">
+                  {{ crew.crewHours }}
+                </p>
+              }
+
+              <label class="form-check-label txt-warring mb-0 m-l-10" [for]="crew.crewId">
+                <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
+                       type="checkbox" (change)="crewSelect(crew)"
+                       [checked]="crew.isChecked">
+                {{ crew.name }}
+              </label>
+
+              <span class="m-l-10">({{ crew.levelShortText }})</span>
+            </div>
+
+            <div class="common-flex align-items-center gap-1">
+              <ng-template #popoverContent>
+                <ul class="list-group">
+                  <li class="list-group-item border-bottom pointer">
+                    <i class="fa-solid rounded fa-phone-square"></i>
+                    WhatsApp
+                  </li>
+                  <li class="list-group-item border-bottom pointer">
+                    <i class="fa-solid fa-envelope"></i>
+                    Sms
+                  </li>
+                </ul>
+              </ng-template>
+
+              <span class="badge badge-info rounded-pill">{{ crew.skills }}</span>
+
+              @if (!crew.isFulltime) {
+                <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-r-10">PT</a>
+              }
+              <i class="fa-solid rounded fa-phone-square text-success pointer f-20"
+                 [ngbPopover]="popoverContent"
+                 [popoverTitle]="'Contact'"
+              ></i>
+            </div>
+          </li>
+        }
+      </ul>
+    }
   </form>
 
   @if (showLimitError) {

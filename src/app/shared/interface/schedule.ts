@@ -60,7 +60,7 @@ export interface Vehicle {
   numberPlate: string;
 }
 
-export interface Crew {
+export interface Crew extends CrewManager{
   crewId: number;
   regionId: number;
   regionText: string;
@@ -137,4 +137,25 @@ export interface Notification {
   sentDate: string;
   sentBy: string;
   crewId: number;
+}
+
+export interface CrewManager {
+  conflict: number;
+  crewHours: number;
+  crewID: number;
+  holiday: number;
+  struckOut: number;
+  turnedDown: number;
+}
+
+export interface CrewClashing {
+  jobId: number;
+  jobPartId: number;
+  bookedCrew: number;
+  assignedCrew: number;
+  startDate: string;
+  endDate: string;
+  hours: number;
+  crewId: number;
+  clashing: number;
 }
