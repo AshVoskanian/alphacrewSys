@@ -10,9 +10,9 @@ export class GeneralService {
   constructor() {
   }
 
-  public static   showSuccessMessage() {
+  public static showSuccessMessage(title?: string) {
     Swal.fire({
-      title: 'Successfully saved',
+      title: title || 'Successfully saved',
       icon: 'success',
       toast: true,
       position: "top-right",
@@ -22,7 +22,7 @@ export class GeneralService {
     })
   }
 
-  public static  showErrorMessage(error: string) {
+  public static showErrorMessage(error: string) {
     Swal.fire({
       title: error,
       icon: 'error',

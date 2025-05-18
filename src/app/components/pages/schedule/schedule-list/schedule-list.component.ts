@@ -45,7 +45,6 @@ import { CrewAction } from "../../../../shared/interface/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
-import { delay } from "rxjs";
 
 @Component({
   selector: 'app-schedule-list',
@@ -533,5 +532,80 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
           schedule.showNotifications = true;
         }
       })
+  }
+
+  getNotificationStatusClass(status: number): { border: string, color: string, bg: string } {
+    const colorData = {
+      0: {
+        border: 'primary',
+        color: 'primary',
+        bg: 'primary-subtle'
+      },
+      1: {
+        border: 'primary',
+        color: 'primary',
+        bg: 'primary-subtle'
+      },
+      2: {
+        border: 'primary',
+        color: 'success',
+        bg: 'success-subtle'
+      },
+      3: {
+        border: 'success',
+        color: 'success',
+        bg: 'success-subtle'
+      },
+      4: {
+        border: 'danger',
+        color: 'danger',
+        bg: 'danger-subtle'
+      },
+      5: {
+        border: 'danger',
+        color: 'danger',
+        bg: 'danger-subtle'
+      },
+      6: {
+        border: 'dark',
+        color: 'dark',
+        bg: 'dark-subtle'
+      },
+      7: {
+        border: 'info',
+        color: 'primary',
+        bg: 'info-subtle'
+      }
+    };
+    return colorData[status];
+  }
+
+  getCrewSectionStyles(schedule: Schedule) {
+    if (schedule.statusId !== 3) {
+      return {}
+    }
+    const crewCount = schedule.crews?.filter(it => it.isActive)?.length ?? 0;
+
+    if (crewCount > schedule.crewNumber) {
+      return {
+        background: 'repeating-linear-gradient(-55deg, #222, #222 10px, #333 10px, #333 20px)'
+      };
+    }
+
+    const allAreConfirmed = schedule.crews?.every(c => c.jobPartCrewStatusId === 2) ?? false;
+
+    if (crewCount < schedule.crewNumber || !allAreConfirmed) {
+      return {
+        background: 'repeating-linear-gradient(to right, #f6ba52, #f6ba52 10px, #ffd180 10px, #ffd180 20px)'
+      };
+    }
+
+    if (crewCount === schedule.crewNumber && allAreConfirmed) {
+      return {
+        background: 'linear-gradient(to bottom, PaleGreen, PaleGreen 50%, PaleGreen 50%, PaleGreen)'
+      };
+    }
+
+    return {};
   }
 }

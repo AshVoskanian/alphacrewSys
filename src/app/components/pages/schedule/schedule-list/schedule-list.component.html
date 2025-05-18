@@ -109,7 +109,7 @@
                 </div>
               </div>
 
-              <div class="list-wrapper col-lg-6">
+              <div class="list-wrapper col-lg-6 p-2 rounded" [ngStyle]="getCrewSectionStyles(schedule)">
                 @if (schedule?.crews?.length) {
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
@@ -184,14 +184,20 @@
                       <div class="d-flex justify-content-between">
                         <ul class="common-flex gap-2">
                           @for (notification of schedule.notifications; track notification.status + $index) {
-                            <li class="border-primary dashed border-1 rounded p-y-1 p-x-3">
-                              <p class="f-10 p-0 m-0 truncate-100">
-                                {{ notification.sentDate + $index * 100 }}
+                            <li
+                              class="
+                              bg-{{getNotificationStatusClass(notification.status)?.bg}}
+                              border-{{getNotificationStatusClass(notification.status)?.border}}
+                              dashed border-1 rounded p-y-1 p-x-3">
+                              <p
+                                class="f-10 p-0 m-0 truncate-100 text-{{getNotificationStatusClass(notification.status)?.color}}">
+                                {{ notification.name }}
                               </p>
                             </li>
                           }
                         </ul>
-                        <button type="button" class="btn-close py-0" (click)="schedule.showNotifications = false"></button>
+                        <button type="button" class="btn-close py-0"
+                                (click)="schedule.showNotifications = false"></button>
                       </div>
                     } @else {
                       <div class="notification-box w-fit position-relative pointer"

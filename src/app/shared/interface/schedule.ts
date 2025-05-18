@@ -24,6 +24,7 @@ export interface Schedule {
   jobPartTypeId: number;
   jobPartVenueName: string;
   jobRegionId: number;
+  statusId: number;
   ootCost: number;
   notes: string;
   onsiteContact: string;
@@ -67,6 +68,7 @@ export interface Crew extends CrewManager{
   levelId: number;
   isFulltime: boolean;
   isChecked?: boolean;
+  notificationLoading?: boolean;
   levelCode: string;
   levelText: string;
   levelShortText: string;
@@ -136,6 +138,7 @@ export interface Notification {
   status: number;
   sentDate: string;
   sentBy: string;
+  name: string;
   crewId: number;
 }
 

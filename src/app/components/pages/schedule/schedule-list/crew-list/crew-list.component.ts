@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveOffcanvas, NgbDropdownModule, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import { Crew, CrewClashing, CrewManager, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
@@ -11,6 +11,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
 import { AsyncPipe, DatePipe } from "@angular/common";
 import { Observable } from "rxjs";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-crew-list',
@@ -23,6 +24,7 @@ import { FeatherIconComponent } from "../../../../../shared/components/ui/feathe
   styleUrl: './crew-list.component.scss'
 })
 export class CrewListComponent extends ApiBase implements OnInit {
+  private _dr: DestroyRef = inject(DestroyRef);
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
   private _scheduleService = inject(ScheduleService);
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
@@ -39,6 +41,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
   showLimitError: boolean | undefined = false;
   crewManagerLoader: boolean = false;
   crewClashingLoader: boolean = false;
+  notificationsSendLoader: boolean = false;
   listLoading$: Observable<boolean> = this._scheduleService.crewListLoading.asObservable();
   selectedSchedule: Schedule | null;
 
@@ -69,8 +72,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getSelectedSchedule();
-    this.getCrewManager();
-    this.getCrewClashing();
   }
 
   hoursDifference(startDateIso: string, endDateIso: string) {
@@ -78,38 +79,43 @@ export class CrewListComponent extends ApiBase implements OnInit {
   }
 
   getSelectedSchedule(): void {
-    this._scheduleService.selectedShift$.subscribe((schedule: Schedule | null) => {
-      if (!schedule) return;
+    this._scheduleService.selectedShift$
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe((schedule: Schedule | null) => {
+        if (!schedule) return;
 
-      this.selectedSchedule = schedule;
+        this.selectedSchedule = schedule;
 
-      const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
-      const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
-      const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelId));
+        const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
+        const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
+        const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelId));
 
-      // Check existing crews
-      this.crewList.forEach(crew => {
-        crew.isChecked = selectedCrewIds.has(crew.crewId);
+        // Check existing crews
+        this.crewList.forEach(crew => {
+          crew.isChecked = selectedCrewIds.has(crew.crewId);
+        });
+
+        // Check existing crew level filters
+        this.levels.forEach(level => {
+          level.checked = selectedCrewLevelIds.has(level.id);
+        })
+
+        // Check existing crew region filters
+        this.regions.forEach(region => {
+          region.checked = selectedCrewRegionIds.has(region.id);
+        })
+
+        if (!this.levels.some(it => it.checked)) {
+          this.levels[0].checked = true;
+        }
+
+        if (!this.regions.some(it => it.checked)) {
+          this.regions[0].checked = true;
+        }
+
+        this.getCrewManager();
+        this.getCrewClashing();
       });
-
-      // Check existing crew level filters
-      this.levels.forEach(level => {
-        level.checked = selectedCrewLevelIds.has(level.id);
-      })
-
-      // Check existing crew region filters
-      this.regions.forEach(region => {
-        region.checked = selectedCrewRegionIds.has(region.id);
-      })
-
-      if (!this.levels.some(it => it.checked)) {
-        this.levels[0].checked = true;
-      }
-
-      if (!this.regions.some(it => it.checked)) {
-        this.regions[0].checked = true;
-      }
-    });
   }
 
   closeOffcanvas() {
@@ -240,5 +246,57 @@ export class CrewListComponent extends ApiBase implements OnInit {
           // }
         }
       })
+  }
+
+  sendNotification(crew?: Crew) {
+    if (this.notificationsSendLoader || crew?.notificationLoading) return;
+
+    if (crew) {
+      crew.notificationLoading = true;
+    } else {
+      this.notificationsSendLoader = true;
+    }
+
+    const data = {
+      job_Id: this.selectedSchedule.jobId,
+      job_Part_Id: this.selectedSchedule.jobPartId,
+      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isChecked).map(it => it.crewId)
+    }
+    this.post('Schedule/AddJobNotifiction', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          crew.notificationLoading = false;
+          this.notificationsSendLoader = false;
+
+          if (res?.errors?.errorCode) return;
+
+          GeneralService.showSuccessMessage('Successfully sent');
+        }
+      })
+  }
+
+  removeNotification() {
+    // if (this.notificationsSendLoader) return;
+    //
+    // this.notificationsSendLoader = true;
+    //
+    // const data = {
+    //   job_Id: this.selectedSchedule.jobId,
+    //   job_Part_Id: this.selectedSchedule.jobPartId,
+    //   crewId: this.crewList.filter(it => it.isChecked).map(it => it.crewId)
+    // }
+    // this.delete(`Schedule/AddJobNotifiction`, `${}`)
+    //   .pipe(takeUntilDestroyed(this._dr))
+    //   .subscribe({
+    //     next: res => {
+    //       console.log(res)
+    //       this.notificationsSendLoader = false;
+    //
+    //       if (res?.errors?.errorCode) return;
+    //
+    //       GeneralService.showSuccessMessage('Successfully sent');
+    //     }
+    //   })
   }
 }
