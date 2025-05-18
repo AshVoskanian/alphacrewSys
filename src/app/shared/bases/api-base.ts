@@ -8,8 +8,9 @@ import { ApiResponse } from "../interface/common";
 @Injectable({
   providedIn: 'root',
 })
-export class ApiBase {constructor(protected http: HttpClient) {
-}
+export class ApiBase {
+  constructor(protected http: HttpClient) {
+  }
 
   private get apiUrl(): string {
     return environment.apiUrl;
@@ -22,27 +23,27 @@ export class ApiBase {constructor(protected http: HttpClient) {
         params = params.append(key, queryParams[key].toString());
       });
     }
-    return this.http.get<ApiResponse<T>>(`${this.apiUrl}/${endpoint}`, {params, headers})
+    return this.http.get<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }`, { params, headers })
   }
 
   post<T, U = any>(endpoint: string, data: U, headers?: HttpHeaders): Observable<ApiResponse<T>> {
-    return this.http.post<ApiResponse<T>>(`${this.apiUrl}/${endpoint}`, data, {headers}).pipe(catchError(this.handleError));
+    return this.http.post<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }`, data, { headers }).pipe(catchError(this.handleError));
   }
 
   put<T, U = any>(endpoint: string, id: number | string, data: U, headers?: HttpHeaders): Observable<ApiResponse<T>> {
-    return this.http.put<ApiResponse<T>>(`${this.apiUrl}/${endpoint}/${id}`, data, {headers}).pipe(catchError(this.handleError));
+    return this.http.put<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }/${ id }`, data, { headers }).pipe(catchError(this.handleError));
   }
 
-  delete(endpoint: string, id: number | string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${endpoint}/${id}`).pipe(catchError(this.handleError));
+  delete<T, U>(endpoint: string, id?: number | string, body?: U): Observable<ApiResponse<T>> {
+    return this.http.delete<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }/${ id }`, { body }).pipe(catchError(this.handleError));
   }
 
   protected handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
     if (error.error instanceof ErrorEvent) {
-      errorMessage = `Error: ${error.error.message}`;
+      errorMessage = `Error: ${ error.error.message }`;
     } else {
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+      errorMessage = `Error Code: ${ error.status }\nMessage: ${ error.message }`;
     }
     return throwError(() => new Error(errorMessage));
   }

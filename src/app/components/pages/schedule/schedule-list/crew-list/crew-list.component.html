@@ -46,6 +46,14 @@
     </div>
 
     <app-card [cardBodyClass]="'p-y-10 p-r-10'">
+      <ul class="max-h-100 overflow-y-auto">
+        @for (item of [1,2,4,4,4,4,4,4,5]; track item) {
+          <li>asd</li>
+        }
+      </ul>
+    </app-card>
+
+    <app-card [cardBodyClass]="'p-y-10 p-r-10'">
       <div class="p-l-14 p-r-17">
         <div class="common-flex justify-content-between align-items-center">
           <ng-template #popoverContentAll>
@@ -54,7 +62,7 @@
                 <i class="fa-solid rounded fa-phone-square"></i>
                 WhatsApp
               </li>
-              <li class="list-group-item border-bottom pointer text-danger">
+              <li class="list-group-item border-bottom pointer text-danger" (click)="removeNotification()">
                 <i class="fa-solid fa-close"></i>
                 Remove
               </li>
@@ -93,7 +101,7 @@
             </div>
 
 
-            @if (notificationsSendLoader) {
+            @if (notificationsLoader) {
               <i class="fas fa-spin fa-spinner f-12"></i>
             } @else {
               <i class="fa-solid rounded fa-phone-square text-success pointer"
@@ -105,6 +113,7 @@
         </div>
       </div>
     </app-card>
+
     @if (listLoading$ | async) {
       Loading...
     } @else {
@@ -141,7 +150,7 @@
                     <i class="fa-solid rounded fa-phone-square"></i>
                     WhatsApp
                   </li>
-                  <li class="list-group-item border-bottom pointer text-danger">
+                  <li class="list-group-item border-bottom pointer text-danger" (click)="removeNotification(crew)">
                     <i class="fa-solid fa-close"></i>
                     Remove
                   </li>

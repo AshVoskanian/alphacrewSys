@@ -41,7 +41,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
   showLimitError: boolean | undefined = false;
   crewManagerLoader: boolean = false;
   crewClashingLoader: boolean = false;
-  notificationsSendLoader: boolean = false;
+  notificationsLoader: boolean = false;
   listLoading$: Observable<boolean> = this._scheduleService.crewListLoading.asObservable();
   selectedSchedule: Schedule | null;
 
@@ -236,7 +236,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
             return acc;
           }, {} as Record<number, CrewClashing[]>);
 
-          console.log(groupedByCrewId, 9888)
 
           // for (let crew of this.crewList) {
           //   const match = res.data.find(r => r.crewId === crew.crewId);
@@ -249,12 +248,12 @@ export class CrewListComponent extends ApiBase implements OnInit {
   }
 
   sendNotification(crew?: Crew) {
-    if (this.notificationsSendLoader || crew?.notificationLoading) return;
+    if (this.notificationsLoader || crew?.notificationLoading) return;
 
     if (crew) {
       crew.notificationLoading = true;
     } else {
-      this.notificationsSendLoader = true;
+      this.notificationsLoader = true;
     }
 
     const data = {
@@ -266,8 +265,11 @@ export class CrewListComponent extends ApiBase implements OnInit {
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: res => {
-          crew.notificationLoading = false;
-          this.notificationsSendLoader = false;
+          if (crew) {
+            crew.notificationLoading = false;
+          } else {
+            this.notificationsLoader = false;
+          }
 
           if (res?.errors?.errorCode) return;
 
@@ -276,27 +278,33 @@ export class CrewListComponent extends ApiBase implements OnInit {
       })
   }
 
-  removeNotification() {
-    // if (this.notificationsSendLoader) return;
-    //
-    // this.notificationsSendLoader = true;
-    //
-    // const data = {
-    //   job_Id: this.selectedSchedule.jobId,
-    //   job_Part_Id: this.selectedSchedule.jobPartId,
-    //   crewId: this.crewList.filter(it => it.isChecked).map(it => it.crewId)
-    // }
-    // this.delete(`Schedule/AddJobNotifiction`, `${}`)
-    //   .pipe(takeUntilDestroyed(this._dr))
-    //   .subscribe({
-    //     next: res => {
-    //       console.log(res)
-    //       this.notificationsSendLoader = false;
-    //
-    //       if (res?.errors?.errorCode) return;
-    //
-    //       GeneralService.showSuccessMessage('Successfully sent');
-    //     }
-    //   })
+  removeNotification(crew?: Crew) {
+    if (this.notificationsLoader || crew?.notificationLoading) return;
+
+    if (crew) {
+      crew.notificationLoading = true;
+    } else {
+      this.notificationsLoader = true;
+    }
+
+    const data = {
+      jobPartId: this.selectedSchedule.jobPartId,
+      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isChecked).map(it => it.crewId)
+    }
+    this.delete('Schedule/DeleteNotificationByCrewIdandJobPartId', '', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          if (crew) {
+            crew.notificationLoading = false;
+          } else {
+            this.notificationsLoader = false;
+          }
+
+          if (res?.errors?.errorCode) return;
+
+          GeneralService.showSuccessMessage('Successfully deleted');
+        }
+      })
   }
 }
