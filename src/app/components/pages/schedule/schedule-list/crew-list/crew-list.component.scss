@@ -5,3 +5,11 @@
     content: none !important;
   }
 }
+
+.table-responsive {
+  height:  100px;
+  overflow-y: auto;
+  th, td {
+    padding: 1px !important;
+  }
+}

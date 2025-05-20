@@ -75,11 +75,17 @@ export interface Crew extends CrewManager{
   name: string;
   skills: string;
   totalHours: number;
+  notClashingInfo: {
+    unassignedCrewCount: number;
+    details: Record<number, number>;
+  }
   rating: number;
   warnings: number;
   jobNotes: string;
+  jobPartIds: Array<number>
   crewSkills: CrewSkill[];
 }
+
 export interface CrewActionItem {
   text: string;
   action: any;
@@ -131,7 +137,6 @@ export interface CrewSkill {
   description: string;
 }
 
-
 export interface Notification {
   jobId: number;
   jobPartId: number;
@@ -151,14 +156,20 @@ export interface CrewManager {
   turnedDown: number;
 }
 
-export interface CrewClashing {
+
+export interface JobPartClashing {
+  assignedCrew: number | null;
+  bookedCrew: number;
+  crewClashingList: CrewClashing[];
+  hours: number;
   jobId: number;
   jobPartId: number;
-  bookedCrew: number;
-  assignedCrew: number;
   startDate: string;
-  endDate: string;
-  hours: number;
+  checked: boolean;
+}
+
+export interface CrewClashing {
+  jobPartId: number;
   crewId: number;
-  clashing: number;
+  clashing: boolean;
 }

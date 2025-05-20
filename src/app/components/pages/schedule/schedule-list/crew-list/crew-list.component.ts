@@ -1,6 +1,6 @@
-import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
 import { NgbActiveOffcanvas, NgbDropdownModule, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
-import { Crew, CrewClashing, CrewManager, Schedule } from "../../../../../shared/interface/schedule";
+import { Crew, CrewManager, JobPartClashing, Schedule } from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
@@ -9,7 +9,7 @@ import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { AsyncPipe, DatePipe } from "@angular/common";
-import { Observable } from "rxjs";
+import { finalize, Observable } from "rxjs";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
@@ -25,6 +25,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 })
 export class CrewListComponent extends ApiBase implements OnInit {
   private _dr: DestroyRef = inject(DestroyRef);
+  private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
   private _scheduleService = inject(ScheduleService);
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
@@ -69,6 +70,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
     { id: 20, title: 'SS', class: 'warning', checked: false },
     { id: 21, title: 'ES', class: 'warning', checked: false },
   ];
+
+  jobPartClashing: Array<JobPartClashing> = [];
 
   ngOnInit() {
     this.getSelectedSchedule();
@@ -122,7 +125,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this._offcanvasService.close()
   }
 
-  getSelectedData(type: 'regions' | 'levels' | 'crew'): Array<number> {
+  getSelectedData(type: 'regions' | 'levels' | 'crew' | 'jobParts'): Array<number> {
     if (type === 'regions') {
       return this.regions.filter(it => it.checked).map(it => it.id);
     }
@@ -133,6 +136,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
     if (type === 'crew') {
       return this.crewList.filter(it => it.isChecked).map(it => it.crewId);
+    }
+
+    if (type === 'jobParts') {
+      return this.jobPartClashing.filter(it => it.checked).map(it => it.jobPartId);
     }
 
     return [];
@@ -208,7 +215,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
       .subscribe({
         next: res => {
           this.crewManagerLoader = false;
-          console.log(res.data.filter(it => it.crewHours > 0))
 
           for (let crew of this.crewList) {
             const match = res.data.find(r => r.crewID === crew.crewId);
@@ -220,32 +226,58 @@ export class CrewListComponent extends ApiBase implements OnInit {
       })
   }
 
-  getCrewClashing() {
+  getCrewClashing(): void {
     this.crewClashingLoader = true;
 
-    this.get<Array<CrewClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
+    this.get<Array<JobPartClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
+      .pipe(finalize(() => this.crewClashingLoader = false))
       .subscribe({
         next: res => {
-          this.crewClashingLoader = false;
+          if (res.errors?.errorCode) return;
 
-          const groupedByCrewId = res.data.reduce((acc, job) => {
-            if (!acc[job.crewId]) {
-              acc[job.crewId] = [];
-            }
-            acc[job.crewId].push(job);
-            return acc;
-          }, {} as Record<number, CrewClashing[]>);
+          this.jobPartClashing = res.data ?? [];
+          this.jobPartClashing.forEach((it, idx) => it.checked = idx === 0)
 
-
-          // for (let crew of this.crewList) {
-          //   const match = res.data.find(r => r.crewId === crew.crewId);
-          //   if (match) {
-          //     crew.crewHours = match.crewHours;
-          //   }
-          // }
+          this.updateNotClashingCounts(this.jobPartClashing);
         }
-      })
+      });
   }
+
+  updateNotClashingCounts(data: JobPartClashing[]): void {
+    // Reset all notClashingInfo
+    this.crewList.forEach(crew => {
+      crew.notClashingInfo = { unassignedCrewCount: 0, details: {} };
+    });
+
+    // Populate notClashingInfo
+    data.forEach(jobPart => {
+      jobPart.crewClashingList?.forEach(crew => {
+        if (!crew.clashing) {
+          const matched = this.crewList.find(c => c.crewId === crew.crewId);
+          if (!matched) return;
+
+          const info = matched.notClashingInfo!;
+          info.details[jobPart.jobPartId] = (info.details[jobPart.jobPartId] ?? 0) + 1;
+          info.unassignedCrewCount = Object.values(info.details).reduce((sum: number, val: number) => sum + val, 0);
+        }
+      });
+    });
+
+    // Update jobPartIds for checked ones
+    this.jobPartClashing
+      .filter(jp => jp.checked)
+      .forEach(jp => {
+        this.crewList.forEach(crew => {
+          crew.jobPartIds = [];
+          if (crew.notClashingInfo?.details?.[jp.jobPartId] > 0) {
+            crew.jobPartIds = [ ...(crew.jobPartIds ?? []), jp.jobPartId ];
+          }
+        });
+      });
+
+    this._cdr.detectChanges();
+  }
+
 
   sendNotification(crew?: Crew) {
     if (this.notificationsLoader || crew?.notificationLoading) return;
@@ -306,5 +338,27 @@ export class CrewListComponent extends ApiBase implements OnInit {
           GeneralService.showSuccessMessage('Successfully deleted');
         }
       })
+  }
+
+  jobPartSelect() {
+    this.updateNotClashingCounts(this.jobPartClashing);
+  }
+
+  selectAllClashing(): void {
+    if (this.isAllSelected()) {
+      this.jobPartClashing?.forEach(part => part.checked = false);
+    } else {
+      this.jobPartClashing?.forEach(part => part.checked = true);
+    }
+
+    this.updateNotClashingCounts(this.jobPartClashing);
+  }
+
+  isAllSelected(): boolean {
+    return this.jobPartClashing?.length > 0 && this.jobPartClashing.every(p => p.checked);
+  }
+
+  isIndeterminate(): boolean {
+    return this.jobPartClashing?.some(p => p.checked) && !this.isAllSelected();
   }
 }

@@ -8,14 +8,19 @@ export class CrewFilterPipe implements PipeTransform {
   transform(
     crew: Crew[],
     regionIds?: number[],
-    levelIds?: number[]
+    levelIds?: number[],
+    jobPartIds?: number[],
   ): Crew[] {
     if (!crew) return [];
 
     return crew.filter(member => {
       const matchesRegion = !regionIds || regionIds.length === 0 || regionIds.includes(member.regionId);
       const matchesLevel = !levelIds || levelIds.length === 0 || levelIds.includes(member.levelId);
-      return matchesRegion && matchesLevel;
+      const matchesJobParts =
+        !jobPartIds || jobPartIds.length === 0 ||
+        member.jobPartIds?.some(id => jobPartIds.includes(id));
+
+      return matchesRegion && matchesLevel && matchesJobParts
     }).sort((a, b) => Number(b.isChecked) - Number(a.isChecked));
   }
 }

@@ -24,7 +24,7 @@
   <form>
     <div class="flex-column row m-b-20 ">
       <ul class="list-group w-100 align-items-center flex-row">
-        @for (region of regions; track region.title) {
+        @for (region of regions; track region.title + $index) {
           <li class="p-y-0 p-x-5">
             <input class="form-check-input me-1 checkbox-{{ region.class }}"
                    type="checkbox"
@@ -35,7 +35,7 @@
       </ul>
 
       <ul class="list-group w-100 align-items-center flex-row">
-        @for (lvl of levels; track lvl.title) {
+        @for (lvl of levels; track lvl.title + $index) {
           <li class="p-y-0 p-x-5">
             <input class="form-check-input me-1 checkbox-{{ lvl.class }}" type="checkbox"
                    [(ngModel)]="lvl.checked" [name]="lvl.title">
@@ -46,11 +46,48 @@
     </div>
 
     <app-card [cardBodyClass]="'p-y-10 p-r-10'">
-      <ul class="max-h-100 overflow-y-auto">
-        @for (item of [1,2,4,4,4,4,4,4,5]; track item) {
-          <li>asd</li>
+      <div class="h-100-i">
+        @if (crewClashingLoader) {
+          <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        } @else {
+          <div class="table-responsive custom-scrollbar">
+            <table class="table border-bottom-table">
+              <thead>
+              <tr class="border-bottom-primary">
+                <th scope="col">
+                  <input
+                    class="form-check-input me-1 checkbox-primary"
+                    type="checkbox"
+                    [checked]="isAllSelected()"
+                    [indeterminate]="isIndeterminate()"
+                    (change)="selectAllClashing()">
+                </th>
+                <th scope="col">Start</th>
+                <th scope="col">Time</th>
+                <th scope="col">Hours</th>
+                <th scope="col">Crew</th>
+              </tr>
+              </thead>
+              <tbody>
+                @for (item of jobPartClashing; track item.jobPartId + item.startDate) {
+                  <tr class="border-bottom-secondary">
+                    <th scope="row">
+                      <input class="form-check-input me-1 checkbox-primary" type="checkbox"
+                             [(ngModel)]="item.checked" [name]="item.jobPartId + ''" (change)="jobPartSelect()">
+                    </th>
+                    <td>{{ item.startDate | date: 'dd MMM yyy' }}</td>
+                    <td>{{ item.startDate | date: 'HH:mm' }}</td>
+                    <td>{{ item.hours }}</td>
+                    <td>{{ item.bookedCrew }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
-      </ul>
+      </div>
     </app-card>
 
     <app-card [cardBodyClass]="'p-y-10 p-r-10'">
@@ -75,7 +112,7 @@
             All
           </label>
 
-          <div class="common-flex align-items-center">
+          <div class="common-flex align-items-center g-5">
             <div class="btn-group" ngbDropdown>
               <button class="btn p-y-0 p-x-33 btn-outline-info position-relative" (click)="saveCrew('current')">
                 @if (loading) {
@@ -118,12 +155,12 @@
       Loading...
     } @else {
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
-        @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'); track crew.crewId) {
+        @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
             @if (crew.jobNotes) {
               <i class="fa-solid fa-tag position-absolute" style="left:0; top:0" [ngbTooltip]="crew.jobNotes"></i>
             }
-            <div>
+            <div class="common-flex align-items-center">
               @if (crewManagerLoader) {
                 <i class="fas fa-spin fa-spinner f-15 m-0"></i>
               } @else {
@@ -133,14 +170,16 @@
                 </p>
               }
 
-              <label class="form-check-label txt-warring mb-0 m-l-10" [for]="crew.crewId">
+              <span class="text-warning min-w-40">{{ selectedSchedule.shiftCount }}/{{ crew.notClashingInfo?.unassignedCrewCount }}</span>
+
+              <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
                 <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
                        type="checkbox" (change)="crewSelect(crew)"
                        [checked]="crew.isChecked">
                 {{ crew.name }}
+                <span class="m-l-10">({{ crew.levelShortText }})</span>
               </label>
 
-              <span class="m-l-10">({{ crew.levelShortText }})</span>
             </div>
 
             <div class="common-flex align-items-center gap-1">

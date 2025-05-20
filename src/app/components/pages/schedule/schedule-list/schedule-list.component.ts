@@ -313,7 +313,10 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       container: null,
       panelClass: 'common-offcanvas custom-off-canvas'
     });
-    this.crewList().forEach(it => it.isChecked = false);
+    this.crewList().forEach(it => {
+      it.isChecked = false;
+      it.jobPartIds = []
+    });
     this.offcanvasRef.componentInstance.crewList = this.crewList();
     this.offcanvasRef.componentInstance.isJobScoped = this.isJobScoped;
 

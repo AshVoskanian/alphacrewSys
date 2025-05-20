@@ -1642,6 +1642,10 @@ $i: 1;
     height: #{$i}px;
   }
 
+  .h-#{$i}-i {
+    height: #{$i}px !important;
+  }
+
   .min-w-#{$i} {
     min-width: #{$i}px;
   }
