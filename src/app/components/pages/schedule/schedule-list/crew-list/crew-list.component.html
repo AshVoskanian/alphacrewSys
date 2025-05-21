@@ -46,12 +46,8 @@
     </div>
 
     <app-card [cardBodyClass]="'p-y-10 p-r-10'">
-      <div class="h-100-i">
-        @if (crewClashingLoader) {
-          <div class="d-flex justify-content-center align-items-center h-100">
-            <div class="spinner-border text-primary" role="status"></div>
-          </div>
-        } @else {
+      <div [class.h-100-i]="jobPartClashing?.length">
+        @if (jobPartClashing?.length > 0) {
           <div class="table-responsive custom-scrollbar">
             <table class="table border-bottom-table">
               <thead>
@@ -85,6 +81,17 @@
                 }
               </tbody>
             </table>
+          </div>
+        } @else {
+          <div class="common-flex align-items-center justify-content-end">
+            <button class="btn p-x-33 btn-outline-info position-relative" (click)="getCrewClashing()">
+              @if (crewClashingLoader) {
+                <i class="position-absolute fas fa-spin fa-spinner text-dark f-16"
+                   style="left: 7px; top: 7px;"
+                ></i>
+              }
+              Crew Manager
+            </button>
           </div>
         }
       </div>
@@ -154,7 +161,7 @@
     @if (listLoading$ | async) {
       Loading...
     } @else {
-      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
+      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar">
         @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
             @if (crew.jobNotes) {
@@ -170,7 +177,15 @@
                 </p>
               }
 
-              <span class="text-warning min-w-40">{{ selectedSchedule.shiftCount }}/{{ crew.notClashingInfo?.unassignedCrewCount }}</span>
+              @if (crewClashingLoader) {
+                <span class="min-w-40"><i class="fas fa-spin fa-spinner text-warning f-15 m-0"></i></span>
+              } @else {
+                @if (jobPartClashing.length) {
+                  <span class="text-warning min-w-40">
+                    {{ selectedSchedule.shiftCount }}/{{ crew.notClashingInfo?.unassignedCrewCount }}
+                  </span>
+                }
+              }
 
               <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
                 <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"

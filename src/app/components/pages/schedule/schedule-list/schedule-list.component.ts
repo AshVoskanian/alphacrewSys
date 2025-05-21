@@ -309,7 +309,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
     this.offcanvasRef = this._offCanvasService.open(CrewListComponent, {
       scroll: false,
-      backdrop: false,
+      backdrop: true,
       container: null,
       panelClass: 'common-offcanvas custom-off-canvas'
     });

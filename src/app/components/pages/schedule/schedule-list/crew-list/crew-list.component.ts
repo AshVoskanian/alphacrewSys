@@ -117,7 +117,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
         }
 
         this.getCrewManager();
-        this.getCrewClashing();
+        // this.getCrewClashing();
       });
   }
 
@@ -274,6 +274,11 @@ export class CrewListComponent extends ApiBase implements OnInit {
           }
         });
       });
+
+    console.log(777, this._filterPipe.transform(this.crewList,
+      this.regions.filter(it => it.checked).map(it => it.id),
+      this.levels.filter(it => it.checked).map(it => it.id)
+    ))
 
     this._cdr.detectChanges();
   }
