@@ -12,6 +12,7 @@ export interface Schedule {
   isNigthShiftPaid: boolean;
   showNotifications: boolean;
   notificationsLoader: boolean;
+  vehicleLoader: boolean;
   editComment?: boolean;
   editCrewNote?: boolean;
   isJobScoped?: boolean;
@@ -53,12 +54,6 @@ export interface JobPartCrew {
   isActive?: boolean;
   loading?: boolean;
   editLoading?: boolean;
-}
-
-export interface Vehicle {
-  vehicleId: number;
-  description: string;
-  numberPlate: string;
 }
 
 export interface Crew extends CrewManager{
@@ -172,4 +167,17 @@ export interface CrewClashing {
   jobPartId: number;
   crewId: number;
   clashing: boolean;
+}
+
+
+export interface Vehicle {
+  vehicleText: string;
+  icon: string;
+  fontAwsome: string;
+  clashes: boolean;
+  vehicleId: number;
+  description: string;
+  numberPlate: string;
+  loading: boolean;
+  active: boolean
 }

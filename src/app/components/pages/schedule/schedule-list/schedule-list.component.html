@@ -20,8 +20,9 @@
                 <div class="flex-no-wrap">
                   <div class="col-9 display-flex">
                     <div class="flex-no-wrap">
-                      <div class="calendar">
-                        <div class="date bg-light">
+                      <div class="calendar pointer">
+                        <div class="date bg-light {{schedule.vehicleLoader ? 'loading' : ''}}"
+                             (click)="getVehicleInfo(schedule)">
                           <em>{{ schedule.startDate | date: 'EEEE':'': 'en' }}</em>
                           <strong>{{ schedule.startDate | date: 'MMMM':'': 'en' }}</strong>
                           <span>{{ schedule.startDate | date: 'dd' }}</span>
@@ -90,7 +91,7 @@
                 <div class="row g-1 row-gap-1 m-t-10">
                   <div class="car-nums col-8">
                     @for (vehicle of schedule.vehicles; track vehicle.vehicleId) {
-                      <div class="car-num">
+                      <div class="car-num" (click)="getVehicleInfo(schedule)">
                         <app-uk-car-num>
                           {{ vehicle.numberPlate }}
                         </app-uk-car-num>
@@ -296,10 +297,22 @@
   }
 }
 
-<ng-template #loginModal let-modal>
-  <app-edit [crewInfo]="crewInfo()" [scheduleInfo]="selectedSchedule"
-            (closeModal)="modal.close()"
-            (finish)="onEditFinish($event); modal.close()"></app-edit>
+<!--Crew Edit-->
+<ng-template #editModal let-editModal>
+  <app-edit [crewInfo]="crewInfo()"
+            [scheduleInfo]="selectedSchedule"
+            (closeModal)="editModal.close()"
+            (finish)="editModal.close()">
+  </app-edit>
+</ng-template>
+
+<!--Set Vehicle or send SMS-->
+<ng-template #vehicleModal let-vehicleModal>
+  <app-vehicles (closeModal)="vehicleModal.close()"
+                [scheduleInfo]="selectedSchedule"
+                (selectVehicle)="onVehicleSelect($event)"
+                [vehicles]="vehiclesInfo()">
+  </app-vehicles>
 </ng-template>
 
 

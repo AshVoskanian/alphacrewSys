@@ -21,7 +21,8 @@ import {
   JobPartCrewEdit,
   JobPartCrewUpdate,
   Notification,
-  Schedule
+  Schedule,
+  Vehicle
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { DatePipe, NgStyle } from "@angular/common";
@@ -45,10 +46,11 @@ import { CrewAction } from "../../../../shared/interface/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
+import { VehiclesComponent } from "./vehicles/vehicles.component";
 
 @Component({
   selector: 'app-schedule-list',
-  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, NgbPopoverModule, NgbAlertModule,
+  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, NgbPopoverModule, NgbAlertModule, VehiclesComponent,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
@@ -60,7 +62,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   private _offCanvasService = inject(NgbOffcanvas);
   private _scheduleService = inject(ScheduleService);
 
-  @ViewChild('loginModal') loginModal: any;
+  @ViewChild('editModal') editModal: any;
+  @ViewChild('vehicleModal') vehicleModal: any;
 
   private offcanvasRef?: NgbOffcanvasRef;
 
@@ -74,6 +77,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   selectedSchedule: Schedule;
 
   crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
+  vehiclesInfo: WritableSignal<Array<Vehicle>> = signal([]);
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
   menu: WritableSignal<Array<CrewActionItem>> = signal([
     {
@@ -160,7 +164,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   crewNoteLoader: boolean = false;
 
   @HostListener('document:click', [ '$event' ])
-  handleClick(event: MouseEvent) {
+  handleClick() {
     this.offcanvasRef?.close();
   }
 
@@ -203,7 +207,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       });
   }
 
-
   fillArray(arr: Array<JobPartCrew>, length: number): Array<JobPartCrew> {
     const filled: Array<JobPartCrew> = [];
 
@@ -222,7 +225,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     return filled;
   }
 
-  openModal(value: TemplateRef<NgbModal>) {
+  openEditModal(value: TemplateRef<NgbModal>) {
     this._modal.open(value, { centered: true, size: 'xl' })
   }
 
@@ -352,7 +355,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
           } else {
             this.crewInfo.set(res.data);
-            this.openModal(this.loginModal);
+            this.openEditModal(this.editModal);
           }
         }
       })
@@ -413,7 +416,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       }
     });
   }
-
 
   menuAction(menu: CrewActionItem, crew: JobPartCrew) {
     if (crew.loading) {
@@ -504,17 +506,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   openJobShifts(schedule: Schedule) {
     this.openJobsShifts.emit(schedule);
   }
-
-  onEditFinish(schedule: Schedule) {
-    // this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
-    //   if (item.jobPartId === schedule.jobPartId) {
-    //     this.fillArray(schedule.crews, schedule.crewNumber);
-    //     return schedule;
-    //   }
-    //   return item;
-    // });
-  }
-
 
   getNotifications(schedule: Schedule) {
     if (schedule.notificationsLoader) return;
@@ -610,5 +601,66 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     }
 
     return {};
+  }
+
+  getVehicleInfo(schedule: Schedule) {
+    if (schedule.vehicleLoader) return;
+
+    schedule.vehicleLoader = true;
+
+    this.get<Array<Vehicle>>(`Schedule/GetScheduleVehicleListAsync/${ schedule.jobPartId }`)
+      .subscribe({
+        next: (res) => {
+          schedule.vehicleLoader = false;
+
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.updateScheduleVehiclesInfo(res.data);
+
+          this.openVehiclesModal(this.vehicleModal);
+        }
+      })
+  }
+
+  updateScheduleVehiclesInfo(vehicles: Array<Vehicle>) {
+    this.vehiclesInfo.set(vehicles.map(vehicle => {
+      return {
+        ...vehicle,
+        active: this.selectedSchedule.vehicles.map(it => it.vehicleId)?.includes(vehicle.vehicleId),
+        fontAwsome: vehicle.vehicleId === 5 || vehicle.vehicleId === 6 ? '<i class="fa-solid fa-car-on"></i>' : vehicle.fontAwsome
+      }
+    }));
+  }
+
+  openVehiclesModal(value: TemplateRef<NgbModal>) {
+    this._modal.open(value, { centered: true, size: 'md' })
+  }
+
+  onVehicleSelect(vehicle: Vehicle) {
+    this._scheduleService.shifts = this._scheduleService.shifts.map(shift => {
+      return {
+        ...shift,
+        vehicles: shift.jobPartId === this.selectedSchedule.jobPartId
+          ? this.toggleVehicle(vehicle, shift.vehicles)
+          : shift.vehicles
+      };
+    });
+
+    this.selectedSchedule.vehicles = this.toggleVehicle(vehicle, this.selectedSchedule.vehicles);
+    this.selectSchedule(this.selectedSchedule);
+    this.updateScheduleVehiclesInfo(this.vehiclesInfo());
+  }
+
+  toggleVehicle(vehicle: Vehicle, list: Vehicle[]): Vehicle[] {
+    const index = list.findIndex(v => v.vehicleId === vehicle.vehicleId);
+
+    if (index > -1) {
+      return [ ...list.slice(0, index), ...list.slice(index + 1) ];
+    } else {
+      return [ ...list, vehicle ];
+    }
   }
 }
