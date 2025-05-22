@@ -181,3 +181,22 @@ export interface Vehicle {
   loading: boolean;
   active: boolean
 }
+
+
+export interface ScheduleSmsInfo {
+  companyName: string;
+  venueName: string;
+  jobPartVenueName: string;
+  address: string;
+  postcode: string;
+  startDay: string;
+  startDate: number;
+  startMonth: string;
+  startYear: number;
+  startTime: string;
+  endTime: string;
+  vehicles: string;
+  crew: string;
+  teamLead: string;
+  crewChiefs: string;
+}

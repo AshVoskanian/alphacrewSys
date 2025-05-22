@@ -22,6 +22,7 @@ import {
   JobPartCrewUpdate,
   Notification,
   Schedule,
+  ScheduleSmsInfo,
   Vehicle
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
@@ -65,7 +66,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
-  @ViewChild('sendSmsModal') sendSmsModal: any;
+  @ViewChild('sendSmsModal') sendSmsModal: SendSmsComponent;
 
   private offcanvasRef?: NgbOffcanvasRef;
 
@@ -160,6 +161,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       icon: 'fa-solid fa-retweet f-18'
     }
   ]);
+  smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
 
 
   jobNoteLoader: boolean = false;
@@ -641,15 +643,15 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._modal.open(value, { centered: true, size: 'md' })
   }
 
-  closeVehiclePopup(vehicleModal: any, e: "current" | "entire") {
-    if (!e) {
+  closeVehiclePopup(vehicleModal: any, smsInfo: Array<ScheduleSmsInfo>) {
+    if (!smsInfo) {
       vehicleModal.close();
       return;
     }
 
-    this.openSendSms();
-
     vehicleModal.close();
+    this.smsInfo.set(smsInfo);
+    this.openSendSms();
   }
 
   onVehicleSelect(vehicle: Vehicle) {

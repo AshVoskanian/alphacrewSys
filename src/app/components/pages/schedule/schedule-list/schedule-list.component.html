@@ -319,6 +319,7 @@
 <!--Send SMS-->
 <ng-template #sendSmsModal let-sendSmsModal>
   <app-send-sms (closeModal)="sendSmsModal.close()"
+                [smsInfo]="smsInfo()"
                 [scheduleInfo]="selectedSchedule">
   </app-send-sms>
 </ng-template>

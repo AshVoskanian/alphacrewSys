@@ -17,7 +17,7 @@
           </span>
           <span class="badge badge-light-danger">Clashes</span>
         </div>
-        @for (vehicle of vehicles; track vehicle.vehicleId + $index) {
+        @for (vehicle of vehicles; track vehicle.vehicleText + vehicle.vehicleId + $index) {
           <li class="p-y-3 p-x-5 common-flex align-items-center justify-content-between pointer"
               (click)="setVehicle(vehicle)">
             <label class="form-check-label pointer mb-0
@@ -49,20 +49,20 @@
       </div>
 
       <div class="common-flex gap-10">
-        <button type="submit" class="btn btn-primary w-100 text-center" (click)="sendSMS('current')">
+        <button type="submit" class="btn btn-primary w-100 text-center" (click)="getSmsInfo('current')">
           Sms - This Job Part
-          <span class="d-inline-block w-30 h-13">
-            @if (true) {
-              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-13"></i>
+          <span class="d-inline-block w-30 h-15">
+            @if (currentLoading) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
             }
           </span>
         </button>
 
-        <button type="submit" class="btn btn-secondary w-100 text-center" (click)="sendSMS('entire')">
+        <button type="submit" class="btn btn-secondary w-100 text-center" (click)="getSmsInfo('entire')">
           Sms - Entire Job
-          <span class="d-inline-block w-30 h-13">
-            @if (false) {
-              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-13"></i>
+          <span class="d-inline-block w-30 h-15">
+            @if (entireLoading) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
             }
           </span>
         </button>
