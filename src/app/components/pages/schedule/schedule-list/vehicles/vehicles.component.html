@@ -5,7 +5,7 @@
         <h6 class="text-primary">Vehicles</h6>
 
         <div class="common-flex align-items-center gap-3">
-          <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(true)"></button>
+          <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(null)"></button>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
         }
       </ul>
 
-      <div class="main-divider">
+      <div class="main-divider m-b-10">
         <div class="divider-body divider-body-1 divider-primary">
           <div class="divider-p-primary }}">
             <i class="fa-solid fa-envelope me-2 txt-primary f-20"></i>
@@ -49,21 +49,21 @@
       </div>
 
       <div class="common-flex gap-10">
-        <button type="submit" class="btn btn-primary w-100 text-center">
+        <button type="submit" class="btn btn-primary w-100 text-center" (click)="sendSMS('current')">
           Sms - This Job Part
-          <span class="d-inline-block" style="width: 30px; height: 13px;">
-                                  @if (false) {
-                                    <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
-                                  }
+          <span class="d-inline-block w-30 h-13">
+            @if (true) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-13"></i>
+            }
           </span>
         </button>
 
-        <button type="submit" class="btn btn-secondary w-100 text-center">
+        <button type="submit" class="btn btn-secondary w-100 text-center" (click)="sendSMS('entire')">
           Sms - Entire Job
-          <span class="d-inline-block" style="width: 30px; height: 13px;">
-                      @if (true) {
-                        <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
-                      }
+          <span class="d-inline-block w-30 h-13">
+            @if (false) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-13"></i>
+            }
           </span>
         </button>
       </div>

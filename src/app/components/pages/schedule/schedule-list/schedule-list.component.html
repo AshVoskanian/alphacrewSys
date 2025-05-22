@@ -308,11 +308,19 @@
 
 <!--Set Vehicle or send SMS-->
 <ng-template #vehicleModal let-vehicleModal>
-  <app-vehicles (closeModal)="vehicleModal.close()"
+  <app-vehicles (closeModal)="closeVehiclePopup(vehicleModal, $event)"
                 [scheduleInfo]="selectedSchedule"
                 (selectVehicle)="onVehicleSelect($event)"
                 [vehicles]="vehiclesInfo()">
   </app-vehicles>
+</ng-template>
+
+
+<!--Send SMS-->
+<ng-template #sendSmsModal let-sendSmsModal>
+  <app-send-sms (closeModal)="sendSmsModal.close()"
+                [scheduleInfo]="selectedSchedule">
+  </app-send-sms>
 </ng-template>
 
 

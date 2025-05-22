@@ -13,7 +13,7 @@ export class VehiclesComponent extends ApiBase {
   @Input() vehicles: Array<Vehicle> = [];
   @Input() scheduleInfo: Schedule;
 
-  @Output() closeModal: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() closeModal: EventEmitter<'current' | 'entire' | null> = new EventEmitter<'current' | 'entire' | null>();
   @Output() selectVehicle: EventEmitter<Vehicle> = new EventEmitter<Vehicle>();
 
   selectedVehicle: Vehicle;
@@ -37,5 +37,9 @@ export class VehiclesComponent extends ApiBase {
           GeneralService.showSuccessMessage();
         })
       })
+  }
+
+  sendSMS(type: 'current' | 'entire') {
+    this.closeModal.emit(type);
   }
 }

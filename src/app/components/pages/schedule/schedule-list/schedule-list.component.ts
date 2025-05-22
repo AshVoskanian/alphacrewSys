@@ -47,11 +47,12 @@ import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
+import { SendSmsComponent } from "./send-sms/send-sms.component";
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, NgbPopoverModule, NgbAlertModule, VehiclesComponent,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent, SendSmsComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
@@ -64,6 +65,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
+  @ViewChild('sendSmsModal') sendSmsModal: any;
 
   private offcanvasRef?: NgbOffcanvasRef;
 
@@ -639,6 +641,17 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._modal.open(value, { centered: true, size: 'md' })
   }
 
+  closeVehiclePopup(vehicleModal: any, e: "current" | "entire") {
+    if (!e) {
+      vehicleModal.close();
+      return;
+    }
+
+    this.openSendSms();
+
+    vehicleModal.close();
+  }
+
   onVehicleSelect(vehicle: Vehicle) {
     this._scheduleService.shifts = this._scheduleService.shifts.map(shift => {
       return {
@@ -662,5 +675,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     } else {
       return [ ...list, vehicle ];
     }
+  }
+
+  openSendSms() {
+    this._modal.open(this.sendSmsModal, { centered: true, size: 'md' })
   }
 }
