@@ -1773,6 +1773,27 @@ $i: 1;
   align-items: center;
 }
 
+::ng-deep .popover {
+  width: max-content !important;
+  max-width: none !important;
+  min-width: unset !important;
+  white-space: normal !important;
+  overflow-x: auto;
+}
+
+::ng-deep .popover-body {
+  width: max-content !important;
+  max-width: none !important;
+  min-width: unset !important;
+  padding: 0.5rem 1rem;
+  white-space: normal;
+  overflow-x: auto;
+}
+
+.wide-popover {
+  --bs-popover-max-width: none;
+}
+
 @media (min-width: 1200px) {
   .modal-xl {
     max-width: 1140px;

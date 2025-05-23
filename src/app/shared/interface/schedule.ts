@@ -19,6 +19,7 @@ export interface Schedule {
   jobId: number;
   shiftCount: number;
   notificationCount: number;
+  roles: string;
   shiftNumber: number;
   jobNotifications: any[]; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   jobPartId: number;
@@ -53,6 +54,7 @@ export interface JobPartCrew {
   levelId?: number;
   isActive?: boolean;
   loading?: boolean;
+  detailsLoading?: boolean;
   editLoading?: boolean;
 }
 
@@ -64,6 +66,7 @@ export interface Crew extends CrewManager{
   isFulltime: boolean;
   isChecked?: boolean;
   notificationLoading?: boolean;
+  detailsLoading?: boolean;
   levelCode: string;
   levelText: string;
   levelShortText: string;
@@ -76,6 +79,7 @@ export interface Crew extends CrewManager{
   }
   rating: number;
   warnings: number;
+  jobPartCrewId: number;
   jobNotes: string;
   jobPartIds: Array<number>
   crewSkills: CrewSkill[];
@@ -199,4 +203,52 @@ export interface ScheduleSmsInfo {
   crew: string;
   teamLead: string;
   crewChiefs: string;
+}
+
+export interface ShiftCrewDetails {
+  role: number;
+  roleName: string;
+  status: number;
+  jpStartDateTime: string;
+  jpEndDateTime: string;
+  startTime: string;
+  endTime: string;
+  thisJPStart: string;
+  jpStart: string;
+  startdate: string;
+  endDate: string;
+  client: string;
+  altVenue: string;
+  venue: string;
+  postCode: string;
+  extraHours: number;
+  skilledCost: number;
+  bonus: number;
+  lastMinuteBonus: number;
+  drivingBonus: number;
+  otherPaymentAdjustment: number;
+  otherPaymentAdjustmentTxt: string;
+  updateHistory: string;
+}
+
+export interface CrewDetailForShift {
+  role: number;
+  status: number;
+  jpStartDateTime: string;
+  jpEndDateTime: string;
+  roleName: string;
+  startTime: string;
+  endTime: string;
+  thisJPStart: string;
+  jpStart: string;
+  startdate: string;
+  endDate: string;
+  client: string;
+  altVenue: string;
+  venue: string;
+  postCode: string;
+  extraHours: number;
+  skilledCost: number;
+  bonus: number;
+  updateHistory: string;
 }

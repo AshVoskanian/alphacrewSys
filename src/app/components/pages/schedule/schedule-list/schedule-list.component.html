@@ -118,19 +118,28 @@
                           (click)="openCrewsPanel(crew, $event, schedule);">
                         @if (crew.isActive) {
                           <div class="status"
+                               (click)="getCrewDetails(crew, popoverRef)"
                                [style.background-color]="crew.jobPartCrewStatusColour"
-                               ngbPopover="აქ იქნება ინფორმაცია ქრუს გრაფიკზე ასევე ისტორია, ბექის სერვისი გვჭირდება"
+                               #popoverRef="ngbPopover"
+                               triggers="manual"
+                               [popoverClass]="'wide-popover'"
+                               [ngbPopover]="shiftCrewDetailsRef"
                                [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
                           >
                             <div class="icon">
-                              @if (crew.jobPartCrewRoleId === 1) {
-                                <i class="fas fa-square me-2 text-white f-10"></i>
-                              }
-                              @if (crew.jobPartCrewRoleId === 2) {
-                                <i class="far fa-solid fa-star me-2 text-white f-10"></i>
-                              }
-                              @if (crew.jobPartCrewRoleId === 4) {
-                                <i class="fa-solid fa-flag me-2 text-white f-10"></i>
+                              @if (crew.detailsLoading) {
+                                <app-feather-icon [class]="'w-10 h-10 text-white spin'"
+                                                  [icon]="'loader'"></app-feather-icon>
+                              } @else {
+                                @if (crew.jobPartCrewRoleId === 1) {
+                                  <i class="fas fa-square me-2 text-white f-10"></i>
+                                }
+                                @if (crew.jobPartCrewRoleId === 2) {
+                                  <i class="far fa-solid fa-star me-2 text-white f-10"></i>
+                                }
+                                @if (crew.jobPartCrewRoleId === 4) {
+                                  <i class="fa-solid fa-flag me-2 text-white f-10"></i>
+                                }
                               }
                             </div>
                           </div>
@@ -325,3 +334,35 @@
 </ng-template>
 
 
+<ng-template #shiftCrewDetailsRef>
+  <table class="table border-bottom-table max-w-700" style="width: 70dvw;">
+    <tbody>
+      @for (item of shiftCrewDetails() | filter:  [
+        { field: 'status', condition: 'greaterThan', value: 0 }
+      ]; track item.startdate + item.startTime + $index) {
+        <tr class="border-bottom-secondary">
+          <td>{{ item.roleName }}</td>
+          <td>{{ item.startdate }} {{ item.startTime }}</td>
+          <td>{{ item.endDate }} {{ item.endTime }}</td>
+          <td>{{ item.client }}</td>
+          <td>{{ item.altVenue }}</td>
+          <td>{{ item.startdate }}</td>
+          <td class="text-nowrap">Sk: £{{ item.skilledCost }}</td>
+          <td class="text-nowrap">Bon: £{{ item.bonus }}</td>
+        </tr>
+      }
+      @for (item of shiftCrewDetails() | filter: [
+        { field: 'status', condition: 'lessThanOrEqual', value: 0 },
+        { field: 'updateHistory', condition: 'isNotEmpty' }
+      ]; track item.startdate + item.startTime + $index) {
+        <tr class="border-bottom-secondary"
+            [class.bg-light-secondary]="item.status === 0"
+            [class.bg-info]="item.status === -1"
+            [class.bg-success]="item.status === -2"
+        >
+          <td colspan="8">{{ item.updateHistory }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</ng-template>

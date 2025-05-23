@@ -168,14 +168,24 @@
               <i class="fa-solid fa-tag position-absolute" style="left:0; top:0" [ngbTooltip]="crew.jobNotes"></i>
             }
             <div class="common-flex align-items-center">
-              @if (crewManagerLoader) {
-                <i class="fas fa-spin fa-spinner f-15 m-0"></i>
-              } @else {
-                <p class="badge h-15 w-15 text-center badge-primary rounded-circle p-0 m-0 m-r-10"
-                   style="line-height: 15px;">
-                  {{ crew.crewHours }}
-                </p>
-              }
+
+              <div class="w-15"
+                   (click)="getCrewDetails(crew, popoverRef)"
+                   #popoverRef="ngbPopover"
+                   triggers="manual"
+                   [popperOptions]=""
+                   [popoverClass]="'wide-popover'"
+                   [ngbPopover]="crewDetailsRef"
+                   [popoverTitle]="crew.name + '' + ' - ' + (selectedSchedule.startDate | date: 'dd MMM')">
+                @if (crewManagerLoader || crew.detailsLoading) {
+                  <i class="fas fa-spin fa-spinner f-15 m-0"></i>
+                } @else {
+                  <p class="badge pointer h-15 w-15 text-center badge-primary rounded-circle p-0 m-0 m-r-10"
+                     style="line-height: 15px;">
+                    {{ crew.crewHours }}
+                  </p>
+                }
+              </div>
 
               @if (crewClashingLoader) {
                 <span class="min-w-40"><i class="fas fa-spin fa-spinner text-warning f-15 m-0"></i></span>
@@ -238,3 +248,22 @@
     </h6>
   }
 </div>
+
+<ng-template #crewDetailsRef>
+  <div class="max-h-350 overflow-y-auto">
+    <table class="table border-bottom-table max-w-350">
+      <tbody>
+        @for (item of shiftCrewDetails() | filter:  [
+          { field: 'status', condition: 'greaterThan', value: 0 }
+        ]; track item.startdate + item.startTime + $index) {
+          <tr class="border-bottom-secondary">
+            <td>{{ item.roleName }}</td>
+            <td>{{ item.startdate }} {{ item.startTime }}</td>
+            <td>{{ item.endDate }} {{ item.endTime }}</td>
+            <td>{{ item.altVenue }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

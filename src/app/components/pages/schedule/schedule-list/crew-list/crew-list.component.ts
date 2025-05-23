@@ -1,6 +1,18 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
-import { NgbActiveOffcanvas, NgbDropdownModule, NgbPopoverModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
-import { Crew, CrewManager, JobPartClashing, Schedule } from "../../../../../shared/interface/schedule";
+import { ChangeDetectorRef, Component, DestroyRef, inject, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  NgbActiveOffcanvas,
+  NgbDropdownModule,
+  NgbPopover,
+  NgbPopoverModule,
+  NgbTooltipModule
+} from "@ng-bootstrap/ng-bootstrap";
+import {
+  Crew,
+  CrewManager,
+  JobPartClashing, JobPartCrew,
+  Schedule,
+  ShiftCrewDetails
+} from "../../../../../shared/interface/schedule";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
@@ -12,11 +24,12 @@ import { AsyncPipe, DatePipe } from "@angular/common";
 import { finalize, Observable } from "rxjs";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
 
 @Component({
   selector: 'app-crew-list',
   imports: [
-    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe,
+    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe,
     FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, FeatherIconComponent
   ],
   providers: [ CrewFilterPipe ],
@@ -45,6 +58,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
   notificationsLoader: boolean = false;
   listLoading$: Observable<boolean> = this._scheduleService.crewListLoading.asObservable();
   selectedSchedule: Schedule | null;
+
+  shiftCrewDetails: WritableSignal<Array<ShiftCrewDetails>> = signal([]);
 
   regions = [
     { id: 1, title: 'Lon', class: 'primary', checked: true },
@@ -357,6 +372,26 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
 
     this.updateNotClashingCounts(this.jobPartClashing);
+  }
+
+  getCrewDetails(crew: JobPartCrew, popover: NgbPopover) {
+    if (crew.detailsLoading) return;
+
+    crew.detailsLoading = true;
+
+    this.get<Array<ShiftCrewDetails>>(`Schedule/GetCrewDetailsForJobPartAsync/${this.selectedSchedule.jobPartId}/${crew.crewId}`)
+      .subscribe({
+        next: (res) => {
+          crew.detailsLoading = false;
+
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.shiftCrewDetails.set(res.data);
+          popover.open();
+        }
+      })
   }
 
   isAllSelected(): boolean {

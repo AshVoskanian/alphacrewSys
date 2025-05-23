@@ -16,13 +16,14 @@ import {
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import {
   Crew,
-  CrewActionItem,
+  CrewActionItem, CrewDetailForShift,
   JobPartCrew,
   JobPartCrewEdit,
   JobPartCrewUpdate,
   Notification,
   Schedule,
   ScheduleSmsInfo,
+  ShiftCrewDetails,
   Vehicle
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
@@ -35,6 +36,7 @@ import {
   NgbModal,
   NgbOffcanvas,
   NgbOffcanvasRef,
+  NgbPopover,
   NgbPopoverModule,
   NgbTooltipModule
 } from "@ng-bootstrap/ng-bootstrap";
@@ -49,10 +51,12 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
+import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
 
 @Component({
   selector: 'app-schedule-list',
-  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, NgbPopoverModule, NgbAlertModule, VehiclesComponent,
+  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent,
+    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent, SendSmsComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
@@ -67,6 +71,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
   @ViewChild('sendSmsModal') sendSmsModal: SendSmsComponent;
+  @ViewChild('shiftCrewDetailsRef') shiftCrewDetailsRef: any;
 
   private offcanvasRef?: NgbOffcanvasRef;
 
@@ -81,6 +86,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
   vehiclesInfo: WritableSignal<Array<Vehicle>> = signal([]);
+  shiftCrewDetails: WritableSignal<Array<CrewDetailForShift>> = signal([]);
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
   menu: WritableSignal<Array<CrewActionItem>> = signal([
     {
@@ -167,10 +173,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   jobNoteLoader: boolean = false;
   crewNoteLoader: boolean = false;
 
-  @HostListener('document:click', [ '$event' ])
-  handleClick() {
-    this.offcanvasRef?.close();
-  }
 
   ngOnInit() {
     this.getCrewList();
@@ -681,5 +683,25 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   openSendSms() {
     this._modal.open(this.sendSmsModal, { centered: true, size: 'lg' })
+  }
+
+  getCrewDetails(crew: JobPartCrew, popover: NgbPopover) {
+    if (crew.detailsLoading) return;
+
+    crew.detailsLoading = true;
+
+    this.get<Array<CrewDetailForShift>>(`Schedule/GetJobPartCrewDetailsAsync/${ crew.jobPartCrewId }`)
+      .subscribe({
+        next: (res) => {
+          crew.detailsLoading = false;
+
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.shiftCrewDetails.set(res.data);
+          popover.open();
+        }
+      })
   }
 }
