@@ -680,6 +680,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   openSendSms() {
-    this._modal.open(this.sendSmsModal, { centered: true, size: 'md' })
+    this._modal.open(this.sendSmsModal, { centered: true, size: 'lg' })
   }
 }
