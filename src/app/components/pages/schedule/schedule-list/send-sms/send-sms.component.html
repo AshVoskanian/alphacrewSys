@@ -21,7 +21,7 @@
                    [disabled]="!list.value || !phone.valid"
             >
             <label class="form-check-label m-0 text-nowrap txt-primary"
-                   [for]="list.id">{{ list.title }}</label>
+                   [for]="list.id" [ngbTooltip]="!list.value ? 'Enter Contact' : ''">{{ list.title }}</label>
             <input class="form-control"
                    #phone="ngModel"
                    [class.is-invalid]="!phone.valid"
