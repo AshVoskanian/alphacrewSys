@@ -341,14 +341,14 @@
         { field: 'status', condition: 'greaterThan', value: 0 }
       ]; track item.startdate + item.startTime + $index) {
         <tr class="border-bottom-secondary">
-          <td>{{ item.roleName }}</td>
-          <td>{{ item.startdate }} {{ item.startTime }}</td>
-          <td>{{ item.endDate }} {{ item.endTime }}</td>
-          <td>{{ item.client }}</td>
-          <td>{{ item.altVenue }}</td>
-          <td>{{ item.startdate }}</td>
-          <td class="text-nowrap">Sk: £{{ item.skilledCost }}</td>
-          <td class="text-nowrap">Bon: £{{ item.bonus }}</td>
+          <td class="p-2 p-x-5 f-12 text-body-secondary">{{ item.roleName }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.client }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.altVenue }}</td>
+          <td class="p-2 p-x-5 f-10">{{ item.startdate }}</td>
+          <td class="text-nowrap p-2 p-x-5 f-12">Sk: £{{ item.skilledCost }}</td>
+          <td class="text-nowrap p-2 p-x-5 f-12">Bon: £{{ item.bonus }}</td>
         </tr>
       }
       @for (item of shiftCrewDetails() | filter: [
@@ -360,7 +360,7 @@
             [class.bg-info]="item.status === -1"
             [class.bg-success]="item.status === -2"
         >
-          <td colspan="8">{{ item.updateHistory }}</td>
+          <td class="f-12" colspan="8">{{ item.updateHistory }}</td>
         </tr>
       }
     </tbody>

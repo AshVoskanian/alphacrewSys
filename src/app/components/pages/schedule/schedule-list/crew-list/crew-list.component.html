@@ -251,16 +251,16 @@
 
 <ng-template #crewDetailsRef>
   <div class="max-h-350 overflow-y-auto">
-    <table class="table border-bottom-table max-w-350">
+    <table class="table border-bottom-table max-w-400">
       <tbody>
         @for (item of shiftCrewDetails() | filter:  [
           { field: 'status', condition: 'greaterThan', value: 0 }
         ]; track item.startdate + item.startTime + $index) {
           <tr class="border-bottom-secondary">
-            <td>{{ item.roleName }}</td>
-            <td>{{ item.startdate }} {{ item.startTime }}</td>
-            <td>{{ item.endDate }} {{ item.endTime }}</td>
-            <td>{{ item.altVenue }}</td>
+            <td class="p-2 p-x-5 f-12">{{ item.roleName }}</td>
+            <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
+            <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
+            <td class="p-2 p-x-5 f-12">{{ item.client }}{{ item.altVenue }}</td>
           </tr>
         }
       </tbody>

@@ -1666,6 +1666,10 @@ $i: 1;
     max-height: #{$i}px;
   }
 
+  .p-#{$i} {
+    padding: #{$i}px !important;
+  }
+
   .p-l-#{$i} {
     padding-left: #{$i}px !important;
   }
