@@ -20,7 +20,6 @@ export class SendSmsComponent extends ApiBase implements OnInit {
 
   checkboxList: any = [];
   loading: boolean = false;
-  selectedId: number | null = null;
   text: string = `Here is the breakdown of your crew. We kindly request you to review the information provided and reach out to our office immediately if any discrepancies are detected.
 
 CLIENT: {{companyName}}
@@ -53,10 +52,14 @@ Alpha Crew
       .replace('{{schedules}}', schedulesText);
   }
 
-  fillCheckboxes() {
-    const match = this.scheduleInfo.onsiteContact?.match(/(?:(?:\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3})/);
+  private extractAllPhoneNumbers(text: string): string {
+    const matches = text?.match(/(?:\+44\s?7\d{3}|\(?07\d{3}\)?|\b\d{9,})\s?\d{3,}\s?\d{3,}/g) || [];
+    const cleaned = matches.map(m => m.replace(/\s+/g, ''));
+    return cleaned.join(';');
+  }
 
-    const onsiteContact = match ? match[0].replace(/\s+/g, '') : '';
+  fillCheckboxes() {
+    const onsiteContact = this.extractAllPhoneNumbers(this.scheduleInfo.onsiteContact || '');
 
     this.checkboxList = [
       {
@@ -74,28 +77,38 @@ Alpha Crew
       {
         id: 3,
         value: onsiteContact,
-        title: `On-site contact`,
+        title: 'On-site contact',
         checked: false,
       }
     ]
 
-    this.selectedId = this.checkboxList.find(it => it.value)?.id || null;
+    this.checkboxList.forEach(it => it.checked = it.value ?? false)
+  }
+
+  getCombinedPhoneNumbers(): string {
+    const allValues = this.checkboxList
+      .filter(item => item.checked)
+      .map(item => item.value)
+      .filter(Boolean)
+      .flatMap(value => value.split(';'))
+      .map(num => num.trim())
+      .filter(num => num.length > 0);
+    const uniqueValues = Array.from(new Set(allValues));
+
+    return uniqueValues.join(';');
   }
 
   showSuccess() {
     GeneralService.showSuccessMessage('Copied to clipboard');
   }
 
-  getSelectedContact() {
-    return this.checkboxList.find(it => it.id === this.selectedId)?.value;
-  }
   sendSMS() {
     if (this.loading) return;
 
     this.loading = true;
     const data = {
       text: this.text,
-      address: this.getSelectedContact(),
+      address: this.getCombinedPhoneNumbers(),
       jobId: this.scheduleInfo.jobId,
       jobPartId: this.scheduleInfo.jobPartId
     };

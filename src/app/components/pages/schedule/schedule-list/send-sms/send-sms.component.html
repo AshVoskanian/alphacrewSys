@@ -14,11 +14,9 @@
           <li class="list-group-item pointer m-b-2 flex items-center gap-12">
             <input class="form-check-input m-0 checkbox-primary"
                    [id]="list.id"
-                   type="radio"
-                   name="listGroupRadio"
-                   [value]="list.id"
-                   [(ngModel)]="selectedId"
-                   [disabled]="!list.value || !phone.valid"
+                   type="checkbox"
+                   [(ngModel)]="list.checked"
+                   [name]="list.id"
             >
             <label class="form-check-label m-0 text-nowrap txt-primary"
                    [for]="list.id" [ngbTooltip]="!list.value ? 'Enter Contact' : ''">{{ list.title }}</label>
@@ -26,7 +24,6 @@
                    #phone="ngModel"
                    [class.is-invalid]="!phone.valid"
                    type="text"
-                   pattern="^(?:\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$"
                    placeholder="Enter Contact"
                    [(ngModel)]="list.value">
           </li>
@@ -39,7 +36,6 @@
 
       <div class="flex justify-between items-center m-t-12 gap-10">
         <button type="submit" class="btn btn-primary w-100 text-center"
-                [disabled]="!selectedId"
                 style="flex: 1" (click)="sendSMS()">
           Send SMS
           <span class="d-inline-block w-30 h-15">
