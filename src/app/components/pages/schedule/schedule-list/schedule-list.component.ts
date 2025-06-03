@@ -2,7 +2,6 @@ import {
   Component,
   DestroyRef,
   EventEmitter,
-  HostListener,
   inject,
   Input,
   input,
@@ -16,18 +15,18 @@ import {
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import {
   Crew,
-  CrewActionItem, CrewDetailForShift,
+  CrewActionItem,
+  CrewDetailForShift,
   JobPartCrew,
   JobPartCrewEdit,
   JobPartCrewUpdate,
   Notification,
   Schedule,
   ScheduleSmsInfo,
-  ShiftCrewDetails,
   Vehicle
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
-import { DatePipe, NgStyle } from "@angular/common";
+import { DatePipe, NgStyle, TitleCasePipe } from "@angular/common";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
@@ -56,7 +55,7 @@ import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
 @Component({
   selector: 'app-schedule-list',
   imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent,
-    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe,
+    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent, SendSmsComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',

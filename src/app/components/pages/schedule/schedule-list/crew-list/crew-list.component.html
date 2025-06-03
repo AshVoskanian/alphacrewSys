@@ -150,6 +150,7 @@
             } @else {
               <i class="fa-solid rounded fa-phone-square text-success pointer"
                  [ngbPopover]="popoverContentAll"
+                 [popoverClass]="'bg-dark'"
                  [popoverTitle]="'Contact'"
               ></i>
             }
@@ -174,7 +175,7 @@
                    #popoverRef="ngbPopover"
                    triggers="manual"
                    [popperOptions]=""
-                   [popoverClass]="'wide-popover'"
+                   [popoverClass]="'wide-popover border border-2 bg-dark'"
                    [ngbPopover]="crewDetailsRef"
                    [popoverTitle]="crew.name + '' + ' - ' + (selectedSchedule.startDate | date: 'dd MMM')">
                 @if (crewManagerLoader || crew.detailsLoading) {
@@ -232,6 +233,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer m-l-10"
                    [ngbPopover]="popoverContent"
+                   [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>
               }

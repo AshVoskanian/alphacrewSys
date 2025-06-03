@@ -87,7 +87,7 @@ export class EditComponent extends ApiBase implements OnInit {
       delete data.bonus;
     }
 
-    this.post('/Schedule/AddOrRemoveJobPartCrewBonus', data)
+    this.post('Schedule/AddOrRemoveJobPartCrewBonus', data)
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {

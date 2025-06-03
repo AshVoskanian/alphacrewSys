@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://alphacrewsysapi.azurewebsites.net/api'
+  apiUrl: 'https://crmapi.alphacrew.eu/api'
 };

@@ -39,8 +39,39 @@ export interface Schedule {
   venueId: number;
   venueName: string;
   notifications: Array<Notification>;
+  jobPartSkills: ScheduleSkills;
+  transformedSkills: TransformedSkill[];
 }
 
+export interface TransformedSkill{
+  active: any;
+  url: any;
+  name: string;
+}
+
+export interface ScheduleSkills {
+  skillDriver: boolean;
+  skillForklift: boolean;
+  skillIpaf: boolean;
+  skillIpaf3b: boolean | null;
+  skillSafety: boolean;
+  skillConstruction: boolean;
+  skillCarpenter: boolean;
+  skillLightning: boolean;
+  skillSound: boolean;
+  skillVideo: boolean;
+  skillTfm: boolean;
+  skillTelehandler: boolean;
+  skillScissorlift: boolean;
+  skillCherrypicker: boolean;
+  skillFirstAid: boolean;
+  skillPasma: boolean;
+  skillFollowspot: boolean;
+  skillAudioTech: boolean | null;
+  skillRoughTerrainForklift: boolean | null;
+  skillHealhAndSafety: boolean | null;
+  skillWorkingAtHeight: boolean | null;
+}
 export interface JobPartCrew {
   jobId?: number;
   crewId?: number | unknown;

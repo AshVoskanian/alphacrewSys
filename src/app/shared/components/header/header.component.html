@@ -5,16 +5,42 @@
   </div>
 
   @if (isScheduleRoute) {
-    <form class="common-flex m-l-20 col-auto" style="max-width: 300px;" [formGroup]="form" (ngSubmit)="submit()">
-      <div class="col" style="max-width: 150px">
-        <input class="form-control digits" id="datetime-local"
-               placeholder="yyyy-mm-dd" name="from"
-               formControlName="date"
-               ngbDatepicker #fromDate="ngbDatepicker"
-               (click)="fromDate.toggle()">
+    <form class="flex gap-10 m-l-20 align-items-center max-w-300" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="flex gap-4">
+        <div class="col w-150">
+          <input class="form-control digits" id="datetime-local"
+                 placeholder="yyyy-mm-dd" name="from"
+                 formControlName="date"
+                 ngbDatepicker #fromDate="ngbDatepicker"
+                 (click)="fromDate.toggle()">
+        </div>
+        <div class="col-auto d-flex justify-content-start align-items-center">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
+        </div>
       </div>
-      <div class="col-auto d-flex justify-content-start align-items-center">
-        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
+
+      <div class="flex gap-2">
+        <button type="button"
+                [class.btn-primary]="navService.days === 2"
+                [class.btn-secondary]="navService.days !== 2"
+                class="btn example-popover mb-0 me-0 p-x-15"
+                (click)="setDays(2)">
+          2
+        </button>
+        <button type="button"
+                [class.btn-primary]="navService.days === 4"
+                [class.btn-secondary]="navService.days !== 4"
+                class="btn example-popover mb-0 me-0 p-x-15"
+                (click)="setDays(4)">
+          4
+        </button>
+        <button type="button"
+                [class.btn-primary]="navService.days === 7"
+                [class.btn-secondary]="navService.days !== 7"
+                class="btn example-popover mb-0 me-0 p-x-15"
+                (click)="setDays(7)">
+          7
+        </button>
       </div>
     </form>
   }
@@ -41,9 +67,9 @@
         <app-mode></app-mode>
       </li>
 
-<!--      <li class="onhover-dropdown">-->
-<!--        <app-header-notification></app-header-notification>-->
-<!--      </li>-->
+      <!--      <li class="onhover-dropdown">-->
+      <!--        <app-header-notification></app-header-notification>-->
+      <!--      </li>-->
 
       <li class="profile-nav onhover-dropdown pe-0 py-0">
         <app-profile></app-profile>

@@ -10,6 +10,7 @@ import { ToastrService } from "ngx-toastr";
 import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon/feather-icon.component";
 import { NavService } from "../../../shared/services/nav.service";
 import { ScheduleService } from "./schedule.service";
+import { SKILLS } from "../../../shared/data/skills";
 
 @Component({
   selector: 'app-schedule',
@@ -91,7 +92,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     const params = {
       jobId,
       date: GeneralService.convertToDate(date),
-      days: 7,
+      days: this._navService.days,
     }
 
     if (!jobId) {
@@ -109,15 +110,36 @@ export class ScheduleComponent extends ApiBase implements OnInit {
           } else {
             if (jobId) {
               this.scheduleService.jobScopedShifts = res.data;
-              this.scheduleService.jobScopedShifts.forEach(it => this.fillArray(it.crews, it.crewNumber));
+              this.scheduleService.jobScopedShifts.forEach(it => {
+                  it.transformedSkills = [];
+                  this.setSkills(it);
+                  this.fillArray(it.crews, it.crewNumber);
+                }
+              );
               this._modal.open(this.scheduleModal, { centered: true, fullscreen: true })
             } else {
               this.scheduleService.shifts = res.data;
-              this.scheduleService.shifts.forEach(it => this.fillArray(it.crews, it.crewNumber));
+              this.scheduleService.shifts.forEach(it => {
+                it.transformedSkills = [];
+                this.setSkills(it);
+                this.fillArray(it.crews, it.crewNumber);
+              });
             }
           }
         }
       })
+  }
+
+  setSkills(schedule: Schedule) {
+    const skills: { [key: string]: any } = schedule.jobPartSkills;
+    for (const [ key, value ] of Object.entries(skills)) {
+      schedule.transformedSkills.push({ name: this.formatSkillName(key), url: SKILLS[key], active: value ?? false });
+    }
+  }
+
+  formatSkillName(key: string): string {
+    const readable = key.replace(/^skill/, '').replace(/([A-Z])/g, ' $1').trim();
+    return `Skill: ${readable}`;
   }
 
   fillArray(arr: Array<JobPartCrew>, length: number): void {
@@ -146,19 +168,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   protected readonly close = close;
 
   closeModal(modal: any) {
-    this.setMainListDataFromJobShiftsData();
     modal.close();
-    console.log(this.scheduleService.shifts)
-  }
-
-  setMainListDataFromJobShiftsData() {
-    // this.scheduleData.set(
-    //   this.scheduleData().map(itemA => {
-    //     const matchingB = this.jobScheduleData().find(itemB => itemB.jobId === itemA.jobId);
-    //     return matchingB ? matchingB : itemA;
-    //   })
-    // );
-    // console.log(this.scheduleData(), 4545)
-    // console.log(this.jobScheduleData(), 2222)
   }
 }

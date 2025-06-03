@@ -29,7 +29,7 @@ export class HeaderComponent {
   isScheduleRoute = false;
 
   form: FormGroup;
-  constructor(private navService: NavService, private router: Router) {
+  constructor(public navService: NavService, private router: Router) {
     this.initForm();
     this.router.events.subscribe(() => {
       this.isScheduleRoute = this.router.url?.includes('/schedule');
@@ -55,8 +55,12 @@ export class HeaderComponent {
 
   submit() {
     if (this.form.valid) {
-      this.navService.date$.next(this.form.get('date')?.value)
+      this.navService.date$.next(this.form.get('date')?.value);
     }
   }
 
+  setDays(days: number) {
+    this.navService.days = days;
+    this.submit();
+  }
 }

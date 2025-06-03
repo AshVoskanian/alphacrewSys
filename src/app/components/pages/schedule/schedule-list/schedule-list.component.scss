@@ -284,7 +284,7 @@
   }
 }
 
-.car-nums, .skills {
+.car-nums, {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -294,6 +294,14 @@
   .car-num {
     flex-shrink: 1;
   }
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-start;
 }
 
 .card-wrapper {

@@ -68,7 +68,11 @@
                           <h6>{{ schedule.address }}</h6>
                         }
                         @if (schedule.onsiteContact) {
-                          <h6>{{ schedule.onsiteContact }}</h6>
+                          <h6 class="fw-bold fst-italic">Onsite: {{ schedule.onsiteContact }}</h6>
+                        } @else {
+                          <h6 class="fw-bold text-warning fst-italic pulse">
+                            <i class="fa-solid fa-warning text-warning"></i> Onsite Contact Missing
+                          </h6>
                         }
                       </div>
                     </div>
@@ -100,12 +104,13 @@
                   </div>
 
                   <div class="skills col-4">
-                    <div>
-                      <i class="fa-solid fa-truck me-2 txt-primary f-14"></i>
-                    </div>
-                    <div>
-                      <i class="fa-solid fa-wrench me-2 text-danger f-14"></i>
-                    </div>
+                    @for (skill of schedule.transformedSkills | filter:[
+                      { field: 'active', condition: 'equals', value: true }
+                    ]; track skill.url + $index) {
+                      <i class="pointer border p-3 rounded text-warning"
+                         [class]="skill.url"
+                         [ngbTooltip]="skill.name | titlecase"></i>
+                    }
                   </div>
                 </div>
               </div>
@@ -122,7 +127,7 @@
                                [style.background-color]="crew.jobPartCrewStatusColour"
                                #popoverRef="ngbPopover"
                                triggers="manual"
-                               [popoverClass]="'wide-popover'"
+                               [popoverClass]="'wide-popover border bg-dark'"
                                [ngbPopover]="shiftCrewDetailsRef"
                                [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
                           >
@@ -242,15 +247,15 @@
                   Job Part Comments:
                   @if (schedule.notes || schedule.editComment) {
                     <span class="pointer">
-                      @if (!jobNoteLoader) {
+                      @if (jobNoteLoader && selectedSchedule && selectedSchedule.jobPartId === schedule.jobPartId) {
+                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
+                      } @else {
                         @if (!schedule.editComment) {
                           <i (click)="edit(schedule, 'comment')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
                         } @else {
                           <i (click)="saveNote(schedule, 'comment')"
                              class="fa-solid fa-check me-2 text-success f-16"></i>
                         }
-                      } @else {
-                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
                       }
                       </span>
                   } @else {
@@ -271,15 +276,15 @@
                   Crew Notes:
                   @if (schedule.crewNotes || schedule.editCrewNote) {
                     <span class="pointer">
-                      @if (!crewNoteLoader) {
+                      @if (crewNoteLoader && selectedSchedule && selectedSchedule.jobPartId === schedule.jobPartId) {
+                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
+                      } @else {
                         @if (!schedule.editCrewNote) {
                           <i (click)="edit(schedule, 'crewNote')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
                         } @else {
                           <i (click)="saveNote(schedule, 'crewNote')"
                              class="fa-solid fa-check me-2 text-success f-16"></i>
                         }
-                      } @else {
-                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
                       }
                       </span>
                   } @else {
@@ -346,7 +351,7 @@
           <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.client }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.altVenue }}</td>
-          <td class="p-2 p-x-5 f-10">{{ item.startdate }}</td>
+          <td class="p-2 p-x-5 f-10 text-nowrap">{{ item.extraHours }}eh</td>
           <td class="text-nowrap p-2 p-x-5 f-12">Sk: £{{ item.skilledCost }}</td>
           <td class="text-nowrap p-2 p-x-5 f-12">Bon: £{{ item.bonus }}</td>
         </tr>

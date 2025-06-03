@@ -100,7 +100,7 @@ Alpha Crew
       jobPartId: this.scheduleInfo.jobPartId
     };
 
-    this.post('/Schedule/AddClientCommnication', data)
+    this.post('Schedule/AddClientCommnication', data)
       .subscribe({
         next: (res => {
           this.loading = false;

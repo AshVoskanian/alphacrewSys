@@ -11,6 +11,7 @@ export class NavService {
   public isLanguage: boolean = false;
   public fullScreen: boolean = false;
   public isSearchOpen: boolean = false;
+  public days: number = 2;
 
   public date$: BehaviorSubject<NgbDateStruct> = new BehaviorSubject<any>(null);
 
