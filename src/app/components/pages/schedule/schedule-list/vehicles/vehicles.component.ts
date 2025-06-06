@@ -12,6 +12,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
 export class VehiclesComponent extends ApiBase {
   @Input() vehicles: Array<Vehicle> = [];
   @Input() scheduleInfo: Schedule;
+  @Input() hideVehicles: boolean = false;
 
   @Output() closeModal: EventEmitter<Array<ScheduleSmsInfo> | null> = new EventEmitter<Array<ScheduleSmsInfo> | null>();
   @Output() selectVehicle: EventEmitter<Vehicle> = new EventEmitter<Vehicle>();

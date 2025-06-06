@@ -6,7 +6,7 @@
   @for (schedule of list; track schedule.jobPartId) {
     <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)">
       <div class="col">
-        <div class="vertical-ribbon-animate">
+        <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">
           <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"
                [style.background-color]="schedule.statusColour">
             <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-success"
@@ -21,7 +21,7 @@
                   <div class="col-9 display-flex">
                     <div class="flex-no-wrap">
                       <div class="calendar pointer">
-                        <div class="date bg-light {{schedule.vehicleLoader ? 'loading' : ''}}"
+                        <div class="date bg-light {{schedule.vehicleLoader && !hideVehicles ? 'loading' : ''}}"
                              (click)="getVehicleInfo(schedule)">
                           <em>{{ schedule.startDate | date: 'EEEE':'': 'en' }}</em>
                           <strong>{{ schedule.startDate | date: 'MMMM':'': 'en' }}</strong>
@@ -36,20 +36,33 @@
                       </div>
 
                       <div class="info-icons">
-                        <div style="min-width: 28px">
+                        <div class="min-w-28 flex flex-col items-center justify-content-center">
                           @if (schedule.ootCost > 0) {
-                            <i class="fa-solid fa-car me-2 txt-primary f-14"></i>
+                            <i class="fa-solid fa-car txt-primary f-14"></i>
                           }
                         </div>
                         @if (schedule.isNigthShiftPaid) {
-                          <div>
-                            <i class="far fa-moon me-2 text-success f-14"></i>
+                          <div class="min-w-28 flex flex-col items-center justify-content-center">
+                            <i class="far fa-moon text-success f-14"></i>
                           </div>
                         } @else if (schedule.isNightShift) {
-                          <div>
-                            <i class="far fa-moon me-2 f-14"></i>
+                          <div class="min-w-28 flex flex-col items-center justify-content-center">
+                            <i class="far fa-moon f-14"></i>
                           </div>
                         }
+                        <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
+                             (click)="getVehicleInfo(schedule, true)">
+                          @if (schedule.vehicleLoader && hideVehicles) {
+                            <app-feather-icon [class]="'w-14 h-14 text-white spin'"
+                                              [icon]="'loader'"></app-feather-icon>
+                          } @else {
+                            @if (schedule.messageStatus === -1) {
+                              <i class="icofont icofont-envelope f-14 text-warning" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                            } @else if (schedule.messageStatus === 0) {
+                              <i class="icofont icofont-envelope-open f-14 text-success" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                            }
+                          }
+                        </div>
                       </div>
 
                       <div class="additional-info">
@@ -307,6 +320,18 @@
       <div class="open-crew-panel pointer" (click)="openCrewsPanel(null, $event, schedule)">
         <i class="fas fa-list f-14 z-3"></i>
       </div>
+
+      <button type="button"
+              (click)="updateShift(schedule)"
+              class="btn btn-primary action-button w-30 h-30 p-0">
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+
+      <button type="button"
+              [ngbTooltip]="(schedule.lastModified | date) + schedule.editedBy"
+              class="btn btn-info action-button left w-30 h-30 p-0">
+        <i class="fa-solid fa-info text-light"></i>
+      </button>
     </div>
   }
 }
@@ -324,11 +349,11 @@
 <ng-template #vehicleModal let-vehicleModal>
   <app-vehicles (closeModal)="closeVehiclePopup(vehicleModal, $event)"
                 [scheduleInfo]="selectedSchedule"
+                [hideVehicles]="hideVehicles"
                 (selectVehicle)="onVehicleSelect($event)"
                 [vehicles]="vehiclesInfo()">
   </app-vehicles>
 </ng-template>
-
 
 <!--Send SMS-->
 <ng-template #sendSmsModal let-sendSmsModal>

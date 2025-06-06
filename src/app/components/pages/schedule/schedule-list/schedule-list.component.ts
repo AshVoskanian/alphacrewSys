@@ -16,7 +16,7 @@ import { CardComponent } from "../../../../shared/components/ui/card/card.compon
 import {
   Crew,
   CrewActionItem,
-  CrewDetailForShift,
+  CrewDetailForShift, JobMessageStatus,
   JobPartCrew,
   JobPartCrewEdit,
   JobPartCrewUpdate,
@@ -30,7 +30,7 @@ import { DatePipe, NgStyle, TitleCasePipe } from "@angular/common";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
-  NgbAlertModule,
+  NgbAlertModule, NgbDateStruct,
   NgbDropdownModule,
   NgbModal,
   NgbOffcanvas,
@@ -51,6 +51,7 @@ import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
+import { interval, startWith, switchMap } from "rxjs";
 
 @Component({
   selector: 'app-schedule-list',
@@ -168,14 +169,15 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
 
-
   jobNoteLoader: boolean = false;
   crewNoteLoader: boolean = false;
+  hideVehicles: boolean = false;
 
 
   ngOnInit() {
     this.getCrewList();
     this.checkIfCrewUpdate();
+    setTimeout(() => this.getInfo(), 3000)
   }
 
   checkIfCrewUpdate() {
@@ -306,6 +308,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
+    if (schedule.updateLoading) return;
+
     if (schedule) {
       this.selectSchedule(schedule);
     }
@@ -608,7 +612,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     return {};
   }
 
-  getVehicleInfo(schedule: Schedule) {
+  getVehicleInfo(schedule: Schedule, hideCars: boolean = false) {
+    this.hideVehicles = hideCars;
+
     if (schedule.vehicleLoader) return;
 
     schedule.vehicleLoader = true;
@@ -702,5 +708,85 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
           popover.open();
         }
       })
+  }
+
+  updateShift(schedule: Schedule) {
+    if (schedule.updateLoading) return;
+
+    schedule.updateLoading = true;
+
+    this.get<Schedule>(`Schedule/GetJobPartByJobPartId/${ schedule.jobPartId }`)
+      .subscribe({
+        next: (res) => {
+          schedule.updateLoading = false;
+
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
+            if (item.jobPartId === schedule.jobPartId) {
+              return {
+                ...res.data,
+                crews: this.fillArray(res.data.crews, res.data.crewNumber)
+              };
+            }
+            return item;
+          });
+
+          this._scheduleService.jobScopedShifts = this._scheduleService.jobScopedShifts.map(item => {
+            if (item.jobPartId === schedule.jobPartId) {
+              return {
+                ...res.data,
+                crews: this.fillArray(res.data.crews, res.data.crewNumber)
+              };
+            }
+            return item;
+          });
+        }
+      })
+  }
+
+  getInfo() {
+    const today = new Date();
+    const date: NgbDateStruct = {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate()
+    };
+
+    const getInfo$ = this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', {
+      date: GeneralService.convertToDate(date),
+      days: 2
+    });
+
+    interval(20000)
+      .pipe(
+        startWith(0),
+        takeUntilDestroyed(this._dr),
+        switchMap(() => getInfo$)
+      )
+      .subscribe(res => {
+        this.updateSchedulesWithStatuses(res.data);
+      });
+  }
+
+  updateSchedulesWithStatuses(statuses: JobMessageStatus[]): void {
+    this._scheduleService.shifts = this._scheduleService.shifts.map(schedule => {
+      const status = statuses.find(s => s.jobId === schedule.jobId);
+      if (status) {
+        return {
+          ...schedule,
+          messageStatus: status.messageStatus,
+          smsStatusColour: status.smsStatusColour,
+          smsStatusTitle: status.smsStatusTitle,
+          lastModified: status.lastModified,
+          editedBy: status.editedBy,
+          onsiteContact: status.onsiteContact
+        };
+      }
+      return schedule;
+    });
   }
 }

@@ -2,51 +2,53 @@
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
       <div class="common-flex justify-content-between align-items-center m-b-10">
-        <h6 class="text-primary">Vehicles</h6>
+        <h6 class="text-primary">{{hideVehicles ? 'Send SMS' : 'Vehicles'}}</h6>
 
         <div class="common-flex align-items-center gap-3">
           <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(null)"></button>
         </div>
       </div>
 
-      <ul class="list-group list-group-flush">
-        <div class="common-flex gap-5 m-b-15">
-          <span class="badge badge-light-primary">Free Vehicles</span>
-          <span class="badge badge-light-success">Vehicles Assigned to This Part
+      @if (!hideVehicles) {
+        <ul class="list-group list-group-flush">
+          <div class="common-flex gap-5 m-b-15">
+            <span class="badge badge-light-primary">Free Vehicles</span>
+            <span class="badge badge-light-success">Vehicles Assigned to This Part
             <i class="fa-solid fa-check text-success"></i>
           </span>
-          <span class="badge badge-light-danger">Clashes</span>
-        </div>
-        @for (vehicle of vehicles; track vehicle.vehicleText + vehicle.vehicleId + $index) {
-          <li class="p-y-3 p-x-5 common-flex align-items-center justify-content-between pointer"
-              (click)="setVehicle(vehicle)">
-            <label class="form-check-label pointer mb-0
+            <span class="badge badge-light-danger">Clashes</span>
+          </div>
+          @for (vehicle of vehicles; track vehicle.vehicleText + vehicle.vehicleId + $index) {
+            <li class="p-y-3 p-x-5 common-flex align-items-center justify-content-between pointer"
+                (click)="setVehicle(vehicle)">
+              <label class="form-check-label pointer mb-0
                           {{vehicle.clashes ? 'text-danger': 'text-primary'}}
                           {{vehicle.active ? 'text-success': ''}}"
-            >
+              >
               <span class="{{vehicle.clashes ? 'text-danger': 'text-primary'}}
                            {{vehicle.active ? 'text-success': ''}}" [innerHTML]="vehicle.fontAwsome"></span>
-              {{ vehicle.vehicleText }}
-              @if (vehicle.active) {
-                <i class="fa-solid fa-check text-success"></i>
+                {{ vehicle.vehicleText }}
+                @if (vehicle.active) {
+                  <i class="fa-solid fa-check text-success"></i>
+                }
+              </label>
+
+              @if (vehicle.loading) {
+                <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 "></i>
               }
-            </label>
+            </li>
+          }
+        </ul>
 
-            @if (vehicle.loading) {
-              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 "></i>
-            }
-          </li>
-        }
-      </ul>
-
-      <div class="main-divider m-b-10">
-        <div class="divider-body divider-body-1 divider-primary">
-          <div class="divider-p-primary }}">
-            <i class="fa-solid fa-envelope me-2 txt-primary f-20"></i>
-            <span class="txt-primary"></span>
+        <div class="main-divider m-b-10">
+          <div class="divider-body divider-body-1 divider-primary">
+            <div class="divider-p-primary }}">
+              <i class="fa-solid fa-envelope me-2 txt-primary f-20"></i>
+              <span class="txt-primary"></span>
+            </div>
           </div>
         </div>
-      </div>
+      }
 
       <div class="common-flex gap-10">
         <button type="submit" class="btn btn-primary w-100 text-center" (click)="getSmsInfo('current')">

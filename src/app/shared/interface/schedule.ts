@@ -15,6 +15,7 @@ export interface Schedule {
   vehicleLoader: boolean;
   editComment?: boolean;
   editCrewNote?: boolean;
+  updateLoading?: boolean;
   isJobScoped?: boolean;
   jobId: number;
   shiftCount: number;
@@ -41,9 +42,14 @@ export interface Schedule {
   notifications: Array<Notification>;
   jobPartSkills: ScheduleSkills;
   transformedSkills: TransformedSkill[];
+  editedBy: string;
+  lastModified: string;
+  messageStatus: number;
+  smsStatusColour: string;
+  smsStatusTitle: string;
 }
 
-export interface TransformedSkill{
+export interface TransformedSkill {
   active: any;
   url: any;
   name: string;
@@ -72,6 +78,7 @@ export interface ScheduleSkills {
   skillHealhAndSafety: boolean | null;
   skillWorkingAtHeight: boolean | null;
 }
+
 export interface JobPartCrew {
   jobId?: number;
   crewId?: number | unknown;
@@ -79,6 +86,7 @@ export interface JobPartCrew {
   jobPartCrewRoleId?: number;
   jobPartCrewStatusId?: number;
   jobPartId?: number;
+  levelCrewingWeighting?: number;
   name?: string;
   jobPartCrewStatusColour?: string;
   regionId?: number;
@@ -89,11 +97,12 @@ export interface JobPartCrew {
   editLoading?: boolean;
 }
 
-export interface Crew extends CrewManager{
+export interface Crew extends CrewManager {
   crewId: number;
   regionId: number;
   regionText: string;
   levelId: number;
+  levelCrewingWeighting: number;
   isFulltime: boolean;
   isChecked?: boolean;
   notificationLoading?: boolean;
@@ -260,6 +269,16 @@ export interface ShiftCrewDetails {
   otherPaymentAdjustment: number;
   otherPaymentAdjustmentTxt: string;
   updateHistory: string;
+}
+
+export interface JobMessageStatus {
+  jobId: number;
+  messageStatus: number;
+  smsStatusColour: string;
+  smsStatusTitle: string;
+  onsiteContact: string;
+  lastModified: string;
+  editedBy: string;
 }
 
 export interface CrewDetailForShift {

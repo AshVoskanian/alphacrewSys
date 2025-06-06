@@ -74,17 +74,13 @@ export class CrewListComponent extends ApiBase implements OnInit {
   ];
 
   levels = [
-    { id: 5, title: 'PBC', class: 'warning', checked: true },
-    { id: 1, title: 'L1', class: 'warning', checked: false },
-    { id: 2, title: 'L2', class: 'warning', checked: false },
-    { id: 3, title: 'L3', class: 'warning', checked: false },
-    { id: 4, title: 'L4', class: 'warning', checked: false },
-    { id: 1, title: 'CC2', class: 'warning', checked: false },
-    { id: 24, title: 'CC1', class: 'warning', checked: false },
-    { id: 15, title: 'SCC', class: 'warning', checked: false },
-    { id: 18, title: 'S', class: 'warning', checked: false },
-    { id: 20, title: 'SS', class: 'warning', checked: false },
-    { id: 21, title: 'ES', class: 'warning', checked: false },
+    { id: 1, title: 'PBC', class: 'warning', checked: true },
+    { id: 2, title: 'L1', class: 'warning', checked: false },
+    { id: 3, title: 'L2', class: 'warning', checked: false },
+    { id: 5, title: 'L3', class: 'warning', checked: false },
+    { id: 8, title: 'L4', class: 'warning', checked: false },
+    { id: 13, title: 'CC', class: 'warning', checked: false },
+    { id: 32, title: 'S', class: 'warning', checked: false }
   ];
 
   jobPartClashing: Array<JobPartClashing> = [];
@@ -107,7 +103,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
         const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
         const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
-        const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelId));
+        const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelCrewingWeighting));
 
         // Check existing crews
         this.crewList.forEach(crew => {
@@ -290,11 +286,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
           }
         });
       });
-
-    console.log(777, this._filterPipe.transform(this.crewList,
-      this.regions.filter(it => it.checked).map(it => it.id),
-      this.levels.filter(it => it.checked).map(it => it.id)
-    ))
 
     this._cdr.detectChanges();
   }

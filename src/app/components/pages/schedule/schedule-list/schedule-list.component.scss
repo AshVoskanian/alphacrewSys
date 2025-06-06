@@ -239,8 +239,9 @@
 
     .info-icons {
       display: flex;
+      align-items: center;
       flex-direction: column;
-      gap: 12px;
+      gap: 5px;
     }
 
     .additional-info {
@@ -323,6 +324,18 @@
     i {
       display: none;
       font-size: 50px !important;
+    }
+  }
+
+  .action-button {
+    position: absolute;
+    top: 5px;
+    right: 13px;
+    z-index: 6;
+
+    &.left {
+      right: auto;
+      left: 13px;
     }
   }
 }

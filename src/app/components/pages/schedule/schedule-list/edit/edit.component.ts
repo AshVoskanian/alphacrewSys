@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { ROLES, SKILLS, STATUSES } from "../../../../../shared/data/schedule";
 import { GeneralService } from "../../../../../shared/services/general.service";
+import { ScheduleService } from "../../schedule.service";
 
 @Component({
   selector: 'app-edit',
@@ -24,6 +25,7 @@ export class EditComponent extends ApiBase implements OnInit {
 
   private readonly _dr: DestroyRef = inject(DestroyRef);
   private readonly _fb: FormBuilder = inject(FormBuilder);
+  private readonly _scheduleService = inject(ScheduleService);
 
   form!: FormGroup;
 
@@ -74,7 +76,7 @@ export class EditComponent extends ApiBase implements OnInit {
   }
 
   bonusAction(type: 'REMOVE' | 'APPLY') {
-    if (this.loading) return;
+    if (this.loading || (type === 'REMOVE' && (this.crewInfo.bonus === 0 || !this.crewInfo.bonus)) ) return;
 
     this.bonusActionType = type;
     this.loading = true;
@@ -98,7 +100,7 @@ export class EditComponent extends ApiBase implements OnInit {
           }
 
           this.crewInfo.bonus = type === 'REMOVE' ? 0 : 5;
-          const bonus = this.crewInfo.bonus = type === 'REMOVE' ? -5 : 5;
+          const bonus = type === 'REMOVE' ? -5 : 5;
           this.pay = this.crewInfo.pay + bonus;
         }
       })
@@ -136,6 +138,7 @@ export class EditComponent extends ApiBase implements OnInit {
           }
 
           GeneralService.showSuccessMessage();
+          this._scheduleService.crewUpdate$.next([res.data]);
           this.finish.emit(res.data);
         }
       })

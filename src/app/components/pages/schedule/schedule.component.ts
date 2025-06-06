@@ -165,8 +165,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     this.getScheduleData(initialDate, schedule.jobId);
   }
 
-  protected readonly close = close;
-
   closeModal(modal: any) {
     modal.close();
   }

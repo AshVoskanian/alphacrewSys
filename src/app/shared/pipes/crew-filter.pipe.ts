@@ -15,7 +15,7 @@ export class CrewFilterPipe implements PipeTransform {
 
     return crew.filter(member => {
       const matchesRegion = !regionIds || regionIds.length === 0 || regionIds.includes(member.regionId);
-      const matchesLevel = !levelIds || levelIds.length === 0 || levelIds.includes(member.levelId);
+      const matchesLevel = !levelIds || levelIds.length === 0 || levelIds.includes(member.levelCrewingWeighting);
       const matchesJobParts =
         !jobPartIds || jobPartIds.length === 0 ||
         member.jobPartIds?.some(id => jobPartIds.includes(id));
