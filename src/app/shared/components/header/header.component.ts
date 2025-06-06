@@ -47,6 +47,8 @@ export class HeaderComponent {
     this.form = this._fb.group({
       date: [ initialDate, [ Validators.required ] ]
     });
+
+    this.navService.date$.next(this.form.get('date')?.value);
   }
 
   toggleLanguage() {

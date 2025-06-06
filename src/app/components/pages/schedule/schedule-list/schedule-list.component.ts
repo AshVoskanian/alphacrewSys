@@ -16,7 +16,8 @@ import { CardComponent } from "../../../../shared/components/ui/card/card.compon
 import {
   Crew,
   CrewActionItem,
-  CrewDetailForShift, JobMessageStatus,
+  CrewDetailForShift,
+  JobMessageStatus,
   JobPartCrew,
   JobPartCrewEdit,
   JobPartCrewUpdate,
@@ -30,7 +31,8 @@ import { DatePipe, NgStyle, TitleCasePipe } from "@angular/common";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
-  NgbAlertModule, NgbDateStruct,
+  NgbAlertModule,
+  NgbDateStruct,
   NgbDropdownModule,
   NgbModal,
   NgbOffcanvas,
@@ -51,7 +53,8 @@ import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
-import { interval, startWith, switchMap } from "rxjs";
+import { interval, startWith, switchMap, take, timer } from "rxjs";
+import { NavService } from "../../../../shared/services/nav.service";
 
 @Component({
   selector: 'app-schedule-list',
@@ -65,6 +68,7 @@ import { interval, startWith, switchMap } from "rxjs";
 export class ScheduleListComponent extends ApiBase implements OnInit {
   private _dr = inject(DestroyRef);
   private _modal = inject(NgbModal);
+  private _navService = inject(NavService);
   private _offCanvasService = inject(NgbOffcanvas);
   private _scheduleService = inject(ScheduleService);
 
@@ -176,8 +180,20 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getCrewList();
+    this.subToDateChange();
     this.checkIfCrewUpdate();
-    setTimeout(() => this.getInfo(), 3000)
+  }
+
+  subToDateChange() {
+    this._navService.date$
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (date) => {
+          if (date) {
+            this.getInfo(date, this.isJobScoped ? this.selectedSchedule.jobId : null);
+          }
+        }
+      });
   }
 
   checkIfCrewUpdate() {
@@ -270,18 +286,20 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       notes: schedule.notes
     }
 
-    this.post('Schedule/updatejobpartnotes', data).subscribe({
-      next: (res) => {
-        this.jobNoteLoader = false;
+    this.post('Schedule/updatejobpartnotes', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          this.jobNoteLoader = false;
 
-        if (res.errors?.errorCode) {
+          if (res.errors?.errorCode) {
 
-        } else {
-          schedule.editComment = false;
-          GeneralService.showSuccessMessage();
+          } else {
+            schedule.editComment = false;
+            GeneralService.showSuccessMessage();
+          }
         }
-      }
-    })
+      })
   }
 
   updateCrewNote(schedule: Schedule) {
@@ -293,18 +311,20 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       jobPartId: schedule.jobPartId,
       notes: schedule.crewNotes
     }
-    this.post('Schedule/updatejobpartcrewnotes', data).subscribe({
-      next: (res) => {
-        this.crewNoteLoader = false;
+    this.post('Schedule/updatejobpartcrewnotes', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          this.crewNoteLoader = false;
 
-        if (res.errors?.errorCode) {
+          if (res.errors?.errorCode) {
 
-        } else {
-          schedule.editCrewNote = false;
-          GeneralService.showSuccessMessage();
+          } else {
+            schedule.editCrewNote = false;
+            GeneralService.showSuccessMessage();
+          }
         }
-      }
-    })
+      })
   }
 
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
@@ -342,6 +362,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this._scheduleService.crewListLoading.next(true);
 
     this.get<Array<Crew>>('Crew/GetCrewList', {})
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           this._scheduleService.crewListLoading.next(false);
@@ -357,6 +378,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     crew.editLoading = true;
 
     this.get<JobPartCrewEdit>('schedule/getjobpartcrewforedit', { jobPartCrewId: crew.jobPartCrewId })
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           crew.editLoading = false;
@@ -372,6 +394,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   updateStatusOrRole(data: JobPartCrewUpdate, crew: JobPartCrew) {
     this.post<JobPartCrew>('Schedule/JobPartCrewStatusOrRoleUpdate', data)
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           if (crew) {
@@ -397,33 +420,35 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       crewId: crew.crewId
     };
 
-    this.post<any>('Schedule/removeJobPartCrew', data).subscribe({
-      next: (res) => {
-        if (res.errors?.errorCode) {
-          return;
-        }
-
-        const removedId = res.data;
-
-        const updateAndSortCrews = (crews: JobPartCrew[]) =>
-          crews.map(c =>
-            c.jobPartCrewId === removedId
-              ? { ...c, isActive: false, crewId: undefined, name: '' }
-              : c
-          )
-            .sort((a, b) => Number(b.isActive) - Number(a.isActive));
-
-        this.selectedSchedule.crews = updateAndSortCrews(this.selectedSchedule.crews);
-
-        this._scheduleService.shifts.forEach(shift => {
-          if (shift.jobPartId === this.selectedSchedule.jobPartId) {
-            shift.crews = updateAndSortCrews(shift.crews);
+    this.post<any>('Schedule/removeJobPartCrew', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            return;
           }
-        });
 
-        this.selectSchedule(this.selectedSchedule);
-      }
-    });
+          const removedId = res.data;
+
+          const updateAndSortCrews = (crews: JobPartCrew[]) =>
+            crews.map(c =>
+              c.jobPartCrewId === removedId
+                ? { ...c, isActive: false, crewId: undefined, name: '' }
+                : c
+            )
+              .sort((a, b) => Number(b.isActive) - Number(a.isActive));
+
+          this.selectedSchedule.crews = updateAndSortCrews(this.selectedSchedule.crews);
+
+          this._scheduleService.shifts.forEach(shift => {
+            if (shift.jobPartId === this.selectedSchedule.jobPartId) {
+              shift.crews = updateAndSortCrews(shift.crews);
+            }
+          });
+
+          this.selectSchedule(this.selectedSchedule);
+        }
+      });
   }
 
   menuAction(menu: CrewActionItem, crew: JobPartCrew) {
@@ -522,6 +547,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     schedule.notificationsLoader = true;
 
     this.get<Array<Notification>>(`Schedule/GetJobNotificationAsync/${ schedule.jobPartId }`)
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           schedule.notificationsLoader = false;
@@ -620,6 +646,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     schedule.vehicleLoader = true;
 
     this.get<Array<Vehicle>>(`Schedule/GetScheduleVehicleListAsync/${ schedule.jobPartId }`)
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           schedule.vehicleLoader = false;
@@ -696,6 +723,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     crew.detailsLoading = true;
 
     this.get<Array<CrewDetailForShift>>(`Schedule/GetJobPartCrewDetailsAsync/${ crew.jobPartCrewId }`)
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           crew.detailsLoading = false;
@@ -716,6 +744,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     schedule.updateLoading = true;
 
     this.get<Schedule>(`Schedule/GetJobPartByJobPartId/${ schedule.jobPartId }`)
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           schedule.updateLoading = false;
@@ -748,24 +777,23 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       })
   }
 
-  getInfo() {
-    const today = new Date();
-    const date: NgbDateStruct = {
-      year: today.getFullYear(),
-      month: today.getMonth() + 1,
-      day: today.getDate()
+  getInfo(date: NgbDateStruct, jobId: number) {
+    const params = {
+      date: GeneralService.convertToDate(date),
+      days: this._navService.days,
+      jobId: jobId
     };
 
-    const getInfo$ = this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', {
-      date: GeneralService.convertToDate(date),
-      days: 2
-    });
+    if (!jobId) {
+      delete params.jobId;
+    }
 
-    interval(20000)
+    const getInfo$ = () => this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', params);
+
+    timer(4000, 60000)
       .pipe(
-        startWith(0),
         takeUntilDestroyed(this._dr),
-        switchMap(() => getInfo$)
+        switchMap(() => getInfo$())
       )
       .subscribe(res => {
         this.updateSchedulesWithStatuses(res.data);

@@ -58,13 +58,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   ]
 
   ngOnInit() {
-    const today = new Date();
-    const initialDate: NgbDateStruct = {
-      year: today.getFullYear(),
-      month: today.getMonth() + 1,
-      day: today.getDate()
-    };
-    this.getScheduleData(initialDate, null);
     this.subToDateChange();
   }
 
@@ -108,6 +101,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) {
             this._toast.error(res.errors.message)
           } else {
+            this.scheduleService.shiftsLoaded.next(true);
+
             if (jobId) {
               this.scheduleService.jobScopedShifts = res.data;
               this.scheduleService.jobScopedShifts.forEach(it => {
