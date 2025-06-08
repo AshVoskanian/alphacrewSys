@@ -32,7 +32,6 @@ import { FeatherIconComponent } from "../../../../shared/components/ui/feather-i
 import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
   NgbAlertModule,
-  NgbDateStruct,
   NgbDropdownModule,
   NgbModal,
   NgbOffcanvas,
@@ -53,7 +52,7 @@ import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
-import { interval, startWith, switchMap, take, timer } from "rxjs";
+import { switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../shared/services/nav.service";
 
 @Component({
@@ -180,20 +179,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getCrewList();
-    this.subToDateChange();
     this.checkIfCrewUpdate();
-  }
-
-  subToDateChange() {
-    this._navService.date$
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe({
-        next: (date) => {
-          if (date) {
-            this.getInfo(date, this.isJobScoped ? this.selectedSchedule.jobId : null);
-          }
-        }
-      });
+    this.getInfo();
+    this.getInfoMultiple();
   }
 
   checkIfCrewUpdate() {
@@ -744,7 +732,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     schedule.updateLoading = true;
 
     this.get<Schedule>(`Schedule/GetJobPartByJobPartId/${ schedule.jobPartId }`)
-      .pipe(takeUntilDestroyed(this._dr))
+      .pipe(takeUntilDestroyed(this._dr), take(2))
       .subscribe({
         next: (res) => {
           schedule.updateLoading = false;
@@ -773,18 +761,34 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             }
             return item;
           });
+
+          const params = {
+            date: GeneralService.convertToDate(this._navService.date$.value),
+            days: this._navService.days,
+            jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+          };
+
+          if (!params.jobId) {
+            delete params.jobId;
+          }
+
+          this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', params)
+            .pipe(takeUntilDestroyed(this._dr))
+            .subscribe(res => {
+              this.updateSchedulesWithStatuses(res.data);
+            });
         }
       })
   }
 
-  getInfo(date: NgbDateStruct, jobId: number) {
+  getInfoMultiple() {
     const params = {
-      date: GeneralService.convertToDate(date),
+      date: GeneralService.convertToDate(this._navService.date$.value),
       days: this._navService.days,
-      jobId: jobId
+      jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
     };
 
-    if (!jobId) {
+    if (!params.jobId) {
       delete params.jobId;
     }
 
@@ -797,6 +801,32 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       )
       .subscribe(res => {
         this.updateSchedulesWithStatuses(res.data);
+      });
+  }
+
+  getInfo() {
+    this._scheduleService.shiftsLoaded
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (date) => {
+          if (date) {
+            const params = {
+              date: GeneralService.convertToDate(this._navService.date$.value),
+              days: this._navService.days,
+              jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+            };
+
+            if (!params.jobId) {
+              delete params.jobId;
+            }
+
+            this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', params)
+              .pipe(takeUntilDestroyed(this._dr))
+              .subscribe(res => {
+                this.updateSchedulesWithStatuses(res.data);
+              });
+          }
+        }
       });
   }
 
