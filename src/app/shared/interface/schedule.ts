@@ -17,6 +17,7 @@ export interface Schedule {
   editCrewNote?: boolean;
   updateLoading?: boolean;
   isJobScoped?: boolean;
+  changed?: boolean;
   jobId: number;
   shiftCount: number;
   notificationCount: number;
@@ -301,4 +302,9 @@ export interface CrewDetailForShift {
   skilledCost: number;
   bonus: number;
   updateHistory: string;
+}
+
+export interface BonusResponse {
+  pay: number;
+  bonus: number;
 }

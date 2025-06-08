@@ -1,7 +1,7 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Select2Data, Select2Module } from "ng-select2-component";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { CrewSkill, JobPartCrewEdit, Schedule } from "../../../../../shared/interface/schedule";
+import { BonusResponse, CrewSkill, JobPartCrewEdit, Schedule } from "../../../../../shared/interface/schedule";
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -76,20 +76,22 @@ export class EditComponent extends ApiBase implements OnInit {
   }
 
   bonusAction(type: 'REMOVE' | 'APPLY') {
-    if (this.loading || (type === 'REMOVE' && (this.crewInfo.bonus === 0 || !this.crewInfo.bonus)) ) return;
+    if (this.loading || (type === 'REMOVE' && (this.crewInfo.bonus === 0 || !this.crewInfo.bonus))) return;
 
     this.bonusActionType = type;
-    this.loading = true;
-    const data = {
-      bonus: 5,
-      jobPartCrewId: this.crewInfo.jobPartCrewId
+
+    if (type === 'APPLY') {
+      this.applyBonus();
     }
 
     if (type === 'REMOVE') {
-      delete data.bonus;
+      this.removeBonus();
     }
+  }
 
-    this.post('Schedule/AddOrRemoveJobPartCrewBonus', data)
+  applyBonus() {
+    this.loading = true;
+    this.post<BonusResponse>('Schedule/AddOrUpdateJobPartCrewBonus', { jobPartCrewId: this.crewInfo.jobPartCrewId })
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
@@ -99,9 +101,26 @@ export class EditComponent extends ApiBase implements OnInit {
             return;
           }
 
-          this.crewInfo.bonus = type === 'REMOVE' ? 0 : 5;
-          const bonus = type === 'REMOVE' ? -5 : 5;
-          this.pay = this.crewInfo.pay + bonus;
+          this.crewInfo.bonus = res.data?.bonus;
+          this.pay = res.data?.pay;
+        }
+      })
+  }
+
+  removeBonus() {
+    this.loading = true;
+    this.post<BonusResponse>('Schedule/RemoveJobPartCrewBonus', { jobPartCrewId: this.crewInfo.jobPartCrewId })
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (res) => {
+          this.loading = false;
+
+          if (res.errors?.errorCode) {
+            return;
+          }
+
+          this.crewInfo.bonus = res.data?.bonus;
+          this.pay = res.data?.pay;
         }
       })
   }
@@ -126,7 +145,7 @@ export class EditComponent extends ApiBase implements OnInit {
     }
 
 
-    this.post<Schedule>('/Schedule/jobpartcrewedit', data)
+    this.post<Schedule>('Schedule/jobpartcrewedit', data)
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
@@ -138,7 +157,7 @@ export class EditComponent extends ApiBase implements OnInit {
           }
 
           GeneralService.showSuccessMessage();
-          this._scheduleService.crewUpdate$.next([res.data]);
+          this._scheduleService.crewUpdate$.next([ res.data ]);
           this.finish.emit(res.data);
         }
       })

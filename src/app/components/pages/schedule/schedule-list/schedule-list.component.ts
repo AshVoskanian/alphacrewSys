@@ -104,7 +104,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       action: CrewAction.ASSIGN,
       color: 'text-warning',
       icon: 'fas fa-square f-18',
-      actionFn: this.updateStatusOrRole
     },
     {
       id: 5,
@@ -450,7 +449,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
     switch (menu.action) {
       case CrewAction.SEND_SMS:
-        // TODO: handle SEND_SMS
+        crew.loading = true;
+        this.sendNotification(crew);
         break;
 
       case CrewAction.ASSIGN:
@@ -496,6 +496,11 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         break;
 
       case CrewAction.TURN_DOWN:
+        crew.loading = true;
+        data.jobPartCrewStatusid = menu.id;
+
+
+        this.updateStatusOrRole(data, crew);
         break;
 
       case CrewAction.REMOVE:
@@ -518,6 +523,26 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         console.warn('Unhandled action:', menu.action);
         break;
     }
+  }
+
+
+  sendNotification(crew?: JobPartCrew) {
+    const data = {
+      job_Id: this.selectedSchedule.jobId,
+      job_Part_Id: this.selectedSchedule.jobPartId,
+      crewId: [ crew.crewId ]
+    }
+    this.post('Schedule/AddJobNotifiction', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          crew.loading = false;
+
+          if (res?.errors?.errorCode) return;
+
+          GeneralService.showSuccessMessage('Successfully sent');
+        }
+      })
   }
 
   selectSchedule(schedule: Schedule) {
@@ -831,9 +856,29 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   }
 
   updateSchedulesWithStatuses(statuses: JobMessageStatus[]): void {
-    this._scheduleService.shifts = this._scheduleService.shifts.map(schedule => {
-      const status = statuses.find(s => s.jobId === schedule.jobId);
-      if (status) {
+    const compareAndUpdate = (list: any[]) =>
+      list.map(schedule => {
+        const status = statuses.find(s => s.jobId === schedule.jobId);
+        if (!status) return schedule;
+
+        // თუ ძველი მნიშვნელობები ჯერ არ არის განსაზღვრული — არ ვაყენებთ changed:true
+        const isFirstTime = !(
+          'messageStatus' in schedule ||
+          'smsStatusColour' in schedule ||
+          'smsStatusTitle' in schedule ||
+          'smsStatusTitle' in schedule ||
+          'lastModified' in schedule
+        );
+
+        const changed = !isFirstTime && (
+          schedule.messageStatus !== status.messageStatus ||
+          schedule.smsStatusColour !== status.smsStatusColour ||
+          schedule.smsStatusTitle !== status.smsStatusTitle ||
+          schedule.editedBy !== status.editedBy ||
+          schedule.lastModified !== status.lastModified ||
+          schedule.onsiteContact !== status.onsiteContact
+        );
+
         return {
           ...schedule,
           messageStatus: status.messageStatus,
@@ -841,10 +886,12 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
           smsStatusTitle: status.smsStatusTitle,
           lastModified: status.lastModified,
           editedBy: status.editedBy,
-          onsiteContact: status.onsiteContact
+          onsiteContact: status.onsiteContact,
+          changed,
         };
-      }
-      return schedule;
-    });
+      });
+
+    this._scheduleService.shifts = compareAndUpdate(this._scheduleService.shifts);
+    this._scheduleService.jobScopedShifts = compareAndUpdate(this._scheduleService.jobScopedShifts);
   }
 }

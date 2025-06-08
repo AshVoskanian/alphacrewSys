@@ -344,12 +344,15 @@
 
       <button type="button"
               (click)="updateShift(schedule)"
-              class="btn btn-primary action-button w-30 h-30 p-0">
+              [class.btn-danger]="schedule.changed"
+              [class.btn-primary]="!schedule.changed"
+              [class.pulse]="schedule.changed"
+              class="btn action-button w-30 h-30 p-0">
         <i class="fa-solid fa-rotate-right"></i>
       </button>
 
       <button type="button"
-              [ngbTooltip]="(schedule.lastModified | date) + schedule.editedBy"
+              [ngbTooltip]="(schedule.lastModified | date:'dd MMM HH:mm') + '  ' + schedule.editedBy"
               class="btn btn-info action-button left w-30 h-30 p-0">
         <i class="fa-solid fa-info text-light"></i>
       </button>
