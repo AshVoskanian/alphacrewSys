@@ -170,7 +170,7 @@
             }
             <div class="common-flex align-items-center">
 
-              <div class="w-15 h-15"
+              <div class="w-15 h-15 flex items-center justify-content-center"
                    (click)="getCrewDetails(crew, popoverRef)"
                    #popoverRef="ngbPopover"
                    triggers="manual"
@@ -179,9 +179,9 @@
                    [ngbPopover]="crewDetailsRef"
                    [popoverTitle]="crew.name + '' + ' - ' + (selectedSchedule.startDate | date: 'dd MMM')">
                 @if (crewManagerLoader || crew.detailsLoading) {
-                  <i class="fas fa-spin fa-spinner f-15 m-0"></i>
+                  <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
                 } @else {
-                  <p class="badge pointer h-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
+                  <p class="badge pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
                      [ngClass]="getBadgeClass(crew)"
                      style="line-height: 15px;">
                     @if (crew.holiday > 0) {
