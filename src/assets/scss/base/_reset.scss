@@ -1777,6 +1777,18 @@ $i: 1;
   align-items: center;
 }
 
+.flex-sm-col {
+  @media screen and (max-width: 767px) {
+    flex-direction: column !important;
+  }
+}
+
+.language-nav, .mode, .fullscreen-body {
+  @media screen and (max-width: 997px) {
+    display: none !important;
+  }
+}
+
 ::ng-deep .popover {
   width: max-content !important;
   max-width: none !important;
@@ -1823,9 +1835,17 @@ $i: 1;
   }
 }
 
+
+
 @media (min-width: 1200px) {
   .modal-xl {
     max-width: 1140px;
+  }
+}
+
+@media (min-width: 767px) {
+  .date-input {
+    width: 150px;
   }
 }
 

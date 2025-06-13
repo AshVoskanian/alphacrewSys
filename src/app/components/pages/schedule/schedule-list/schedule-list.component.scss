@@ -22,6 +22,16 @@
     span {
       font-size: 12px;
       line-height: 30px;
+
+      &:hover {
+        color: var(--bs-blue);
+      }
+    }
+
+    a {
+      &:hover {
+        color: var(--bs-blue) !important;
+      }
     }
 
     @media screen and (max-width: 400px) {

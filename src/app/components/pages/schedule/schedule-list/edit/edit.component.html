@@ -2,30 +2,30 @@
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
       <form [formGroup]="form" (ngSubmit)="save()">
-        <div class="common-flex justify-content-between align-items-center m-b-10">
+        <div class="flex flex-no-wrap gap-5 justify-content-between align-items-center m-b-10">
           <h6 class="text-primary">
             ({{ crewInfo?.levelShortText }})
             {{ crewInfo?.name }},
             {{ crewInfo?.postcode }}
           </h6>
 
-          <div class="common-flex align-items-center gap-3">
+          <div class="flex align-items-center gap-6">
             <h2 class="text-success">Pay: £{{ pay }}</h2>
             <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(true)"></button>
           </div>
         </div>
 
         <div class="row g-3">
-          <div class="col-5">
+          <div class="col-12 col-md-5">
             <div class="row g-3">
               <div class="col w-1-5 align-self-center">
-                <label class="form-label">
+                <label class="form-label w-100">
                   Expenses
                   <input class="form-control" formControlName="expences" type="text">
                 </label>
               </div>
               <div class="col w-1-5">
-                <label class="form-label">
+                <label class="form-label w-100">
                   Extra Hours
                   <input class="form-control" formControlName="extraHours" type="text">
                 </label>
@@ -33,7 +33,7 @@
             </div>
             <div class="row g-3">
               <div class="col w-1-5">
-                <label class="form-label">
+                <label class="form-label w-100">
                   Adjustment
                   <input class="form-control" formControlName="otherPaymentAdjustment" type="text">
                   <input class="form-control" formControlName="otherPaymentAdjustmentTxt" type="text"
@@ -41,11 +41,11 @@
                 </label>
               </div>
               <div class="col w-1-5">
-                <label class="form-label">
+                <label class="form-label w-100">
                   Skills
                   <input class="form-control" formControlName="skilledCost" type="text">
                 </label>
-                <label class="form-label">
+                <label class="form-label w-100">
                   Last Minute Bonus
                   <input class="form-control" formControlName="lastMinuteBonus" type="text">
                 </label>
@@ -77,20 +77,21 @@
               </div>
             </div>
           </div>
-          <div class="col-7 right">
+
+          <div class="col-12 col-md-7 right">
             <div class="row g-3">
-              <div class="col-4">
+              <div class="col-6 col-md-4">
                 <p class="text-nowrap text-primary">Late Night Shift: £{{ lateNightShift | number:'1.2-2' }}</p>
                 <p class="text-nowrap text-primary">Out of Town: £{{ oot | number:'1.2-2' }}</p>
               </div>
-              <div class="col-4">
-                <p class="text-nowrap text-primary">Travel: £{{ travel | number:'1.2-2' }}</p>
-                <p class="text-nowrap text-primary">Bonus: £{{ (crewInfo.bonus || 0) | number:'1.2-2' }}</p>
+              <div class="col-6 col-md-4">
+                <p class="text-nowrap text-primary text-end">Travel: £{{ travel | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary text-end">Bonus: £{{ (crewInfo.bonus || 0) | number:'1.2-2' }}</p>
               </div>
             </div>
 
             <div class="row g-3">
-              <div class="col justify-content-between common-flex">
+              <div class="col justify-content-between flex-sm-col gap-5 flex">
                 <button type="button" class="btn btn-warning w-1-5" (click)="bonusAction('APPLY')">
                   Apply Bonus
                   <span class="d-inline-block" style="width: 30px; height: 13px;">
@@ -102,7 +103,7 @@
 
                 <button type="button" class="btn btn-danger w-1-5" (click)="bonusAction('REMOVE')">
                   Remove Bonus
-                  <span class="d-inline-block" style="width: 30px; height: 13px;">
+                  <span class="d-inline-block w-30 h-13">
                       @if (loading && bonusActionType === 'REMOVE') {
                         <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
                       }
@@ -113,7 +114,7 @@
           </div>
         </div>
 
-        <div class="main-divider">
+        <div class="main-divider m-y-5">
           <div class="divider-body divider-body-1 divider-primary">
             <div class="divider-p-primary }}">
               <i class="fa-solid fa-comments me-2 txt-primary f-20"></i>
@@ -122,7 +123,7 @@
           </div>
         </div>
 
-        <div class="row row-cols-6">
+        <div class="row row-cols-2 row-cols-sm-4 row-cols-md-6">
           @for (item of skills; track item) {
             <div class="col form-check checkbox checkbox-solid-warning">
               <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked" (change)="item.checked = !item.checked">
@@ -132,12 +133,12 @@
         </div>
 
         <div class="row m-t-20">
-          <div class="col justify-content-end">
-            <button type="submit" class="btn btn-primary float-end" style="padding-left: 60px;">
+          <div class="col col-md-3 offset-md-9">
+            <button type="submit" class="w-100 btn btn-primary float-end p-l-52">
               Save
-              <span class="d-inline-block" style="width: 30px; height: 13px;">
+              <span class="d-inline-block w-30 h-13">
                       @if (saveLoading) {
-                        <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 " style="height: 13px;"></i>
+                        <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-13"></i>
                       }
                   </span>
             </button>

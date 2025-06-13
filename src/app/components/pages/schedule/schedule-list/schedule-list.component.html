@@ -9,10 +9,20 @@
         <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">
           <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"
                [style.background-color]="schedule.statusColour">
-            <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-success"
-                 [ngStyle]="{'backgroundColor' : schedule.statusColour}">
-              <i class="fa fa-bolt m-r-10"></i>
-              <span>{{ schedule.statusText + ' ' + schedule.jobId }}</span>
+            <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-dark flex gap-5">
+              @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
+                <span>
+                  <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                </span>
+              } @else {
+                <span class="text-nowrap pointer" style="line-height: 22px;" (click)="openJobShifts(schedule)">
+                  {{ schedule.shiftNumber }} of {{ schedule.shiftCount }}
+                </span>
+              }
+              <a [href]="'https://alphacrew.eu/Jobs/Edit/' + schedule.jobId" target="_blank"
+                 class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
+                {{ schedule.statusText + ' ' + schedule.jobId }}
+              </a>
             </div>
 
             <div class="row g-3 justify-content-between">
@@ -58,25 +68,32 @@
                           } @else {
                             @switch (schedule.messageStatus) {
                               @case (-1) {
-                                <i class="icofont icofont-envelope f-14 text-dark" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope f-14 text-dark"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @case (0) {
-                                <i class="icofont icofont-envelope f-14 text-warning" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope f-14 text-warning"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @case (1) {
-                                <i class="icofont icofont-envelope f-14 text-warning" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope f-14 text-warning"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @case (2) {
-                                <i class="icofont icofont-envelope-open f-14 text-success" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope-open f-14 text-success"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @case (3) {
-                                <i class="icofont icofont-envelope f-14 text-success-emphasis" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope f-14 text-success-emphasis"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @case (4) {
-                                <i class="icofont icofont-envelope f-14 text-primary" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope f-14 text-primary"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @case (5) {
-                                <i class="icofont icofont-envelope f-14 text-danger" [ngbTooltip]="schedule.smsStatusTitle"></i>
+                                <i class="icofont icofont-envelope f-14 text-danger"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @default {
 

@@ -1,13 +1,13 @@
-<div class="header-wrapper row m-0">
+<div class="header-wrapper row m-x-0">
   <app-search></app-search>
   <div class="header-logo-wrapper col-auto p-0">
     <app-header-logo [icon]="'align-center'" [type]="'header'"></app-header-logo>
   </div>
 
   @if (isScheduleRoute) {
-    <form class="flex gap-10 m-l-20 align-items-center max-w-300" [formGroup]="form" (ngSubmit)="submit()">
+    <form class="flex gap-10 align-items-center max-w-300" [formGroup]="form" (ngSubmit)="submit()">
       <div class="flex gap-4">
-        <div class="col w-150">
+        <div class="col date-input">
           <input class="form-control digits" id="datetime-local"
                  placeholder="yyyy-mm-dd" name="from"
                  formControlName="date"
@@ -15,7 +15,7 @@
                  (click)="fromDate.toggle()">
         </div>
         <div class="col-auto d-flex justify-content-start align-items-center">
-          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
+          <button class="btn p-x-14 btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
         </div>
       </div>
 
@@ -23,21 +23,21 @@
         <button type="button"
                 [class.btn-primary]="navService.days === 2"
                 [class.btn-secondary]="navService.days !== 2"
-                class="btn example-popover mb-0 me-0 p-x-15"
+                class="btn example-popover mb-0 me-0 p-x-12"
                 (click)="setDays(2)">
           2
         </button>
         <button type="button"
                 [class.btn-primary]="navService.days === 4"
                 [class.btn-secondary]="navService.days !== 4"
-                class="btn example-popover mb-0 me-0 p-x-15"
+                class="btn example-popover mb-0 me-0 p-x-12"
                 (click)="setDays(4)">
           4
         </button>
         <button type="button"
                 [class.btn-primary]="navService.days === 7"
                 [class.btn-secondary]="navService.days !== 7"
-                class="btn example-popover mb-0 me-0 p-x-15"
+                class="btn example-popover mb-0 me-0 p-x-12"
                 (click)="setDays(7)">
           7
         </button>
@@ -63,7 +63,7 @@
       <!--                <app-header-bookmark></app-header-bookmark>-->
       <!--            </li>-->
 
-      <li>
+      <li class="mode">
         <app-mode></app-mode>
       </li>
 

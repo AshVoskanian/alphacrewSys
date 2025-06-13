@@ -9,7 +9,8 @@ import {
 import {
   Crew,
   CrewManager,
-  JobPartClashing, JobPartCrew,
+  JobPartClashing,
+  JobPartCrew,
   Schedule,
   ShiftCrewDetails
 } from "../../../../../shared/interface/schedule";
@@ -20,7 +21,7 @@ import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
-import { AsyncPipe, DatePipe } from "@angular/common";
+import { AsyncPipe, DatePipe, NgClass } from "@angular/common";
 import { finalize, Observable } from "rxjs";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -29,7 +30,7 @@ import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
 @Component({
   selector: 'app-crew-list',
   imports: [
-    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe,
+    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe, NgClass,
     FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, FeatherIconComponent
   ],
   providers: [ CrewFilterPipe ],
@@ -70,17 +71,17 @@ export class CrewListComponent extends ApiBase implements OnInit {
     { id: 7, title: 'Scot', class: 'primary', checked: false },
     { id: 4, title: 'Par', class: 'primary', checked: false },
     { id: 8, title: 'Bcn', class: 'primary', checked: false },
-    { id: 10, title: 'Ny', class: 'primary', checked: false },
+    { id: 10, title: 'NY', class: 'primary', checked: false },
   ];
 
   levels = [
-    { id: 1, title: 'PBC', class: 'warning', checked: true },
-    { id: 2, title: 'L1', class: 'warning', checked: false },
-    { id: 3, title: 'L2', class: 'warning', checked: false },
-    { id: 5, title: 'L3', class: 'warning', checked: false },
-    { id: 8, title: 'L4', class: 'warning', checked: false },
-    { id: 13, title: 'CC', class: 'warning', checked: false },
-    { id: 32, title: 'S', class: 'warning', checked: false }
+    { id: 1, title: 'PBC', class: 'primary', checked: true },
+    { id: 2, title: 'L1', class: 'primary', checked: false },
+    { id: 3, title: 'L2', class: 'primary', checked: false },
+    { id: 5, title: 'L3', class: 'primary', checked: false },
+    { id: 8, title: 'L4', class: 'primary', checked: false },
+    { id: 13, title: 'CC', class: 'primary', checked: false },
+    { id: 32, title: 'S', class: 'primary', checked: false }
   ];
 
   jobPartClashing: Array<JobPartClashing> = [];
@@ -232,6 +233,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
             const match = res.data.find(r => r.crewID === crew.crewId);
             if (match) {
               crew.crewHours = match.crewHours;
+              crew.conflict = match.conflict;
+              crew.holiday = match.holiday;
+              crew.struckOut = match.struckOut;
+              crew.turnedDown = match.turnedDown;
             }
           }
         }
@@ -371,7 +376,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
     crew.detailsLoading = true;
 
-    this.get<Array<ShiftCrewDetails>>(`Schedule/GetCrewDetailsForJobPartAsync/${this.selectedSchedule.jobPartId}/${crew.crewId}`)
+    this.get<Array<ShiftCrewDetails>>(`Schedule/GetCrewDetailsForJobPartAsync/${ this.selectedSchedule.jobPartId }/${ crew.crewId }`)
       .subscribe({
         next: (res) => {
           crew.detailsLoading = false;
@@ -392,5 +397,25 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   isIndeterminate(): boolean {
     return this.jobPartClashing?.some(p => p.checked) && !this.isAllSelected();
+  }
+
+  getBadgeClass(crew: Crew): string {
+    if (crew.conflict > 0) {
+      return 'badge-danger'
+    }
+
+    if (crew.holiday > 0) {
+      return 'badge-light-danger'
+    }
+
+    if (crew.struckOut > 0) {
+      return 'badge-dark'
+    }
+
+    if (crew.turnedDown > 0) {
+      return 'badge-danger'
+    }
+
+    return 'badge-primary';
   }
 }
