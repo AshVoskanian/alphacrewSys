@@ -19,6 +19,7 @@ import {
   CrewDetailForShift,
   JobMessageStatus,
   JobPartCrew,
+  JobPartCrewAdditionalDetail,
   JobPartCrewEdit,
   JobPartCrewUpdate,
   Notification,
@@ -27,7 +28,7 @@ import {
   Vehicle
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
-import { DatePipe, NgStyle, TitleCasePipe } from "@angular/common";
+import { DatePipe, NgClass, NgStyle, TitleCasePipe } from "@angular/common";
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
@@ -52,13 +53,14 @@ import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
-import { switchMap, take, timer } from "rxjs";
+import { forkJoin, switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../shared/services/nav.service";
+import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
 
 @Component({
   selector: 'app-schedule-list',
-  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent,
-    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe,
+  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent,
+    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent, SendSmsComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
@@ -74,6 +76,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
   @ViewChild('sendSmsModal') sendSmsModal: SendSmsComponent;
+  @ViewChild('updateNotes') updateNotes: UpdatesNotesComponent;
   @ViewChild('shiftCrewDetailsRef') shiftCrewDetailsRef: any;
 
   private offcanvasRef?: NgbOffcanvasRef;
@@ -171,16 +174,21 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
 
-  jobNoteLoader: boolean = false;
-  crewNoteLoader: boolean = false;
   hideVehicles: boolean = false;
 
+  colorsConfig = {
+    2: 'light',
+    14: 'light',
+    3: 'dark',
+    7: 'light'
+  }
 
   ngOnInit() {
     this.getCrewList();
     this.checkIfCrewUpdate();
     this.getInfo();
-    this.getInfoMultiple();
+    // this.getInfoMultiple();
+    this.getJobPartCrewAdditionalDetails();
   }
 
   checkIfCrewUpdate() {
@@ -243,75 +251,10 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
 
-  edit(schedule: Schedule, type: 'comment' | 'crewNote') {
-    if (type === 'comment') {
-      schedule.editComment = true;
-    }
-
-    if (type === 'crewNote') {
-      schedule.editCrewNote = true;
-    }
-  }
-
-  saveNote(schedule: Schedule, type: 'comment' | 'crewNote') {
-    if (type === 'comment') {
-      this.updatePartNote(schedule);
-    }
-
-    if (type === 'crewNote') {
-      this.updateCrewNote(schedule);
-    }
-  }
-
-  updatePartNote(schedule: Schedule) {
-    if (this.jobNoteLoader) return;
-
-    this.jobNoteLoader = true;
-
-    const data = {
-      jobPartId: schedule.jobPartId,
-      notes: schedule.notes
-    }
-
-    this.post('Schedule/updatejobpartnotes', data)
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe({
-        next: (res) => {
-          this.jobNoteLoader = false;
-
-          if (res.errors?.errorCode) {
-
-          } else {
-            schedule.editComment = false;
-            GeneralService.showSuccessMessage();
-          }
-        }
-      })
-  }
-
-  updateCrewNote(schedule: Schedule) {
-    if (this.crewNoteLoader) return;
-
-    this.crewNoteLoader = true;
-
-    const data = {
-      jobPartId: schedule.jobPartId,
-      notes: schedule.crewNotes
-    }
-    this.post('Schedule/updatejobpartcrewnotes', data)
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe({
-        next: (res) => {
-          this.crewNoteLoader = false;
-
-          if (res.errors?.errorCode) {
-
-          } else {
-            schedule.editCrewNote = false;
-            GeneralService.showSuccessMessage();
-          }
-        }
-      })
+  edit(schedule: Schedule, type: 'job_note' | 'crew_note') {
+    this.selectedSchedule = schedule;
+    schedule.noteType = type;
+    this._modal.open(this.updateNotes, { centered: true, size: 'xl' });
   }
 
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
@@ -797,10 +740,16 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             delete params.jobId;
           }
 
-          this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', params)
+          this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params)
             .pipe(takeUntilDestroyed(this._dr))
             .subscribe(res => {
               this.updateSchedulesWithStatuses(res.data);
+            });
+
+          this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetails', params)
+            .pipe(takeUntilDestroyed(this._dr))
+            .subscribe(res => {
+              this.updateSchedulesWithCrewChanges(res.data);
             });
         }
       })
@@ -817,18 +766,22 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       delete params.jobId;
     }
 
-    const getInfo$ = () => this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', params);
+    const getStatuses$ = () => this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params);
+    const getCrewAdditionalInfo$ = () => this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params);
 
-    timer(4000, 60000)
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        switchMap(() => getInfo$())
+    timer(4000, 60000).pipe(
+      takeUntilDestroyed(this._dr),
+      switchMap(() =>
+        forkJoin({
+          statuses: getStatuses$(),
+          crewDetails: getCrewAdditionalInfo$()
+        })
       )
-      .subscribe(res => {
-        this.updateSchedulesWithStatuses(res.data);
-      });
+    ).subscribe(({ statuses, crewDetails }) => {
+      this.updateSchedulesWithStatuses(statuses.data);
+      this.updateSchedulesWithCrewChanges(crewDetails.data);
+    });
   }
-
   getInfo() {
     this._scheduleService.shiftsLoaded
       .pipe(takeUntilDestroyed(this._dr))
@@ -845,10 +798,36 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
               delete params.jobId;
             }
 
-            this.post<Array<JobMessageStatus>>('Schedule/GetJobPartAdditionalDetailsSms', params)
+            this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params)
               .pipe(takeUntilDestroyed(this._dr))
               .subscribe(res => {
                 this.updateSchedulesWithStatuses(res.data);
+              });
+          }
+        }
+      });
+  }
+
+  getJobPartCrewAdditionalDetails() {
+    this._scheduleService.shiftsLoaded
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (date) => {
+          if (date) {
+            const params = {
+              date: GeneralService.convertToDate(this._navService.date$.value),
+              days: this._navService.days,
+              jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+            };
+
+            if (!params.jobId) {
+              delete params.jobId;
+            }
+
+            this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params)
+              .pipe(takeUntilDestroyed(this._dr))
+              .subscribe(res => {
+                this.updateSchedulesWithCrewChanges(res.data);
               });
           }
         }
@@ -893,5 +872,50 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
     this._scheduleService.shifts = compareAndUpdate(this._scheduleService.shifts);
     this._scheduleService.jobScopedShifts = compareAndUpdate(this._scheduleService.jobScopedShifts);
+  }
+
+  updateSchedulesWithCrewChanges(crewStatuses: any[]): void {
+    const crewKeysToCheck: (keyof typeof crewStatuses[0])[] = [
+      'additionalFees',
+      'crewSkillsText',
+      'inConflict',
+      'jobPartCrewId',
+      'jobPartLateChange',
+      'lateChange',
+      'onHoliday',
+      'onWarnings'
+    ];
+
+    const updateCrews = (list: any[]) =>
+      list.map(schedule => {
+        if (!Array.isArray(schedule.crews)) return schedule;
+
+        const updatedCrews = schedule.crews.map(crew => {
+          const status = crewStatuses.find(s => s.jobPartCrewId === crew.jobPartCrewId && s.jobId === crew.jobId);
+          if (!status) return crew;
+
+          const isFirstTime = !crew.hasOwnProperty('changed');
+
+          const changed = !isFirstTime && crewKeysToCheck.some(key => crew[key] !== status[key]);
+
+          return {
+            ...crew,
+            ...Object.fromEntries(crewKeysToCheck.map(key => [ key, status[key] ])),
+            changed,
+          };
+        });
+
+        return {
+          ...schedule,
+          crews: updatedCrews
+        };
+      });
+
+    this._scheduleService.shifts = updateCrews(this._scheduleService.shifts);
+    this._scheduleService.jobScopedShifts = updateCrews(this._scheduleService.jobScopedShifts);
+  }
+
+  finishNoteEdit(schedule: Schedule) {
+    this.updateShift(schedule);
   }
 }

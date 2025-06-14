@@ -13,8 +13,7 @@ export interface Schedule {
   showNotifications: boolean;
   notificationsLoader: boolean;
   vehicleLoader: boolean;
-  editComment?: boolean;
-  editCrewNote?: boolean;
+  noteType?: 'job_note' | 'crew_note';
   updateLoading?: boolean;
   isJobScoped?: boolean;
   changed?: boolean;
@@ -80,7 +79,7 @@ export interface ScheduleSkills {
   skillWorkingAtHeight: boolean | null;
 }
 
-export interface JobPartCrew {
+export interface JobPartCrew extends JobPartCrewAdditionalDetail{
   jobId?: number;
   crewId?: number | unknown;
   jobPartCrewId?: number;
@@ -307,4 +306,16 @@ export interface CrewDetailForShift {
 export interface BonusResponse {
   pay: number;
   bonus: number;
+}
+
+export interface JobPartCrewAdditionalDetail {
+  additionalFees?: number;
+  crewSkillsText?: string;
+  inConflict?: number;
+  jobId?: number;
+  jobPartCrewId?: number;
+  jobPartLateChange?: number;
+  lateChange?: boolean;
+  onHoliday?: number;
+  onWarnings?: number;
 }

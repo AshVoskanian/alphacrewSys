@@ -269,8 +269,9 @@
     border-radius: 5px;
     height: fit-content;
     font-size: 11px !important;
-    background: #FFF7E5;
+    background: #FBEE95;
     line-height: 1;
+    resize: none;
   }
 
   textarea:read-only {
@@ -350,3 +351,14 @@
   }
 }
 
+.half {
+  background: linear-gradient(to right, #FF7E4F 50%, black 50%) !important;
+}
+
+.orange {
+  background: #FF7E4F !important;
+}
+
+.black {
+  background: #000 !important;
+}

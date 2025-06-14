@@ -170,77 +170,96 @@
                 @if (schedule?.crews?.length) {
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
-                      <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"
-                          (click)="openCrewsPanel(crew, $event, schedule);">
-                        @if (crew.isActive) {
-                          <div class="status"
-                               (click)="getCrewDetails(crew, popoverRef)"
-                               [style.background-color]="crew.jobPartCrewStatusColour"
-                               #popoverRef="ngbPopover"
-                               triggers="manual"
-                               [popoverClass]="'wide-popover border bg-dark'"
-                               [ngbPopover]="shiftCrewDetailsRef"
-                               [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
-                          >
-                            <div class="icon">
-                              @if (crew.detailsLoading) {
-                                <app-feather-icon [class]="'w-10 h-10 text-white spin'"
-                                                  [icon]="'loader'"></app-feather-icon>
-                              } @else {
-                                @if (crew.jobPartCrewRoleId === 1) {
-                                  <i class="fas fa-square me-2 text-white f-10"></i>
-                                }
-                                @if (crew.jobPartCrewRoleId === 2) {
-                                  <i class="far fa-solid fa-star me-2 text-white f-10"></i>
-                                }
-                                @if (crew.jobPartCrewRoleId === 4) {
-                                  <i class="fa-solid fa-flag me-2 text-white f-10"></i>
-                                }
-                              }
-                            </div>
-                          </div>
-                          <p class="hide-scrollbar">
-                            {{ crew.name }}
-                          </p>
-                        }
-
-                        @if (crew.isActive) {
-                          <div class="buttons">
-                            <button class="btn b-ln-height btn-primary btn-square" [ngbTooltip]="'Edit'"
-                                    (click)="getCrewInfo(crew)">
-                              @if (crew.editLoading) {
-                                <app-feather-icon [class]="'w-10 h-10 text-white spin'"
-                                                  [icon]="'loader'"></app-feather-icon>
-                              } @else {
-                                <app-feather-icon [class]="'w-10 h-10'" [icon]="'edit'"></app-feather-icon>
-                              }
-                            </button>
-
-                            <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
-                              <button class="btn b-ln-height btn-info btn-square" style="width: 36px;"
-                                      ngbDropdownToggle>
-                                @if (crew.loading) {
+                      <div>
+                        <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"
+                            (click)="openCrewsPanel(crew, $event, schedule);">
+                          @if (crew.isActive) {
+                            <div class="status"
+                                 [class.half]="crew.lateChange && crew.jobPartLateChange === 0 && crew.inConflict > 0"
+                                 [class.black]="crew.lateChange && crew.jobPartLateChange === 0 && crew.inConflict === 0"
+                                 [class.orange]="crew.inConflict > 0 && !(crew.lateChange && crew.jobPartLateChange === 0)"
+                                 (click)="getCrewDetails(crew, popoverRef)"
+                                 [style.background-color]="crew.jobPartCrewStatusColour"
+                                 #popoverRef="ngbPopover"
+                                 triggers="manual"
+                                 [popoverClass]="'wide-popover border bg-dark'"
+                                 [ngbPopover]="shiftCrewDetailsRef"
+                                 [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
+                            >
+                              <div class="icon">
+                                @if (crew.detailsLoading) {
                                   <app-feather-icon [class]="'w-10 h-10 text-white spin'"
                                                     [icon]="'loader'"></app-feather-icon>
                                 } @else {
-                                  <app-feather-icon [class]="'w-10 h-10'" [icon]="'settings'"></app-feather-icon>
+                                  @if (crew.jobPartCrewRoleId === 1) {
+                                    <i class="fas fa-square me-2 text-white f-10"></i>
+                                  }
+                                  @if (crew.jobPartCrewRoleId === 2) {
+                                    <i class="far fa-solid fa-star me-2 text-white f-10"></i>
+                                  }
+                                  @if (crew.jobPartCrewRoleId === 4) {
+                                    <i class="fa-solid fa-flag me-2 text-white f-10"></i>
+                                  }
+                                }
+                              </div>
+                            </div>
+                            <p class="hide-scrollbar">
+                              {{ crew.name }}
+                            </p>
+                          }
+
+                          @if (crew.isActive) {
+                            <div class="buttons">
+                              <button class="btn b-ln-height btn-square" [ngbTooltip]="'Edit'"
+                                      [ngClass]="crew.additionalFees > 0 ? 'bg-danger' : 'btn-primary'"
+                                      (click)="getCrewInfo(crew)">
+                                @if (crew.editLoading) {
+                                  <app-feather-icon [class]="'w-10 h-10 text-white spin'"
+                                                    [icon]="'loader'"></app-feather-icon>
+                                } @else {
+                                  <app-feather-icon [class]="'w-10 h-10'" [icon]="'edit'"></app-feather-icon>
                                 }
                               </button>
-                              <ul class="dropdown-menu" ngbDropdownMenu>
-                                @for (menu of menu(); track menu) {
-                                  <li (click)="menuAction(menu, crew)">
-                                    <a class="dropdown-item" style="display:flex; align-items: center"
-                                       href="javascript:void(0)" ngbDropdownItem>
-                                      <i class="{{menu.icon}} {{menu.color}} me-2"></i>
-                                      {{ menu.text }}
-                                    </a>
-                                  </li>
-                                }
-                              </ul>
+
+                              <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
+                                <button class="btn b-ln-height btn-info btn-square w-36" ngbDropdownToggle>
+                                  @if (crew.loading) {
+                                    <app-feather-icon [class]="'w-10 h-10 text-white spin'"
+                                                      [icon]="'loader'"></app-feather-icon>
+                                  } @else {
+                                    <app-feather-icon [class]="'w-10 h-10'" [icon]="'settings'"></app-feather-icon>
+                                  }
+                                </button>
+                                <ul class="dropdown-menu" ngbDropdownMenu>
+                                  @for (menu of menu(); track menu) {
+                                    <li (click)="menuAction(menu, crew)">
+                                      <a class="dropdown-item" style="display:flex; align-items: center"
+                                         href="javascript:void(0)" ngbDropdownItem>
+                                        <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                        {{ menu.text }}
+                                      </a>
+                                    </li>
+                                  }
+                                </ul>
+                              </div>
                             </div>
-                          </div>
-                        }
-                      </li>
+                          }
+                        </li>
+                        <div class="flex items-center gap-6">
+                          <p class="f-10 m-t-2 lh-1 p-0 m-0 pulse text-{{colorsConfig[schedule.statusId]}}">
+                            @if (crew.onHoliday > 0) {
+                              HOL
+                            }
+
+                            @if (crew.onWarnings > 0) {
+                              WARNING
+                            }
+                          </p>
+                          <p class="f-10 m-t-2 lh-1 p-0 m-0 text-{{colorsConfig[schedule.statusId]}}">
+                            {{ crew.crewSkillsText }}
+                          </p>
+                        </div>
+                      </div>
                     }
                   </ol>
                 }
@@ -284,10 +303,10 @@
             </div>
 
             <div class="main-divider">
-              <div class="divider-body divider-body-1 divider-primary">
-                <div class="divider-p-primary" style="padding: 0;">
-                  <i class="fa-solid fa-comments me-2 txt-primary f-14"></i>
-                  <span class="txt-primary">Comments</span>
+              <div class="divider-body divider-body-1 divider-{{colorsConfig[schedule.statusId]}}">
+                <div class="divider-p-{{colorsConfig[schedule.statusId]}} p-0">
+                  <i class="fa-solid fa-comments me-2 txt-{{colorsConfig[schedule.statusId]}} f-14"></i>
+                  <span class="txt-{{colorsConfig[schedule.statusId]}}">Comments</span>
                 </div>
               </div>
             </div>
@@ -295,58 +314,46 @@
             <div class="row justify-content-between">
               <div class="col-sm-5">
                 <label class="form-label justify-content-between common-flex f-12">
-                  Job Part Comments:
-                  @if (schedule.notes || schedule.editComment) {
-                    <span class="pointer">
-                      @if (jobNoteLoader && selectedSchedule && selectedSchedule.jobPartId === schedule.jobPartId) {
-                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
-                      } @else {
-                        @if (!schedule.editComment) {
-                          <i (click)="edit(schedule, 'comment')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
-                        } @else {
-                          <i (click)="saveNote(schedule, 'comment')"
-                             class="fa-solid fa-check me-2 text-success f-16"></i>
-                        }
-                      }
-                      </span>
+                  <span [class.pulse]="schedule.importantNotes"
+                        [class.text-danger]="schedule.importantNotes"
+                  >
+                    Job Part Comments:
+                  </span>
+                  @if (schedule.notes) {
+                    <i (click)="edit(schedule, 'job_note')"
+                       class="fas fa-pencil-alt me-2 pointer text-{{colorsConfig[schedule.statusId]}} f-16"></i>
                   } @else {
-                    <span class="pointer"><i (click)="edit(schedule, 'comment')"
-                                             class="fa-solid fa-plus me-2 text-success f-16"></i></span>
+                    <span class="pointer"><i (click)="edit(schedule, 'job_note')"
+                                             class="fa-solid fa-plus me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i></span>
                   }
                 </label>
-                @if (schedule.notes || schedule.editComment) {
+                @if (schedule.notes) {
                   <textarea [(ngModel)]="schedule.notes" rows="4"
-                            [readonly]="!schedule.editComment"
-                            class="form-control btn-square hide-scrollbar text-warning">
+                            [readonly]="true"
+                            class="form-control btn-square hide-scrollbar text-dark">
                     </textarea>
                 }
               </div>
 
               <div class="col-sm-5">
                 <label class="form-label justify-content-between common-flex f-12">
-                  Crew Notes:
-                  @if (schedule.crewNotes || schedule.editCrewNote) {
-                    <span class="pointer">
-                      @if (crewNoteLoader && selectedSchedule && selectedSchedule.jobPartId === schedule.jobPartId) {
-                        <i class="fas fa-spin fa-spinner me-2 text-success f-16"></i>
-                      } @else {
-                        @if (!schedule.editCrewNote) {
-                          <i (click)="edit(schedule, 'crewNote')" class="fas fa-pencil-alt me-2 text-primary f-16"></i>
-                        } @else {
-                          <i (click)="saveNote(schedule, 'crewNote')"
-                             class="fa-solid fa-check me-2 text-success f-16"></i>
-                        }
-                      }
-                      </span>
+                  <span [class.pulse]="schedule.importantNotes"
+                        [class.text-danger]="schedule.importantNotes"
+                  >
+                    Crew Notes:
+                  </span>
+                  @if (schedule.crewNotes) {
+                    <i (click)="edit(schedule, 'crew_note')"
+                       class="fas fa-pencil-alt pointer me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i>
                   } @else {
-                    <span class="pointer"><i (click)="edit(schedule, 'crewNote')"
-                                             class="fa-solid fa-plus me-2 text-success f-16"></i></span>
+                    <span class="pointer"><i (click)="edit(schedule, 'crew_note')"
+                                             class="fa-solid fa-plus me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i></span>
                   }
                 </label>
-                @if (schedule.crewNotes || schedule.editCrewNote) {
+                @if (schedule.crewNotes) {
                   <textarea [(ngModel)]="schedule.crewNotes" rows="4"
-                            [readonly]="!schedule.editCrewNote"
-                            class="form-control btn-square hide-scrollbar text-warning">
+                            [readonly]="true"
+                            class="form-control btn-square hide-scrollbar text-dark">
                     </textarea>
                 }
               </div>
@@ -402,6 +409,15 @@
                 [smsInfo]="smsInfo()"
                 [scheduleInfo]="selectedSchedule">
   </app-send-sms>
+</ng-template>
+
+<!--Update Notes-->
+<ng-template #updateNotes let-updateNotesModal>
+  <app-updates-notes (closeModal)="updateNotesModal.close()"
+                     (finish)="finishNoteEdit($event); updateNotesModal.close()"
+                     [selectedSchedule]="selectedSchedule"
+  >
+  </app-updates-notes>
 </ng-template>
 
 
