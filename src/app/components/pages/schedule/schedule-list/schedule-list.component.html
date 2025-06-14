@@ -245,7 +245,7 @@
                             </div>
                           }
                         </li>
-                        <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-6" [class.gap-6]="crew.onHoliday > 0 || crew.onWarnings > 0">
                           <p class="f-10 m-t-2 lh-1 p-0 m-0 pulse text-{{colorsConfig[schedule.statusId]}}">
                             @if (crew.onHoliday > 0) {
                               HOL
