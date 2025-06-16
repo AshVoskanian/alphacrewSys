@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Crew } from "../interface/schedule";
+
 @Pipe({
   name: 'crewFilter'
 })
@@ -21,6 +22,10 @@ export class CrewFilterPipe implements PipeTransform {
         member.jobPartIds?.some(id => jobPartIds.includes(id));
 
       return matchesRegion && matchesLevel && matchesJobParts
-    }).sort((a, b) => Number(b.isChecked) - Number(a.isChecked));
+    }).sort((a, b) =>
+      Number(b.isFulltime && b.isChecked) - Number(a.isFulltime && a.isChecked) ||
+      Number(!b.isFulltime && b.isChecked) - Number(!a.isFulltime && a.isChecked) ||
+      Number(a.holiday > 0) - Number(b.holiday > 0)
+    );
   }
 }

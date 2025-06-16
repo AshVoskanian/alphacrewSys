@@ -52,6 +52,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   loading: boolean = false;
   allAreSelected: boolean = false;
+  allAreSelectedForSMS: boolean = false;
   showBtnOptions: boolean = false;
   showLimitError: boolean | undefined = false;
   crewManagerLoader: boolean = false;
@@ -167,8 +168,16 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
   }
 
+  selectAllForSMS() {
+    this.crewList.forEach(it => it.isCheckedForSMS = this.allAreSelectedForSMS);
+  }
+
   areAllChecked(crew: Array<Crew>): boolean {
     return !crew.some(it => !it.isChecked);
+  }
+
+  areAllCheckedForSMS(crew: Array<Crew>): boolean {
+    return !crew.some(it => !it.isCheckedForSMS);
   }
 
   crewSelect(crew: Crew): void {
@@ -186,6 +195,16 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
   }
 
+
+  selectCrewForSMS(crew: Crew) {
+    crew.isCheckedForSMS = !crew.isCheckedForSMS;
+
+    const selectedRegions = this.getSelectedData('regions');
+    const selectedLevels = this.getSelectedData('levels');
+
+    const filteredCrew = this._filterPipe.transform(this.crewList, selectedRegions, selectedLevels);
+    this.allAreSelectedForSMS = this.areAllCheckedForSMS(filteredCrew);
+  }
   saveCrew(type: 'current' | 'all') {
     this.showBtnOptions = false;
 
@@ -292,6 +311,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
         });
       });
 
+    console.log(111, this.crewList)
     this._cdr.detectChanges();
   }
 
@@ -308,7 +328,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     const data = {
       job_Id: this.selectedSchedule.jobId,
       job_Part_Id: this.selectedSchedule.jobPartId,
-      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isChecked).map(it => it.crewId)
+      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId)
     }
     this.post('Schedule/AddJobNotifiction', data)
       .pipe(takeUntilDestroyed(this._dr))
