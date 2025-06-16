@@ -73,7 +73,7 @@
                       <input class="form-check-input me-1 checkbox-primary" type="checkbox"
                              [(ngModel)]="item.checked" [name]="item.jobPartId + ''" (change)="jobPartSelect()">
                     </th>
-                    <td>{{ item.startDate | date: 'dd MMM yyy' }} {{item.jobPartId}}</td>
+                    <td>{{ item.startDate | date: 'dd MMM yyy' }}</td>
                     <td>{{ item.startDate | date: 'HH:mm' }}</td>
                     <td>{{ item.hours }}</td>
                     <td>{{ item.bookedCrew }}</td>
@@ -211,7 +211,7 @@
               } @else {
                 @if (jobPartClashing.length) {
                   <span class="text-warning min-w-40">
-                    {{ selectedSchedule.shiftCount }}/{{ crew.notClashingInfo?.unassignedCrewCount }}
+                    {{ jobPartClashing.length}}/{{ crew.notClashingInfo?.unassignedCrewCount }}
                   </span>
                 }
               }

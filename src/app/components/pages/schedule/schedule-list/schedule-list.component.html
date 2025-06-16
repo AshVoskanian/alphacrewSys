@@ -30,7 +30,7 @@
                 <div class="flex-no-wrap">
                   <div class="col-9 display-flex">
                     <div class="flex-no-wrap">
-                      <div class="calendar pointer">
+                      <div class="calendar pointer" [class.pulse]="schedule.importantNotes">
                         <div class="date bg-light {{schedule.vehicleLoader && !hideVehicles ? 'loading' : ''}}"
                              (click)="getVehicleInfo(schedule)">
                           <em>{{ schedule.startDate | date: 'EEEE':'': 'en' }}</em>
@@ -314,11 +314,7 @@
             <div class="row justify-content-between">
               <div class="col-sm-5">
                 <label class="form-label justify-content-between common-flex f-12">
-                  <span [class.pulse]="schedule.importantNotes"
-                        [class.text-danger]="schedule.importantNotes"
-                  >
-                    Job Part Comments:
-                  </span>
+                  Job Part Comments:
                   @if (schedule.notes) {
                     <i (click)="edit(schedule, 'job_note')"
                        class="fas fa-pencil-alt me-2 pointer text-{{colorsConfig[schedule.statusId]}} f-16"></i>
@@ -337,11 +333,7 @@
 
               <div class="col-sm-5">
                 <label class="form-label justify-content-between common-flex f-12">
-                  <span [class.pulse]="schedule.importantNotes"
-                        [class.text-danger]="schedule.importantNotes"
-                  >
-                    Crew Notes:
-                  </span>
+                  Crew Notes:
                   @if (schedule.crewNotes) {
                     <i (click)="edit(schedule, 'crew_note')"
                        class="fas fa-pencil-alt pointer me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i>

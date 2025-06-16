@@ -205,6 +205,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     const filteredCrew = this._filterPipe.transform(this.crewList, selectedRegions, selectedLevels);
     this.allAreSelectedForSMS = this.areAllCheckedForSMS(filteredCrew);
   }
+
   saveCrew(type: 'current' | 'all') {
     this.showBtnOptions = false;
 
@@ -272,7 +273,16 @@ export class CrewListComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) return;
 
           this.jobPartClashing = res.data ?? [];
-          this.jobPartClashing.forEach((it, idx) => it.checked = idx === 0)
+
+          const selected = this.jobPartClashing.find(it => it.jobPartId === this.selectedSchedule.jobPartId);
+
+          if (selected?.startDate) {
+            const selectedDate = new Date(selected.startDate);
+
+            this.jobPartClashing = this.jobPartClashing.filter(it => new Date(it.startDate) >= selectedDate);
+
+            this.jobPartClashing.forEach(it => it.checked = it.jobPartId === this.selectedSchedule.jobPartId);
+          }
 
           this.updateNotClashingCounts(this.jobPartClashing);
         }
