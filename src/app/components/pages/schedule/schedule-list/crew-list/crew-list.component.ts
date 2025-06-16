@@ -300,18 +300,17 @@ export class CrewListComponent extends ApiBase implements OnInit {
     });
 
     // Update jobPartIds for checked ones
-    this.jobPartClashing
-      .filter(jp => jp.checked)
-      .forEach(jp => {
-        this.crewList.forEach(crew => {
-          crew.jobPartIds = [];
+    this.crewList.forEach(crew => {
+      crew.jobPartIds = [];
+
+      this.jobPartClashing
+        .filter(jp => jp.checked)
+        .forEach(jp => {
           if (crew.notClashingInfo?.details?.[jp.jobPartId] > 0) {
-            crew.jobPartIds = [ ...(crew.jobPartIds ?? []), jp.jobPartId ];
+            crew.jobPartIds.push(jp.jobPartId);
           }
         });
-      });
-
-    console.log(111, this.crewList)
+    });
     this._cdr.detectChanges();
   }
 

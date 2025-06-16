@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Crew } from "../interface/schedule";
 
 @Pipe({
-  name: 'crewFilter'
+  name: 'crewFilter',
+  standalone: true,
 })
 export class CrewFilterPipe implements PipeTransform {
 
@@ -17,11 +18,12 @@ export class CrewFilterPipe implements PipeTransform {
     return crew.filter(member => {
       const matchesRegion = !regionIds || regionIds.length === 0 || regionIds.includes(member.regionId);
       const matchesLevel = !levelIds || levelIds.length === 0 || levelIds.includes(member.levelCrewingWeighting);
-      const matchesJobParts =
-        !jobPartIds || jobPartIds.length === 0 ||
-        member.jobPartIds?.some(id => jobPartIds.includes(id));
 
-      return matchesRegion && matchesLevel && matchesJobParts
+      const matchesAllJobParts =
+        !jobPartIds || jobPartIds.length === 0 ||
+        jobPartIds.every(id => member.notClashingInfo?.details?.[id] > 0);
+
+      return matchesRegion && matchesLevel && matchesAllJobParts;
     }).sort((a, b) =>
       Number(b.isFulltime && b.isChecked) - Number(a.isFulltime && a.isChecked) ||
       Number(!b.isFulltime && b.isChecked) - Number(!a.isFulltime && a.isChecked) ||

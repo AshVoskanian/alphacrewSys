@@ -73,7 +73,7 @@
                       <input class="form-check-input me-1 checkbox-primary" type="checkbox"
                              [(ngModel)]="item.checked" [name]="item.jobPartId + ''" (change)="jobPartSelect()">
                     </th>
-                    <td>{{ item.startDate | date: 'dd MMM yyy' }}</td>
+                    <td>{{ item.startDate | date: 'dd MMM yyy' }} {{item.jobPartId}}</td>
                     <td>{{ item.startDate | date: 'HH:mm' }}</td>
                     <td>{{ item.hours }}</td>
                     <td>{{ item.bookedCrew }}</td>
@@ -171,7 +171,7 @@
     @if (listLoading$ | async) {
       Loading...
     } @else {
-      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: 70dvh">
+      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: calc(100dvh - 410px)">
         @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
             @if (crew.jobNotes) {
