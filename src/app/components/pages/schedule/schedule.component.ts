@@ -11,11 +11,12 @@ import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon
 import { NavService } from "../../../shared/services/nav.service";
 import { ScheduleService } from "./schedule.service";
 import { SKILLS } from "../../../shared/data/skills";
+import { ScheduleGridComponent } from "./schedule-grid/schedule-grid.component";
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [ CardComponent, Select2Module, ScheduleListComponent, FeatherIconComponent ],
+  imports: [ CardComponent, Select2Module, ScheduleListComponent, FeatherIconComponent, ScheduleGridComponent ],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })

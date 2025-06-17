@@ -1,0 +1,48 @@
+<div class="card p-6">
+  <div class="common-space project-tabs">
+    <ul class="nav nav-tabs border-tab">
+      @for(tab of statuses; track tab) {
+        <li class="nav-item" (click)="handleTab(tab)">
+          <a class="nav-link" [class.active]="true" href="javascript:void(0)">
+            <i class="fa-solid fa-{{ tab.icon }}"></i>
+            {{ tab.title }}
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</div>
+
+<div class="col-12">
+  <ul class="seller-cards">
+    @for (jp of list; track jp.jobPartId) {
+      <li class="seller-box">
+        <div>
+          <!--          <img [src]="jp.store_logo">-->
+          <div [ngbTooltip]="jp.statusText">
+            <i [class]="getStatusIcon(jp.statusText)"
+               [ngStyle]="{ color: getStatusColor(jp.statusText) }"
+               class="mr-2 f-30"
+            ></i>
+          </div>
+          <div>
+            <h5>{{ jp.startDate | date }}</h5>
+            <span class="f-light" [ngStyle]="{ color: getStatusColor(jp.statusText) }">{{ jp.statusText }}</span>
+          </div>
+        </div>
+        <ul class="seller-profits">
+          <li>
+            <div class="common-space"><span>Total Orders</span><span>{{ jp.statusText }}</span></div>
+          </li>
+          <li>
+            <div class="common-space"><span>Total Products </span><span>{{ jp.venueName }}</span></div>
+          </li>
+          <li>
+            <div class="common-space"><span> Total Earnings</span><span>${{ jp.onsiteContact }}</span></div>
+          </li>
+        </ul>
+        <a class="btn btn-primary btn-hover-effect">View</a>
+      </li>
+    }
+  </ul>
+</div>

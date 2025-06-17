@@ -171,7 +171,8 @@
     @if (listLoading$ | async) {
       Loading...
     } @else {
-      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar" style="max-height: calc(100dvh - 410px)">
+      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar"
+          style="max-height: calc(100dvh - 410px)">
         @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
             @if (crew.jobNotes) {
@@ -211,7 +212,7 @@
               } @else {
                 @if (jobPartClashing.length) {
                   <span class="text-warning min-w-40">
-                    {{ jobPartClashing.length}}/{{ crew.notClashingInfo?.unassignedCrewCount }}
+                    {{ jobPartClashing.length }}/{{ crew.notClashingInfo?.unassignedCrewCount }}
                   </span>
                 }
               }
@@ -256,8 +257,9 @@
                 ></i>
               }
 
-              <label class="form-check-label txt-warring mb-0">
+              <label class="form-check-label txt-warring mb-0" [ngbTooltip]="crew.notificationStatusText">
                 <input class="form-check-input me-1 checkbox-success"
+                       [ngStyle]="{ backgroundColor: crew.cssColour, borderColor: crew.cssColour }"
                        type="checkbox" (change)="selectCrewForSMS(crew)"
                        [checked]="crew.isCheckedForSMS">
               </label>

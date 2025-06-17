@@ -47,6 +47,8 @@ export interface Schedule {
   messageStatus: number;
   smsStatusColour: string;
   smsStatusTitle: string;
+  icon?:string;
+  iconColor?:string;
 }
 
 export interface TransformedSkill {
@@ -194,6 +196,9 @@ export interface CrewManager {
   holiday: number;
   struckOut: number;
   turnedDown: number;
+  notificationStatusId: number;
+  notificationStatusText: string;
+  cssColour: string;
 }
 
 
@@ -319,4 +324,10 @@ export interface JobPartCrewAdditionalDetail {
   lateChange?: boolean;
   onHoliday?: number;
   onWarnings?: number;
+}
+
+
+export interface StatusIcon {
+  icon: string;
+  color: string;
 }

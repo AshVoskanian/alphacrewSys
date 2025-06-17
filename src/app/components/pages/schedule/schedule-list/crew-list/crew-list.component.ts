@@ -21,7 +21,7 @@ import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
-import { AsyncPipe, DatePipe, NgClass } from "@angular/common";
+import { AsyncPipe, DatePipe, NgClass, NgStyle } from "@angular/common";
 import { finalize, Observable } from "rxjs";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -31,7 +31,7 @@ import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
   selector: 'app-crew-list',
   imports: [
     SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe, NgClass,
-    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, FeatherIconComponent
+    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, FeatherIconComponent, NgStyle
   ],
   providers: [ CrewFilterPipe ],
   templateUrl: './crew-list.component.html',
@@ -257,6 +257,9 @@ export class CrewListComponent extends ApiBase implements OnInit {
               crew.holiday = match.holiday;
               crew.struckOut = match.struckOut;
               crew.turnedDown = match.turnedDown;
+              crew.cssColour = match.cssColour;
+              crew.notificationStatusId = match.notificationStatusId;
+              crew.notificationStatusText = match.notificationStatusText;
             }
           }
         }
