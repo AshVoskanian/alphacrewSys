@@ -31,9 +31,13 @@
                   <div class="col-9 display-flex">
                     <div class="flex-no-wrap">
                       <div class="calendar pointer" [class.pulse]="schedule.importantNotes">
-                        <div class="date bg-light {{schedule.vehicleLoader && !hideVehicles ? 'loading' : ''}}"
+                        <div class="date {{schedule.vehicleLoader && !hideVehicles ? 'loading' : ''}}"
+                             [class.bg-danger]="schedule.importantNotes"
+                             [class.bg-light]="!schedule.importantNotes"
                              (click)="getVehicleInfo(schedule)">
-                          <em>{{ schedule.startDate | date: 'EEEE':'': 'en' }}</em>
+                          <em [class.text-light]="schedule.importantNotes">
+                            {{ schedule.startDate | date: 'EEEE':'': 'en' }}
+                          </em>
                           <strong>{{ schedule.startDate | date: 'MMMM':'': 'en' }}</strong>
                           <span>{{ schedule.startDate | date: 'dd' }}</span>
                         </div>
@@ -248,11 +252,11 @@
                         <div class="flex items-center gap-6" [class.gap-6]="crew.onHoliday > 0 || crew.onWarnings > 0">
                           <p class="f-10 m-t-2 lh-1 p-0 m-0 pulse text-{{colorsConfig[schedule.statusId]}}">
                             @if (crew.onHoliday > 0) {
-                              HOL
+                              <span class="text-danger m-r-3">HOL</span>
                             }
 
                             @if (crew.onWarnings > 0) {
-                              WARNING
+                              <span class="text-danger">WARNING</span>
                             }
                           </p>
                           <p class="f-10 m-t-2 lh-1 p-0 m-0 text-{{colorsConfig[schedule.statusId]}}">

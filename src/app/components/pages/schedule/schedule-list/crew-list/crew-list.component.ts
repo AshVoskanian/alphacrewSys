@@ -338,8 +338,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
 
     const data = {
-      job_Id: this.selectedSchedule.jobId,
-      job_Part_Id: this.selectedSchedule.jobPartId,
+      jobId: this.selectedSchedule.jobId,
+      jobPartId: this.selectedSchedule.jobPartId,
       crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId)
     }
     this.post('Schedule/AddJobNotifiction', data)
