@@ -423,7 +423,9 @@
       @for (item of shiftCrewDetails() | filter:  [
         { field: 'status', condition: 'greaterThan', value: 0 }
       ]; track item.startdate + item.startTime + $index) {
-        <tr class="border-bottom-secondary">
+        <tr class="border-bottom-secondary"
+            [class.border-2]="item.jobPartId === selectedSchedule.jobPartId"
+            [class.border-danger]="item.jobPartId === selectedSchedule.jobPartId">
           <td class="p-2 p-x-5 f-12 text-body-secondary">{{ item.roleName }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>

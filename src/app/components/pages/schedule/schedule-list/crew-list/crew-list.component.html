@@ -1,13 +1,13 @@
 <div class="div" (click)="$event.stopPropagation()">
   <div class="offcanvas-header p-y-10 p-x-0 gap-12 align-items-start">
     <div class="max-w-465">
-      <p class="f-12 m-0 text-warning">
+      <p class="f-14 m-0 txt-primary">
         {{ selectedSchedule?.startDate |  date: 'dd MMM yyy':'': 'en' }},
         {{ selectedSchedule?.startDate | date: 'HH:mm' }} -  {{ selectedSchedule?.endDate | date: 'HH:mm' }}
         (Cr: {{ selectedSchedule?.crewNumber }},
         Hrs: {{ hoursDifference(selectedSchedule?.startDate, selectedSchedule?.endDate) }} )
       </p>
-      <p class="f-10 m-0 text-info">
+      <p class="f-14 m-0 txt-primary">
         @if (selectedSchedule.companyName) {
           {{ selectedSchedule.companyName }} <span class="text-dark">|</span>
         }
@@ -172,7 +172,7 @@
       Loading...
     } @else {
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar"
-          style="max-height: calc(100dvh - 410px)">
+          style="max-height: calc(100dvh - 440px)">
         @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
             @if (crew.jobNotes) {
@@ -285,7 +285,10 @@
         @for (item of shiftCrewDetails() | filter:  [
           { field: 'status', condition: 'greaterThan', value: 0 }
         ]; track item.startdate + item.startTime + $index) {
-          <tr class="border-bottom-secondary">
+          <tr class="border-bottom-secondary"
+              [class.border-2]="item.jobPartId === selectedSchedule.jobPartId"
+              [class.border-danger]="item.jobPartId === selectedSchedule.jobPartId"
+          >
             <td class="p-2 p-x-5 f-12">{{ item.roleName }}</td>
             <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
             <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>

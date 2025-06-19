@@ -250,7 +250,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
           this.crewManagerLoader = false;
 
           for (let crew of this.crewList) {
-            const match = res.data.find(r => r.crewID === crew.crewId);
+            const match = res?.data?.find(r => r.crewID === crew.crewId);
             if (match) {
               crew.crewHours = match.crewHours;
               crew.conflict = match.conflict;

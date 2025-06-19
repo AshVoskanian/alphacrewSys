@@ -269,6 +269,7 @@ export interface ShiftCrewDetails {
   postCode: string;
   extraHours: number;
   skilledCost: number;
+  jobPartId: number;
   bonus: number;
   lastMinuteBonus: number;
   drivingBonus: number;
@@ -304,6 +305,7 @@ export interface CrewDetailForShift {
   venue: string;
   postCode: string;
   extraHours: number;
+  jobPartId: number;
   skilledCost: number;
   bonus: number;
   updateHistory: string;
