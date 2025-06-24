@@ -30,9 +30,6 @@ export class EditComponent extends ApiBase implements OnInit {
   form!: FormGroup;
 
   pay: number = 0;
-  oot: number = 0;
-  travel: number = 0;
-  lateNightShift: number = 0;
 
   loading: boolean = false;
   saveLoading: boolean = false;
@@ -47,7 +44,6 @@ export class EditComponent extends ApiBase implements OnInit {
   ngOnInit() {
     this.initForm();
     this.setCrewSkills();
-    this.setAdditionalInfo();
     this.pay = this.crewInfo.pay;
   }
 
@@ -62,12 +58,6 @@ export class EditComponent extends ApiBase implements OnInit {
       otherPaymentAdjustmentTxt: [ this.crewInfo?.otherPaymentAdjustmentTxt || '' ],
       skilledCost: [ this.crewInfo?.skilledCost || 0 ],
     });
-  }
-
-  setAdditionalInfo() {
-    this.oot = (this.crewInfo.ootCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber));
-    this.travel = (this.crewInfo.travelHoursCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber));
-    this.lateNightShift = (this.crewInfo.lateShiftCost / (this.crewInfo.crewNumber + this.crewInfo.crewChiefNumber)) * 0.8;
   }
 
   setCrewSkills() {

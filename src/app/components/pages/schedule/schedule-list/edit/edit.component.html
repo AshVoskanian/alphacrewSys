@@ -81,11 +81,11 @@
           <div class="col-12 col-md-7 right">
             <div class="row g-3">
               <div class="col-6 col-md-4">
-                <p class="text-nowrap text-primary">Late Night Shift: £{{ lateNightShift | number:'1.2-2' }}</p>
-                <p class="text-nowrap text-primary">Out of Town: £{{ oot | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary">Late Night Shift: £{{ crewInfo.lateShiftCost | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary">Out of Town: £{{ crewInfo.ootCost | number:'1.2-2' }}</p>
               </div>
               <div class="col-6 col-md-4">
-                <p class="text-nowrap text-primary text-end">Travel: £{{ travel | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary text-end">Travel: £{{ crewInfo.travelHoursCost | number:'1.2-2' }}</p>
                 <p class="text-nowrap text-primary text-end">Bonus: £{{ (crewInfo.bonus || 0) | number:'1.2-2' }}</p>
               </div>
             </div>
