@@ -13,11 +13,12 @@ import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
 import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
 
 @Component({
   selector: 'app-header',
   imports: [HeaderLogoComponent, HeaderNoticeComponent, HeaderLanguageComponent,
-            ToggleScreenComponent, SvgIconComponent, SearchComponent,
+            ToggleScreenComponent, SvgIconComponent, SearchComponent, Select2Module,
             HeaderBookmarkComponent, ModeComponent, ReactiveFormsModule,
             HeaderNotificationComponent, ProfileComponent, NgbInputDatepicker],
   templateUrl: './header.component.html',
@@ -26,7 +27,51 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angula
 
 export class HeaderComponent {
   private _fb = inject(FormBuilder);
+
   isScheduleRoute = false;
+
+  regions = [
+    {
+      label: 'All',
+      value: 0
+    },
+    {
+      label: 'London',
+      value: 1
+    },
+    {
+      label: 'Birm/Man',
+      value: 2
+    },
+    {
+      label: 'Bristol',
+      value: 6
+    },
+    {
+      label: 'Scotland',
+      value: 7
+    },
+    {
+      label: 'Nice',
+      value: 3
+    },
+    {
+      label: 'Paris',
+      value: 4
+    },
+    {
+      label: 'Barcelona',
+      value: 8
+    },
+    {
+      label: 'NewYork',
+      value: 10
+    },
+    {
+      label: 'SECURITY',
+      value: 9
+    },
+  ]
 
   form: FormGroup;
   constructor(public navService: NavService, private router: Router) {
@@ -63,6 +108,11 @@ export class HeaderComponent {
 
   setDays(days: number) {
     this.navService.days = days;
+    this.submit();
+  }
+
+  setRegion(e: Select2UpdateEvent<Select2UpdateValue>) {
+    this.navService.regionId = +e.value;
     this.submit();
   }
 }

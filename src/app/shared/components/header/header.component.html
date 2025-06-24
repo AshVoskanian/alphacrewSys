@@ -42,6 +42,15 @@
           7
         </button>
       </div>
+
+      <div class="flex gap-2">
+        <select2 [data]="regions" [value]="0" [templates]="template" [displaySearchStatus]="'hidden'" (update)="setRegion($event)"
+                 placeholder="Region" class="w-130 bg-light-secondary">
+          <ng-template #template let-item="label">
+            {{ item }}
+          </ng-template>
+        </select2>
+      </div>
     </form>
   }
 

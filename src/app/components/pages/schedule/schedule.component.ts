@@ -87,6 +87,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
       jobId,
       date: GeneralService.convertToDate(date),
       days: this._navService.days,
+      regionFilter: this._navService.regionId,
     }
 
     if (!jobId) {
