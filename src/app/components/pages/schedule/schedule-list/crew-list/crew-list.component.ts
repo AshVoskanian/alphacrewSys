@@ -14,7 +14,6 @@ import {
   Schedule,
   ShiftCrewDetails
 } from "../../../../../shared/interface/schedule";
-import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
 import { FormGroup, FormsModule } from "@angular/forms";
@@ -23,15 +22,14 @@ import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { AsyncPipe, DatePipe, NgClass, NgStyle } from "@angular/common";
 import { finalize, Observable } from "rxjs";
-import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
 
 @Component({
   selector: 'app-crew-list',
   imports: [
-    SvgIconComponent, CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe, NgClass,
-    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, FeatherIconComponent, NgStyle
+    CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe, NgClass,
+    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, NgStyle
   ],
   providers: [ CrewFilterPipe ],
   templateUrl: './crew-list.component.html',
@@ -111,6 +109,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
         this.crewList.forEach(crew => {
           crew.isChecked = selectedCrewIds.has(crew.crewId);
         });
+
+        // Uncheck checked crew for SMS
+        this.crewList.forEach(crew => crew.isCheckedForSMS = false);
+        this.allAreSelectedForSMS = false;
 
         // Check existing crew level filters
         this.levels.forEach(level => {
