@@ -1,32 +1,30 @@
 import { Component, inject } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
-import { HeaderNoticeComponent } from "./widgets/header-notice/header-notice.component";
 import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
 import { ToggleScreenComponent } from "./widgets/toggle-screen/toggle-screen.component";
-import { SvgIconComponent } from "../ui/svg-icon/svg-icon.component";
 import { SearchComponent } from "./widgets/search/search.component";
-import { HeaderBookmarkComponent } from "./widgets/header-bookmark/header-bookmark.component";
 import { ModeComponent } from "./widgets/mode/mode.component";
-import { HeaderNotificationComponent } from "./widgets/header-notification/header-notification.component";
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
 import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
+import { LocalStorageService } from "../../services/local-storage.service";
 
 @Component({
   selector: 'app-header',
-  imports: [HeaderLogoComponent, HeaderNoticeComponent, HeaderLanguageComponent,
-            ToggleScreenComponent, SvgIconComponent, SearchComponent, Select2Module,
-            HeaderBookmarkComponent, ModeComponent, ReactiveFormsModule,
-            HeaderNotificationComponent, ProfileComponent, NgbInputDatepicker],
+  imports: [ HeaderLogoComponent, HeaderLanguageComponent,
+    ToggleScreenComponent, SearchComponent, Select2Module,
+    ModeComponent, ReactiveFormsModule,
+    ProfileComponent, NgbInputDatepicker ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 
 export class HeaderComponent {
   private _fb = inject(FormBuilder);
+  private _localStorageService = inject(LocalStorageService);
 
   isScheduleRoute = false;
 
@@ -73,12 +71,16 @@ export class HeaderComponent {
     },
   ]
 
+  userInfo = JSON.parse(this._localStorageService.getItem('user')) || {};
+
   form: FormGroup;
+
   constructor(public navService: NavService, private router: Router) {
     this.initForm();
     this.router.events.subscribe(() => {
       this.isScheduleRoute = this.router.url?.includes('/schedule');
     });
+    this.filterRegionsByRole();
   }
 
   initForm() {
@@ -96,8 +98,14 @@ export class HeaderComponent {
     this.navService.date$.next(this.form.get('date')?.value);
   }
 
+  filterRegionsByRole() {
+    const roleRegionsIds = this.userInfo?.userRegions?.map(reg => reg.value);
+
+    this.regions = this.regions.filter(region => roleRegionsIds?.includes(region.value) || region.value === 0);
+  }
+
   toggleLanguage() {
-    this.navService.isLanguage =! this.navService.isLanguage;
+    this.navService.isLanguage = !this.navService.isLanguage;
   }
 
   submit() {
