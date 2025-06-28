@@ -1,0 +1,71 @@
+@if (schedule) {
+  <div class="progress-schedule-box">
+    <div class="list-box pending title-line-warning">
+      <div class="header-top">
+          <span class="badge badge-light-success"
+
+                [ngStyle]="{
+                 color: getStatusTextColor(schedule.statusText),
+                 backgroundColor: getStatusColor(schedule.statusText)
+                 }">
+              {{ schedule.statusText | titlecase }}
+          </span>
+        <p class="mb-0 c-o-light">
+          <app-svg-icon [icon]="'vector-calendar'" [class]="'me-2'"></app-svg-icon>
+          {{ schedule.startDate | date: 'dd MMM yyyy' }}
+        </p>
+      </div>
+      <div class="schedule-body">
+        <div class="common-f-start gap-3">
+          <div class="m-r-16" [ngbTooltip]="schedule.statusText">
+            <i [class]="getStatusIcon(schedule.statusText)"
+               [ngStyle]="{ color: getStatusColor(schedule.statusText) }"
+               class="mr-2 f-30"
+            ></i>
+          </div>
+          <div>
+            <h6>{{ schedule.address }}</h6>
+            <span>{{ schedule.onsiteContact }}</span>
+          </div>
+        </div>
+        <div class="common-space">
+          <p class="mb-0 c-o-light">Tasks</p>
+          <span>{{ 22 }}%</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar bg-success" [ngStyle]="{ 'width': 66 + '%'}"></div>
+        </div>
+        <div class="schedule-bottom common-space">
+          <ul class="common-f-start">
+            @if (schedule.crews && schedule.crews.length) {
+              @for (crew of schedule.crews; track crew.crewId + crew.crewSkillsText + crew.name + crew.jobPartCrewRoleId + $index) {
+                @if (crew) {
+                  <li placement="top" class="m-t-5 border-2 border-primary"
+                      [ngbTooltip]="crew.name + getRole(crew.jobPartCrewRoleId)">
+                    @if (crew.isActive) {
+                      <img class="rounded-circle w-30 h-30"
+                           [src]="'https://alphacrew.eu/Crew/CrewImage/' + crew.crewId" alt="">
+                    } @else {
+                      <div class="w-30 h-30 flex flex-col items-center justify-content-center">
+                        <app-feather-icon [icon]="'user'" [class]="'f-30'"></app-feather-icon>
+                      </div>
+                    }
+                  </li>
+                } @else {
+                  <li placement="top" [ngbTooltip]="crew.crewSkillsText">
+                    <div
+                      class="common-circle bg-lighter-{{ chatService.getTextColor(chatService.getUserText(crew.name)) }}">{{ chatService.getUserText(crew.name, 'singleText') }}
+                    </div>
+                  </li>
+                }
+              }
+            }
+          </ul>
+          <p class="mb-0">Budget
+            <span>2323</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

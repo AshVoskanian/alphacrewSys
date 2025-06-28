@@ -175,7 +175,7 @@
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
                       <div>
-                        <li class="list-group-item fw-bold {{!crew.isActive ? 'pointer' : ''}}"
+                        <li class="list-group-item {{!crew.isActive ? 'pointer' : ''}}"
                             (click)="openCrewsPanel(crew, $event, schedule);">
                           @if (crew.isActive) {
                             <div class="status"
@@ -207,7 +207,15 @@
                                 }
                               </div>
                             </div>
-                            <p class="hide-scrollbar">
+                            <p class="hide-scrollbar fw-bold"
+                               [class.fw-medium]="crew.byNotification && crew.byNotification > 0"
+                               [class.fw-bold]="crew.byCrewManager && crew.byCrewManager > 0"
+                               [class.text-decoration-underline]="crew.buddyDown > 0"
+                               [class.fst-italic]="crew.buddyUp > 0"
+                            >
+                              @if (crew.hours) {
+                                ({{ crew.hours }})
+                              }
                               {{ crew.name }}
                             </p>
                           }
@@ -236,12 +244,26 @@
                                 </button>
                                 <ul class="dropdown-menu" ngbDropdownMenu>
                                   @for (menu of menu(); track menu) {
-                                    <li (click)="menuAction(menu, crew)">
-                                      <a class="dropdown-item" style="display:flex; align-items: center"
-                                         href="javascript:void(0)" ngbDropdownItem>
-                                        <i class="{{menu.icon}} {{menu.color}} me-2"></i>
-                                        {{ menu.text }}
-                                      </a>
+                                    <li class="pointer" (click)="menuAction(menu, crew)">
+                                      @if (menu.href) {
+                                        <a class="dropdown-item opacity-100 flex items-center"
+                                           target="_blank"
+                                           [href]="menu.href"
+                                           ngbDropdownItem>
+                                          <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                          {{ menu.text }}
+                                        </a>
+                                      } @else {
+                                        <a class="dropdown-item opacity-100 flex items-center" ngbDropdownItem>
+                                          <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                          {{ menu.text }}
+                                        </a>
+                                      }
+
+
+                                      @if ([ 0, 3, 5, 6, 9, 10 ].includes($index)) {
+                                        <div class="divider-h-line m-0 bg-dark"></div>
+                                      }
                                     </li>
                                   }
                                 </ul>
@@ -426,10 +448,15 @@
         <tr class="border-bottom-secondary"
             [class.border-2]="item.jobPartId === selectedSchedule.jobPartId"
             [class.border-danger]="item.jobPartId === selectedSchedule.jobPartId">
-          <td class="p-2 p-x-5 f-12 text-body-secondary">{{ item.roleName }}</td>
+          <td class="p-2 p-x-5 f-12 text-nowrap">
+            <div class="w-15 h-15 pointer rounded-circle" [ngbTooltip]="item.jobPartCrewStatusText"
+                 [ngStyle]="{'background': item.jobPartCrewStatusColourMvc}">
+            </div>
+          </td>
+          <td class="p-2 p-x-5 f-12 text-nowrap text-body-secondary">{{ item.roleName }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
-          <td class="p-2 p-x-5 f-12">{{ item.client }}</td>
+          <td class="p-2 p-x-5 f-12 text-nowrap">{{ item.client }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.altVenue }}</td>
           <td class="p-2 p-x-5 f-10 text-nowrap">{{ item.extraHours }}eh</td>
           <td class="text-nowrap p-2 p-x-5 f-12">Sk: £{{ item.skilledCost }}</td>

@@ -9,5 +9,6 @@ export enum CrewAction {
   TURN_DOWN = 'TURN_DOWN',
   REMOVE = 'REMOVE',
   MARK_AS_NO_SHOW = 'MARK_AS_NO_SHOW',
-  CHANGE = 'CHANGE'
+  CHANGE = 'CHANGE',
+  PROFILE = 'PROFILE',
 }

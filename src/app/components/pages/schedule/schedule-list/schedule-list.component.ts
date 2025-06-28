@@ -162,14 +162,22 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       text: 'No Show',
       action: CrewAction.MARK_AS_NO_SHOW,
       color: 'text-success',
-      icon: 'fa-solid fa-eye-slash f-16'
+      icon: 'fa-solid fa-eye-slash f-14'
     },
     {
       id: 2,
       text: 'Change',
       action: CrewAction.CHANGE,
       color: 'text-success',
-      icon: 'fa-solid fa-retweet f-18'
+      icon: 'fa-solid fa-retweet f-16'
+    },
+    {
+      id: 2,
+      text: 'Profile',
+      action: CrewAction.PROFILE,
+      color: 'text-dark',
+      icon: 'fa-solid fa-user f-16',
+      href: `https://alphacrew.eu/Crew/Edit/${this.crewInfo()?.crewId}`
     }
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
@@ -733,7 +741,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
           const params = {
             date: GeneralService.convertToDate(this._navService.date$.value),
             days: this._navService.days,
-            jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+            regionFilter: this._navService.regionId,
+            jobId: this.isJobScoped ? this.selectedSchedule.jobId : null,
           };
 
           if (!params.jobId) {
@@ -746,7 +755,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
               this.updateSchedulesWithStatuses(res.data);
             });
 
-          this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetails', params)
+          this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params)
             .pipe(takeUntilDestroyed(this._dr))
             .subscribe(res => {
               this.updateSchedulesWithCrewChanges(res.data);
@@ -755,33 +764,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       })
   }
 
-  getInfoMultiple() {
-    const params = {
-      date: GeneralService.convertToDate(this._navService.date$.value),
-      days: this._navService.days,
-      jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
-    };
-
-    if (!params.jobId) {
-      delete params.jobId;
-    }
-
-    const getStatuses$ = () => this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params);
-    const getCrewAdditionalInfo$ = () => this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params);
-
-    timer(4000, 60000).pipe(
-      takeUntilDestroyed(this._dr),
-      switchMap(() =>
-        forkJoin({
-          statuses: getStatuses$(),
-          crewDetails: getCrewAdditionalInfo$()
-        })
-      )
-    ).subscribe(({ statuses, crewDetails }) => {
-      this.updateSchedulesWithStatuses(statuses.data);
-      this.updateSchedulesWithCrewChanges(crewDetails.data);
-    });
-  }
   getInfo() {
     this._scheduleService.shiftsLoaded
       .pipe(takeUntilDestroyed(this._dr))
@@ -791,6 +773,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             const params = {
               date: GeneralService.convertToDate(this._navService.date$.value),
               days: this._navService.days,
+              regionFilter: this._navService.regionId,
               jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
             };
 
@@ -817,6 +800,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             const params = {
               date: GeneralService.convertToDate(this._navService.date$.value),
               days: this._navService.days,
+              regionFilter: this._navService.regionId,
               jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
             };
 
@@ -883,7 +867,12 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       'jobPartLateChange',
       'lateChange',
       'onHoliday',
-      'onWarnings'
+      'onWarnings',
+      'hours',
+      'byNotification',
+      'byCrewManager',
+      'buddyDown',
+      'buddyUp',
     ];
 
     const updateCrews = (list: any[]) =>

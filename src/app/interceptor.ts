@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, throwError } from 'rxjs';
 import { LoadingService } from "./shared/services/loader.service";
 import { AuthService } from "./shared/services/auth.service";
+import { HttpErrorResponse } from '@angular/common/http';
 
 const urlsWithoutLoader: Array<string> = ['/assets/i18n/'];
 
@@ -13,33 +14,37 @@ export const Interceptor: HttpInterceptorFn = (req, next) => {
   const loadingService = inject(LoadingService);
   const token = authService.getToken();
 
-  // Check if the request must be without loader
+  // Check if the request should skip the loader
   const isReqWithoutLoader = urlsWithoutLoader.some(url => req.url.startsWith(url));
 
   if (!isReqWithoutLoader) {
-    setTimeout(() => loadingService.show())
+    loadingService.show(); // remove setTimeout()
   }
 
   const clonedRequest = req.clone({
     setHeaders: {
-      'authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
     }
   });
 
   return next(clonedRequest).pipe(
     finalize(() => {
-      loadingService.hide();
+      if (!isReqWithoutLoader) {
+        loadingService.hide();
+      }
     }),
-    catchError((error) => {
-      // Bypass error handling if the custom header is present
+    catchError((error: HttpErrorResponse) => {
+      // Skip error handling if custom header is present
       if (req.headers.has('HandleErrors')) {
         return throwError(() => error);
       }
 
-      let errorMessage = error.error.error || error.statusText;
+      let errorMessage = 'An unknown error occurred.';
 
-      // Customize error messages based on error status
-      if (error.status === 401) {
+      // Handle different status codes
+      if (error.status === 0) {
+        errorMessage = 'Network error. Please check your internet connection.';
+      } else if (error.status === 401) {
         errorMessage = 'Unauthorized access. Please check your credentials.';
         authService.logout();
       } else if (error.status === 403) {
@@ -50,12 +55,20 @@ export const Interceptor: HttpInterceptorFn = (req, next) => {
         errorMessage = 'Server error. Please try again later.';
       }
 
-      toastr.error(errorMessage, 'Error');
+      // Prefer backend-provided error message if available
+      if (error.error) {
+        if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (error.error.error) {
+          errorMessage = error.error.error;
+        } else if (error.error.message) {
+          errorMessage = error.error.message;
+        }
+      }
 
-      // Log error to console for debugging
+      toastr.error(errorMessage, 'Error');
       console.error('HTTP Error:', error);
 
-      // Re-throw the error so it can be handled by other parts of the application if needed
       return throwError(() => error);
     })
   );

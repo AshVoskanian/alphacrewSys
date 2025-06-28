@@ -134,6 +134,7 @@ export interface CrewActionItem {
   color: string;
   id?: number;
   icon: string;
+  href?: string;
 }
 
 export interface JobPartCrewUpdate {
@@ -276,6 +277,8 @@ export interface ShiftCrewDetails {
   otherPaymentAdjustment: number;
   otherPaymentAdjustmentTxt: string;
   updateHistory: string;
+  jobPartCrewStatusColourMvc: string;
+  jobPartCrewStatusText: string;
 }
 
 export interface JobMessageStatus {
@@ -309,6 +312,8 @@ export interface CrewDetailForShift {
   skilledCost: number;
   bonus: number;
   updateHistory: string;
+  jobPartCrewStatusColourMvc: string;
+  jobPartCrewStatusText: string;
 }
 
 export interface BonusResponse {
@@ -318,7 +323,12 @@ export interface BonusResponse {
 
 export interface JobPartCrewAdditionalDetail {
   additionalFees?: number;
+  buddyDown?: number;
+  buddyUp?: number;
+  byCrewManager?: number;
+  byNotification?: number;
   crewSkillsText?: string;
+  hours?: number;
   inConflict?: number;
   jobId?: number;
   jobPartCrewId?: number;
