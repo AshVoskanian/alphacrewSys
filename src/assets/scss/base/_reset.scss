@@ -1836,6 +1836,11 @@ $i: 1;
 }
 
 
+.list-box.title-line-warning::before {
+  background-color: var(--status-color) !important;
+  top: 20px;
+}
+
 
 @media (min-width: 1200px) {
   .modal-xl {

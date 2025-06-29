@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { CommonModule, DatePipe } from "@angular/common";
 import { Schedule, StatusIcon } from "../../../../shared/interface/schedule";
@@ -15,6 +15,7 @@ import { GridItemComponent } from "./grid-item/grid-item.component";
 })
 export class ScheduleGridComponent {
   @Input() scheduleList: Array<Schedule> = [];
+  @Input() loading: boolean = false;
 
   projects: any = [
     {

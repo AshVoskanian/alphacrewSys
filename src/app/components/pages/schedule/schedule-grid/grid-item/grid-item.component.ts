@@ -1,14 +1,18 @@
 import { Component, inject, Input } from '@angular/core';
-import { CommonModule, TitleCasePipe } from "@angular/common";
+import { CommonModule, NgClass, TitleCasePipe } from "@angular/common";
 import { ChatService } from "../../../../../shared/services/chat.service";
 import { SvgIconComponent } from "../../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import { Schedule, StatusIcon } from "../../../../../shared/interface/schedule";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
+import { GeneralService } from "../../../../../shared/services/general.service";
 
 @Component({
   selector: 'app-grid-item',
-  imports: [ CommonModule, NgbTooltipModule, SvgIconComponent, TitleCasePipe, FeatherIconComponent ],
+  imports: [
+    CommonModule, NgbTooltipModule, SvgIconComponent,
+    TitleCasePipe, FeatherIconComponent , NgClass
+  ],
   templateUrl: './grid-item.component.html',
   styleUrl: './grid-item.component.scss'
 })
@@ -63,5 +67,9 @@ export class GridItemComponent {
       case 3: return ', Team Leader';
       default: return '';
     }
+  }
+
+  hoursDifference(startDateIso: string, endDateIso: string) {
+    return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
 }

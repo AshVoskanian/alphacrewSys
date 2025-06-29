@@ -1,10 +1,12 @@
 <div class="container-fluid p-t-20">
   <div class="row">
     <div class="col">
-      <app-schedule-list (openJobsShifts)="openModal($event)" [list]="scheduleService.shifts"
-                         [loading]="loading()" [jobShiftsLoading]="JobScheduleLoading()">
-      </app-schedule-list>
-<!--      <app-schedule-grid [scheduleList]="scheduleService.shifts"></app-schedule-grid>-->
+<!--      <app-schedule-list (openJobsShifts)="openModal($event)" [list]="scheduleService.shifts"-->
+<!--                         [loading]="loading()" [jobShiftsLoading]="JobScheduleLoading()">-->
+<!--      </app-schedule-list>-->
+      <app-schedule-grid [scheduleList]="scheduleService.shifts"
+                         [loading]="loading()"
+      ></app-schedule-grid>
     </div>
   </div>
 </div>

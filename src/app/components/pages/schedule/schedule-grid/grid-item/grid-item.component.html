@@ -1,18 +1,21 @@
 @if (schedule) {
   <div class="progress-schedule-box">
-    <div class="list-box pending title-line-warning">
+    <div class="list-box pending title-line-warning"
+         [ngStyle]="{ '--status-color': getStatusColor(schedule.statusText)
+}"
+    >
       <div class="header-top">
           <span class="badge badge-light-success"
-
                 [ngStyle]="{
                  color: getStatusTextColor(schedule.statusText),
                  backgroundColor: getStatusColor(schedule.statusText)
                  }">
               {{ schedule.statusText | titlecase }}
+            <span class="pointer">{{ schedule.jobPartId }}</span>
           </span>
         <p class="mb-0 c-o-light">
           <app-svg-icon [icon]="'vector-calendar'" [class]="'me-2'"></app-svg-icon>
-          {{ schedule.startDate | date: 'dd MMM yyyy' }}
+          {{ schedule.startDate | date: 'dd MMM yyyy HH:mm' }}
         </p>
       </div>
       <div class="schedule-body">
@@ -24,21 +27,41 @@
             ></i>
           </div>
           <div>
-            <h6>{{ schedule.address }}</h6>
-            <span>{{ schedule.onsiteContact }}</span>
+            <h6>
+              {{ schedule.startDate | date: 'HH:mm' }} -  {{ schedule.endDate | date: 'HH:mm' }}
+              (Cr: {{ schedule.crewNumber }},
+              Hrs: {{ hoursDifference(schedule.startDate, schedule.endDate) }} )
+            </h6>
+            @if (schedule.companyName) {
+              <span>{{ schedule.companyName }}</span>
+            }
+            @if (schedule.venueName) {
+              <span>{{ schedule.venueName }}</span><br>
+            }
+            @if (schedule.address) {
+              <span>{{ schedule.address }}</span><br>
+            }
+            @if (schedule.onsiteContact) {
+              <span>{{ schedule.onsiteContact }}</span>
+            }
           </div>
         </div>
         <div class="common-space">
-          <p class="mb-0 c-o-light">Tasks</p>
-          <span>{{ 22 }}%</span>
+          <p class="mb-0 c-o-light">Shifts</p>
+          <span>({{ schedule.shiftNumber }} of {{ schedule.shiftCount }})</span>
         </div>
-        <div class="progress">
-          <div class="progress-bar bg-success" [ngStyle]="{ 'width': 66 + '%'}"></div>
+        <div class="shifts flex items-center m-b-10 rounded-2 overflow-hidden">
+          @for (shift of [].constructor(schedule.shiftCount); track $index * 0.3) {
+            <div
+              class="flex-grow-1 h-20  border-end border-1 {{schedule.shiftNumber === $index + 1 ? 'bg-info' : 'bg-primary'}}"
+            ></div>
+          }
         </div>
         <div class="schedule-bottom common-space">
           <ul class="common-f-start">
             @if (schedule.crews && schedule.crews.length) {
-              @for (crew of schedule.crews; track crew.crewId + crew.crewSkillsText + crew.name + crew.jobPartCrewRoleId + $index) {
+              @for (
+                crew of schedule.crews; track crew.crewId + crew.crewSkillsText + crew.name + crew.jobPartCrewRoleId + $index) {
                 @if (crew) {
                   <li placement="top" class="m-t-5 border-2 border-primary"
                       [ngbTooltip]="crew.name + getRole(crew.jobPartCrewRoleId)">
@@ -61,9 +84,9 @@
               }
             }
           </ul>
-          <p class="mb-0">Budget
-            <span>2323</span>
-          </p>
+<!--          <p class="mb-0">Budget-->
+<!--            <span>2323</span>-->
+<!--          </p>-->
         </div>
       </div>
     </div>
