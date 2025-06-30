@@ -68,8 +68,7 @@ export class EditComponent extends ApiBase implements OnInit {
 
   setCrewsList() {
     // Check selected crew status(must be confirmed) and buddy (must be buddyUp)
-    const selectedCrew = this.scheduleInfo.crews?.find(it => it.jobPartCrewId === this.crewInfo.jobPartCrewId);
-    this.showBuddy = selectedCrew.buddyUp === 0 && selectedCrew.jobPartCrewStatusId === 2;
+    this.showBuddy = this.crewInfo.jobPartCrewBuddy && this.crewInfo.jobPartCrewBuddy.isBuddyUp && this.crewInfo.jobPartCrewStatusId === 2;
 
     this.crews = this.scheduleInfo.crews
       ?.filter(crew => {

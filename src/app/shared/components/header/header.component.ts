@@ -11,20 +11,25 @@ import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
 import { LocalStorageService } from "../../services/local-storage.service";
+import { FeatherIconComponent } from "../ui/feather-icon/feather-icon.component";
+import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-header',
   imports: [ HeaderLogoComponent, HeaderLanguageComponent,
     ToggleScreenComponent, SearchComponent, Select2Module,
     ModeComponent, ReactiveFormsModule,
-    ProfileComponent, NgbInputDatepicker ],
+    ProfileComponent, NgbInputDatepicker, FeatherIconComponent, AsyncPipe ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 
 export class HeaderComponent {
+  private router: Router = inject(Router);
   private _fb = inject(FormBuilder);
   private _localStorageService = inject(LocalStorageService);
+
+  public navService: NavService = inject(NavService);
 
   isScheduleRoute = false;
 
@@ -75,12 +80,24 @@ export class HeaderComponent {
 
   form: FormGroup;
 
-  constructor(public navService: NavService, private router: Router) {
+  constructor() {
     this.initForm();
     this.router.events.subscribe(() => {
       this.isScheduleRoute = this.router.url?.includes('/schedule');
     });
     this.filterRegionsByRole();
+    this.checkListView();
+  }
+
+  checkListView() {
+    const view = this._localStorageService.getItem('listView') as 'grid' | 'list';
+
+    if (!view) {
+      this._localStorageService.setItem('listView', 'list');
+      this.setListView('list');
+    } else {
+      this.setListView(view);
+    }
   }
 
   initForm() {
@@ -122,5 +139,10 @@ export class HeaderComponent {
   setRegion(e: Select2UpdateEvent<Select2UpdateValue>) {
     this.navService.regionId = +e.value;
     this.submit();
+  }
+
+  setListView(viewType: 'list' | 'grid') {
+    this._localStorageService.setItem('listView', viewType);
+    this.navService.listView$.next(viewType);
   }
 }

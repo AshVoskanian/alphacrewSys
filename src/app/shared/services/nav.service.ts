@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from "rxjs";
 import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
+import { Schedule } from "../interface/schedule";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,10 @@ export class NavService {
   public regionId: number = 0;
 
   public date$: BehaviorSubject<NgbDateStruct> = new BehaviorSubject<any>(null);
+  public listView$: BehaviorSubject<'list' | 'grid'> = new BehaviorSubject<'list' | 'grid'>('list');
+  public scrollTo$: BehaviorSubject<Schedule> = new BehaviorSubject<Schedule>(null);
 
-  constructor() { }
+  constructor() {
+  }
 
 }

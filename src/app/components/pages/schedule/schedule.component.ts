@@ -12,11 +12,12 @@ import { NavService } from "../../../shared/services/nav.service";
 import { ScheduleService } from "./schedule.service";
 import { SKILLS } from "../../../shared/data/skills";
 import { ScheduleGridComponent } from "./schedule-grid/schedule-grid.component";
+import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [ CardComponent, Select2Module, ScheduleListComponent, FeatherIconComponent, ScheduleGridComponent ],
+  imports: [ CardComponent, Select2Module, ScheduleListComponent, FeatherIconComponent, ScheduleGridComponent, AsyncPipe ],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
@@ -24,7 +25,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   @ViewChild('scheduleModal') scheduleModal: any;
 
   private _modal = inject(NgbModal);
-  private _navService = inject(NavService);
+  public _navService = inject(NavService);
   private _toast = inject(ToastrService);
   public scheduleService = inject(ScheduleService);
 

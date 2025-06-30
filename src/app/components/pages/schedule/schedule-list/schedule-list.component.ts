@@ -1,18 +1,21 @@
 import {
+  AfterViewInit,
   Component,
   DestroyRef,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
   input,
   OnInit,
   Output,
+  QueryList,
   signal,
   TemplateRef,
   ViewChild,
+  ViewChildren,
   WritableSignal
 } from '@angular/core';
-import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import {
   Crew,
   CrewActionItem,
@@ -49,7 +52,6 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { CrewAction } from "../../../../shared/interface/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
@@ -59,14 +61,14 @@ import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
 
 @Component({
   selector: 'app-schedule-list',
-  imports: [ CardComponent, NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent,
+  imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SvgIconComponent, SendSmsComponent ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
 })
-export class ScheduleListComponent extends ApiBase implements OnInit {
+export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewInit {
   private _dr = inject(DestroyRef);
   private _modal = inject(NgbModal);
   private _navService = inject(NavService);
@@ -78,6 +80,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
   @ViewChild('sendSmsModal') sendSmsModal: SendSmsComponent;
   @ViewChild('updateNotes') updateNotes: UpdatesNotesComponent;
   @ViewChild('shiftCrewDetailsRef') shiftCrewDetailsRef: any;
+  @ViewChildren('itemBlock') itemBlocks!: QueryList<ElementRef>;
 
   private offcanvasRef?: NgbOffcanvasRef;
 
@@ -177,7 +180,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
       action: CrewAction.PROFILE,
       color: 'text-dark',
       icon: 'fa-solid fa-user f-16',
-      href: `https://alphacrew.eu/Crew/Edit/${this.crewInfo()?.crewId}`
+      href: `https://alphacrew.eu/Crew/Edit/${ this.crewInfo()?.crewId }`
     }
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
@@ -197,6 +200,20 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this.getInfo();
     this.getInfoMultiple();
     this.getJobPartCrewAdditionalDetails();
+  }
+
+  ngAfterViewInit() {
+    this.subToGridElementClick();
+  }
+
+  subToGridElementClick() {
+    this._navService.scrollTo$
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: schedule => {
+          this.scrollToItem(schedule.jobPartId)
+        }
+      })
   }
 
   checkIfCrewUpdate() {
@@ -956,5 +973,16 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   finishNoteEdit(schedule: Schedule) {
     this.updateShift(schedule);
+  }
+
+
+  scrollToItem(jpId: number) {
+    const target = this.itemBlocks?.find(el =>
+      el.nativeElement.getAttribute('data-id') === String(jpId)
+    );
+
+    if (target) {
+      target.nativeElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
   }
 }

@@ -4,7 +4,7 @@
   </div>
 } @else {
   @for (schedule of list; track schedule.jobPartId) {
-    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)">
+    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)" [attr.data-id]="schedule.jobPartId" #itemBlock>
       <div class="col">
         <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">
           <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"

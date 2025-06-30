@@ -11,7 +11,7 @@
                  backgroundColor: getStatusColor(schedule.statusText)
                  }">
               {{ schedule.statusText | titlecase }}
-            <span class="pointer">{{ schedule.jobPartId }}</span>
+            <span class="pointer">{{ schedule.jobId }}</span>
           </span>
         <p class="mb-0 c-o-light">
           <app-svg-icon [icon]="'vector-calendar'" [class]="'me-2'"></app-svg-icon>
@@ -62,31 +62,26 @@
             @if (schedule.crews && schedule.crews.length) {
               @for (
                 crew of schedule.crews; track crew.crewId + crew.crewSkillsText + crew.name + crew.jobPartCrewRoleId + $index) {
-                @if (crew) {
+                @if (crew && crew.isActive) {
                   <li placement="top" class="m-t-5 border-2 border-primary"
                       [ngbTooltip]="crew.name + getRole(crew.jobPartCrewRoleId)">
-                    @if (crew.isActive) {
-                      <img class="rounded-circle w-30 h-30"
-                           [src]="'https://alphacrew.eu/Crew/CrewImage/' + crew.crewId" alt="">
-                    } @else {
-                      <div class="w-30 h-30 flex flex-col items-center justify-content-center">
-                        <app-feather-icon [icon]="'user'" [class]="'f-30'"></app-feather-icon>
-                      </div>
-                    }
-                  </li>
-                } @else {
-                  <li placement="top" [ngbTooltip]="crew.crewSkillsText">
-                    <div
-                      class="common-circle bg-lighter-{{ chatService.getTextColor(chatService.getUserText(crew.name)) }}">{{ chatService.getUserText(crew.name, 'singleText') }}
-                    </div>
+                    <img class="rounded-circle w-30 h-30 object-fit-cover"
+                         [src]="'https://alphacrew.eu/Crew/CrewImage/' + crew.crewId" alt="">
                   </li>
                 }
               }
+              @if (getMissingPeopleCount() > 0) {
+                <li class="m-t-5 border-2 border-primary">
+                  <div class="w-30 h-30 rounded-circle flex flex-col items-center justify-content-center bg-light">
+                    <p class="text-primary">-{{ getMissingPeopleCount() }}</p>
+                  </div>
+                </li>
+              }
             }
           </ul>
-<!--          <p class="mb-0">Budget-->
-<!--            <span>2323</span>-->
-<!--          </p>-->
+          <!--          <p class="mb-0">Budget-->
+          <!--            <span>2323</span>-->
+          <!--          </p>-->
         </div>
       </div>
     </div>

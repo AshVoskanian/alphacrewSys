@@ -72,4 +72,8 @@ export class GridItemComponent {
   hoursDifference(startDateIso: string, endDateIso: string) {
     return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
+
+  getMissingPeopleCount() {
+    return this.schedule.crews.filter(it => !it.isActive).length;
+  }
 }

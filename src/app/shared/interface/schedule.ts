@@ -180,6 +180,7 @@ export interface JobPartCrewBuddy {
   buddyDown: number;
   createDate: string;
   userEmail: string;
+  isBuddyUp: boolean;
 }
 
 export interface CrewSkill {

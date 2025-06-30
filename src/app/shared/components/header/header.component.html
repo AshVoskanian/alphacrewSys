@@ -51,6 +51,23 @@
           </ng-template>
         </select2>
       </div>
+
+      <div class="flex">
+        <div class="square-product-setting d-inline-block" (click)="setListView('list')">
+          <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0"
+             [class.text-primary]="(navService.listView$ | async) === 'list'"
+          >
+            <app-feather-icon [icon]="'list'"></app-feather-icon>
+          </a>
+        </div>
+        <div class="square-product-setting d-inline-block" (click)="setListView('grid')">
+          <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0"
+             [class.text-primary]="(navService.listView$ | async) === 'grid'"
+          >
+            <app-feather-icon [icon]="'grid'"></app-feather-icon>
+          </a>
+        </div>
+      </div>
     </form>
   }
 
