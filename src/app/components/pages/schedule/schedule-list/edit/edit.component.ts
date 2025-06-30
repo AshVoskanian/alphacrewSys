@@ -5,14 +5,13 @@ import { BonusResponse, CrewSkill, JobPartCrewEdit, Schedule } from "../../../..
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { ROLES, SKILLS, STATUSES } from "../../../../../shared/data/schedule";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { ScheduleService } from "../../schedule.service";
 
 @Component({
   selector: 'app-edit',
-  imports: [ Select2Module, CommonModule, FeatherIconComponent ],
+  imports: [ Select2Module, CommonModule ],
   templateUrl: './edit.component.html',
   standalone: true,
   styleUrl: './edit.component.scss'
@@ -32,17 +31,18 @@ export class EditComponent extends ApiBase implements OnInit {
   pay: number = 0;
 
   loading: boolean = false;
+  showBuddy: boolean = false;
   saveLoading: boolean = false;
   bonusActionType: 'REMOVE' | 'APPLY';
 
-  skills: Array<CrewSkill> = SKILLS;
-
+  crews: Select2Data = [];
   roles: Select2Data = ROLES;
-
   statuses: Select2Data = STATUSES;
+  skills: Array<CrewSkill> = SKILLS;
 
   ngOnInit() {
     this.initForm();
+    this.setCrewsList();
     this.setCrewSkills();
     this.pay = this.crewInfo.pay;
   }
@@ -55,6 +55,7 @@ export class EditComponent extends ApiBase implements OnInit {
       jobPartCrewStatusId: [ this.crewInfo?.jobPartCrewStatusId || 0 ],
       lastMinuteBonus: [ this.crewInfo?.lastMinuteBonus || 0 ],
       otherPaymentAdjustment: [ this.crewInfo?.otherPaymentAdjustment || 0 ],
+      buddyDown: [ this.crewInfo?.jobPartCrewBuddy?.buddyDown || 0 ],
       otherPaymentAdjustmentTxt: [ this.crewInfo?.otherPaymentAdjustmentTxt || '' ],
       skilledCost: [ this.crewInfo?.skilledCost || 0 ],
     });
@@ -63,6 +64,23 @@ export class EditComponent extends ApiBase implements OnInit {
   setCrewSkills() {
     const crewSkillIds: number[] = this.crewInfo.jobPartSkills.map(it => it.crewSkillId);
     this.skills.forEach(it => it.checked = crewSkillIds.includes(it.crewSkillId));
+  }
+
+  setCrewsList() {
+    // Check selected crew status(must be confirmed) and buddy (must be buddyUp)
+    const selectedCrew = this.scheduleInfo.crews?.find(it => it.jobPartCrewId === this.crewInfo.jobPartCrewId);
+    this.showBuddy = selectedCrew.buddyUp === 0 && selectedCrew.jobPartCrewStatusId === 2;
+
+    this.crews = this.scheduleInfo.crews
+      ?.filter(crew => {
+        return (
+          crew.jobPartCrewId !== this.crewInfo.jobPartCrewId &&
+          crew.jobPartCrewStatusId === 2 &&
+          (crew.buddyUp === 0 && crew.buddyDown === 0 || crew.buddyUp === this.crewInfo.jobPartCrewId)
+        )
+      })
+      ?.map(crew => ({ label: crew.name, value: crew.jobPartCrewId }));
+    this.crews.unshift({ label: 'No Buddy', value: 0 });
   }
 
   bonusAction(type: 'REMOVE' | 'APPLY') {
@@ -131,6 +149,7 @@ export class EditComponent extends ApiBase implements OnInit {
       lastMinuteBonus: this.form.get('lastMinuteBonus').value,
       jobPartCrewStatusId: this.form.get('jobPartCrewStatusId').value,
       jobPartCrewRoleId: this.form.get('jobPartCrewRoleId').value,
+      buddyDown: this.form.get('buddyDown').value,
       skillId: this.skills.filter(it => it.checked).map(it => it.crewSkillId)
     }
 

@@ -186,7 +186,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
 
   colorsConfig = {
     2: 'light',
-    14: 'light',
+    14: 'dark',
     3: 'dark',
     7: 'light'
   }
@@ -195,7 +195,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
     this.getCrewList();
     this.checkIfCrewUpdate();
     this.getInfo();
-    // this.getInfoMultiple();
+    this.getInfoMultiple();
     this.getJobPartCrewAdditionalDetails();
   }
 
@@ -227,6 +227,28 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
               });
             });
 
+            const params = {
+              date: GeneralService.convertToDate(this._navService.date$.value),
+              days: this._navService.days,
+              regionFilter: this._navService.regionId,
+              jobId: this.isJobScoped ? this.selectedSchedule.jobId : null,
+            };
+
+            if (!params.jobId) {
+              delete params.jobId;
+            }
+
+            this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params)
+              .pipe(takeUntilDestroyed(this._dr))
+              .subscribe(res => {
+                this.updateSchedulesWithStatuses(res.data);
+              });
+
+            this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params)
+              .pipe(takeUntilDestroyed(this._dr))
+              .subscribe(res => {
+                this.updateSchedulesWithCrewChanges(res.data);
+              });
             this._scheduleService.crewUpdate$.next(null);
           }
         }
@@ -321,7 +343,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
         next: (res) => {
           crew.editLoading = false;
           if (res.errors?.errorCode) {
-
+            GeneralService.showErrorMessage(res.errors.message);
           } else {
             this.crewInfo.set(res.data);
             this.openEditModal(this.editModal);
@@ -762,6 +784,34 @@ export class ScheduleListComponent extends ApiBase implements OnInit {
             });
         }
       })
+  }
+
+  getInfoMultiple() {
+    const params = {
+      date: GeneralService.convertToDate(this._navService.date$.value),
+      days: this._navService.days,
+      jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+    };
+
+    if (!params.jobId) {
+      delete params.jobId;
+    }
+
+    const getStatuses$ = () => this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params);
+    const getCrewAdditionalInfo$ = () => this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params);
+
+    timer(4000, 60000).pipe(
+      takeUntilDestroyed(this._dr),
+      switchMap(() =>
+        forkJoin({
+          statuses: getStatuses$(),
+          crewDetails: getCrewAdditionalInfo$()
+        })
+      )
+    ).subscribe(({ statuses, crewDetails }) => {
+      this.updateSchedulesWithStatuses(statuses.data);
+      this.updateSchedulesWithCrewChanges(crewDetails.data);
+    });
   }
 
   getInfo() {

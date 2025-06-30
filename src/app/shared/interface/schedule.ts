@@ -169,6 +169,17 @@ export interface JobPartCrewEdit {
   crewChiefNumber: number;
   crewSkills: CrewSkill[];
   jobPartSkills: CrewSkill[];
+  jobPartCrewBuddy: JobPartCrewBuddy
+}
+
+export interface JobPartCrewBuddy {
+  id: number;
+  jobId: number;
+  jobPartId: number;
+  buddyUp: number;
+  buddyDown: number;
+  createDate: string;
+  userEmail: string;
 }
 
 export interface CrewSkill {

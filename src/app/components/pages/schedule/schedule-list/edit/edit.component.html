@@ -75,6 +75,19 @@
                   </select2>
                 </label>
               </div>
+              @if (showBuddy) {
+                <div class="col w-1-5">
+                  <label class="form-label w-100">
+                    Buddy Down
+                    <select2 [data]="crews" formControlName="buddyDown" [templates]="template"
+                             placeholder="Choose BodyDown..">
+                      <ng-template #template let-item="label">
+                        {{ item }}
+                      </ng-template>
+                    </select2>
+                  </label>
+                </div>
+              }
             </div>
           </div>
 
@@ -85,7 +98,8 @@
                 <p class="text-nowrap text-primary">Out of Town: £{{ crewInfo.ootCost | number:'1.2-2' }}</p>
               </div>
               <div class="col-6 col-md-4">
-                <p class="text-nowrap text-primary text-end">Travel: £{{ crewInfo.travelHoursCost | number:'1.2-2' }}</p>
+                <p class="text-nowrap text-primary text-end">Travel:
+                  £{{ crewInfo.travelHoursCost | number:'1.2-2' }}</p>
                 <p class="text-nowrap text-primary text-end">Bonus: £{{ (crewInfo.bonus || 0) | number:'1.2-2' }}</p>
               </div>
             </div>
@@ -126,7 +140,8 @@
         <div class="row row-cols-2 row-cols-sm-4 row-cols-md-6">
           @for (item of skills; track item) {
             <div class="col form-check checkbox checkbox-solid-warning">
-              <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked" (change)="item.checked = !item.checked">
+              <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked"
+                     (change)="item.checked = !item.checked">
               <label class="form-check-label user-select-none" [for]="item.crewSkillId">{{ item.crewSkillText }}</label>
             </div>
           }
