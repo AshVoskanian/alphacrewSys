@@ -2,15 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LayoutService } from '../../../services/layout.service';
-import { FooterComponent } from "../../footer/footer.component";
 import { HeaderComponent } from "../../header/header.component";
 import { SidebarComponent } from '../../sidebar/sidebar.component';
-import { BreadcrumbsComponent } from "../../ui/breadcrumbs/breadcrumbs.component";
 
 @Component({
   selector: 'app-content',
-  imports: [CommonModule, RouterOutlet, HeaderComponent, SidebarComponent,
-            BreadcrumbsComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, SidebarComponent],
   templateUrl: './content.component.html',
   styleUrl: './content.component.scss'
 })

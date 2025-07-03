@@ -2,9 +2,7 @@ import { Component, inject } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
 import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
-import { ToggleScreenComponent } from "./widgets/toggle-screen/toggle-screen.component";
 import { SearchComponent } from "./widgets/search/search.component";
-import { ModeComponent } from "./widgets/mode/mode.component";
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
 import { Router } from "@angular/router";
@@ -16,10 +14,11 @@ import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-header',
-  imports: [ HeaderLogoComponent, HeaderLanguageComponent,
-    ToggleScreenComponent, SearchComponent, Select2Module,
-    ModeComponent, ReactiveFormsModule,
-    ProfileComponent, NgbInputDatepicker, FeatherIconComponent, AsyncPipe ],
+  imports: [
+    HeaderLogoComponent, HeaderLanguageComponent, SearchComponent,
+    Select2Module, ReactiveFormsModule,
+    ProfileComponent, NgbInputDatepicker, FeatherIconComponent, AsyncPipe
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

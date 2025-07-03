@@ -44,29 +44,13 @@
       </div>
 
       <div class="flex gap-2">
-        <select2 [data]="regions" [value]="0" [templates]="template" [displaySearchStatus]="'hidden'" (update)="setRegion($event)"
+        <select2 [data]="regions" [value]="0" [templates]="template" [displaySearchStatus]="'hidden'"
+                 (update)="setRegion($event)"
                  placeholder="Region" class="w-130 bg-light-secondary">
           <ng-template #template let-item="label">
             {{ item }}
           </ng-template>
         </select2>
-      </div>
-
-      <div class="flex">
-        <div class="square-product-setting d-inline-block" (click)="setListView('list')">
-          <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0"
-             [class.text-primary]="(navService.listView$ | async) === 'list'"
-          >
-            <app-feather-icon [icon]="'list'"></app-feather-icon>
-          </a>
-        </div>
-        <div class="square-product-setting d-inline-block" (click)="setListView('grid')">
-          <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0"
-             [class.text-primary]="(navService.listView$ | async) === 'grid'"
-          >
-            <app-feather-icon [icon]="'grid'"></app-feather-icon>
-          </a>
-        </div>
       </div>
     </form>
   }
@@ -77,9 +61,23 @@
         <app-header-language></app-header-language>
       </li>
 
-      <li class="fullscreen-body">
-        <app-toggle-screen></app-toggle-screen>
+      <li>
+        <div class="flex">
+          <div class="square-product-setting flex items-center" (click)="setListView('list')">
+            <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0">
+              <i class="fas fa-list-ul f-18" [class.text-primary]="(navService.listView$ | async) === 'list'"></i>
+            </a>
+          </div>
+          <div class="square-product-setting flex items-center" (click)="setListView('grid')">
+            <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0">
+              <i class="fas fa-th f-18" [class.text-primary]="(navService.listView$ | async) === 'grid'"></i>
+            </a>
+          </div>
+        </div>
       </li>
+      <!--      <li class="fullscreen-body">-->
+      <!--        <app-toggle-screen></app-toggle-screen>-->
+      <!--      </li>-->
 
       <!--            <li>-->
       <!--                <app-svg-icon [icon]="'search'" (click)="openSearch()"></app-svg-icon>-->
@@ -89,9 +87,9 @@
       <!--                <app-header-bookmark></app-header-bookmark>-->
       <!--            </li>-->
 
-      <li class="mode">
-        <app-mode></app-mode>
-      </li>
+      <!--      <li class="mode">-->
+      <!--        <app-mode></app-mode>-->
+      <!--      </li>-->
 
       <!--      <li class="onhover-dropdown">-->
       <!--        <app-header-notification></app-header-notification>-->
