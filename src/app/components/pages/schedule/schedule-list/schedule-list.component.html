@@ -4,6 +4,11 @@
   </div>
 } @else {
   @for (schedule of list; track schedule.jobPartId) {
+    @if ($index > 0 && list[$index]?.startDate?.slice(0, 10) !== list[$index - 1]?.startDate?.slice(0, 10)) {
+      <div class="p-x-15">
+        <div class="divider rounded-3 h-20 m-0 bg-danger"></div>
+      </div>
+    }
     <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)" [attr.data-id]="schedule.jobPartId" #itemBlock>
       <div class="col">
         <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">

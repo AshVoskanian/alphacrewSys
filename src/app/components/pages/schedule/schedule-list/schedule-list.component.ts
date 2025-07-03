@@ -211,7 +211,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: schedule => {
-          this.scrollToItem(schedule.jobPartId)
+          if (schedule) {
+            this.scrollToItem(schedule.jobPartId)
+          }
         }
       })
   }
