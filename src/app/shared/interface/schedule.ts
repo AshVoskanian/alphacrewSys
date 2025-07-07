@@ -291,6 +291,7 @@ export interface ShiftCrewDetails {
   updateHistory: string;
   jobPartCrewStatusColourMvc: string;
   jobPartCrewStatusText: string;
+  highlight?: boolean;
 }
 
 export interface JobMessageStatus {

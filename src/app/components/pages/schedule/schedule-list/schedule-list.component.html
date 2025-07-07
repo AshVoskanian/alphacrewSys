@@ -5,11 +5,12 @@
 } @else {
   @for (schedule of list; track schedule.jobPartId) {
     @if ($index > 0 && list[$index]?.startDate?.slice(0, 10) !== list[$index - 1]?.startDate?.slice(0, 10)) {
-      <div class="p-x-15">
+      <div class="p-x-15 m-b-15">
         <div class="divider rounded-3 h-20 m-0 bg-danger"></div>
       </div>
     }
-    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)" [attr.data-id]="schedule.jobPartId" #itemBlock>
+    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)"
+         [attr.data-id]="schedule.jobPartId" #itemBlock>
       <div class="col">
         <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">
           <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"
@@ -183,12 +184,11 @@
                         <li class="list-group-item {{!crew.isActive ? 'pointer' : ''}}"
                             (click)="openCrewsPanel(crew, $event, schedule);">
                           @if (crew.isActive) {
-                            <div class="status"
+                            <div class="status bg-dark-subtle"
                                  [class.half]="crew.lateChange && crew.jobPartLateChange === 0 && crew.inConflict > 0"
                                  [class.black]="crew.lateChange && crew.jobPartLateChange === 0 && crew.inConflict === 0"
                                  [class.orange]="crew.inConflict > 0 && !(crew.lateChange && crew.jobPartLateChange === 0)"
                                  (click)="getCrewDetails(crew, popoverRef)"
-                                 [style.background-color]="crew.jobPartCrewStatusColour"
                                  #popoverRef="ngbPopover"
                                  triggers="manual"
                                  [popoverClass]="'wide-popover border bg-dark'"
@@ -201,13 +201,16 @@
                                                     [icon]="'loader'"></app-feather-icon>
                                 } @else {
                                   @if (crew.jobPartCrewRoleId === 1) {
-                                    <i class="fas fa-square me-2 text-white f-10"></i>
+                                    <i [style.color]="crew.jobPartCrewStatusColour"
+                                       class="fas fa-square me-2 f-10"></i>
                                   }
                                   @if (crew.jobPartCrewRoleId === 2) {
-                                    <i class="far fa-solid fa-star me-2 text-white f-10"></i>
+                                    <i [style.color]="crew.jobPartCrewStatusColour"
+                                       class="far fa-solid fa-star me-2 f-10"></i>
                                   }
                                   @if (crew.jobPartCrewRoleId === 4) {
-                                    <i class="fa-solid fa-flag me-2 text-white f-10"></i>
+                                    <i [style.color]="crew.jobPartCrewStatusColour"
+                                       class="fa-solid fa-flag me-2 f-10"></i>
                                   }
                                 }
                               </div>
@@ -355,10 +358,7 @@
                   }
                 </label>
                 @if (schedule.notes) {
-                  <textarea [(ngModel)]="schedule.notes" rows="4"
-                            [readonly]="true"
-                            class="form-control btn-square hide-scrollbar text-dark">
-                    </textarea>
+                  <div class="text-dark textarea" [innerText]="schedule.notes"></div>
                 }
               </div>
 
@@ -374,10 +374,7 @@
                   }
                 </label>
                 @if (schedule.crewNotes) {
-                  <textarea [(ngModel)]="schedule.crewNotes" rows="4"
-                            [readonly]="true"
-                            class="form-control btn-square hide-scrollbar text-dark">
-                    </textarea>
+                  <div class="text-dark textarea" [innerText]="schedule.crewNotes"></div>
                 }
               </div>
             </div>

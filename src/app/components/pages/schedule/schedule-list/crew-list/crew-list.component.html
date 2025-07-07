@@ -173,7 +173,8 @@
     } @else {
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar"
           style="max-height: calc(100dvh - 440px)">
-        @for (crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
+        @for (
+          crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
             @if (crew.jobNotes) {
               <i class="fa-solid fa-tag position-absolute" style="left:0; top: -3px" [ngbTooltip]="crew.jobNotes"></i>
@@ -299,6 +300,13 @@
             <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
             <td class="p-2 p-x-5 f-12">{{ item.client }}{{ item.altVenue }}</td>
           </tr>
+          @if (item.highlight) {
+            <tr>
+              <td colspan="5" class="p-2 f-12">
+                <div class="bg-danger m-y-2 rounded-3 h-10"></div>
+              </td>
+            </tr>
+          }
         }
       </tbody>
     </table>

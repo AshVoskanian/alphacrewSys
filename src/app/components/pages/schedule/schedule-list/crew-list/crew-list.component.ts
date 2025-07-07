@@ -419,10 +419,35 @@ export class CrewListComponent extends ApiBase implements OnInit {
             GeneralService.showErrorMessage(res.errors.message);
             return;
           }
-          this.shiftCrewDetails.set(res.data);
+          this.shiftCrewDetails.set(this.markPossibleJPInsertion(res.data, this.selectedSchedule));
+          console.log(this.shiftCrewDetails())
           popover.open();
         }
       })
+  }
+
+  markPossibleJPInsertion(scheduleList: ShiftCrewDetails[], jp: Schedule): ShiftCrewDetails[] {
+    const jpStart = new Date(jp.startDate);
+    const jpEnd = new Date(jp.endDate);
+
+    const sortedList = [ ...scheduleList ].sort(
+      (a, b) => new Date(a.jpStartDateTime).getTime() - new Date(b.jpStartDateTime).getTime()
+    );
+
+    return sortedList.map((item, index, list) => {
+      const currentEnd = new Date(item.jpEndDateTime);
+      const nextStart = index + 1 < list.length ? new Date(list[index + 1].jpStartDateTime) : null;
+
+      const canFit =
+        nextStart &&
+        jpStart >= currentEnd &&
+        jpEnd <= nextStart;
+
+      return {
+        ...item,
+        highlight: canFit
+      };
+    });
   }
 
   isAllSelected(): boolean {
