@@ -180,7 +180,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       action: CrewAction.PROFILE,
       color: 'text-dark',
       icon: 'fa-solid fa-user f-16',
-      href: `https://alphacrew.eu/Crew/Edit/${ this.crewInfo()?.crewId }`
+      href: `https://alphacrew.eu/Crew/Edit/`
     }
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);

@@ -8,7 +8,7 @@ import { LocalStorageService } from "../../../../services/local-storage.service"
 
 @Component({
   selector: 'app-profile',
-  imports: [FeatherIconComponent,RouterModule, AsyncPipe],
+  imports: [FeatherIconComponent,RouterModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

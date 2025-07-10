@@ -256,7 +256,7 @@
                                       @if (menu.href) {
                                         <a class="dropdown-item opacity-100 flex items-center"
                                            target="_blank"
-                                           [href]="menu.href"
+                                           [href]="menu.href + crew.crewId"
                                            ngbDropdownItem>
                                           <i class="{{menu.icon}} {{menu.color}} me-2"></i>
                                           {{ menu.text }}

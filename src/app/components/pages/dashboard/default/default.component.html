@@ -1,32 +1,19 @@
-<div class="container-fluid default-dashboard">
-    <div class="row widget-grid">
-        <div class="col-xxl-4 col-sm-6 box-col-6">
-            <app-welcome-card></app-welcome-card>
-        </div>
-
-        @for(group of groupDetails; track group; let i = $index) {
-            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-3">
-                <div class="row">
-                    @for(details of group; track details) {
-                        <div class="col-xl-12">
-                            <app-details [detail]="details"></app-details>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-
-        <div class="col-xxl-auto col-xl-4 col-sm-6 box-col-4 ord-xl-5 box-ord-5">
-            <app-visitors-chart></app-visitors-chart>
-        </div>
-        <div class="col-xl-5 col-md-6 ord-xl-4 ord-md-5 box-ord-4">
-            <app-activity-log></app-activity-log>
-        </div>
-        <div class="col-xxl-3 col-lg-4 col-sm-6 box-col-4 ord-xl-7 ord-md-2 box-ord-7">
-          <app-buy-account></app-buy-account>
-        </div>
-        <div class="col-xxl-4 col-lg-6 ord-xl-10 ord-md-8 box-ord-7 box-col-6">
-          <app-manage-appointments></app-manage-appointments>
-        </div>
+<div class="container-fluid p-t-30 default-dashboard">
+  <div class="row">
+    <div class="col-xxl-7 col-md-6 box-col-6">
+      <app-social-analytics></app-social-analytics>
     </div>
+    <div class="col-xxl-5 col-md-6 box-col-6">
+      <app-sales-week></app-sales-week>
+    </div>
+    <div class="col-xxl-6 col-md-6 order-xxl-0 order-sm-4 box-col-6 box-ord-4">
+      <app-recent-orders></app-recent-orders>
+    </div>
+    <div class="col-xxl-3 col-md-6 box-col-6">
+      <app-website-traffic></app-website-traffic>
+    </div>
+    <div class="col-xxl-3 col-md-6 box-col-6">
+      <app-finance-overview></app-finance-overview>
+    </div>
+  </div>
 </div>
