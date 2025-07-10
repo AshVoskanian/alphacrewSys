@@ -3,7 +3,6 @@ import { profile } from '../../../../data/header';
 import { FeatherIconComponent } from "../../../ui/feather-icon/feather-icon.component";
 import { RouterModule } from '@angular/router';
 import { AuthService } from "../../../../services/auth.service";
-import { AsyncPipe } from "@angular/common";
 import { LocalStorageService } from "../../../../services/local-storage.service";
 
 @Component({

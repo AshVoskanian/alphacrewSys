@@ -373,11 +373,7 @@ export class TableComponent {
               return true;
             }
           }
-          if (typeof value === 'number' && value.toString().includes(this.filter['search'])) {
-            return true;
-          }
-
-          return false;
+          return typeof value === 'number' && value.toString().includes(this.filter['search']);
         });
       });
     }

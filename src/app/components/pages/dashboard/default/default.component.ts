@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
 import { details } from '../../../../shared/data/dashboard/default';
 import { Details } from '../../../../shared/interface/dashboard/default';
 import { WebsiteTrafficComponent } from "./widgets/website-traffic/website-traffic.component";
@@ -23,7 +22,7 @@ export class DefaultComponent {
   public activeTab: string = 'youtube';
 
 
-  constructor(private toast: ToastrService) {
+  constructor() {
     this.groupDetails = this.groupDetail(this.details, 2);
   }
 
