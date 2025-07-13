@@ -521,7 +521,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   sendNotification(crew?: JobPartCrew) {
     const data = {
       jobId: this.selectedSchedule.jobId,
-      jobPartId: this.selectedSchedule.jobPartId,
+      jobPartId: [this.selectedSchedule.jobPartId],
       crewId: [ crew.crewId ]
     }
     this.post('Schedule/AddJobNotifiction', data)

@@ -329,7 +329,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this._cdr.detectChanges();
   }
 
-
   sendNotification(crew?: Crew) {
     if (this.notificationsLoader || crew?.notificationLoading) return;
 
@@ -339,9 +338,12 @@ export class CrewListComponent extends ApiBase implements OnInit {
       this.notificationsLoader = true;
     }
 
+    const selectedJps = this.jobPartClashing.filter(it => it.checked);
+    const isAnyJpSelected = this.jobPartClashing.some(it => it.checked);
+
     const data = {
       jobId: this.selectedSchedule.jobId,
-      jobPartId: this.selectedSchedule.jobPartId,
+      jobPartId: isAnyJpSelected ? selectedJps.map(it => it.jobPartId) : [ this.selectedSchedule.jobPartId ],
       crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId)
     }
     this.post('Schedule/AddJobNotifiction', data)
@@ -374,6 +376,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
       jobPartId: this.selectedSchedule.jobPartId,
       crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isChecked).map(it => it.crewId)
     }
+
     this.delete('Schedule/DeleteNotificationByCrewIdandJobPartId', '', data)
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
@@ -420,7 +423,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
             return;
           }
           this.shiftCrewDetails.set(this.markPossibleJPInsertion(res.data, this.selectedSchedule));
-          console.log(this.shiftCrewDetails())
           popover.open();
         }
       })
