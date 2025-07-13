@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
-import { CardComponent } from "../../../shared/components/ui/card/card.component";
 import { Select2Module } from "ng-select2-component";
 import { NgbDateStruct, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ScheduleListComponent } from "./schedule-list/schedule-list.component";
@@ -7,7 +6,6 @@ import { ApiBase } from "../../../shared/bases/api-base";
 import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
 import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
-import { FeatherIconComponent } from "../../../shared/components/ui/feather-icon/feather-icon.component";
 import { NavService } from "../../../shared/services/nav.service";
 import { ScheduleService } from "./schedule.service";
 import { SKILLS } from "../../../shared/data/skills";
@@ -17,7 +15,7 @@ import { AsyncPipe } from "@angular/common";
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [ CardComponent, Select2Module, ScheduleListComponent, FeatherIconComponent, ScheduleGridComponent, AsyncPipe ],
+  imports: [ Select2Module, ScheduleListComponent, ScheduleGridComponent, AsyncPipe ],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
@@ -62,7 +60,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   ngOnInit() {
     this.subToDateChange();
   }
-
 
   subToDateChange() {
     this._navService.date$.subscribe({

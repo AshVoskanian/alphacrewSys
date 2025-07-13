@@ -6,6 +6,7 @@ export interface Schedule {
   crewNumber: number;
   crews: Array<JobPartCrew>; // თუ გაქვს კონკრეტული ტიპი, ჩაანაცვლე
   hours: number;
+  travelHours: number;
   importantNotes: boolean;
   isJobActive: boolean;
   isNightShift: boolean;
@@ -49,6 +50,10 @@ export interface Schedule {
   smsStatusTitle: string;
   icon?:string;
   iconColor?:string;
+  confirmed?: string;
+  other?: string;
+  region?: string;
+  total?: string;
 }
 
 export interface TransformedSkill {

@@ -5,7 +5,11 @@
         {{ selectedSchedule?.startDate |  date: 'dd MMM yyy':'': 'en' }},
         {{ selectedSchedule?.startDate | date: 'HH:mm' }} -  {{ selectedSchedule?.endDate | date: 'HH:mm' }}
         (Cr: {{ selectedSchedule?.crewNumber }},
-        Hrs: {{ hoursDifference(selectedSchedule?.startDate, selectedSchedule?.endDate) }} )
+        Hrs: {{ hoursDifference(selectedSchedule?.startDate, selectedSchedule?.endDate) }}
+        @if (selectedSchedule?.travelHours > 0) {
+          +{{ selectedSchedule?.travelHours }}TrHr
+        }
+        )
       </p>
       <p class="f-14 m-0 txt-primary">
         @if (selectedSchedule.companyName) {

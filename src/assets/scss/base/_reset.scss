@@ -1825,6 +1825,10 @@ $i: 1;
     gap: #{$i}px !important;
   }
 
+  .lh-#{$i} {
+    line-height: #{$i}px !important;
+  }
+
   .truncate-#{$i} {
     max-width: #{$i}px;
     overflow: hidden;

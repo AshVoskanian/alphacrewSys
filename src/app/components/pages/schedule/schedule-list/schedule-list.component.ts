@@ -198,6 +198,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     this.getCrewList();
     this.checkIfCrewUpdate();
     this.getInfo();
+    this.getStatistics();
     this.getInfoMultiple();
     this.getJobPartCrewAdditionalDetails();
   }
@@ -521,7 +522,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   sendNotification(crew?: JobPartCrew) {
     const data = {
       jobId: this.selectedSchedule.jobId,
-      jobPartId: [this.selectedSchedule.jobPartId],
+      jobPartId: [ this.selectedSchedule.jobPartId ],
       crewId: [ crew.crewId ]
     }
     this.post('Schedule/AddJobNotifiction', data)
@@ -858,6 +859,35 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           }
         }
       });
+  }
+
+  getStatistics() {
+    const params = {
+      date: GeneralService.convertToDate(this._navService.date$.value),
+      days: this._navService.days,
+      regionId: this._navService.regionId
+    };
+
+    this._scheduleService.shiftsLoaded
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (loaded) => {
+          if (loaded) {
+            this.post('Dashboard/GetDashboarUpcomingDaysWithScheduleFilter', params)
+              .pipe(takeUntilDestroyed(this._dr))
+              .subscribe({
+                next: (res) => {
+                  if (res.errors?.errorCode) {
+                    GeneralService.showErrorMessage(res.errors.message);
+                    return;
+                  }
+
+                  console.log(555, res)
+                }
+              })
+          }
+        }
+      })
   }
 
   getJobPartCrewAdditionalDetails() {

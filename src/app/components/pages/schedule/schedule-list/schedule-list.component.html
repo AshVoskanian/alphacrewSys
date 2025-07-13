@@ -6,7 +6,23 @@
   @for (schedule of list; track schedule.jobPartId) {
     @if ($index > 0 && list[$index]?.startDate?.slice(0, 10) !== list[$index - 1]?.startDate?.slice(0, 10)) {
       <div class="p-x-15 m-b-15">
-        <div class="divider rounded-3 h-20 m-0 bg-danger"></div>
+        <div class="divider p-y-5 rounded-3 m-0 bg-danger flex items-center justify-content-center gap-20">
+          <p class="text-dark m-0 p-0">
+            {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
+          </p>
+          <p class="text-dark m-0 p-0 lh-20 flex items-center gap-5">
+            Hours/Crew:
+            900/139
+          </p>
+          <p class="text-dark m-0 p-0 lh-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-success rounded-1"></span>
+            900/139
+          </p>
+          <p class="text-dark m-0 p-0 lh-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-light rounded-1"></span>
+            900/139
+          </p>
+        </div>
       </div>
     }
     <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)"
@@ -117,7 +133,11 @@
                         <h6>
                           {{ schedule.startDate | date: 'HH:mm' }} -  {{ schedule.endDate | date: 'HH:mm' }}
                           (Cr: {{ schedule.crewNumber }},
-                          Hrs: {{ hoursDifference(schedule.startDate, schedule.endDate) }} )
+                          Hrs: {{ hoursDifference(schedule.startDate, schedule.endDate) }}
+                          @if (schedule?.travelHours > 0) {
+                            +{{ schedule?.travelHours }}TrHr
+                          }
+                          )
                         </h6>
                         @if (schedule.companyName) {
                           <h6>{{ schedule.companyName }}</h6>
