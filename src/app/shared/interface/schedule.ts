@@ -356,8 +356,15 @@ export interface JobPartCrewAdditionalDetail {
   onWarnings?: number;
 }
 
-
 export interface StatusIcon {
   icon: string;
   color: string;
+}
+
+export interface Statistics {
+  confirmed?: string;
+  other?: string;
+  region?: string;
+  total?: string;
+  startDate?: string;
 }

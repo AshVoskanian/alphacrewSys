@@ -28,6 +28,7 @@ import {
   Notification,
   Schedule,
   ScheduleSmsInfo,
+  Statistics,
   Vehicle
 } from "../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
@@ -94,6 +95,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   selectedSchedule: Schedule;
 
   crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
+  statics: WritableSignal<Array<Statistics>> = signal([]);
   vehiclesInfo: WritableSignal<Array<Vehicle>> = signal([]);
   shiftCrewDetails: WritableSignal<Array<CrewDetailForShift>> = signal([]);
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
@@ -862,17 +864,17 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   getStatistics() {
-    const params = {
-      date: GeneralService.convertToDate(this._navService.date$.value),
-      days: this._navService.days,
-      regionId: this._navService.regionId
-    };
-
     this._scheduleService.shiftsLoaded
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (loaded) => {
           if (loaded) {
+            const params = {
+              date: GeneralService.convertToDate(this._navService.date$.value),
+              days: this._navService.days,
+              regionId: this._navService.regionId
+            };
+
             this.post('Dashboard/GetDashboarUpcomingDaysWithScheduleFilter', params)
               .pipe(takeUntilDestroyed(this._dr))
               .subscribe({
@@ -881,13 +883,45 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
                     GeneralService.showErrorMessage(res.errors.message);
                     return;
                   }
-
-                  console.log(555, res)
+                  this.statics.set(res.data[this.statisticByRegion()]);
                 }
               })
           }
         }
       })
+  }
+
+  getStatisticByDate(startDate: string): Statistics {
+    const targetDateOnly = startDate.substring(0, 10);
+
+    return this.statics().find(it => it.startDate.substring(0, 10) === targetDateOnly);
+  }
+
+  statisticByRegion() {
+    switch (this._navService.regionId) {
+      case 0:
+        return 'London';
+      case 1:
+        return 'London';
+      case 2:
+        return 'Birmingham';
+      case 6:
+        return 'Bristol';
+      case 3:
+        return 'Nice';
+      case 4:
+        return 'paris';
+      case 7:
+        return 'Scotland';
+      case 9:
+        return 'SECURITY';
+      case 10:
+        return 'NewYork';
+      case 8:
+        return 'Barcelona';
+      default:
+        return 'London';
+    }
   }
 
   getJobPartCrewAdditionalDetails() {
@@ -1006,7 +1040,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   finishNoteEdit(schedule: Schedule) {
     this.updateShift(schedule);
   }
-
 
   scrollToItem(jpId: number) {
     const target = this.itemBlocks?.find(el =>

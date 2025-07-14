@@ -4,27 +4,6 @@
   </div>
 } @else {
   @for (schedule of list; track schedule.jobPartId) {
-    @if ($index > 0 && list[$index]?.startDate?.slice(0, 10) !== list[$index - 1]?.startDate?.slice(0, 10)) {
-      <div class="p-x-15 m-b-15">
-        <div class="divider p-y-5 rounded-3 m-0 bg-danger flex items-center justify-content-center gap-20">
-          <p class="text-dark m-0 p-0">
-            {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
-          </p>
-          <p class="text-dark m-0 p-0 lh-20 flex items-center gap-5">
-            Hours/Crew:
-            900/139
-          </p>
-          <p class="text-dark m-0 p-0 lh-20 flex items-center gap-5">
-            <span class="w-20 h-20 bg-success rounded-1"></span>
-            900/139
-          </p>
-          <p class="text-dark m-0 p-0 lh-20 flex items-center gap-5">
-            <span class="w-20 h-20 bg-light rounded-1"></span>
-            900/139
-          </p>
-        </div>
-      </div>
-    }
     <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)"
          [attr.data-id]="schedule.jobPartId" #itemBlock>
       <div class="col">
@@ -188,7 +167,7 @@
                     @for (skill of schedule.transformedSkills | filter:[
                       { field: 'active', condition: 'equals', value: true }
                     ]; track skill.url + $index) {
-                      <i class="pointer border p-3 rounded text-warning"
+                      <i class="pointer border border-dark p-3 rounded text-danger f-20"
                          [class]="skill.url"
                          [ngbTooltip]="skill.name | titlecase"></i>
                     }
@@ -217,25 +196,25 @@
                             >
                               <div class="icon">
                                 @if (crew.detailsLoading) {
-                                  <app-feather-icon [class]="'w-10 h-10 text-white spin'"
+                                  <app-feather-icon [class]="'w-14 h-14 text-white spin'"
                                                     [icon]="'loader'"></app-feather-icon>
                                 } @else {
                                   @if (crew.jobPartCrewRoleId === 1) {
                                     <i [style.color]="crew.jobPartCrewStatusColour"
-                                       class="fas fa-square me-2 f-10"></i>
+                                       class="fas fa-square me-2 f-14"></i>
                                   }
                                   @if (crew.jobPartCrewRoleId === 2) {
                                     <i [style.color]="crew.jobPartCrewStatusColour"
-                                       class="far fa-solid fa-star me-2 f-10"></i>
+                                       class="far fa-solid fa-star me-2 f-14"></i>
                                   }
                                   @if (crew.jobPartCrewRoleId === 4) {
                                     <i [style.color]="crew.jobPartCrewStatusColour"
-                                       class="fa-solid fa-flag me-2 f-10"></i>
+                                       class="fa-solid fa-flag me-2 f-14"></i>
                                   }
                                 }
                               </div>
                             </div>
-                            <p class="hide-scrollbar fw-bold"
+                            <p class="hide-scrollbar fw-bold f-14"
                                [class.fw-medium]="crew.byNotification && crew.byNotification > 0"
                                [class.fw-bold]="crew.byCrewManager && crew.byCrewManager > 0"
                                [class.text-decoration-underline]="crew.buddyDown > 0"
@@ -254,20 +233,20 @@
                                       [ngClass]="crew.additionalFees > 0 ? 'bg-danger' : 'btn-primary'"
                                       (click)="getCrewInfo(crew)">
                                 @if (crew.editLoading) {
-                                  <app-feather-icon [class]="'w-10 h-10 text-white spin'"
+                                  <app-feather-icon [class]="'w-14 h-14 text-white spin'"
                                                     [icon]="'loader'"></app-feather-icon>
                                 } @else {
-                                  <app-feather-icon [class]="'w-10 h-10'" [icon]="'edit'"></app-feather-icon>
+                                  <app-feather-icon [class]="'w-14 h-14'" [icon]="'edit'"></app-feather-icon>
                                 }
                               </button>
 
                               <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
                                 <button class="btn b-ln-height btn-info btn-square w-36" ngbDropdownToggle>
                                   @if (crew.loading) {
-                                    <app-feather-icon [class]="'w-10 h-10 text-white spin'"
+                                    <app-feather-icon [class]="'w-14 h-14 text-white spin'"
                                                       [icon]="'loader'"></app-feather-icon>
                                   } @else {
-                                    <app-feather-icon [class]="'w-10 h-10'" [icon]="'settings'"></app-feather-icon>
+                                    <app-feather-icon [class]="'w-14 h-14'" [icon]="'settings'"></app-feather-icon>
                                   }
                                 </button>
                                 <ul class="dropdown-menu" ngbDropdownMenu>
@@ -421,6 +400,28 @@
         <i class="fa-solid fa-info text-light"></i>
       </button>
     </div>
+
+    @if (list[$index]?.startDate.substring(0, 10) !== list[$index + 1]?.startDate.substring(0, 10)) {
+      <div class="p-x-15 m-b-15">
+        <div class="divider p-y-5 rounded-3 m-0 bg-danger flex items-center justify-content-center gap-20">
+          <p class="text-dark m-0 p-0">
+            {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            Hours/Crew:
+            {{ getStatisticByDate(schedule.startDate)?.total }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-success rounded-1"></span>
+            {{ getStatisticByDate(schedule.startDate)?.confirmed }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-light rounded-1"></span>
+            {{ getStatisticByDate(schedule.startDate)?.other }}
+          </p>
+        </div>
+      </div>
+    }
   }
 }
 
