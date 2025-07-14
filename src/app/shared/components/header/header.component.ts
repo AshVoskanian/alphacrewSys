@@ -9,7 +9,6 @@ import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
 import { LocalStorageService } from "../../services/local-storage.service";
-import { FeatherIconComponent } from "../ui/feather-icon/feather-icon.component";
 import { AsyncPipe } from "@angular/common";
 
 @Component({
@@ -17,7 +16,7 @@ import { AsyncPipe } from "@angular/common";
   imports: [
     HeaderLogoComponent, HeaderLanguageComponent, SearchComponent,
     Select2Module, ReactiveFormsModule,
-    ProfileComponent, NgbInputDatepicker, FeatherIconComponent, AsyncPipe
+    ProfileComponent, NgbInputDatepicker, AsyncPipe
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'

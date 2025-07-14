@@ -4,11 +4,10 @@ import { Schedule } from "../../../../../shared/interface/schedule";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { ApiBase } from "../../../../../shared/bases/api-base";
-import { JsonPipe } from "@angular/common";
 
 @Component({
   selector: 'app-updates-notes',
-  imports: [ FormsModule, JsonPipe ],
+  imports: [ FormsModule ],
   templateUrl: './updates-notes.component.html',
   styleUrl: './updates-notes.component.scss'
 })
