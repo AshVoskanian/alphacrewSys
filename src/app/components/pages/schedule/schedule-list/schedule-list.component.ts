@@ -50,7 +50,7 @@ import { FormsModule } from "@angular/forms";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { CrewListComponent } from "./crew-list/crew-list.component";
 import { ApiBase } from "../../../../shared/bases/api-base";
-import { CrewAction } from "../../../../shared/interface/enums/schedule";
+import { CrewAction } from "../../../../shared/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "./vehicles/vehicles.component";

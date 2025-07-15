@@ -1,14 +1,14 @@
-<app-card [cardClass]="'sales-report'" [headerTitle]="'Social Analytics'" [padding]="false"
+<app-card [cardClass]="'sales-report'" [headerTitle]="'Regions'" [padding]="false"
     [cardBodyClass]="'pt-0 analytics-data'" [dropdownType]="'simple'" [options]="[]">
 
-    <ul class="balance-data">
-        @for(marker of socialAnalytics.marker; track marker) {
-            <li>
-                <span class="circle bg-{{ marker.color }}"></span>
-                <span class="c-light ms-1">{{ marker.title }}</span>
-            </li>
-        }
-    </ul>
+  <ul class="balance-data">
+    @for (marker of socialAnalytics.marker; track marker) {
+      <li>
+        <span class="circle bg-{{ marker.color }}"></span>
+        <span class="c-light ms-1">{{ marker.title }}</span>
+      </li>
+    }
+  </ul>
 
     <div class="social-tabs">
         <div class="nav nav-pills custom-scrollbar">
@@ -17,7 +17,7 @@
                     <div class="frame-image">
                       <div class="outline-10-{{ tabs.bg_color }}">
                         <div class="bg-10-{{ tabs.bg_color }}">
-                            <i class="fa-brands fa-{{ tabs.icon }} {{ tabs.icon_color }} {{tabs.class}} m-0"></i>
+                            <i class="fa-solid fa-{{ tabs.icon }} {{ tabs.icon_color }} {{tabs.class}} m-0"></i>
                         </div>
                       </div>
                     </div>
