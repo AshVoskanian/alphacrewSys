@@ -4,6 +4,27 @@
   </div>
 } @else {
   @for (schedule of list; track schedule.jobPartId) {
+    @if (list[$index]?.startDate.substring(0, 10) !== list[$index - 1]?.startDate.substring(0, 10)) {
+      <div class="p-x-15 m-b-15">
+        <div class="divider p-y-5 rounded-3 m-0 bg-danger flex items-center justify-content-center gap-20">
+          <p class="text-dark m-0 p-0">
+            {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            Hours/Crew:
+            {{ getStatisticByDate(schedule.startDate)?.total }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-success rounded-1"></span>
+            {{ getStatisticByDate(schedule.startDate)?.confirmed }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-light rounded-1"></span>
+            {{ getStatisticByDate(schedule.startDate)?.other }}
+          </p>
+        </div>
+      </div>
+    }
     <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)"
          [attr.data-id]="schedule.jobPartId" #itemBlock>
       <div class="col">
@@ -400,28 +421,6 @@
         <i class="fa-solid fa-info text-light"></i>
       </button>
     </div>
-
-    @if (list[$index]?.startDate.substring(0, 10) !== list[$index + 1]?.startDate.substring(0, 10)) {
-      <div class="p-x-15 m-b-15">
-        <div class="divider p-y-5 rounded-3 m-0 bg-danger flex items-center justify-content-center gap-20">
-          <p class="text-dark m-0 p-0">
-            {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
-          </p>
-          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
-            Hours/Crew:
-            {{ getStatisticByDate(schedule.startDate)?.total }}
-          </p>
-          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
-            <span class="w-20 h-20 bg-success rounded-1"></span>
-            {{ getStatisticByDate(schedule.startDate)?.confirmed }}
-          </p>
-          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
-            <span class="w-20 h-20 bg-light rounded-1"></span>
-            {{ getStatisticByDate(schedule.startDate)?.other }}
-          </p>
-        </div>
-      </div>
-    }
   }
 }
 
