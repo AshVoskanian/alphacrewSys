@@ -102,7 +102,7 @@
     </app-card>
 
     <app-card [cardBodyClass]="'p-y-10 p-r-10'">
-      <div class="p-l-14 p-r-10">
+      <div class="p-l-14 p-r-5">
         <div class="common-flex justify-content-between align-items-center">
           <ng-template #popoverContentAll>
             <ul class="list-group">
@@ -159,13 +159,13 @@
                 ></i>
               }
 
-              <label class="form-check-label m-0 txt-warring flex flex-col justify-content-center">
-                <input class="form-check-input m-0 checkbox-success"
-                       type="checkbox"
-                       name="selectAllForSMS"
-                       (change)="selectAllForSMS()"
-                       [(ngModel)]="allAreSelectedForSMS">
-              </label>
+              <!--              <label class="form-check-label m-0 txt-warring flex flex-col justify-content-center">-->
+              <!--                <input class="form-check-input m-0 checkbox-success"-->
+              <!--                       type="checkbox"-->
+              <!--                       name="selectAllForSMS"-->
+              <!--                       (change)="selectAllForSMS()"-->
+              <!--                       [(ngModel)]="allAreSelectedForSMS">-->
+              <!--              </label>-->
             </div>
           </div>
         </div>
@@ -222,14 +222,14 @@
                 }
               }
 
-              <label class="form-check-label txt-warring mb-0" [for]="crew.crewId">
-                <input class="form-check-input me-1 checkbox-warring" [id]="crew.crewId"
-                       type="checkbox" (change)="crewSelect(crew)"
-                       [checked]="crew.isChecked">
+              <input class="form-check-input m-0 checkbox-warring" [id]="crew.crewId"
+                     type="checkbox" (change)="crewSelect(crew)"
+                     [checked]="crew.isChecked">
+
+              <label class="form-check-label txt-warring mb-0 pointer" (click)="selectCrewForSMS(crew)">
                 {{ crew.name }}
                 <span class="m-l-10">({{ crew.levelShortText }})</span>
               </label>
-
             </div>
 
             <div class="common-flex align-items-center gap-1">
@@ -262,12 +262,12 @@
                 ></i>
               }
 
-              <label class="form-check-label txt-warring mb-0" [ngbTooltip]="crew.notificationStatusText">
-                <input class="form-check-input me-1 checkbox-success"
-                       [ngStyle]="{ backgroundColor: crew.cssColour, borderColor: crew.cssColour }"
-                       type="checkbox" (change)="selectCrewForSMS(crew)"
-                       [checked]="crew.isCheckedForSMS">
-              </label>
+              <label class="form-check-label txt-warring m-0" [ngbTooltip]="crew.notificationStatusText"></label>
+
+              <input class="form-check-input m-0 checkbox-success"
+                     [ngStyle]="{ backgroundColor: crew.cssColour, borderColor: crew.cssColour }"
+                     type="checkbox" (change)="selectCrewForSMS(crew)"
+                     [checked]="crew.isCheckedForSMS">
 
             </div>
           </li>
@@ -315,4 +315,13 @@
       </tbody>
     </table>
   </div>
+</ng-template>
+
+<!--Selected crew count warning popup-->
+<ng-template #confirmModal let-confirmModal>
+  <app-confirm-modal
+    [title]="'Many Crew Selected'"
+    [subTitle]="'You have selected more than 12 crew. Are you sure you want to send SMS to all of them?'"
+    (closeModal)="closeConfirmModal($event)"
+  ></app-confirm-modal>
 </ng-template>

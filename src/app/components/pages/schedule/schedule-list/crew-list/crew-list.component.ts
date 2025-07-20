@@ -1,7 +1,19 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  Input,
+  OnInit,
+  signal,
+  ViewChild,
+  WritableSignal
+} from '@angular/core';
 import {
   NgbActiveOffcanvas,
   NgbDropdownModule,
+  NgbModal,
   NgbPopover,
   NgbPopoverModule,
   NgbTooltipModule
@@ -24,25 +36,30 @@ import { AsyncPipe, DatePipe, NgClass, NgStyle } from "@angular/common";
 import { finalize, Observable } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
+import { ConfirmModalComponent } from "../../../../../shared/components/ui/confirm-modal/confirm-modal.component";
 
 @Component({
   selector: 'app-crew-list',
   imports: [
     CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe, NgClass,
-    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, NgStyle
+    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, NgStyle, ConfirmModalComponent
   ],
   providers: [ CrewFilterPipe ],
   templateUrl: './crew-list.component.html',
   styleUrl: './crew-list.component.scss'
 })
 export class CrewListComponent extends ApiBase implements OnInit {
+  private _modal = inject(NgbModal);
   private _dr: DestroyRef = inject(DestroyRef);
+  private _scheduleService = inject(ScheduleService);
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
-  private _scheduleService = inject(ScheduleService);
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
 
   @Input() title: string;
+
+  @ViewChild('confirmModal') confirmModal: ElementRef<ConfirmModalComponent>;
+
   crewList: Array<Crew> = [];
   isJobScoped: boolean = false;
 
@@ -168,10 +185,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
     if (!this.isJobScoped) {
       this.showLimitError = !!this.selectedSchedule && selectedCount > this.selectedSchedule.crewNumber;
     }
-  }
-
-  selectAllForSMS() {
-    this.crewList.forEach(it => it.isCheckedForSMS = this.allAreSelectedForSMS);
   }
 
   areAllChecked(crew: Array<Crew>): boolean {
@@ -329,8 +342,15 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this._cdr.detectChanges();
   }
 
-  sendNotification(crew?: Crew) {
+  sendNotification(crew?: Crew, checkCrewCount = true) {
     if (this.notificationsLoader || crew?.notificationLoading) return;
+
+    const selectedCrewForSMS = this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId);
+
+    if (selectedCrewForSMS && selectedCrewForSMS.length > 12 && checkCrewCount) {
+      this.openConfirmModal(this.confirmModal);
+      return;
+    }
 
     if (crew) {
       crew.notificationLoading = true;
@@ -344,7 +364,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     const data = {
       jobId: this.selectedSchedule.jobId,
       jobPartId: isAnyJpSelected ? selectedJps.map(it => it.jobPartId) : [ this.selectedSchedule.jobPartId ],
-      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId)
+      crewId: crew ? [ crew.crewId ] : selectedCrewForSMS
     }
     this.post('Schedule/AddJobNotifiction', data)
       .pipe(takeUntilDestroyed(this._dr))
@@ -355,6 +375,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
           } else {
             this.notificationsLoader = false;
           }
+
+          this.closeConfirmModal('cancel');
 
           if (res?.errors?.errorCode) return;
 
@@ -478,5 +500,17 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
 
     return 'badge-primary';
+  }
+
+  openConfirmModal(value: any) {
+    this._modal.open(value, { centered: true })
+  }
+
+  closeConfirmModal(result: 'ok' | 'cancel') {
+    if (result === 'ok') {
+      this.sendNotification(null, false);
+      return;
+    }
+    this._modal.dismissAll();
   }
 }

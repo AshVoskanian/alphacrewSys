@@ -451,6 +451,15 @@
   </app-send-sms>
 </ng-template>
 
+<!--Send SMS To Crew-->
+<ng-template #sendSmsToCrewModal let-sendSmsToCrewModal>
+  <app-send-sms-to-crew
+    [selectedCrew]="selectedCrew"
+    [scheduleInfo]="selectedSchedule"
+    (closeModal)="sendSmsToCrewModal.close()">
+  </app-send-sms-to-crew>
+</ng-template>
+
 <!--Update Notes-->
 <ng-template #updateNotes let-updateNotesModal>
   <app-updates-notes (closeModal)="updateNotesModal.close()"
@@ -459,7 +468,6 @@
   >
   </app-updates-notes>
 </ng-template>
-
 
 <ng-template #shiftCrewDetailsRef>
   <table class="table border-bottom-table max-w-700" style="width: 70dvw;">

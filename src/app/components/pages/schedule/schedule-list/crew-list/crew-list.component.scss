@@ -19,5 +19,11 @@ ul.custom-scrollbar {
   li:nth-child(odd) {
     background: var(--light-background);
   }
+
+  li {
+    &:hover {
+      background: var(--dark-light-color);
+    }
+  }
 }
 

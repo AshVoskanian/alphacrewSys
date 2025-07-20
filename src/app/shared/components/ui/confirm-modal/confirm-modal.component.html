@@ -1,0 +1,17 @@
+<div class="modal-content">
+  <div class="modal-body">
+    <div class="modal-toggle-wrapper">
+      <ul class="modal-img">
+        <li> <img [ngSrc]="'assets/images/gif/danger.gif'" alt="error" height="500" width="500"></li>
+      </ul>
+      <h4 class="text-center pb-2">{{title}}</h4>
+      <p class="text-center c-light">
+        {{subTitle}}
+      </p>
+      <div class="flex gap-10 m-t-10">
+        <button class="btn btn-primary flex-grow-1" type="button" (click)="closeModal.emit('ok')">ok</button>
+        <button class="btn btn-secondary flex-grow-1" type="button" (click)="closeModal.emit('cancel')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

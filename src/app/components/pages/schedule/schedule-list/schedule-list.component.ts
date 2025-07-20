@@ -59,12 +59,13 @@ import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
 import { forkJoin, switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../shared/services/nav.service";
 import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
+import { SendSmsToCrewComponent } from "./send-sms-to-crew/send-sms-to-crew.component";
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
@@ -82,6 +83,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   @ViewChild('updateNotes') updateNotes: UpdatesNotesComponent;
   @ViewChild('shiftCrewDetailsRef') shiftCrewDetailsRef: any;
   @ViewChildren('itemBlock') itemBlocks!: QueryList<ElementRef>;
+  @ViewChild('sendSmsToCrewModal') sendSmsToCrewModal: SendSmsToCrewComponent;
 
   private offcanvasRef?: NgbOffcanvasRef;
 
@@ -92,6 +94,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   loading = input<boolean>(false);
   jobShiftsLoading = input<boolean>(false);
 
+  selectedCrew: JobPartCrew
   selectedSchedule: Schedule;
 
   crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
@@ -434,6 +437,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   menuAction(menu: CrewActionItem, crew: JobPartCrew) {
+    this.selectedCrew = crew;
+
     if (crew.loading) {
       return;
     }
@@ -444,8 +449,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
 
     switch (menu.action) {
       case CrewAction.SEND_SMS:
-        crew.loading = true;
-        this.sendNotification(crew);
+        this.openSendSmsToCrew();
+        // this.sendNotification(crew);
         break;
 
       case CrewAction.ASSIGN:
@@ -518,26 +523,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         console.warn('Unhandled action:', menu.action);
         break;
     }
-  }
-
-
-  sendNotification(crew?: JobPartCrew) {
-    const data = {
-      jobId: this.selectedSchedule.jobId,
-      jobPartId: [ this.selectedSchedule.jobPartId ],
-      crewId: [ crew.crewId ]
-    }
-    this.post('Schedule/AddJobNotifiction', data)
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe({
-        next: res => {
-          crew.loading = false;
-
-          if (res?.errors?.errorCode) return;
-
-          GeneralService.showSuccessMessage('Successfully sent');
-        }
-      })
   }
 
   selectSchedule(schedule: Schedule) {
@@ -723,6 +708,10 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
 
   openSendSms() {
     this._modal.open(this.sendSmsModal, { centered: true, size: 'lg' })
+  }
+
+  openSendSmsToCrew() {
+    this._modal.open(this.sendSmsToCrewModal, { centered: true, size: 'lg' })
   }
 
   getCrewDetails(crew: JobPartCrew, popover: NgbPopover) {
