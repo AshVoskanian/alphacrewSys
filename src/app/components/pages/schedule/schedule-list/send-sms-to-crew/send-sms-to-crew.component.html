@@ -13,23 +13,30 @@
         <textarea [(ngModel)]="text" class="form-control min-h-i-230" id="floatingTextarea" placeholder=""></textarea>
       </div>
 
-      <div class="flex justify-between items-center m-t-12 gap-10">
-        <button type="submit" class="btn btn-primary w-100 text-center" (click)="sendSMS()">
-          Send SMS
-          <span class="d-inline-block w-30 h-15">
+      <div class="row m-t-12 gap-y-8">
+        <div class="col-12 col-sm-4 text-nowrap flex flex-no-wrap">
+          <button type="submit" class="btn btn-primary w-100 text-center" (click)="sendSMS()">
+            Send SMS
+            <span class="d-inline-block w-30 h-15">
             @if (loading) {
               <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
             }
           </span>
-        </button>
+          </button>
+        </div>
 
-        <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()" [cdkCopyToClipboard]="text">
-          Copy
-        </button>
+        <div class="col-12 col-sm-4">
+          <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
+                  [cdkCopyToClipboard]="text">
+            Copy
+          </button>
+        </div>
 
-        <button type="submit" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
-          Cancel
-        </button>
+        <div class="col-12 col-sm-4">
+          <button type="submit" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>

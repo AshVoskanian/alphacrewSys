@@ -1825,6 +1825,14 @@ $i: 1;
     gap: #{$i}px !important;
   }
 
+  .gap-y-#{$i} {
+    row-gap: #{$i}px !important;
+  }
+
+  .gap-x-#{$i} {
+    column-gap: #{$i}px !important;
+  }
+
   .l-h-#{$i} {
     line-height: #{$i}px !important;
   }
