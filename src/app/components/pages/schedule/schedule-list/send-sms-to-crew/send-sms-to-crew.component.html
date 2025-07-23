@@ -23,6 +23,10 @@
           </span>
         </button>
 
+        <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()" [cdkCopyToClipboard]="text">
+          Copy
+        </button>
+
         <button type="submit" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
           Cancel
         </button>

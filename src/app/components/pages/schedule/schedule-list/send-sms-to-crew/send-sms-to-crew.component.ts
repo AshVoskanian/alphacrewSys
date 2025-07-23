@@ -5,11 +5,13 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { DatePipe } from "@angular/common";
+import { ClipboardModule } from "@angular/cdk/clipboard";
 
 @Component({
   selector: 'app-send-sms-to-crew',
   imports: [
-    Select2Module
+    Select2Module,
+    ClipboardModule
   ],
   templateUrl: './send-sms-to-crew.component.html',
   styleUrl: './send-sms-to-crew.component.scss'
@@ -84,5 +86,9 @@ Please reply in App
           this.closeModal.emit();
         }
       })
+  }
+
+  showSuccess() {
+    GeneralService.showSuccessMessage('Copied to clipboard');
   }
 }
