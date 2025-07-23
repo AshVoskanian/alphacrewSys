@@ -143,7 +143,7 @@
                           <h6>{{ schedule.companyName }}</h6>
                         }
                         @if (schedule.venueName) {
-                          <h6>{{ schedule.venueName }}</h6>
+                          <h6 [innerHTML]="schedule.venueName | ukPostcodeLink"></h6>
                         }
                         @if (schedule.address) {
                           <h6>{{ schedule.address }}</h6>

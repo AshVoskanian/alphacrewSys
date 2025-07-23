@@ -60,11 +60,12 @@ import { forkJoin, switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../shared/services/nav.service";
 import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
 import { SendSmsToCrewComponent } from "./send-sms-to-crew/send-sms-to-crew.component";
+import { UkPostcodeLinkPipe } from "../../../../shared/pipes/uk-post-code-link.pipe";
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent,
-    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass,
+    NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
