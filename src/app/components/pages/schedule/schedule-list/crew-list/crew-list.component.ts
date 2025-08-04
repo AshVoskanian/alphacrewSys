@@ -6,8 +6,10 @@ import {
   inject,
   Input,
   OnInit,
+  QueryList,
   signal,
   ViewChild,
+  ViewChildren,
   WritableSignal
 } from '@angular/core';
 import {
@@ -58,6 +60,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   @Input() title: string;
 
+  @ViewChildren(NgbPopover) popovers!: QueryList<NgbPopover>;
   @ViewChild('confirmModal') confirmModal: ElementRef<ConfirmModalComponent>;
 
   crewList: Array<Crew> = [];
@@ -77,6 +80,16 @@ export class CrewListComponent extends ApiBase implements OnInit {
   selectedSchedule: Schedule | null;
 
   shiftCrewDetails: WritableSignal<Array<ShiftCrewDetails>> = signal([]);
+  btnDropdownItems: WritableSignal<Array<{ type: 'new' | 'all' | 'current', name: string }>> = signal([
+    {
+      type: 'all',
+      name: 'Save All Future Parts'
+    },
+    {
+      type: 'new',
+      name: 'Save New Crew To All Future Parts'
+    }
+  ]);
 
   regions = [
     { id: 1, title: 'Lon', class: 'primary', checked: true },
@@ -106,6 +119,11 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.getSelectedSchedule();
   }
 
+  getAlreadyAssignedCrewCountByLevel(levelId: number) {
+    const selectedCrewLevelIds = this.selectedSchedule.crews.map(c => c.levelCrewingWeighting);
+    return selectedCrewLevelIds.filter(it => it === levelId).length
+  }
+
   hoursDifference(startDateIso: string, endDateIso: string) {
     return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
@@ -125,6 +143,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
         // Check existing crews
         this.crewList.forEach(crew => {
           crew.isChecked = selectedCrewIds.has(crew.crewId);
+          crew.isAlreadyAssigned = selectedCrewIds.has(crew.crewId);
         });
 
         // Uncheck checked crew for SMS
@@ -221,20 +240,21 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.allAreSelectedForSMS = this.areAllCheckedForSMS(filteredCrew);
   }
 
-  saveCrew(type: 'current' | 'all') {
+  saveCrew(type: 'current' | 'all' | 'new') {
     this.showBtnOptions = false;
 
     this.addCrewToShift(type);
   }
 
-  addCrewToShift(type: 'current' | 'all') {
+  addCrewToShift(type: 'current' | 'all' | 'new') {
     if (this.loading) return;
     this.loading = true;
 
     const data = {
       jobId: this.selectedSchedule.jobId,
       jobPartId: this.selectedSchedule?.jobPartId,
-      crewId: this.getSelectedData('crew')
+      crewId: this.getSelectedData('crew'),
+      newCrewOnly: type === 'new',
     }
 
     if (type === 'current') {
@@ -342,7 +362,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this._cdr.detectChanges();
   }
 
-  sendNotification(crew?: Crew, checkCrewCount = true) {
+  sendNotification(crew?: Crew, checkCrewCount = true, appOnly = false) {
     if (this.notificationsLoader || crew?.notificationLoading) return;
 
     const selectedCrewForSMS = this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId);
@@ -364,7 +384,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
     const data = {
       jobId: this.selectedSchedule.jobId,
       jobPartId: isAnyJpSelected ? selectedJps.map(it => it.jobPartId) : [ this.selectedSchedule.jobPartId ],
-      crewId: crew ? [ crew.crewId ] : selectedCrewForSMS
+      crewId: crew ? [ crew.crewId ] : selectedCrewForSMS,
+      appOnly
     }
     this.post('Schedule/AddJobNotifiction', data)
       .pipe(takeUntilDestroyed(this._dr))
@@ -512,5 +533,9 @@ export class CrewListComponent extends ApiBase implements OnInit {
       return;
     }
     this._modal.dismissAll();
+  }
+
+  closeAllPopovers() {
+    this.popovers.forEach((popover) => popover.close());
   }
 }

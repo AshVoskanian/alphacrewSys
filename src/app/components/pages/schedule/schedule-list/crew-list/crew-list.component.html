@@ -40,10 +40,15 @@
 
       <ul class="list-group w-100 align-items-center flex-row">
         @for (lvl of levels; track lvl.title + $index) {
-          <li class="p-y-0 p-x-5">
-            <input class="form-check-input me-1 checkbox-{{ lvl.class }}" type="checkbox"
+          <li class="p-y-0 p-x-5 flex items-center gap-5">
+            <input class="form-check-input m-0 m-r-2 checkbox-{{ lvl.class }}" type="checkbox"
                    [(ngModel)]="lvl.checked" [name]="lvl.title">
-            <label class="form-check-label txt-{{ lvl.class }} mb-0">{{ lvl.title }}</label>
+            <label class="form-check-label flex items-center txt-{{ lvl.class }} mb-0">
+              {{ lvl.title }}
+              <p class="badge badge-secondary h-15 l-h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-l-2">
+                {{ getAlreadyAssignedCrewCountByLevel(lvl.id) }}
+              </p>
+            </label>
           </li>
         }
       </ul>
@@ -110,6 +115,11 @@
                 <i class="fa-solid rounded fa-phone-square"></i>
                 WhatsApp
               </li>
+              <li class="list-group-item border-bottom pointer text-warning"
+                  (click)="sendNotification(null, true, true)">
+                <i class="fa-solid fa-mobile-phone"></i>
+                App
+              </li>
               <li class="list-group-item border-bottom pointer text-danger" (click)="removeNotification()">
                 <i class="fa-solid fa-close"></i>
                 Remove
@@ -125,7 +135,10 @@
 
           <div class="common-flex align-items-center g-5">
             <div class="btn-group" ngbDropdown>
-              <button class="btn p-y-0 p-x-33 btn-outline-info position-relative" (click)="saveCrew('current')">
+              <button
+                [disabled]="showLimitError"
+                class="btn p-y-0 p-x-33 btn-outline-info position-relative"
+                (click)="saveCrew('current')">
                 @if (loading) {
                   <i class="position-absolute fas fa-spin fa-spinner text-dark f-16"
                      style="left: 7px; top: 7px;"
@@ -139,9 +152,11 @@
                   <i class="icofont icofont-arrow-down"></i>
                 </button>
                 <ul class="dropdown-menu" ngbDropdownMenu>
-                  @for (item of [ 'Save All Future Parts' ]; track item) {
+                  @for (item of btnDropdownItems(); track item) {
                     <li class="dropdown-item" ngbDropdownItem>
-                      <a href="javascript:void(0)" (click)="saveCrew('all')">{{ item }}</a>
+                      <a href="javascript:void(0)" (click)="saveCrew(item.type)">
+                        {{ item.name }}
+                      </a>
                     </li>
                   }
                 </ul>
@@ -179,7 +194,8 @@
           style="max-height: calc(100dvh - 440px)">
         @for (
           crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
-          <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3">
+          <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3"
+              [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned">
             @if (crew.jobNotes) {
               <i class="fa-solid fa-tag position-absolute" style="left:0; top: -3px" [ngbTooltip]="crew.jobNotes"></i>
             }
@@ -238,6 +254,11 @@
                   <li class="list-group-item border-bottom pointer text-success" (click)="sendNotification(crew)">
                     <i class="fa-solid rounded fa-phone-square"></i>
                     WhatsApp
+                  </li>
+                  <li class="list-group-item border-bottom pointer text-warning"
+                      (click)="sendNotification(crew, true, true)">
+                    <i class="fa-solid fa-mobile-phone"></i>
+                    App
                   </li>
                   <li class="list-group-item border-bottom pointer text-danger" (click)="removeNotification(crew)">
                     <i class="fa-solid fa-close"></i>
@@ -300,8 +321,8 @@
               </div>
             </td>
             <td class="p-2 p-x-5 f-12">{{ item.roleName }}</td>
-            <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
-            <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
+            <td class="p-2 p-x-5 f-12">{{ item.jpStartDateTime | date:'dd MMM HH:mm' }}</td>
+            <td class="p-2 p-x-5 f-12">{{ item.jpEndDateTime | date:'dd MMM HH:mm' }}</td>
             <td class="p-2 p-x-5 f-12">{{ item.client }}{{ item.altVenue }}</td>
           </tr>
           @if (item.highlight) {

@@ -6,7 +6,7 @@
   @for (schedule of list; track schedule.jobPartId) {
     @if (list[$index]?.startDate.substring(0, 10) !== list[$index - 1]?.startDate.substring(0, 10)) {
       <div class="p-x-15 m-b-15">
-        <div class="divider p-y-5 rounded-3 m-0 bg-danger flex items-center justify-content-center gap-20">
+        <div class="divider p-y-5 p-x-30 rounded-3 m-0 bg-danger flex items-center justify-content-start gap-20">
           <p class="text-dark m-0 p-0">
             {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
           </p>
@@ -256,6 +256,8 @@
                                 @if (crew.editLoading) {
                                   <app-feather-icon [class]="'w-14 h-14 text-white spin'"
                                                     [icon]="'loader'"></app-feather-icon>
+                                } @else if (crew.additionalFees > 0) {
+                                  &pound;
                                 } @else {
                                   <app-feather-icon [class]="'w-14 h-14'" [icon]="'edit'"></app-feather-icon>
                                 }
@@ -300,7 +302,7 @@
                           }
                         </li>
                         <div class="flex items-center gap-6" [class.gap-6]="crew.onHoliday > 0 || crew.onWarnings > 0">
-                          <p class="f-10 m-t-2 lh-1 p-0 m-0 pulse text-{{colorsConfig[schedule.statusId]}}">
+                          <p class="f-12 fw-bold m-t-2 lh-1 p-0 m-0 pulse text-{{colorsConfig[schedule.statusId]}}">
                             @if (crew.onHoliday > 0) {
                               <span class="text-danger m-r-3">HOL</span>
                             }
@@ -484,8 +486,8 @@
             </div>
           </td>
           <td class="p-2 p-x-5 f-12 text-nowrap text-body-secondary">{{ item.roleName }}</td>
-          <td class="p-2 p-x-5 f-12">{{ item.startdate }} {{ item.startTime }}</td>
-          <td class="p-2 p-x-5 f-12">{{ item.endDate }} {{ item.endTime }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.jpStartDateTime | date:'dd MMM HH:mm' }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.jpEndDateTime | date:'dd MMM HH:mm' }}</td>
           <td class="p-2 p-x-5 f-12 text-nowrap">{{ item.client }}</td>
           <td class="p-2 p-x-5 f-12">{{ item.altVenue }}</td>
           <td class="p-2 p-x-5 f-10 text-nowrap">{{ item.extraHours }}eh</td>

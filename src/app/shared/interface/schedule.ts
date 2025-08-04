@@ -112,6 +112,7 @@ export interface Crew extends CrewManager {
   levelCrewingWeighting: number;
   isFulltime: boolean;
   isChecked?: boolean;
+  isAlreadyAssigned?: boolean;
   isCheckedForSMS?: boolean;
   notificationLoading?: boolean;
   detailsLoading?: boolean;
