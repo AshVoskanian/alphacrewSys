@@ -10,11 +10,11 @@
       </div>
 
       <div class="form-floating">
-        <textarea [(ngModel)]="text" class="form-control min-h-i-230" id="floatingTextarea" placeholder=""></textarea>
+        <ngx-editor [editor]="editor" [ngModel]="text" [disabled]="false" [placeholder]="'Type here...'"></ngx-editor>
       </div>
 
       <div class="row m-t-12 gap-y-8">
-        <div class="col-12 col-sm-4 text-nowrap flex flex-no-wrap">
+        <div class="col-12 col-sm-3 text-nowrap flex flex-no-wrap">
           <button type="submit" class="btn btn-primary w-100 text-center" (click)="sendSMS()">
             Send SMS
             <span class="d-inline-block w-30 h-15">
@@ -25,14 +25,21 @@
           </button>
         </div>
 
-        <div class="col-12 col-sm-4">
+        <div class="col-12 col-sm-3">
           <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
                   [cdkCopyToClipboard]="text">
             Copy
           </button>
         </div>
 
-        <div class="col-12 col-sm-4">
+        <div class="col-12 col-sm-3">
+          <button type="submit" class="btn btn-primary w-100 text-center" (click)="closeModal.emit()"
+                  [cdkCopyToClipboard]="text">
+            Copy and Close
+          </button>
+        </div>
+
+        <div class="col-12 col-sm-3">
           <button type="submit" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
             Cancel
           </button>

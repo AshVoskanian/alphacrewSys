@@ -6,12 +6,14 @@ import { ApiBase } from "../../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { DatePipe } from "@angular/common";
 import { ClipboardModule } from "@angular/cdk/clipboard";
+import { Editor, NgxEditorModule } from "ngx-editor";
 
 @Component({
   selector: 'app-send-sms-to-crew',
   imports: [
     Select2Module,
-    ClipboardModule
+    ClipboardModule,
+    NgxEditorModule
   ],
   templateUrl: './send-sms-to-crew.component.html',
   styleUrl: './send-sms-to-crew.component.scss'
@@ -26,18 +28,24 @@ export class SendSmsToCrewComponent extends ApiBase implements OnInit {
 
   loading = false;
 
-  text: string = `Job Notification:
-{{date}}
+  public editor: Editor;
 
-{{crewCount}}CREW {{hourCount}}HR
-Client: {{clientName}}
-Venue: {{venueName}}
+  text: string = `
+PLEASE CONFIRM: </br>
+<strong><i>{{date}}</i></strong> </br>
 
-Please reply in App
+<strong><i>{{crewCount}}</i></strong>CREW <strong><i>{{hourCount}}</i></strong>HR </br>
+CLIENT: <strong><i>{{clientName}}</i></strong> </br>
+VENUE: <strong><i>{{venueName}}</i></strong> </br>
   `;
 
   ngOnInit() {
+    this.initEditor();
     this.fillTemplate();
+  }
+
+  initEditor() {
+    this.editor = new Editor();
   }
 
   fillText(template: string, data: Record<string, string | number>): string {
@@ -72,7 +80,7 @@ Please reply in App
       jobId: this.scheduleInfo.jobId,
       jobPartId: [ this.scheduleInfo.jobPartId ],
       crewId: [ this.selectedCrew.crewId ],
-      message: this.text
+      message: GeneralService.stripHtmlTags(this.text)
     }
     this.post('Schedule/AddJobNotifiction', data)
       .pipe(takeUntilDestroyed(this._dr))

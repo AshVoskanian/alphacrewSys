@@ -45,4 +45,9 @@ export class GeneralService {
 
     return diffInMilliseconds / (1000 * 60 * 60);
   }
+
+  public static stripHtmlTags(html: string): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.innerText || "";
+  }
 }
