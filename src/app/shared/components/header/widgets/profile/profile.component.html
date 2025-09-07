@@ -9,14 +9,14 @@
   </div>
 </div>
 <ul class="profile-dropdown onhover-show-div">
-  <!--    @for(item of profile; track item) {-->
-  <!--        <li>-->
-  <!--            <a href="javascript:void(0)" [routerLink]="item.path">-->
-  <!--                <app-feather-icon [icon]="item.icon"></app-feather-icon>-->
-  <!--                <span>{{ item.title }}</span>-->
-  <!--            </a>-->
-  <!--        </li>-->
-  <!--    }-->
+  @for (item of profile; track item) {
+    <li>
+      <a href="javascript:void(0)" [routerLink]="item.path">
+        <app-feather-icon [icon]="item.icon"></app-feather-icon>
+        <span>{{ item.title }}</span>
+      </a>
+    </li>
+  }
   <li>
     <a (click)="logout()">
       <app-feather-icon [icon]="'log-in'"></app-feather-icon>

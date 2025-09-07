@@ -1,0 +1,19 @@
+<app-card [headerTitle]="'User'" [border]="true" [padding]="false" >
+  <div class="flex items-center justify-content-center flex-col">
+    <div class="social-img-wrap">
+      <div class="social-img">
+        <img src="./assets/images/dashboard/img.png" [alt]=""></div>
+      <div class="edit-icon">
+        <app-svg-icon [icon]="'profile-check'"></app-svg-icon>
+      </div>
+    </div>
+    <div class="social-details flex items-center justify-content-center flex-col">
+      <h5 class="mb-1">
+        <a href="javascript:void(0)">
+          {{ userInfo?.userInfo }}
+        </a>
+      </h5>
+      <span class="c-o-light">Admin</span>
+    </div>
+  </div>
+</app-card>

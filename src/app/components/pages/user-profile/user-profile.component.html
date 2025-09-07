@@ -1,0 +1,48 @@
+<div class="container-fluid">
+  <div class="user-profile">
+    <div class="row">
+      <div class="col-12 p-t-30">
+        <div class="row scope-bottom-wrapper user-profile-wrapper">
+          <div class="col-xxl-3 user-xl-25 col-xl-4 box-col-4">
+            <app-card>
+              <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="sidebar-left-icons nav nav-pills flex-column"
+                  orientation="vertical">
+                @for (tab of userDetailsTab; track tab) {
+                  <li [ngbNavItem]="tab.value">
+                    <a ngbNavLink>
+                      <div class="nav-rounded">
+                        <div class="product-icons">
+                          <i [class]="tab.icon"></i>
+                        </div>
+                      </div>
+                      <div class="product-tab-content">
+                        <h6>{{ tab.title }}</h6>
+                      </div>
+                    </a>
+                    <ng-template ngbNavContent>
+                      <div class="row">
+                        <div class="col-12">
+                          @if (activeTab == 'user') {
+                            <div class="notification">
+                              <app-user-details></app-user-details>
+                            </div>
+                          }
+                          @if (activeTab == 'change-password') {
+                            <app-change-password></app-change-password>
+                          }
+                        </div>
+                      </div>
+                    </ng-template>
+                  </li>
+                }
+              </ul>
+            </app-card>
+          </div>
+          <div class="col-xxl-9 user-xl-75 col-xl-8 box-col-8e">
+            <div [ngbNavOutlet]="nav"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

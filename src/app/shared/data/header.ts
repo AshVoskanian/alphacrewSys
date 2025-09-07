@@ -73,18 +73,18 @@ export const notification: Notification[] = [
 ]
 
 export const profile = [
-  {
-    id: 1,
-    title: 'Logout',
-    icon: 'log-in',
-    path: 'landing/auth',
-  },
   // {
   //   id: 1,
-  //   title: 'Account',
-  //   icon: 'user',
+  //   title: 'Logout',
+  //   icon: 'log-in',
   //   path: 'landing/auth',
   // },
+  {
+    id: 2,
+    title: 'Profile',
+    icon: 'user',
+    path: 'profile',
+  },
   // {
   //   id: 2,
   //   title: 'Inbox',
