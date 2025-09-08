@@ -16,7 +16,7 @@ import { ChangePasswordComponent } from "./change-password/change-password.compo
 
 export class UserProfileComponent {
 
-  public activeTab: string = 'change-password';
+  public activeTab: string = 'user';
   public userDetailsTab: Tabs[] = [
     {
       id: 1,

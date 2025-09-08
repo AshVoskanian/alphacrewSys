@@ -22,6 +22,15 @@ export const menuItems: Menu[] = [
     level: 1,
   },
   {
+    title: 'Profile',
+    icon: 'reports',
+    type: 'link',
+    bookmark: true,
+    path: '/profile',
+    active: false,
+    level: 1,
+  },
+  {
     main_title: 'Legacy System'
   },
   {

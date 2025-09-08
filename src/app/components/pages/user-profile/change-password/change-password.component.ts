@@ -1,11 +1,21 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from "@angular/forms";
 import { CommonModule, NgClass } from "@angular/common";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { Notification } from "../../../../shared/interface/schedule";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GeneralService } from "../../../../shared/services/general.service";
+import { HttpClient } from "@angular/common/http";
+import { mustMatch } from "../../../../shared/validators/must-match";
 
 @Component({
   selector: 'app-change-password',
@@ -35,10 +45,33 @@ export class ChangePasswordComponent extends ApiBase implements OnInit {
   form = new FormGroup({
     currentPassword: new FormControl('', [ Validators.required ]),
     newPassword: new FormControl('', Validators.required,),
+    confirmPassword: new FormControl('', Validators.required,),
   })
+
+  constructor(private fb: FormBuilder, public override http: HttpClient) {
+    super(http);
+    this.form = this.fb.group(
+      {
+        currentPassword: [ '', [ Validators.required ] ],
+        newPassword: [ '', [ Validators.required, Validators.minLength(6) ] ],
+        confirmPassword: [ '', [ Validators.required ] ]
+      },
+      {
+        validators: [
+          mustMatch('newPassword', 'confirmPassword')
+        ]
+      }
+    );
+  }
 
   ngOnInit() {
     this.checkStrength();
+  }
+
+  private passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
+    const newPass = group.get('newPassword')?.value;
+    const confirm = group.get('confirmPassword')?.value;
+    return newPass === confirm ? null : { passwordsMismatch: true };
   }
 
   submit() {
@@ -76,6 +109,10 @@ export class ChangePasswordComponent extends ApiBase implements OnInit {
     return this.form.get('currentPassword');
   }
 
+  get confirmPassword() {
+    return this.form.get('confirmPassword');
+  }
+
   get newPassword() {
     return this.form.get('newPassword');
   }
@@ -111,7 +148,5 @@ export class ChangePasswordComponent extends ApiBase implements OnInit {
         this.strengthClass = 'bg-success';
         break;
     }
-
-    console.log(this.passwordValid)
   }
 }
