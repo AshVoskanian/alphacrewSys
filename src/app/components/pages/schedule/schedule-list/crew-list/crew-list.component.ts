@@ -68,6 +68,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   form: FormGroup;
 
+  searchKey: string = '';
   loading: boolean = false;
   allAreSelected: boolean = false;
   allAreSelectedForSMS: boolean = false;

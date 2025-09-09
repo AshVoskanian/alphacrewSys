@@ -257,7 +257,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.date$.value),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
-              jobId: this.isJobScoped ? this.selectedSchedule.jobId : null,
+              jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null,
             };
 
             if (!params.jobId) {
@@ -776,7 +776,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             date: GeneralService.convertToDate(this._navService.date$.value),
             days: this._navService.days,
             regionFilter: this._navService.regionId,
-            jobId: this.isJobScoped ? this.selectedSchedule.jobId : null,
+            jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null,
           };
 
           if (!params.jobId) {
@@ -802,7 +802,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     const params = {
       date: GeneralService.convertToDate(this._navService.date$.value),
       days: this._navService.days,
-      jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+      jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
     };
 
     if (!params.jobId) {
@@ -836,7 +836,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.date$.value),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
-              jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+              jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
             };
 
             if (!params.jobId) {
@@ -924,7 +924,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.date$.value),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
-              jobId: this.isJobScoped ? this.selectedSchedule.jobId : null
+              jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
             };
 
             if (!params.jobId) {
@@ -944,7 +944,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   updateSchedulesWithStatuses(statuses: JobMessageStatus[]): void {
     const compareAndUpdate = (list: any[]) =>
       list.map(schedule => {
-        const status = statuses.find(s => s.jobId === schedule.jobId);
+        const status = statuses.find(s => s?.jobId === schedule?.jobId);
         if (!status) return schedule;
 
         // თუ ძველი მნიშვნელობები ჯერ არ არის განსაზღვრული — არ ვაყენებთ changed:true
@@ -1003,7 +1003,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         if (!Array.isArray(schedule.crews)) return schedule;
 
         const updatedCrews = schedule.crews.map(crew => {
-          const status = crewStatuses.find(s => s.jobPartCrewId === crew.jobPartCrewId && s.jobId === crew.jobId);
+          const status = crewStatuses.find(s => s.jobPartCrewId === crew.jobPartCrewId && s?.jobId === crew?.jobId);
           if (!status) return crew;
 
           const isFirstTime = !crew.hasOwnProperty('changed');

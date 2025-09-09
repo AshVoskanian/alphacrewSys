@@ -133,6 +133,11 @@
             All
           </label>
 
+          <div>
+            <input class="form-control h-33" name="search" type="text" [(ngModel)]="searchKey"
+                   placeholder="Search Crew...">
+          </div>
+
           <div class="common-flex align-items-center g-5">
             <div class="btn-group" ngbDropdown>
               <button
@@ -192,8 +197,13 @@
     } @else {
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar"
           style="max-height: calc(100dvh - 440px)">
-        @for (
-          crew of crewList | crewFilter:getSelectedData('regions'):getSelectedData('levels'):getSelectedData('jobParts'); track crew.crewId + $index * 0.1) {
+        @for (crew of crewList
+          | crewFilter
+          :getSelectedData('regions')
+            :getSelectedData('levels')
+            :getSelectedData('jobParts')
+            :searchKey;
+          track crew.crewId + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3"
               [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned">
             @if (crew.jobNotes) {

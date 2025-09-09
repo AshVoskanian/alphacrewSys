@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { SvgIconComponent } from "../../../../shared/components/ui/svg-icon/svg-icon.component";
 import { RouterLink } from "@angular/router";
@@ -14,11 +14,7 @@ import { LocalStorageService } from "../../../../shared/services/local-storage.s
   templateUrl: './user-details.component.html',
   styleUrl: './user-details.component.scss'
 })
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsComponent {
   private _localStorageService = inject(LocalStorageService);
   userInfo = JSON.parse(this._localStorageService.getItem('user')) || {};
-
-  ngOnInit() {
-    console.log(this.userInfo)
-  }
 }
