@@ -99,4 +99,8 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
   showSuccess() {
     GeneralService.showSuccessMessage('Copied to clipboard');
   }
+
+  stripHtmlTags(html: string): string {
+    return GeneralService.stripHtmlTags(html);
+  }
 }

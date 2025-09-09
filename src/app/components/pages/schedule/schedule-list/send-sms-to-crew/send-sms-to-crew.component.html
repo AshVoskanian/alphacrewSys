@@ -27,14 +27,14 @@
 
         <div class="col-12 col-sm-3">
           <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
-                  [cdkCopyToClipboard]="text">
+                  [cdkCopyToClipboard]="stripHtmlTags(text)">
             Copy
           </button>
         </div>
 
         <div class="col-12 col-sm-3">
           <button type="submit" class="btn btn-primary w-100 text-center" (click)="closeModal.emit()"
-                  [cdkCopyToClipboard]="text">
+                  [cdkCopyToClipboard]="stripHtmlTags(text)">
             Copy and Close
           </button>
         </div>
