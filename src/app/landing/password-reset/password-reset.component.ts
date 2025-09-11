@@ -71,7 +71,7 @@ export class PasswordResetComponent extends ApiBase implements OnInit {
 
       const data = this.form.getRawValue();
 
-      this.post<any>('Account/CreatePasswordChangeUrl', data).subscribe({
+      this.post<any>('Account/CreatePasswordResetUrl', data).subscribe({
         next: (res) => {
           this._layoutService.loading = false;
           if (res.errors?.errorCode) {

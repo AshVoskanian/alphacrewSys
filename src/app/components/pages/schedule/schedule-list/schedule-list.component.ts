@@ -153,7 +153,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       icon: 'fas fa-square f-18'
     },
     {
-      id: 2,
+      id: 3,
       text: 'Turned Down',
       action: CrewAction.TURN_DOWN,
       color: 'text-success',
