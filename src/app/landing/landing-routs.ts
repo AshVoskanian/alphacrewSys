@@ -10,4 +10,8 @@ export const landingRouts: Routes = [
     path: 'landing/auth',
     loadComponent: () => import('../landing/login/login.component').then(c => c.LoginComponent)
   },
+  {
+    path: 'landing/password-reset',
+    loadComponent: () => import('../landing/password-reset/password-reset.component').then(c => c.PasswordResetComponent)
+  },
 ];

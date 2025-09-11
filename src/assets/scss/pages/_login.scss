@@ -57,6 +57,12 @@
     margin: 0 auto;
     background-color: $white;
 
+    p.desc {
+      margin-bottom: 25px;
+      font-size: 14px;
+      color: $dark-gray;
+    }
+
     .theme-form {
       h4 {
         margin-bottom: 5px;
