@@ -17,23 +17,37 @@ export class CrewFilterPipe implements PipeTransform {
     if (!crew) return [];
 
     const normalizedSearch = searchKey?.toLowerCase().trim();
+    const regionSet = regionIds?.length ? new Set(regionIds) : null;
+    const levelSet = levelIds?.length ? new Set(levelIds) : null;
+    const jobPartSet = jobPartIds?.length ? new Set(jobPartIds) : null;
 
-    return crew.filter(member => {
-      const matchesRegion = !regionIds || regionIds.length === 0 || regionIds.includes(member.regionId);
-      const matchesLevel = !levelIds || levelIds.length === 0 || levelIds.includes(member.levelCrewingWeighting);
+    const result = crew.filter(member => {
+      const matchesRegion = !regionSet || regionSet.has(member.regionId);
+      const matchesLevel = !levelSet || levelSet.has(member.levelCrewingWeighting);
 
-      const matchesAllJobParts =
-        !jobPartIds || jobPartIds.length === 0 ||
-        jobPartIds.every(id => member.notClashingInfo?.details?.[id] > 0);
+      let matchesAllJobParts = true;
+      if (jobPartSet) {
+        for (const id of jobPartSet) {
+          if (!(member.notClashingInfo?.details?.[id] > 0)) {
+            matchesAllJobParts = false;
+            break;
+          }
+        }
+      }
 
       const matchesSearch =
-        !normalizedSearch || member.name?.toLowerCase().includes(normalizedSearch);
+        !normalizedSearch || (member.nameLower ?? member.name?.toLowerCase()).includes(normalizedSearch);
 
       return matchesRegion && matchesLevel && matchesAllJobParts && matchesSearch;
-    }).sort((a, b) =>
+    });
+
+    result.sort((a, b) =>
       Number(b.isFulltime && b.isChecked) - Number(a.isFulltime && a.isChecked) ||
       Number(!b.isFulltime && b.isChecked) - Number(!a.isFulltime && a.isChecked) ||
       Number(a.holiday > 0) - Number(b.holiday > 0)
     );
+
+    return result;
   }
+
 }

@@ -119,6 +119,7 @@ export interface Crew extends CrewManager {
   levelCode: string;
   levelText: string;
   levelShortText: string;
+  nameLower?: string;
   name: string;
   skills: string;
   totalHours: number;

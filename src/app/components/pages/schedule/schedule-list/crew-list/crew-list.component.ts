@@ -230,7 +230,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
   }
 
-
   selectCrewForSMS(crew: Crew) {
     crew.isCheckedForSMS = !crew.isCheckedForSMS;
 
@@ -536,7 +535,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this._modal.dismissAll();
   }
 
-  closeAllPopovers() {
-    this.popovers.forEach((popover) => popover.close());
+  resetFilters() {
+    this.levels.forEach(level => level.checked = false);
+    this.regions.forEach(region => region.checked = false);
   }
 }

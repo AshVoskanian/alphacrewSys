@@ -134,7 +134,10 @@
           </label>
 
           <div>
-            <input class="form-control h-33" name="search" type="text" [(ngModel)]="searchKey"
+            <input class="form-control h-33"
+                   name="search" type="text"
+                   [(ngModel)]="searchKey"
+                   (focus)="resetFilters()"
                    placeholder="Search Crew...">
           </div>
 
