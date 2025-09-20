@@ -326,7 +326,9 @@
                         <ul class="common-flex gap-2">
                           @for (notification of schedule.notifications; track notification.status + $index) {
                             <li
+                              [ngbTooltip]="notification.statusText"
                               class="
+                              pointer
                               bg-{{getNotificationStatusClass(notification.status)?.bg}}
                               border-{{getNotificationStatusClass(notification.status)?.border}}
                               dashed border-1 rounded p-y-1 p-x-3">

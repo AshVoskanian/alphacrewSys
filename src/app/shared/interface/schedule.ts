@@ -205,6 +205,8 @@ export interface Notification {
   status: number;
   sentDate: string;
   sentBy: string;
+  cssColour: string;
+  statusText: string;
   name: string;
   crewId: number;
 }

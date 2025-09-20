@@ -590,9 +590,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         bg: 'danger-subtle'
       },
       6: {
-        border: 'dark',
-        color: 'dark',
-        bg: 'dark-subtle'
+        border: 'danger',
+        color: 'danger',
+        bg: 'danger-subtle'
       },
       7: {
         border: 'info',
