@@ -178,7 +178,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this._offcanvasService.close()
   }
 
-  getSelectedData(type: 'regions' | 'levels' | 'crew' | 'jobParts'): Array<number> {
+  getSelectedData(type: 'regions' | 'levels' | 'crew' | 'onlyNewCrew' | 'jobParts'): Array<number> {
     if (type === 'regions') {
       return this.regions.filter(it => it.checked).map(it => it.id);
     }
@@ -189,6 +189,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
     if (type === 'crew') {
       return this.crewList.filter(it => it.isChecked).map(it => it.crewId);
+    }
+
+    if (type === 'onlyNewCrew') {
+      return this.crewList.filter(it => it.isChecked && !it.isAlreadyAssigned).map(it => it.crewId);
     }
 
     if (type === 'jobParts') {
@@ -253,7 +257,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
     const data = {
       jobId: this.selectedSchedule.jobId,
       jobPartId: this.selectedSchedule?.jobPartId,
-      crewId: this.getSelectedData('crew'),
+      crewId: this.getSelectedData(type === 'new' ? 'onlyNewCrew' : 'crew'),
       newCrewOnly: type === 'new',
     }
 

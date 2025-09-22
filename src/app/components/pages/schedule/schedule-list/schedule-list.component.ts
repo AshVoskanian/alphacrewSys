@@ -175,13 +175,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     },
     {
       id: 2,
-      text: 'Change',
-      action: CrewAction.CHANGE,
-      color: 'text-success',
-      icon: 'fa-solid fa-retweet f-16'
-    },
-    {
-      id: 2,
       text: 'Profile',
       action: CrewAction.PROFILE,
       color: 'text-dark',
