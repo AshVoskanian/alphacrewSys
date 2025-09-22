@@ -27,6 +27,7 @@ export interface Schedule {
   jobPartId: number;
   jobPartTypeId: number;
   jobPartVenueName: string;
+  jobPartTypeText: string;
   jobRegionId: number;
   statusId: number;
   ootCost: number;

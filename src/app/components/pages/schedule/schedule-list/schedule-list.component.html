@@ -127,6 +127,19 @@
                             }
                           }
                         </div>
+                        @if (schedule.jobPartTypeId === 2 || schedule.jobPartTypeId === 5) {
+                          <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
+                               [ngbTooltip]="schedule.jobPartTypeText">
+                            <i class="fa-solid fa-truck text-danger f-14"></i>
+                          </div>
+                        }
+
+                        @if (schedule.jobPartTypeId === 4 || schedule.jobPartTypeId === 6) {
+                          <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
+                               [ngbTooltip]="schedule.jobPartTypeText">
+                            <i class="fa-solid fa-shield text-warning f-14"></i>
+                          </div>
+                        }
                       </div>
 
                       <div class="additional-info">
