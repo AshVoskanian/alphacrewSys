@@ -550,52 +550,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       })
   }
 
-  getNotificationStatusClass(status: number): { border: string, color: string, bg: string } {
-    const colorData = {
-      0: {
-        border: 'primary',
-        color: 'primary',
-        bg: 'primary-subtle'
-      },
-      1: {
-        border: 'primary',
-        color: 'primary',
-        bg: 'primary-subtle'
-      },
-      2: {
-        border: 'primary',
-        color: 'success',
-        bg: 'success-subtle'
-      },
-      3: {
-        border: 'success',
-        color: 'success',
-        bg: 'success-subtle'
-      },
-      4: {
-        border: 'danger',
-        color: 'danger',
-        bg: 'danger-subtle'
-      },
-      5: {
-        border: 'danger',
-        color: 'danger',
-        bg: 'danger-subtle'
-      },
-      6: {
-        border: 'danger',
-        color: 'danger',
-        bg: 'danger-subtle'
-      },
-      7: {
-        border: 'info',
-        color: 'primary',
-        bg: 'info-subtle'
-      }
-    };
-    return colorData[status];
-  }
-
   getCrewSectionStyles(schedule: Schedule) {
     if (schedule.statusId !== 3) {
       return {}

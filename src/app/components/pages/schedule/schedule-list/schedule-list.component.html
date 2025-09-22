@@ -340,13 +340,12 @@
                           @for (notification of schedule.notifications; track notification.status + $index) {
                             <li
                               [ngbTooltip]="notification.statusText"
+                              [style.background-color]="notification.cssColour"
                               class="
                               pointer
-                              bg-{{getNotificationStatusClass(notification.status)?.bg}}
-                              border-{{getNotificationStatusClass(notification.status)?.border}}
                               dashed border-1 rounded p-y-1 p-x-3">
                               <p
-                                class="f-10 p-0 m-0 truncate-100 text-{{getNotificationStatusClass(notification.status)?.color}}">
+                                class="f-10 text-light p-0 m-0 fw-bold">
                                 {{ notification.name }}
                               </p>
                             </li>
