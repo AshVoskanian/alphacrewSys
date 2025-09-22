@@ -421,7 +421,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
     const data = {
       jobPartId: this.selectedSchedule.jobPartId,
-      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isChecked).map(it => it.crewId)
+      crewId: crew ? [ crew.crewId ] : this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId)
     }
 
     this.delete('Schedule/DeleteNotificationByCrewIdandJobPartId', '', data)
