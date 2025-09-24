@@ -161,6 +161,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   }
 
   closeModal(modal: any) {
+    this.scheduleService.closeJobScopedShiftModal$.next(true);
     modal.close();
   }
 }

@@ -9,6 +9,7 @@ export interface Schedule {
   travelHours: number;
   importantNotes: boolean;
   isJobActive: boolean;
+  isActive: boolean;
   isNightShift: boolean;
   isNigthShiftPaid: boolean;
   showNotifications: boolean;

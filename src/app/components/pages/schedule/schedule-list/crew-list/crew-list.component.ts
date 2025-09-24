@@ -2,7 +2,6 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  ElementRef,
   inject,
   Input,
   OnInit,
@@ -16,6 +15,7 @@ import {
   NgbActiveOffcanvas,
   NgbDropdownModule,
   NgbModal,
+  NgbModalRef,
   NgbPopover,
   NgbPopoverModule,
   NgbTooltipModule
@@ -53,18 +53,21 @@ import { ConfirmModalComponent } from "../../../../../shared/components/ui/confi
 export class CrewListComponent extends ApiBase implements OnInit {
   private _modal = inject(NgbModal);
   private _dr: DestroyRef = inject(DestroyRef);
-  private _scheduleService = inject(ScheduleService);
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
+  private _scheduleService = inject(ScheduleService);
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
+  public scheduleService = inject(ScheduleService);
+
 
   @Input() title: string;
 
   @ViewChildren(NgbPopover) popovers!: QueryList<NgbPopover>;
-  @ViewChild('confirmModal') confirmModal: ElementRef<ConfirmModalComponent>;
+  @ViewChild('confirmModal') confirmModal: any;
 
   crewList: Array<Crew> = [];
   isJobScoped: boolean = false;
+  private modalRef!: NgbModalRef;
 
   form: FormGroup;
 
@@ -118,6 +121,20 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getSelectedSchedule();
+    this.checkIfJobScopedShiftsModalClosed();
+  }
+
+  checkIfJobScopedShiftsModalClosed() {
+    this.scheduleService.closeJobScopedShiftModal$
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          if (res) {
+            this.closeOffcanvas();
+            this.scheduleService.closeJobScopedShiftModal$.next(false)
+          }
+        }
+      })
   }
 
   getAlreadyAssignedCrewCountByLevel(levelId: number) {
@@ -528,7 +545,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
   }
 
   openConfirmModal(value: any) {
-    this._modal.open(value, { centered: true })
+    this.modalRef = this._modal.open(value, { centered: true })
   }
 
   closeConfirmModal(result: 'ok' | 'cancel') {
@@ -536,7 +553,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
       this.sendNotification(null, false);
       return;
     }
-    this._modal.dismissAll();
+    this.modalRef?.close();
   }
 
   resetFilters() {

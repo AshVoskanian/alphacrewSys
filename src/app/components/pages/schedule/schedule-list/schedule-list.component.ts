@@ -551,7 +551,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   getCrewSectionStyles(schedule: Schedule) {
-    if (schedule.statusId !== 3) {
+    if (!schedule.isActive) {
       return {}
     }
     const crewCount = schedule.crews?.filter(it => it.isActive)?.length ?? 0;
