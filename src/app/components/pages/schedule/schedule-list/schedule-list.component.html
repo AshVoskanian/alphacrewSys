@@ -345,7 +345,9 @@
                               pointer
                               dashed border-1 rounded p-y-1 p-x-3">
                               <p
-                                class="f-10 text-light p-0 m-0 fw-bold">
+                                [class.text-light]="notification.status !== 1 && notification.status !== 6"
+                                [class.text-dark]="notification.status === 1 || notification.status === 6"
+                                class="f-10 p-0 m-0 fw-bold">
                                 {{ notification.name }}
                               </p>
                             </li>
