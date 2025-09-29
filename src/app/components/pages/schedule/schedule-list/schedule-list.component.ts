@@ -190,7 +190,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     2: 'light',
     14: 'dark',
     3: 'dark',
-    7: 'light'
+    7: 'dark'
   }
 
   ngOnInit() {
