@@ -1769,6 +1769,10 @@ $i: 1;
     max-height: #{$i}px;
   }
 
+  .max-h-#{$i}-i {
+    max-height: #{$i}px !important;
+  }
+
   .p-#{$i} {
     padding: #{$i}px !important;
   }

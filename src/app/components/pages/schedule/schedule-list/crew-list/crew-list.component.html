@@ -55,9 +55,9 @@
     </div>
 
     <app-card [cardBodyClass]="'p-y-10 p-r-10'">
-      <div [class.h-100-i]="jobPartClashing?.length">
+      <div>
         @if (jobPartClashing?.length > 0) {
-          <div class="table-responsive custom-scrollbar">
+          <div class="table-responsive custom-scrollbar" #crewManager>
             <table class="table border-bottom-table table-striped">
               <thead>
               <tr class="border-bottom-primary">
@@ -199,7 +199,7 @@
       Loading...
     } @else {
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar"
-          style="max-height: calc(100dvh - 440px)">
+          [style.max-height]="maxHeight">
         @for (crew of crewList
           | crewFilter
           :getSelectedData('regions')

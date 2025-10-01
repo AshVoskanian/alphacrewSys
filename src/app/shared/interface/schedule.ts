@@ -352,6 +352,7 @@ export interface JobPartCrewAdditionalDetail {
   byCrewManager?: number;
   byNotification?: number;
   crewSkillsText?: string;
+  warningTitle?: string;
   hours?: number;
   inConflict?: number;
   jobId?: number;

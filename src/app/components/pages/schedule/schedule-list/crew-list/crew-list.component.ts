@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   Input,
   OnInit,
@@ -64,6 +65,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   @ViewChildren(NgbPopover) popovers!: QueryList<NgbPopover>;
   @ViewChild('confirmModal') confirmModal: any;
+  @ViewChild('crewManager') crewManager!: ElementRef<HTMLElement>;
 
   crewList: Array<Crew> = [];
   isJobScoped: boolean = false;
@@ -73,6 +75,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   searchKey: string = '';
   loading: boolean = false;
+  crewManagerHeight = 0;
   allAreSelected: boolean = false;
   allAreSelectedForSMS: boolean = false;
   showBtnOptions: boolean = false;
@@ -122,6 +125,16 @@ export class CrewListComponent extends ApiBase implements OnInit {
   ngOnInit() {
     this.getSelectedSchedule();
     this.checkIfJobScopedShiftsModalClosed();
+  }
+
+  get maxHeight(): string {
+    const offsetHeight = (this.crewManager?.nativeElement?.offsetHeight - 50) || 0;
+
+    if (this.crewManager?.nativeElement?.offsetHeight < 200 || !this.crewManager?.nativeElement?.offsetHeight) {
+      return `calc(100dvh - ${ 440 }px)`;
+    }
+
+    return `calc(100dvh - ${ offsetHeight + 440 }px)`;
   }
 
   checkIfJobScopedShiftsModalClosed() {

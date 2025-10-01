@@ -943,6 +943,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       'byCrewManager',
       'buddyDown',
       'buddyUp',
+      'warningTitle'
     ];
 
     const updateCrews = (list: any[]) =>
