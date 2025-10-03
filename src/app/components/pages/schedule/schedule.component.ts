@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { Select2Module } from "ng-select2-component";
-import { NgbDateStruct, NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDateStruct, NgbModal, NgbOffcanvas } from "@ng-bootstrap/ng-bootstrap";
 import { ScheduleListComponent } from "./schedule-list/schedule-list.component";
 import { ApiBase } from "../../../shared/bases/api-base";
 import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
@@ -25,6 +25,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   private _modal = inject(NgbModal);
   public _navService = inject(NavService);
   private _toast = inject(ToastrService);
+  private _offcanvas = inject(NgbOffcanvas);
   public scheduleService = inject(ScheduleService);
 
   loading: WritableSignal<boolean> = signal(false);
@@ -134,7 +135,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
 
   formatSkillName(key: string): string {
     const readable = key.replace(/^skill/, '').replace(/([A-Z])/g, ' $1').trim();
-    return `Skill: ${readable}`;
+    return `Skill: ${ readable }`;
   }
 
   fillArray(arr: Array<JobPartCrew>, length: number): void {
@@ -161,7 +162,22 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   }
 
   closeModal(modal: any) {
-    this.scheduleService.closeJobScopedShiftModal$.next(true);
-    modal.close();
+    if (this._offcanvas.hasOpenOffcanvas()) {
+      this._offcanvas.dismiss();
+
+      setTimeout(() => {
+        this.scheduleService.closeJobScopedShiftModal$.next(true);
+        modal.close();
+
+        setTimeout(() => {
+          if (document.body.style.overflow === 'hidden') {
+            document.body.style.overflow = 'auto';
+          }
+        }, 100);
+      }, 150);
+    } else {
+      this.scheduleService.closeJobScopedShiftModal$.next(true);
+      modal.close();
+    }
   }
 }
