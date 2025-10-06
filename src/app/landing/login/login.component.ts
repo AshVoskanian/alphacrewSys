@@ -56,7 +56,7 @@ export class LoginComponent extends ApiBase implements OnInit {
           } else {
             this._authService.setToken(res.data?.token);
             this._authService.userInfo = res.user;
-            this.router.navigateByUrl('dashboard/default')
+            this.router.navigateByUrl('dashboard');
           }
         }
       });

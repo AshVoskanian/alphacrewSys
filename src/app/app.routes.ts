@@ -10,7 +10,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/dashboard/default',
+    redirectTo: '/dashboard',
     pathMatch: 'full'
   },
   {

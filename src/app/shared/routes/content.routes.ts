@@ -2,10 +2,10 @@ import { Routes } from '@angular/router';
 
 export const content: Routes = [
   {
-    path: 'dashboard',
+    path: '',
     data: {
-      title: "sample-page",
-      breadcrumb: "sample-page",
+      title: "Dashboard",
+      breadcrumb: "dashboard",
     },
     loadChildren: () => import('../../components/pages/pages.routes').then(r => r.pages)
   },

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { CardComponent } from "../../../../../../shared/components/ui/card/card.component";
-import { SocialAnalytics } from "../../../../../../shared/interface/dashboard";
+import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
+import { SocialAnalytics } from "../../../../../shared/interface/dashboard";
 
 @Component({
   selector: 'app-social-analytics',

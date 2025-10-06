@@ -10,7 +10,7 @@ export const menuItems: Menu[] = [
     icon: 'home',
     type: 'link',
     bookmark: true,
-    path: '/dashboard/default',
+    path: '/dashboard',
     level: 1,
   },
   {

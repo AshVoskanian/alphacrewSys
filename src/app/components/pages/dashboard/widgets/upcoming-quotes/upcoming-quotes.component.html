@@ -1,0 +1,15 @@
+<app-card
+  [headerTitle]="'Upcoming Quotes (next two weeks)'"
+  [padding]="false"
+  [cardBodyClass]="'px-0 pt-0 common-option'">
+
+  <div class="recent-table table-responsive currency-table recent-order-table custom-scrollbar">
+    @if (tableConfig?.data?.length) {
+      <app-table [tableConfig]="tableConfig"
+                 [pageSize]="tableConfig?.data?.length"
+                 [maxHeight]="400"
+                 [hasCheckbox]="true" [pagination]="false">
+      </app-table>
+    }
+  </div>
+</app-card>

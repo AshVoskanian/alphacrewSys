@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { CardComponent } from "../../../../../../shared/components/ui/card/card.component";
-import { primaryColor } from "../../../../../../shared/data/common";
+import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
+import { primaryColor } from "../../../../../shared/data/common";
 
 @Component({
   selector: 'app-finance-overview',

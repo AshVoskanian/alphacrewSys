@@ -25,6 +25,7 @@ export class TableComponent {
   @Input() tableConfig: TableConfigs;
   @Input() hasCheckbox: boolean;
   @Input() pageSize: number = 4;
+  @Input() maxHeight: number = 1000;
   @Input() paginateDetails: boolean = false;
   @Input() showPaginate: boolean = false;
   @Input() tableClass: string;
