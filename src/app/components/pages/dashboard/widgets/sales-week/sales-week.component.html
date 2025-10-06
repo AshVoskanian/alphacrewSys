@@ -3,7 +3,7 @@
     <div class="header-top week-header">
       <h5>Crew By Hour(London)</h5>
       <div class="card-header-right-icon">
-        <a class="btn btn-light f-w-500 c-o-light" href="javascript:void(0)">
+        <a class="btn btn-light f-w-500 c-o-light">
           Next 14 days
         </a>
       </div>
@@ -25,18 +25,24 @@
       </li>
     </ul>
     <div class="sales-week-container">
-      <div id="sale-week">
-        <apx-chart
-          [chart]="salesWeekChart.chart"
-          [colors]="salesWeekChart.colors"
-          [plotOptions]="salesWeekChart.plotOptions"
-          [dataLabels]="salesWeekChart.dataLabels"
-          [series]="salesWeekChart.series"
-          [xaxis]="salesWeekChart.xaxis"
-          [yaxis]="salesWeekChart.yaxis"
-          [responsive]="salesWeekChart.responsive">
-        </apx-chart>
-      </div>
+      @if (loading())  {
+        <div class="h-300 w-100 flex items-center justify-content-center">
+          <p class="text-primary f-24">Loading...</p>
+        </div>
+      } @else {
+        <div id="sale-week">
+          <apx-chart
+            [chart]="crewByHour.chart"
+            [colors]="crewByHour.colors"
+            [plotOptions]="crewByHour.plotOptions"
+            [dataLabels]="crewByHour.dataLabels"
+            [series]="crewByHour.series"
+            [xaxis]="crewByHour.xaxis"
+            [yaxis]="crewByHour.yaxis"
+            [responsive]="crewByHour.responsive">
+          </apx-chart>
+        </div>
+      }
     </div>
   </div>
 </div>

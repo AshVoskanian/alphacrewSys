@@ -27,3 +27,16 @@ export interface UpcomingQuotes {
   parts: number;
 }
 
+export interface CrewByHour {
+  times: string;
+  weekday: number;
+  hour: number;
+  limit: number;
+  warning: number;
+  crew: number;
+  status: number;
+  cssColour: string;
+  title: string;
+}
+
+

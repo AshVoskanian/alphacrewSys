@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import { TableComponent } from "../../../../../shared/components/ui/table/table.component";
 import { TableConfigs } from "../../../../../shared/interface/common";
@@ -15,6 +15,8 @@ import { GeneralService } from "../../../../../shared/services/general.service";
 })
 export class UpcomingQuotesComponent extends ApiBase implements OnInit {
   private _dr = inject(DestroyRef);
+
+  loading = signal(false);
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -34,6 +36,8 @@ export class UpcomingQuotesComponent extends ApiBase implements OnInit {
   }
 
   getQuotes() {
+    this.loading.set(true);
+
     this.get<Array<UpcomingQuotes>>('Dashboard/GetDashboardUpcomingQuotes')
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
@@ -44,6 +48,7 @@ export class UpcomingQuotesComponent extends ApiBase implements OnInit {
           }
 
           this.tableConfig.data = res.data.map((quote: UpcomingQuotes) => ({ ...quote, id: quote.jobId }));
+          this.loading.set(false);
         }
       });
   }
