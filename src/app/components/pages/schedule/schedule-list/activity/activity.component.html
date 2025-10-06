@@ -5,9 +5,10 @@
       <div class="tab-pane fade active show" id="sun" role="tabpanel" aria-labelledby="sun-tab">
         <ul class="activity-update max-h-400 overflow-auto custom-scrollbar">
           @for (activitie of activityList(); track activitie.id) {
-            <li class="d-flex align-items-center p-r-5">
+            <li class="d-flex align-items-center p-r-5 m-b-2">
               <div class="flex-grow-1">
-                <h6>{{ activitie.content }}</h6>
+                <h6 class="m-b-0"
+                    [ngbTooltip]="activitie.content?.length > 100 ? activitie.content : ''">{{ activitie.content }}</h6>
                 <span>By <span class="text-primary">{{ activitie.name }}</span></span>
               </div>
               <div class="flex-shrink-0">
