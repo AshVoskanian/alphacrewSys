@@ -15,6 +15,7 @@ export interface Schedule {
   showNotifications: boolean;
   notificationsLoader: boolean;
   vehicleLoader: boolean;
+  activityLoader?: boolean;
   noteType?: 'job_note' | 'crew_note';
   updateLoading?: boolean;
   isJobScoped?: boolean;
@@ -214,17 +215,19 @@ export interface Notification {
 }
 
 export interface CrewManager {
+  cleintHours: number;
   conflict: number;
   crewHours: number;
   crewID: number;
+  cssColour: string | null;
+  experienceHours: number;
   holiday: number;
+  notificationStatusId: number | null;
+  notificationStatusText: string | null;
+  rating: number;
   struckOut: number;
   turnedDown: number;
-  notificationStatusId: number;
-  notificationStatusText: string;
-  cssColour: string;
 }
-
 
 export interface JobPartClashing {
   assignedCrew: number | null;
@@ -375,3 +378,5 @@ export interface Statistics {
   total?: string;
   startDate?: string;
 }
+
+

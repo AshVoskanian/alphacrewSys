@@ -1,0 +1,29 @@
+<app-card [cardType]="'classic'" [headerTitle]="'Recent Activity'" [path]="'/task'"
+          [cardBodyClass]="'activity-wrapper pt-0'">
+  @if (activityList()?.length > 0) {
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade active show" id="sun" role="tabpanel" aria-labelledby="sun-tab">
+        <ul class="activity-update max-h-400 overflow-auto custom-scrollbar">
+          @for (activitie of activityList(); track activitie.id) {
+            <li class="d-flex align-items-center p-r-5">
+              <div class="flex-grow-1">
+                <h6>{{ activitie.content }}</h6>
+                <span>By <span class="text-primary">{{ activitie.name }}</span></span>
+              </div>
+              <div class="flex-shrink-0">
+                <p class="mb-0">{{ activitie.createDate | date }}</p>
+                <i class="fa-regular text-warning fa-clock mb-2 m-r-5"></i>
+                <span class="text-warning">{{ activitie.createDate | date:'HH:mm' }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  } @else {
+    <div class="flex flex-col text-warning items-center justify-content-center">
+      <i class="fa-regular text-center f-30 fa-clock text-2xl mb-2"></i>
+      <p class="f-20 text-warning">No recent updates — check back soon!</p>
+    </div>
+  }
+</app-card>

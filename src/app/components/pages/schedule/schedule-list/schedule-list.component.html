@@ -434,9 +434,13 @@
       </button>
 
       <button type="button"
-              [ngbTooltip]="(schedule.lastModified | date:'dd MMM HH:mm') + '  ' + schedule.editedBy"
+              (click)="getActivities(schedule, popoverRef)"
+              #popoverRef="ngbPopover"
+              triggers="manual"
+              [popoverClass]="'wide-popover border max-w-800'"
+              [ngbPopover]="activities"
               class="btn btn-info action-button left w-30 h-30 p-0">
-        <i class="fa-solid fa-info text-light"></i>
+        <i class="fa-solid fa-{{schedule.activityLoader ? 'spinner' : 'info'}} text-light"></i>
       </button>
     </div>
   }
@@ -520,9 +524,14 @@
             [class.bg-info]="item.status === -1"
             [class.bg-success]="item.status === -2"
         >
-          <td class="f-12" colspan="8">{{ item.updateHistory }}</td>
+          <td class="f-12" colspan="9">{{ item.updateHistory }}</td>
         </tr>
       }
     </tbody>
   </table>
+</ng-template>
+
+<!--Recent Activities-->
+<ng-template #activities>
+  <app-activity [activityList]="activityList()"></app-activity>
 </ng-template>

@@ -1864,6 +1864,14 @@ $i: 1;
   border-right: none;
 }
 
+.tooltip-inner {
+  opacity: 1 !important;
+}
+
+.tooltip {
+  --bs-tooltip-opacity: 1 !important;
+}
+
 .spin {
   animation: spin 1s linear infinite;
 }

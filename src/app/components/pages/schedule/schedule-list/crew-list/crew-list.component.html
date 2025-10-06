@@ -198,7 +198,7 @@
     @if (listLoading$ | async) {
       Loading...
     } @else {
-      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar"
+      <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar min-h-100"
           [style.max-height]="maxHeight">
         @for (crew of crewList
           | crewFilter
@@ -206,7 +206,7 @@
             :getSelectedData('levels')
             :getSelectedData('jobParts')
             :searchKey;
-          track crew.crewId + $index * 0.1) {
+          track crew.crewId + crew.name + $index * 0.1) {
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3"
               [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned">
             @if (crew.jobNotes) {
@@ -238,6 +238,35 @@
                       {{ crew.crewHours }}
                     }
                   </p>
+                }
+              </div>
+
+              <div class="w-15 h-15 flex items-center justify-content-center">
+                @if (crewManagerLoader || crew.detailsLoading) {
+                  <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
+                } @else {
+                  <p class="badge l-h-15 pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
+                     [ngClass]="getBadgeClass(crew)" [ngbTooltip]="ratingInfo">
+                    <i class="fa-solid fa-info text-light m-0"></i>
+                  </p>
+
+                  <ng-template #ratingInfo>
+                    <div>
+                      <div class="flex items-center justify-content-between gap-20">
+                        <p class="m-0">Client Hours:</p>
+                        <p class="m-0">{{crew.cleintHours}}</p>
+                      </div>
+                      <div class="flex items-center justify-content-between gap-20">
+                        <p class="m-0">Total Hours:</p>
+                        <p class="m-0">{{crew.experienceHours}}</p>
+                      </div>
+
+                      <div class="flex items-center justify-content-between gap-20">
+                        <p class="m-0">Rating:</p>
+                        <p class="m-0">{{crew.rating}}</p>
+                      </div>
+                    </div>
+                  </ng-template>
                 }
               </div>
 

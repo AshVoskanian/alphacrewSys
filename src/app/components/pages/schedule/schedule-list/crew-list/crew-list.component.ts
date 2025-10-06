@@ -329,6 +329,9 @@ export class CrewListComponent extends ApiBase implements OnInit {
               crew.cssColour = match.cssColour;
               crew.notificationStatusId = match.notificationStatusId;
               crew.notificationStatusText = match.notificationStatusText;
+              crew.rating = match.rating;
+              crew.cleintHours = match.cleintHours;
+              crew.experienceHours = match.experienceHours;
             }
           }
         }

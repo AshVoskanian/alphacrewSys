@@ -56,15 +56,17 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
-import { forkJoin, switchMap, take, timer } from "rxjs";
+import { finalize, forkJoin, switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../shared/services/nav.service";
 import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
 import { SendSmsToCrewComponent } from "./send-sms-to-crew/send-sms-to-crew.component";
 import { UkPostcodeLinkPipe } from "../../../../shared/pipes/uk-post-code-link.pipe";
+import { ActivityComponent } from "./activity/activity.component";
+import { JobPartLog } from "../../../../shared/interface/activity";
 
 @Component({
   selector: 'app-schedule-list',
-  imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent,
+  imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent ],
   providers: [ DatePipe ],
@@ -101,6 +103,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
   statics: WritableSignal<Array<Statistics>> = signal([]);
   vehiclesInfo: WritableSignal<Array<Vehicle>> = signal([]);
+  activityList: WritableSignal<JobPartLog[]> = signal([]);
   shiftCrewDetails: WritableSignal<Array<CrewDetailForShift>> = signal([]);
   crewList: WritableSignal<Array<Crew>> = signal<Array<Crew>>([]);
   menu: WritableSignal<Array<CrewActionItem>> = signal([
@@ -977,6 +980,31 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
 
   finishNoteEdit(schedule: Schedule) {
     this.updateShift(schedule);
+  }
+
+  getActivities(schedule: Schedule, popover: NgbPopover) {
+    schedule.activityLoader = true;
+
+    const body = {
+      jobId: schedule.jobId,
+      jobPartId: schedule.jobPartId
+    }
+
+    this.post<JobPartLog[]>('ActionHistory/GetActionHistoryLogByJobIdOrJobPartId', { ...body })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => schedule.activityLoader = false)
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.activityList.set(res.data);
+          popover.open();
+        }
+      })
   }
 
   scrollToItem(jpId: number) {
