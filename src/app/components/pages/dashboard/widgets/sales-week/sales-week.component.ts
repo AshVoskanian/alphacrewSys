@@ -39,9 +39,9 @@ export class SalesWeekComponent extends ApiBase implements OnInit {
           shadeIntensity: 1,
           colorScale: {
             ranges: [
-              { from: 0, to: 30, color: '#B3E5FC', name: 'Low' },
-              { from: 31, to: 70, color: '#03A9F4', name: 'Medium' },
-              { from: 71, to: Math.max(...crew), color: '#0D47A1', name: 'High' },
+              { from: 0, to: 30, color: '#A5D6A7', name: 'Low' },      // Soft green
+              { from: 31, to: 70, color: '#FFF176', name: 'Medium' },  // Warm yellow
+              { from: 71, to: Math.max(...crew), color: '#EF5350', name: 'High' }, // Red
             ]
           }
         },
