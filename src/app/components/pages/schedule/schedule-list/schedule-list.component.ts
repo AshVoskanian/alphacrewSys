@@ -415,7 +415,15 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           const updateAndSortCrews = (crews: JobPartCrew[]) =>
             crews.map(c =>
               c.jobPartCrewId === removedId
-                ? { ...c, isActive: false, crewId: undefined, name: '' }
+                ? {
+                  ...c,
+                  isActive: false,
+                  crewId: undefined,
+                  name: '',
+                  onHoliday: undefined,
+                  onWarnings: undefined,
+                  crewSkillsText: ''
+                }
                 : c
             )
               .sort((a, b) => Number(b.isActive) - Number(a.isActive));
@@ -702,11 +710,14 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             return;
           }
 
+          const transformedSkills = schedule.transformedSkills;
+
           this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, res.data.crewNumber)
+                crews: this.fillArray(res.data.crews, res.data.crewNumber),
+                transformedSkills
               };
             }
             return item;
@@ -716,7 +727,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, res.data.crewNumber)
+                crews: this.fillArray(res.data.crews, res.data.crewNumber),
+                transformedSkills
               };
             }
             return item;
@@ -902,8 +914,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           'messageStatus' in schedule ||
           'smsStatusColour' in schedule ||
           'smsStatusTitle' in schedule ||
-          'smsStatusTitle' in schedule ||
-          'lastModified' in schedule
+          'smsStatusTitle' in schedule
         );
 
         const changed = !isFirstTime && (
@@ -911,7 +922,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           schedule.smsStatusColour !== status.smsStatusColour ||
           schedule.smsStatusTitle !== status.smsStatusTitle ||
           schedule.editedBy !== status.editedBy ||
-          schedule.lastModified !== status.lastModified ||
           schedule.onsiteContact !== status.onsiteContact
         );
 
@@ -920,7 +930,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           messageStatus: status.messageStatus,
           smsStatusColour: status.smsStatusColour,
           smsStatusTitle: status.smsStatusTitle,
-          lastModified: status.lastModified,
           editedBy: status.editedBy,
           onsiteContact: status.onsiteContact,
           changed,

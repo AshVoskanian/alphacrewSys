@@ -34,7 +34,7 @@ export class SendSmsToCrewComponent extends ApiBase implements OnInit {
 PLEASE CONFIRM: </br>
 <strong><i>{{date}}</i></strong> </br>
 
-<strong><i>{{crewCount}}</i></strong>CREW <strong><i>{{hourCount}}</i></strong>HR </br>
+<strong><i>{{crewCount}}</i></strong> CREW <strong><i>{{hourCount}}</i></strong> HR </br>
 CLIENT: <strong><i>{{clientName}}</i></strong> </br>
 VENUE: <strong><i>{{venueName}}</i></strong> </br>
   `;
@@ -57,7 +57,7 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
 
   fillTemplate() {
     const values = {
-      date: this._date.transform(this.scheduleInfo.startDate, 'EEE, dMMM, HH:mm'),
+      date: this._date.transform(this.scheduleInfo.startDate, 'EEE, d MMM, HH:mm'),
       crewCount: this.scheduleInfo.crewNumber,
       hourCount: this.hoursDifference(this.scheduleInfo.startDate, this.scheduleInfo.endDate),
       clientName: this.scheduleInfo.companyName,

@@ -404,10 +404,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
     const selectedCrewForSMS = this.crewList.filter(it => it.isCheckedForSMS).map(it => it.crewId);
 
-    if (selectedCrewForSMS && selectedCrewForSMS.length > 12 && checkCrewCount) {
-      this.openConfirmModal(this.confirmModal);
-      return;
-    }
+    // if (selectedCrewForSMS && selectedCrewForSMS.length > 12 && checkCrewCount) {
+    //   this.openConfirmModal(this.confirmModal);
+    //   return;
+    // }
 
     if (crew) {
       crew.notificationLoading = true;
