@@ -906,7 +906,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   updateSchedulesWithStatuses(statuses: JobMessageStatus[]): void {
     const compareAndUpdate = (list: any[]) =>
       list.map(schedule => {
-        const status = statuses.find(s => s?.jobId === schedule?.jobId);
+        const status = statuses.find(s => s?.jobPartId === schedule?.jobPartId);
         if (!status) return schedule;
 
         // თუ ძველი მნიშვნელობები ჯერ არ არის განსაზღვრული — არ ვაყენებთ changed:true

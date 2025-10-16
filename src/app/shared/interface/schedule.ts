@@ -310,6 +310,7 @@ export interface ShiftCrewDetails {
 
 export interface JobMessageStatus {
   jobId: number;
+  jobPartId: number;
   messageStatus: number;
   smsStatusColour: string;
   smsStatusTitle: string;
