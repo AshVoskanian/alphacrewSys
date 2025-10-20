@@ -11,6 +11,7 @@ import { ScheduleService } from "./schedule.service";
 import { SKILLS } from "../../../shared/data/skills";
 import { ScheduleGridComponent } from "./schedule-grid/schedule-grid.component";
 import { AsyncPipe } from "@angular/common";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-schedule',
@@ -23,6 +24,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   @ViewChild('scheduleModal') scheduleModal: any;
 
   private _modal = inject(NgbModal);
+  private _router = inject(Router);
   public _navService = inject(NavService);
   private _toast = inject(ToastrService);
   private _offcanvas = inject(NgbOffcanvas);
@@ -63,20 +65,19 @@ export class ScheduleComponent extends ApiBase implements OnInit {
   }
 
   subToDateChange() {
-    this._navService.date$.subscribe({
-      next: (date) => {
-        if (date) {
-          this.getScheduleData(date, null);
+    this._navService.filterParams.subscribe({
+      next: (params) => {
+        if (params) {
+          this.getScheduleData(params.date, params.jobId, false);
         }
       }
     });
   }
 
-  getScheduleData(date: NgbDateStruct, jobId: number) {
-    if (this.loading()) return;
+  getScheduleData(date: NgbDateStruct, jobId: number, openModal: boolean = true) {
+    if (this.loading() || this.JobScheduleLoading()) return;
 
-
-    if (jobId) {
+    if (jobId && openModal) {
       this.JobScheduleLoading.set(true);
     } else {
       this.loading.set(true);
@@ -104,7 +105,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
           } else {
             this.scheduleService.shiftsLoaded.next(true);
 
-            if (jobId) {
+            if (jobId && openModal) {
               this.scheduleService.jobScopedShifts = res.data;
               this.scheduleService.jobScopedShifts.forEach(it => {
                   it.transformedSkills = [];
@@ -112,7 +113,11 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                   this.fillArray(it.crews, it.crewNumber);
                 }
               );
-              this._modal.open(this.scheduleModal, { centered: true, fullscreen: true })
+              this._modal.open(this.scheduleModal, { centered: true, fullscreen: true });
+              const queryParams = {
+                jobId
+              }
+              this._router.navigate([ 'schedule' ], { queryParams });
             } else {
               this.scheduleService.shifts = res.data;
               this.scheduleService.shifts.forEach(it => {
@@ -169,6 +174,9 @@ export class ScheduleComponent extends ApiBase implements OnInit {
         this.scheduleService.closeJobScopedShiftModal$.next(true);
         modal.close();
 
+        const queryParams = {};
+        this._router.navigate([ 'schedule' ], { queryParams });
+
         setTimeout(() => {
           if (document.body.style.overflow === 'hidden') {
             document.body.style.overflow = 'auto';
@@ -178,6 +186,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     } else {
       this.scheduleService.closeJobScopedShiftModal$.next(true);
       modal.close();
+      const queryParams = {};
+      this._router.navigate([ 'schedule' ], { queryParams });
     }
   }
 }

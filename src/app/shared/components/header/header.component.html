@@ -52,6 +52,20 @@
           </ng-template>
         </select2>
       </div>
+
+      @if (queryParams() && queryParams().get('jobId')) {
+        <div class="badge-spacing image-badges">
+            <span
+              class="badge common-align txt-primary rounded-pill badge-l-primary rounded-pill border border-primary">
+                {{ queryParams().get('jobId') }}
+              <a href="javascript:void(0)" (click)="resetJobIdFilter()">
+                <app-feather-icon [icon]="'x-circle'"
+                                  [class]="'ms-1 stroke-primary'">
+                </app-feather-icon>
+              </a>
+            </span>
+        </div>
+      }
     </form>
   }
 

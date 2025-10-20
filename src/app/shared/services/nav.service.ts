@@ -15,7 +15,7 @@ export class NavService {
   public days: number = 2;
   public regionId: number = 0;
 
-  public date$: BehaviorSubject<NgbDateStruct> = new BehaviorSubject<any>(null);
+  public filterParams: BehaviorSubject<{date: NgbDateStruct, jobId: number}> = new BehaviorSubject<any>(null);
   public listView$: BehaviorSubject<'list' | 'grid'> = new BehaviorSubject<'list' | 'grid'>('list');
   public scrollTo$: BehaviorSubject<Schedule> = new BehaviorSubject<Schedule>(null);
 

@@ -1,31 +1,35 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
 import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
 import { SearchComponent } from "./widgets/search/search.component";
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
 import { LocalStorageService } from "../../services/local-storage.service";
 import { AsyncPipe } from "@angular/common";
+import { FeatherIconComponent } from "../ui/feather-icon/feather-icon.component";
+import { toSignal } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-header',
   imports: [
     HeaderLogoComponent, HeaderLanguageComponent, SearchComponent,
     Select2Module, ReactiveFormsModule,
-    ProfileComponent, NgbInputDatepicker, AsyncPipe
+    ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   private router: Router = inject(Router);
   private _fb = inject(FormBuilder);
+  private _activatedRouter = inject(ActivatedRoute);
   private _localStorageService = inject(LocalStorageService);
+  private _router = inject(Router);
 
   public navService: NavService = inject(NavService);
 
@@ -78,6 +82,8 @@ export class HeaderComponent {
 
   form: FormGroup;
 
+  queryParams = toSignal(this._activatedRouter.queryParamMap)
+
   constructor() {
     this.initForm();
     this.router.events.subscribe(() => {
@@ -85,6 +91,9 @@ export class HeaderComponent {
     });
     this.filterRegionsByRole();
     this.checkListView();
+  }
+
+  ngOnInit() {
   }
 
   checkListView() {
@@ -110,7 +119,7 @@ export class HeaderComponent {
       date: [ initialDate, [ Validators.required ] ]
     });
 
-    this.navService.date$.next(this.form.get('date')?.value);
+    this.navService.filterParams.next({ date: this.form.get('date')?.value, jobId: +this.queryParams().get('jobId') });
   }
 
   filterRegionsByRole() {
@@ -125,7 +134,10 @@ export class HeaderComponent {
 
   submit() {
     if (this.form.valid) {
-      this.navService.date$.next(this.form.get('date')?.value);
+      this.navService.filterParams.next({
+        date: this.form.get('date')?.value,
+        jobId: +this.queryParams().get('jobId')
+      });
     }
   }
 
@@ -142,5 +154,11 @@ export class HeaderComponent {
   setListView(viewType: 'list' | 'grid') {
     this._localStorageService.setItem('listView', viewType);
     this.navService.listView$.next(viewType);
+  }
+
+  resetJobIdFilter() {
+    const queryParams = {};
+    this._router.navigate([ 'schedule' ], { queryParams });
+    setTimeout(() => this.submit());
   }
 }

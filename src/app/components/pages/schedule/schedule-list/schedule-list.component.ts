@@ -250,7 +250,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             });
 
             const params = {
-              date: GeneralService.convertToDate(this._navService.date$.value),
+              date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
               jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null,
@@ -735,7 +735,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           });
 
           const params = {
-            date: GeneralService.convertToDate(this._navService.date$.value),
+            date: GeneralService.convertToDate(this._navService.filterParams.value.date),
             days: this._navService.days,
             regionFilter: this._navService.regionId,
             jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null,
@@ -762,7 +762,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
 
   getInfoMultiple() {
     const params = {
-      date: GeneralService.convertToDate(this._navService.date$.value),
+      date: GeneralService.convertToDate(this._navService.filterParams.value.date),
       days: this._navService.days,
       jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
     };
@@ -795,7 +795,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         next: (date) => {
           if (date) {
             const params = {
-              date: GeneralService.convertToDate(this._navService.date$.value),
+              date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
               jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
@@ -822,7 +822,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         next: (loaded) => {
           if (loaded) {
             const params = {
-              date: GeneralService.convertToDate(this._navService.date$.value),
+              date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionId: this._navService.regionId
             };
@@ -883,7 +883,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         next: (date) => {
           if (date) {
             const params = {
-              date: GeneralService.convertToDate(this._navService.date$.value),
+              date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
               jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
@@ -962,7 +962,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       list.map(schedule => {
         if (!Array.isArray(schedule.crews)) return schedule;
 
-        const updatedCrews = schedule.crews.map(crew => {
+        const updatedCrews = schedule.crews.map((crew: any) => {
           const status = crewStatuses.find(s => s.jobPartCrewId === crew.jobPartCrewId && s?.jobId === crew?.jobId);
           if (!status) return crew;
 
