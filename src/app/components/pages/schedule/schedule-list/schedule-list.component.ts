@@ -764,6 +764,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     const params = {
       date: GeneralService.convertToDate(this._navService.filterParams.value.date),
       days: this._navService.days,
+      regionFilter: this._navService.regionId,
       jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
     };
 
