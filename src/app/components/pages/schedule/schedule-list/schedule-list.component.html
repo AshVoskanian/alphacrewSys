@@ -130,14 +130,14 @@
                         @if (schedule.jobPartTypeId === 2 || schedule.jobPartTypeId === 5) {
                           <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
                                [ngbTooltip]="schedule.jobPartTypeText">
-                            <i class="fa-solid fa-truck text-danger f-14"></i>
+                            <i class="fa-solid fa-truck text-danger f-20"></i>
                           </div>
                         }
 
                         @if (schedule.jobPartTypeId === 4 || schedule.jobPartTypeId === 6) {
                           <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
                                [ngbTooltip]="schedule.jobPartTypeText">
-                            <i class="fa-solid fa-shield text-warning f-14"></i>
+                            <i class="icofont icofont-shield-alt text-danger f-16"></i>
                           </div>
                         }
                       </div>
@@ -164,8 +164,8 @@
                         @if (schedule.onsiteContact) {
                           <h6 class="fw-bold fst-italic">Onsite: {{ schedule.onsiteContact }}</h6>
                         } @else {
-                          <h6 class="fw-bold text-warning fst-italic pulse">
-                            <i class="fa-solid fa-warning text-warning"></i> Onsite Contact Missing
+                          <h6 class="fw-bold text-danger fst-italic pulse">
+                            <i class="fa-solid fa-warning text-danger"></i> Onsite Contact Missing
                           </h6>
                         }
                       </div>
