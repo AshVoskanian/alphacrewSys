@@ -22,6 +22,14 @@ export const menuItems: Menu[] = [
     level: 1,
   },
   {
+    title: 'Crew',
+    icon: 'reports',
+    type: 'link',
+    bookmark: true,
+    path: '/crew',
+    level: 1,
+  },
+  {
     title: 'Profile',
     icon: 'reports',
     type: 'link',

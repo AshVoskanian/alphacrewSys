@@ -13,15 +13,4 @@ import { UpcomingQuotesComponent } from "./widgets/upcoming-quotes/upcoming-quot
 })
 
 export class DashboardComponent {
-
-  ngOnInit() {
-   //  this.toast.show('<i class="fa fa-bell"></i> <strong>Loading Inner Data........</strong>', '', {
-   //   enableHtml: true,
-   //   closeButton: true,
-   //   progressBar: true,
-   //   progressAnimation: 'increasing',
-   //   timeOut: 5000,
-   // });
- }
-
 }

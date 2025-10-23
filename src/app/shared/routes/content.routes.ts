@@ -24,4 +24,11 @@ export const content: Routes = [
     },
     loadComponent: () => import('../../components/pages/user-profile/user-profile.component').then(r => r.UserProfileComponent)
   },
+  {
+    path: 'crew',
+    data: {
+      title: "Crew"
+    },
+    loadComponent: () => import('../../components/pages/crew/crew.component').then(r => r.CrewComponent)
+  },
 ];
