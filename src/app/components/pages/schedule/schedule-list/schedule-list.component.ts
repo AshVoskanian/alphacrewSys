@@ -767,7 +767,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     const getCrewAdditionalInfo$ = (params: any) =>
       this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params);
 
-    timer(4000, 6000).pipe(
+    timer(4000, 60000).pipe(
       takeUntilDestroyed(this._dr),
       switchMap(() => {
         const params = {
