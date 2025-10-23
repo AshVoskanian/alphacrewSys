@@ -44,7 +44,8 @@ export class CrewComponent extends ApiBase implements OnInit {
       page: 1,
       pageSize: 2000
     }
-    this.post<CrewIndex[]>('Crew/GetCrewIndex', { body })
+
+    this.post<CrewIndex[]>('Crew/GetCrewIndex', body)
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: res => {

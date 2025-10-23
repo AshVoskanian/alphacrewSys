@@ -761,28 +761,28 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   getInfoMultiple() {
-    const params = {
-      date: GeneralService.convertToDate(this._navService.filterParams.value.date),
-      days: this._navService.days,
-      regionFilter: this._navService.regionId,
-      jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
-    };
+    const getStatuses$ = (params: any) =>
+      this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params);
 
-    if (!params.jobId) {
-      delete params.jobId;
-    }
+    const getCrewAdditionalInfo$ = (params: any) =>
+      this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params);
 
-    const getStatuses$ = () => this.post<Array<JobMessageStatus>>('Schedule/GetJobPartCrewAdditionalDetailsSms', params);
-    const getCrewAdditionalInfo$ = () => this.post<Array<JobPartCrewAdditionalDetail>>('Schedule/GetJobPartCrewAdditionalDetails', params);
-
-    timer(4000, 60000).pipe(
+    timer(4000, 6000).pipe(
       takeUntilDestroyed(this._dr),
-      switchMap(() =>
-        forkJoin({
-          statuses: getStatuses$(),
-          crewDetails: getCrewAdditionalInfo$()
-        })
-      )
+      switchMap(() => {
+        const params = {
+          date: GeneralService.convertToDate(this._navService.filterParams.value.date),
+          days: this._navService.days,
+          regionFilter: this._navService.regionId,
+          jobId: this.isJobScoped ? this.selectedSchedule?.jobId : null
+        };
+        if (!params.jobId) delete params.jobId;
+
+        return forkJoin({
+          statuses: getStatuses$(params),
+          crewDetails: getCrewAdditionalInfo$(params)
+        });
+      })
     ).subscribe(({ statuses, crewDetails }) => {
       this.updateSchedulesWithStatuses(statuses.data);
       this.updateSchedulesWithCrewChanges(crewDetails.data);
