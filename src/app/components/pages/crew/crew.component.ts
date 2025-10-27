@@ -1,15 +1,18 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { TableConfigs } from "../../../shared/interface/common";
 import { CardComponent } from "../../../shared/components/ui/card/card.component";
 import { TableComponent } from "../../../shared/components/ui/table/table.component";
 import { ApiBase } from "../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GeneralService } from "../../../shared/services/general.service";
-import { CrewIndex } from "../../../shared/interface/crew";
+import { CrewIndex, CrewSearchParams } from "../../../shared/interface/crew";
+import { Select2Module } from "ng-select2-component";
+import { CrewFilterComponent } from "./crew-filter/crew-filter.component";
+import { NgxPaginationModule } from "ngx-pagination";
 
 @Component({
   selector: 'app-crew',
-  imports: [ CardComponent, TableComponent ],
+  imports: [ CardComponent, TableComponent, Select2Module, CrewFilterComponent, NgxPaginationModule ],
   templateUrl: './crew.component.html',
   styleUrl: './crew.component.scss'
 })
@@ -17,6 +20,10 @@ export class CrewComponent extends ApiBase implements OnInit {
   private readonly _dr = inject(DestroyRef);
 
   loading = signal(false);
+  filterParams: WritableSignal<{ page: number, pageSize: number }> = signal({
+    page: 1,
+    pageSize: 20
+  });
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -34,18 +41,15 @@ export class CrewComponent extends ApiBase implements OnInit {
   };
 
   ngOnInit() {
-    this.getCrewList();
+    this.getCrewList(this.filterParams());
   }
 
-  getCrewList() {
+  getCrewList(params: CrewSearchParams) {
     this.loading.set(true);
 
-    const body = {
-      page: 1,
-      pageSize: 2000
-    }
+    GeneralService.clearObject(params);
 
-    this.post<CrewIndex[]>('Crew/GetCrewIndex', body)
+    this.post<CrewIndex[]>('Crew/GetCrewIndex', { ...params, ...this.filterParams() })
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: res => {
@@ -61,9 +65,18 @@ export class CrewComponent extends ApiBase implements OnInit {
           }));
           this.loading.set(false);
         },
-        error: err => {
+        error: _ => {
           this.loading.set(false);
         }
       })
+  }
+
+  filter(params: CrewSearchParams) {
+    this.getCrewList(params);
+  }
+
+  pageChanged(p: number) {
+    this.filterParams().page = p;
+    this.filter(this.filterParams());
   }
 }

@@ -51,4 +51,26 @@ export class GeneralService {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.innerText || "";
   }
+
+  public static clearObject(object: any, zeroCheck: boolean = false): any {
+    for (const item in object) {
+      if (object.hasOwnProperty(item)) {
+        if (typeof object[item] === 'string' && !object[item]) {
+          delete object[item];
+        }
+        if (object[item] === null) {
+          delete object[item];
+        }
+        if (object[item] === undefined) {
+          delete object[item];
+        }
+        if (zeroCheck && object[item] === 0) {
+          delete object[item];
+        }
+        if (object[item] && object[item].length === 0) {
+          delete object[item];
+        }
+      }
+    }
+  }
 }

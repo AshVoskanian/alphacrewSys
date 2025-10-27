@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
-@Injectable({ 
-  providedIn: 'root' 
+@Injectable({
+  providedIn: 'root'
 })
 
 export class TableService {
@@ -9,11 +9,7 @@ export class TableService {
   public searchText: string = '';
 
   // Get Pager For Pagination
-  getPager(total_items: number, current_page: number, page_size: number) {
-
-    // calculate total pages
-    let total_pages = Number(Math.ceil(Number(total_items) / Number(page_size)));
-
+  getPager(total_items: number, current_page: number, page_size: number, total_pages: number) {
     // Paginate Range
     let paginateRange = 3;
 

@@ -1,83 +1,4 @@
 @if (tableConfig) {
-
-  @if (search || dateFilter || showPaginate) {
-    <div class="top-body">
-      @if (showPaginate) {
-        <select (change)="handleSelect($event)">
-          @for (pages of pageSizeOptions; track pages) {
-            <option [value]="pages.value" [selected]="pages.selected">{{ pages.title }}</option>
-          }
-        </select>
-      }
-      @if (dateFilter) {
-        <div>
-          <div class="row align-items-center g-1">
-            <div class="col-auto">
-              <label class="form-label">Select Dates</label>
-            </div>
-            <div class="col-auto">
-              <div class="range-dropdown flatpickr-input" id="reportrange" readonly="readonly">
-                <span (click)="handleDropdown()">{{ selectedDate ? selectedDate : 'Select' }}</span>
-                <div id="rangeButtons" [class.range-option]="dateDropdownOpen">
-                  <button (click)="handleDateFilter('today')" [class.active]="selectedValue == 'today'">Today</button>
-                  <button (click)="handleDateFilter('yesterday')"
-                          [class.active]="selectedValue == 'yesterday'">Yesterday
-                  </button>
-                  <button (click)="handleDateFilter('7_days')" [class.active]="selectedValue == '7_days'">Last 7 Days
-                  </button>
-                  <button (click)="handleDateFilter('30_days')" [class.active]="selectedValue == '30_days'">Last 30
-                    Days
-                  </button>
-                  <button (click)="handleDateFilter('this_month')" [class.active]="selectedValue == 'this_month'">This
-                    Month
-                  </button>
-                  <button (click)="handleDateFilter('last_month')" [class.active]="selectedValue == 'last_month'">Last
-                    Month
-                  </button>
-                  <button (click)="handleDateFilter('custom')" [class.active]="selectedValue == 'custom'">Custom Date
-                    Range
-                  </button>
-                </div>
-
-              </div>
-              @if (selectedValue === 'custom') {
-                <ngb-datepicker #dp (dateSelect)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t"
-                                outsideDays="hidden"></ngb-datepicker>
-
-                <ng-template #t let-date let-focused="focused">
-          <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)"
-                [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date"
-                (mouseleave)="hoveredDate = null">
-            {{ date.day }}
-          </span>
-                </ng-template>
-              }
-            </div>
-          </div>
-
-        </div>
-      }
-      @if (search) {
-        <div id="basic-1_filter" class="dataTables_filter" search>
-          <label>Search:
-            <input type="text" name="searchTerm" [(ngModel)]="searchText" (keyup)="searchTerm(searchText)"
-                   [placeholder]="searchPlaceholder">
-          </label>
-          @if (downloadReports) {
-            <div class="dt-buttons btn-group flex-wrap">
-              <button class="btn buttons-copy buttons-html5 btn-outline-primary" type="button"><span>Copy</span>
-              </button>
-              <button class="btn buttons-csv buttons-html5 btn-outline-primary" type="button"><span>CSV</span></button>
-              <button class="btn buttons-excel buttons-html5 btn-outline-primary" type="button"><span>Excel</span>
-              </button>
-              <button class="btn buttons-pdf buttons-html5 btn-outline-primary" type="button"><span>PDF</span></button>
-              <button class="btn buttons-print btn-outline-primary" type="button"><span>Print</span></button>
-            </div>
-          }
-        </div>
-      }
-    </div>
-  }
   <div class="overflow-auto custom-scrollbar max-h-{{maxHeight}}">
     <table class="table" [ngClass]="tableClass">
       <thead>
@@ -119,7 +40,7 @@
 
       @if (tableData && tableData.length) {
         <tbody>
-          @for (details of tableData; track details) {
+          @for (details of tableData | paginate: { itemsPerPage: pageSize, currentPage: pageNo, totalItems: totalCount }; track details) {
             <tr [class.selected]="selected && selected.length && selected.includes(details.id)">
               @if (hasCheckbox) {
                 <td class="datatable-checkbox">
@@ -249,10 +170,4 @@
       }
     </table>
   </div>
-
-  @if (tableConfig.data.length && pagination) {
-    <app-pagination [total]="tableConfig.data.length" [paginate]="paginate" (setPage)="setPage($event)"
-                    [paginateDetails]="paginateDetails" [selectedRows]="selectedRows" [selectedItems]="selected.length">
-    </app-pagination>
-  }
 }

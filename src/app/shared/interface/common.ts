@@ -76,3 +76,8 @@ export interface ApiResponse<T> {
     message: string
   };
 }
+
+export interface IdName {
+  id: number;
+  name: string;
+}
