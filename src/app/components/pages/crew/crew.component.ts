@@ -71,7 +71,13 @@ export class CrewComponent extends ApiBase implements OnInit {
       })
   }
 
-  filter(params: CrewSearchParams) {
+  filter(params: CrewSearchParams, resetPage = false) {
+    if (resetPage) {
+      this.filterParams.set({
+        page: 1,
+        pageSize: 20
+      })
+    }
     this.getCrewList(params);
   }
 
