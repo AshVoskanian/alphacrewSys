@@ -41,7 +41,11 @@
       @if (tableData && tableData.length) {
         <tbody>
           @for (details of tableData | paginate: { itemsPerPage: pageSize, currentPage: pageNo, totalItems: totalCount }; track details) {
-            <tr [class.selected]="selected && selected.length && selected.includes(details.id)">
+            <tr class="pointer"
+                (click)="rowClicked.emit(details)"
+                [class.selected]="selected && selected.length && selected.includes(details.id)"
+                [class.hovered]="hover"
+            >
               @if (hasCheckbox) {
                 <td class="datatable-checkbox">
                   <input type="checkbox" [attr.data-id]="details.id" [value]="details?.id"

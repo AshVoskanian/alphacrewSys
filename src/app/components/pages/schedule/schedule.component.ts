@@ -114,10 +114,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                 }
               );
               this._modal.open(this.scheduleModal, { centered: true, fullscreen: true });
-              const queryParams = {
-                jobId
-              }
-              this._router.navigate([ 'schedule' ], { queryParams });
+              const url = `/schedule?jobId=${jobId}`;
+              window.history.pushState({}, '', url);
             } else {
               this.scheduleService.shifts = res.data;
               this.scheduleService.shifts.forEach(it => {
@@ -173,9 +171,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
       setTimeout(() => {
         this.scheduleService.closeJobScopedShiftModal$.next(true);
         modal.close();
-
-        const queryParams = {};
-        this._router.navigate([ 'schedule' ], { queryParams });
+        window.history.replaceState({}, '', '/schedule');
 
         setTimeout(() => {
           if (document.body.style.overflow === 'hidden') {
@@ -186,8 +182,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     } else {
       this.scheduleService.closeJobScopedShiftModal$.next(true);
       modal.close();
-      const queryParams = {};
-      this._router.navigate([ 'schedule' ], { queryParams });
+      window.history.replaceState({}, '', '/schedule');
     }
   }
 }

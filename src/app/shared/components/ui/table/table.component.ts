@@ -30,7 +30,7 @@ export class TableComponent implements OnInit {
 
   @Input() tableConfig: TableConfigs;
   @Input() hasCheckbox: boolean;
-  @Input()  pageNo: number = 1
+  @Input() pageNo: number = 1
   @Input() pageSize: number = 4;
   @Input() maxHeight: number = 1000;
   @Input() totalCount: number = 100;
@@ -42,10 +42,13 @@ export class TableComponent implements OnInit {
   @Input() selectedRows: boolean = false;
   @Input() rowDetails: boolean = false;
   @Input() dateFilter: boolean = false;
+  @Input() hover: boolean = false;
   @Input() downloadReports: boolean = false;
   @Input() searchPlaceholder: string = '';
 
   @Output() action = new EventEmitter<TableClickedAction>();
+  @Output() rowClicked = new EventEmitter<any>();
+
   public selected: number[] = [];
   public tableData: any;
 

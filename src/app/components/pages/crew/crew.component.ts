@@ -5,10 +5,12 @@ import { TableComponent } from "../../../shared/components/ui/table/table.compon
 import { ApiBase } from "../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GeneralService } from "../../../shared/services/general.service";
-import { CrewIndex, CrewSearchParams } from "../../../shared/interface/crew";
+import { CrewIndex, CrewIndexResponse, CrewSearchParams } from "../../../shared/interface/crew";
 import { Select2Module } from "ng-select2-component";
 import { CrewFilterComponent } from "./crew-filter/crew-filter.component";
 import { NgxPaginationModule } from "ngx-pagination";
+import { CrewService } from "./crew.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-crew',
@@ -17,13 +19,13 @@ import { NgxPaginationModule } from "ngx-pagination";
   styleUrl: './crew.component.scss'
 })
 export class CrewComponent extends ApiBase implements OnInit {
+  private _router: Router = inject(Router);
   private readonly _dr = inject(DestroyRef);
+  private _crewService: CrewService = inject(CrewService);
 
-  loading = signal(false);
-  filterParams: WritableSignal<{ page: number, pageSize: number }> = signal({
-    page: 1,
-    pageSize: 20
-  });
+  loading: WritableSignal<boolean> = signal(false);
+  totalCount: WritableSignal<number> = signal<number>(null);
+  filterParams: WritableSignal<{ page: number, pageSize: number }> = signal({ page: 1, pageSize: 20 });
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -49,7 +51,7 @@ export class CrewComponent extends ApiBase implements OnInit {
 
     GeneralService.clearObject(params);
 
-    this.post<CrewIndex[]>('Crew/GetCrewIndex', { ...params, ...this.filterParams() })
+    this.post<CrewIndexResponse>('Crew/GetCrewIndex', { ...params, ...this.filterParams() })
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: res => {
@@ -58,11 +60,13 @@ export class CrewComponent extends ApiBase implements OnInit {
             return;
           }
 
-          this.tableConfig.data = res.data.map((crew: CrewIndex) => ({
+          this.tableConfig.data = res.data.crewIndex.map((crew: CrewIndex) => ({
             ...crew,
             id: crew.crewId,
             hours: `${ crew.completed }/${ crew.scheduled }`
           }));
+          this.totalCount.set(res.data.rowCount);
+
           this.loading.set(false);
         },
         error: _ => {
@@ -84,5 +88,9 @@ export class CrewComponent extends ApiBase implements OnInit {
   pageChanged(p: number) {
     this.filterParams().page = p;
     this.filter(this.filterParams());
+  }
+
+  itemSelect(crew: CrewIndex) {
+    this._router.navigate([ 'crew', crew.crewId ]);
   }
 }

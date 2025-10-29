@@ -1,5 +1,10 @@
 import { Select2Data } from "ng-select2-component";
 
+export interface CrewIndexResponse {
+  rowCount: number;
+  crewIndex: CrewIndex[];
+}
+
 export interface CrewIndex {
   avgRating: number;
   checksId: number;

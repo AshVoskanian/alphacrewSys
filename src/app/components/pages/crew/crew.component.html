@@ -1,4 +1,4 @@
-<div class="p-x-10 p-y-15 row table-components default-datatable">
+<div class="p-x-10 p-y-15">
   <app-card>
     <app-crew-filter (filter)="filter($event, true)"></app-crew-filter>
   </app-card>
@@ -17,11 +17,13 @@
               <div class="flex flex-col gap-20">
                 <app-table [tableConfig]="tableConfig"
                            [search]="false"
+                           [hover]="true"
                            [pageNo]="filterParams().page"
-                           [totalCount]="1000"
+                           [totalCount]="totalCount()"
                            [pageSize]="filterParams().pageSize"
                            [hasCheckbox]="true"
-                           [pagination]="true">
+                           [pagination]="true"
+                           (rowClicked)="itemSelect($event)">
                 </app-table>
 
                 <div class="flex w-full justify-content-end">

@@ -31,4 +31,9 @@ export const content: Routes = [
     },
     loadComponent: () => import('../../components/pages/crew/crew.component').then(r => r.CrewComponent)
   },
+  {
+    path: 'crew/:id',
+    data: { title: 'Crew Details' },
+    loadComponent: () => import('../../components/pages/crew/crew-details/crew-details.component').then(c => c.CrewDetailsComponent)
+  }
 ];

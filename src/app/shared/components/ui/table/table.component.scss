@@ -1,0 +1,15 @@
+.custom-scrollbar {
+  table {
+    thead {
+
+    }
+
+    tbody {
+      tr {
+        &.hovered:hover {
+          background: var(--chart-progress-light);
+        }
+      }
+    }
+  }
+}
