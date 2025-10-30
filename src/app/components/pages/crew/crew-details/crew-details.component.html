@@ -10,6 +10,11 @@
               <p class="txt-dark f-20">{{ crewDetails().name }}</p>
               <p class="txt-secondary f-18">Crew Chief 2</p>
               <p class="txt-secondary f-18">London</p>
+
+              <div class="text-start">
+                <label class="form-label" for="inputEmail4">Job Notes</label>
+                <input class="form-control" id="inputEmail4" type="email" placeholder="Enter Your Email">
+              </div>
             </div>
           </div>
         </div>
@@ -42,65 +47,49 @@
           <li [ngbNavItem]="'profile'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                1
-              </div>
+              <app-crew-profile></app-crew-profile>
             </ng-template>
           </li>
           <li [ngbNavItem]="'documents'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                2
-              </div>
+              2
             </ng-template>
           </li>
           <li [ngbNavItem]="'feedback'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-comment-dots"></i>Feedback</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                3
-              </div>
+              3
             </ng-template>
           </li>
           <li [ngbNavItem]="'holidays'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Absences / Holidays</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                3
-              </div>
+              4
             </ng-template>
           </li>
           <li [ngbNavItem]="'notes'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-note-sticky"></i>Notes</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                3
-              </div>
+              5
             </ng-template>
           </li>
           <li [ngbNavItem]="'deduction'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-minus-circle"></i>Deductions</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                3
-              </div>
+              6
             </ng-template>
           </li>
           <li [ngbNavItem]="'timesheet'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-clock"></i>Timesheets</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                3
-              </div>
+              7
             </ng-template>
           </li>
           <li [ngbNavItem]="'payments'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-credit-card"></i>Payments</a>
             <ng-template ngbNavContent>
-              <div class="p-x-10 p-y-15">
-                3
-              </div>
+              8
             </ng-template>
           </li>
         </ul>
