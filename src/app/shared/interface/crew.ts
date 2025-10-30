@@ -51,4 +51,56 @@ export interface CrewSearchParams {
   pageSize: number;
 }
 
+export interface CrewSkill {
+  id: number;
+  name: string;
+  isActive: boolean;
+}
+
+export interface CrewDetail {
+  crewId: number;
+  name: string;
+  regionId: number;
+  groupId: number;
+  classificationId: number;
+  vaccinationStatus: string | null;
+  login: string;
+  password: string;
+  jobNotes: string;
+  address: string;
+  postcode: string;
+  phoneNumber: string;
+  email: string;
+  payrollEmail: string;
+  payrollRef: string | null;
+  doB: string;              // ISO string: e.g. "2018-09-20T00:00:00"
+  startDate: string;        // ISO string
+  checksId: number;
+  documents: string;
+  ltdCompanyName: string | null;
+  ltdCompanyNumber: string | null;
+  utrNumber: string | null;
+  ninNumber: string | null;
+  pliProvides: string | null;
+  pliExpiry: string | null;
+  pliCoverId: string | null;
+  levelId: number;
+  loyaltyBonus: number;
+  paymentOptionId: number;
+  rating: number;
+  availability: string | null;
+  availabilityFlag: string | null;
+  isFulltime: boolean;
+  isActive: boolean;
+  deactivationDate: string | null;
+  onFurlough: boolean;
+  phoneNumbere164: string;
+  useWhatsapp: boolean | null;
+  useEmail: boolean | null;
+  useSms: boolean | null;
+  crewSkills: CrewSkill[];
+  crewSkillIds: number[];
+  crewAllSkills: CrewSkill[];
+}
+
 

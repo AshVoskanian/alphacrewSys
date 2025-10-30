@@ -1,27 +1,31 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { CrewService } from "../crew.service";
+import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { finalize } from "rxjs";
-import { AsyncPipe, JsonPipe } from "@angular/common";
 import { ActivatedRoute } from "@angular/router";
 import { LayoutService } from "../../../../shared/services/layout.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { CrewDetail } from "../../../../shared/interface/crew";
+import { ApiBase } from "../../../../shared/bases/api-base";
+import { CardComponent } from "../../../../shared/components/ui/card/card.component";
+import { TransformedSkill } from "../../../../shared/interface/schedule";
+import { CREW_SKILLS } from "../../../../shared/data/skills";
+import { TitleCasePipe } from "@angular/common";
+import { NgbNavModule } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-crew-details',
-  imports: [
-    AsyncPipe,
-    JsonPipe
-  ],
+  imports: [ CardComponent, TitleCasePipe, NgbNavModule ],
   templateUrl: './crew-details.component.html',
   styleUrl: './crew-details.component.scss'
 })
-export class CrewDetailsComponent implements OnInit {
+export class CrewDetailsComponent extends ApiBase implements OnInit {
   private _dr: DestroyRef = inject(DestroyRef);
   private _route: ActivatedRoute = inject(ActivatedRoute);
-  private _crewService: CrewService = inject(CrewService);
   private _layoutService = inject(LayoutService);
 
-  crewDetails = signal(null);
+  crewDetails: WritableSignal<CrewDetail> = signal<CrewDetail>(null);
+  skills: WritableSignal<TransformedSkill[]> = signal<TransformedSkill[]>(null);
+
+  activeTab: string = 'profile';
 
   ngOnInit() {
     this.getDetails();
@@ -33,18 +37,31 @@ export class CrewDetailsComponent implements OnInit {
     this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: params => {
-          this._crewService.getDetail(+params.get('id'))
+          this.get<CrewDetail>(`Crew/GetCrewByCrewId?crewId=8`)
+            // this.get<CrewDetail>(`/Crew/GetCrewByCrewId?crewId=${ +params.get('id') }`)
             .pipe(
               takeUntilDestroyed(this._dr),
               finalize(() => this._layoutService.loading = false)
             )
             .subscribe({
               next: res => {
-                console.log(res)
-                this.crewDetails.set(res);
+                this.crewDetails.set(res.data);
+                this.setSkills(res.data);
               }
             })
         }
       })
+  }
+
+  setSkills(crewDetails: CrewDetail) {
+    this.skills.set([]);
+
+    crewDetails.crewAllSkills.forEach(skill => {
+      this.skills().push({
+        name: skill.name,
+        url: CREW_SKILLS[skill.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, '')],
+        active: skill.isActive
+      })
+    })
   }
 }

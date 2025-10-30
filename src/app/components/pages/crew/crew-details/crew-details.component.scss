@@ -1,0 +1,13 @@
+.crew-wrapper {
+  .grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+
+    .user-info {
+      p {
+        margin: 0 !important;
+      }
+    }
+  }
+}

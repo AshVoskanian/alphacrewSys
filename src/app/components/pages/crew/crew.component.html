@@ -1,9 +1,9 @@
 <div class="p-x-10 p-y-15">
   <app-card>
-    <app-crew-filter (filter)="filter($event, true)"></app-crew-filter>
+    <app-crew-filter></app-crew-filter>
   </app-card>
 
-  <div class="container-fluid">
+  <div class="container-fluid p-0">
     <div class="row table-components default-datatable">
       <app-card [headerTitle]="'Crew'"
                 [cardBodyClass]="'common-option'">

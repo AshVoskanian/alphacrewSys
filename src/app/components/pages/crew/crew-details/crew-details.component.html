@@ -1,5 +1,111 @@
-<div class="p-x-10 p-y-15">
-    <pre>
-      {{ crewDetails() | json }}
-    </pre>
+<div class="crew-wrapper p-x-10 p-y-15">
+  <div class="grid">
+    <div class="flex flex-col ">
+      <app-card>
+        <div class="user-info">
+          <div class="flex flex-col items-center p-12 gap-12">
+            <img class="rounded-circle w-180 h-180 object-fit-cover"
+                 [src]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails().crewId" alt="">
+            <div class="text-center">
+              <p class="txt-dark f-20">{{ crewDetails().name }}</p>
+              <p class="txt-secondary f-18">Crew Chief 2</p>
+              <p class="txt-secondary f-18">London</p>
+            </div>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card>
+        <div class="skills">
+          <ul class="list-group list-group-flush">
+            @for (skill of skills(); track skill.name + skill.url) {
+              <li class="list-group-item flex justify-content-between">
+                <span>
+                  <i class="{{ skill.url }}"></i>
+                  {{ skill.name | titlecase }}
+                </span>
+
+                <div>
+                  <input class="tgl tgl-flip" [id]="skill.name" type="checkbox" [checked]="skill.active">
+                  <label class="tgl-btn m-0" data-tg-off="No" data-tg-on="Yes" [for]="skill.name"></label>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </app-card>
+    </div>
+
+    <div class="content">
+      <app-card>
+        <ul class="nav nav-tabs" ngbNav #nav="ngbNav" [(activeId)]="activeTab">
+          <li [ngbNavItem]="'profile'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                1
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'documents'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                2
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'feedback'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-comment-dots"></i>Feedback</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                3
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'holidays'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Absences / Holidays</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                3
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'notes'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-note-sticky"></i>Notes</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                3
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'deduction'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-minus-circle"></i>Deductions</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                3
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'timesheet'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-clock"></i>Timesheets</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                3
+              </div>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="'payments'">
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-credit-card"></i>Payments</a>
+            <ng-template ngbNavContent>
+              <div class="p-x-10 p-y-15">
+                3
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="nav"></div>
+      </app-card>
+    </div>
+  </div>
 </div>

@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CrewSearchParams, FilterDropdowns } from "../../../../shared/interface/crew";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { map } from "rxjs";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: 'app-crew-filter',
@@ -17,8 +18,10 @@ import { map } from "rxjs";
 export class CrewFilterComponent extends ApiBase implements OnInit {
   @Output() public filter: EventEmitter<CrewSearchParams> = new EventEmitter();
 
+  private _router: Router = inject(Router);
   private _dr = inject(DestroyRef);
   private _fb = inject(FormBuilder);
+  private _activatedRoute: ActivatedRoute = inject(ActivatedRoute);
 
   form: FormGroup;
 
@@ -55,6 +58,25 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
     });
   }
 
+  setExistingParams() {
+    this._activatedRoute.queryParams
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(params => {
+        const transformedParams = {
+          ...params,
+          page: +params['page'] || 1,
+          classification: +params['classification'] || 0,
+          crewLevel: +params['crewLevel'] || 0,
+          crewRegion: +params['crewRegion'] || 0,
+          paymentOption: +params['paymentOption'] || 0,
+          acive: +params['acive'] || null,
+        }
+        if (Object.keys(transformedParams).length) {
+          this.form.patchValue(transformedParams, { emitEvent: false });
+        }
+      });
+  }
+
   getFilters() {
     this.loading.set(true);
 
@@ -79,14 +101,18 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
         next: (res) => {
           this.dropdowns.set(res.data);
           this.loading.set(false);
+          this.setExistingParams();
         }
       });
   }
 
-
   submit() {
-    this.filter.emit({
-      ...this.form.getRawValue()
-    })
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      queryParams: {
+        ...this.form.getRawValue(),
+        page: 1
+      }
+    }).then();
   }
 }
