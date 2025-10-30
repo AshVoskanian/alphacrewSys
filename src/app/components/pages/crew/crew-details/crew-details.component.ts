@@ -8,13 +8,13 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { TransformedSkill } from "../../../../shared/interface/schedule";
 import { CREW_SKILLS } from "../../../../shared/data/skills";
-import { TitleCasePipe } from "@angular/common";
+import { DatePipe, TitleCasePipe } from "@angular/common";
 import { NgbNavModule } from "@ng-bootstrap/ng-bootstrap";
 import { CrewProfileComponent } from "./crew-profile/crew-profile.component";
 
 @Component({
   selector: 'app-crew-details',
-  imports: [ CardComponent, TitleCasePipe, NgbNavModule, CrewProfileComponent ],
+  imports: [ CardComponent, TitleCasePipe, NgbNavModule, CrewProfileComponent, DatePipe ],
   templateUrl: './crew-details.component.html',
   styleUrl: './crew-details.component.scss'
 })

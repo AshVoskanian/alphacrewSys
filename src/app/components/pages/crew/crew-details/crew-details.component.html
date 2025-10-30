@@ -4,14 +4,20 @@
       <app-card>
         <div class="user-info">
           <div class="flex flex-col items-center p-12 gap-12">
-            <img class="rounded-circle w-180 h-180 object-fit-cover"
+            <img class="rounded-circle w-170 h-170 object-fit-cover"
                  [src]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails().crewId" alt="">
             <div class="text-center">
-              <p class="txt-dark f-20">{{ crewDetails().name }}</p>
-              <p class="txt-secondary f-18">Crew Chief 2</p>
-              <p class="txt-secondary f-18">London</p>
+              <p class="txt-dark f-18">{{ crewDetails().name }}</p>
+              <p class="txt-secondary f-16">Crew Chief 2</p>
+              <p class="txt-secondary f-16">London</p>
 
-              <div class="text-start">
+              <div class="ttl-info  m-t-10">
+                <h6>
+                  <i class="fa-solid fa-calendar-days pe-2"></i>{{ crewDetails()?.doB | date }}
+                </h6>
+              </div>
+
+              <div class="text-start w-300 m-t-10">
                 <label class="form-label" for="inputEmail4">Job Notes</label>
                 <input class="form-control" id="inputEmail4" type="email" placeholder="Enter Your Email">
               </div>
