@@ -5,21 +5,16 @@
         <div class="user-info">
           <div class="flex flex-col items-center p-12 gap-12">
             <img class="rounded-circle w-170 h-170 object-fit-cover"
-                 [src]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails().crewId" alt="">
+                 [src]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails()?.crewId" alt="">
             <div class="text-center">
-              <p class="txt-dark f-18">{{ crewDetails().name }}</p>
-              <p class="txt-secondary f-16">Crew Chief 2</p>
-              <p class="txt-secondary f-16">London</p>
+              <p class="txt-dark f-18">{{ crewDetails()?.name }}</p>
+              <p class="txt-secondary f-16">{{ crewDetails()?.levelText }}</p>
+              <p class="txt-secondary f-16">{{ crewDetails()?.regionText }}</p>
 
               <div class="ttl-info  m-t-10">
                 <h6>
                   <i class="fa-solid fa-calendar-days pe-2"></i>{{ crewDetails()?.doB | date }}
                 </h6>
-              </div>
-
-              <div class="text-start w-300 m-t-10">
-                <label class="form-label" for="inputEmail4">Job Notes</label>
-                <input class="form-control" id="inputEmail4" type="email" placeholder="Enter Your Email">
               </div>
             </div>
           </div>
@@ -37,7 +32,7 @@
                 </span>
 
                 <div>
-                  <input class="tgl tgl-flip" [id]="skill.name" type="checkbox" [checked]="skill.active">
+                  <input class="tgl tgl-flip" [id]="skill.name" type="checkbox" [(ngModel)]="skill.active">
                   <label class="tgl-btn m-0" data-tg-off="No" data-tg-on="Yes" [for]="skill.name"></label>
                 </div>
               </li>
@@ -53,7 +48,10 @@
           <li [ngbNavItem]="'profile'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
             <ng-template ngbNavContent>
-              <app-crew-profile></app-crew-profile>
+              <app-crew-profile [crewDetail]="crewDetails()"
+                                [loading]="profileLoading()"
+                                (save)="saveCrewProfile($event)">
+              </app-crew-profile>
             </ng-template>
           </li>
           <li [ngbNavItem]="'documents'">

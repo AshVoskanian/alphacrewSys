@@ -63,6 +63,7 @@ export interface TransformedSkill {
   active: any;
   url: any;
   name: string;
+  id?: number
 }
 
 export interface ScheduleSkills {

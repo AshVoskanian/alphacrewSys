@@ -1,4 +1,4 @@
-import { Select2Data } from "ng-select2-component";
+import { Select2Data, Select2Option } from "ng-select2-component";
 
 export interface CrewIndexResponse {
   rowCount: number;
@@ -31,13 +31,13 @@ export interface CrewIndex {
 }
 
 export interface FilterDropdowns {
-  checks: Select2Data;
-  groups: Select2Data;
-  region: Select2Data;
-  pLiCover: Select2Data;
-  level: Select2Data;
-  classification: Select2Data;
-  payMethod: Select2Data;
+  checks: Select2Option[];
+  groups: Select2Option[];
+  region: Select2Option[];
+  pLiCover: Select2Option[];
+  level: Select2Option[];
+  classification: Select2Option[];
+  payMethod: Select2Option[];
 }
 
 export interface CrewSearchParams {
@@ -60,6 +60,8 @@ export interface CrewSkill {
 export interface CrewDetail {
   crewId: number;
   name: string;
+  levelText: string;
+  regionText: string;
   regionId: number;
   groupId: number;
   classificationId: number;

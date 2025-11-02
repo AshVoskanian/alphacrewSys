@@ -4,8 +4,8 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CrewSearchParams, FilterDropdowns } from "../../../../shared/interface/crew";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { map } from "rxjs";
 import { ActivatedRoute, Router } from "@angular/router";
+import { CrewService } from "../crew.service";
 
 @Component({
   selector: 'app-crew-filter',
@@ -21,6 +21,7 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
   private _router: Router = inject(Router);
   private _dr = inject(DestroyRef);
   private _fb = inject(FormBuilder);
+  private _crewService = inject(CrewService);
   private _activatedRoute: ActivatedRoute = inject(ActivatedRoute);
 
   form: FormGroup;
@@ -43,7 +44,7 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
   ]);
 
   ngOnInit() {
-    this.getFilters();
+    this.getDropdownsData();
     this.initForm();
   }
 
@@ -77,26 +78,11 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
       });
   }
 
-  getFilters() {
+  getDropdownsData() {
     this.loading.set(true);
 
-    this.get<FilterDropdowns>('Crew/GetCrewEditUpdateDropDown')
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        map((res) => {
-          const updatedData = Object.fromEntries(
-            Object.entries(res.data).map(([ key, value ]) => [
-              key,
-              [ { label: 'All', value: 0 }, ...(value || []) ]
-            ])
-          ) as unknown as FilterDropdowns;
-
-          return {
-            ...res,
-            data: updatedData
-          };
-        })
-      )
+    this._crewService.getDropdownsData()
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           this.dropdowns.set(res.data);
