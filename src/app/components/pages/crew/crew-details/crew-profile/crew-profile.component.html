@@ -70,7 +70,7 @@
       <div class="input-group">
         <input class="form-control" type="text" formControlName="jobNotes">
         <span class="input-group-text bg-light-secondary">
-        <i class="fa-solid fa-coins txt-secondary"></i>
+        <i class="fa-solid fa-pen-to-square txt-secondary"></i>
       </span>
       </div>
     </div>
@@ -188,13 +188,18 @@
       <input class="form-control digits" type="date" formControlName="pliExpiry">
     </div>
 
-    <div class="col-8">
+    <div class="col-9">
       <label class="form-label" for="formFileSimple">Default File Input Example</label>
       <input class="form-control px-4" id="formFileSimple" type="file">
     </div>
 
-    <div class="col-4 d-flex flex-col justify-content-end align-items-end text-end p-t-15">
-      <button class="btn btn-primary" type="submit">Save</button>
+    <div class="col-3 d-flex flex-col justify-content-end align-items-end text-end p-t-15">
+      <button class="w-110 btn btn-primary" type="submit">
+        Save
+        @if (loading()) {
+          <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+        }
+      </button>
     </div>
   </div>
 </form>

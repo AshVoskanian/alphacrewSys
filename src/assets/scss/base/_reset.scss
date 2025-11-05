@@ -617,7 +617,7 @@ $warning-color;
 
   .social-tabs {
     .tab-content {
-      @media (max-width:413px) {
+      @media (max-width: 413px) {
         margin-bottom: -45px;
       }
     }
@@ -625,11 +625,11 @@ $warning-color;
     .nav {
       gap: 16px;
 
-      @media (max-width:1210px) {
+      @media (max-width: 1210px) {
         gap: 10px;
       }
 
-      @media (max-width:575px) {
+      @media (max-width: 575px) {
         display: flex;
       }
 
@@ -643,7 +643,7 @@ $warning-color;
         align-items: center;
         gap: 16px;
 
-        @media (max-width:1528px) {
+        @media (max-width: 1528px) {
           gap: 12px;
         }
 
@@ -671,7 +671,7 @@ $warning-color;
               align-items: center;
               border-radius: 50%;
 
-              @media (max-width:1528px) {
+              @media (max-width: 1528px) {
                 width: 28px;
                 height: 28px;
               }
@@ -701,7 +701,7 @@ $warning-color;
 
     .tab-content {
       .tab-pane {
-        >div {
+        > div {
           margin-bottom: -20px;
         }
       }
@@ -1841,6 +1841,22 @@ $i: 1;
     line-height: #{$i}px !important;
   }
 
+  .t-#{$i} {
+    top: #{$i}px !important;
+  }
+
+  .b-#{$i} {
+    bottom: #{$i}px !important;
+  }
+
+  .l-#{$i} {
+    left: #{$i}px !important;
+  }
+
+  .r-#{$i} {
+    right: #{$i}px !important;
+  }
+
   .truncate-#{$i} {
     max-width: #{$i}px;
     overflow: hidden;
@@ -1856,6 +1872,23 @@ $i: 1;
 .custom-off-canvas {
   width: fit-content !important;
   padding: 12px;
+}
+
+.timeline-dot-primary {
+  min-width: 12px;
+  height: 12px;
+  background-color: $primary-color;
+  outline: 5px solid rgba($primary-color, 0.25);
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+
+  @media (max-width:1399px) {
+    min-width: 10px;
+    height: 10px;
+    outline: 4px solid rgba($primary-color, 0.25);
+
+  }
 }
 
 .border-bottom {

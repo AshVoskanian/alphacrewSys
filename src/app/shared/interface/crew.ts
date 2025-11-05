@@ -1,4 +1,4 @@
-import { Select2Data, Select2Option } from "ng-select2-component";
+import { Select2Option } from "ng-select2-component";
 
 export interface CrewIndexResponse {
   rowCount: number;
@@ -105,4 +105,20 @@ export interface CrewDetail {
   crewAllSkills: CrewSkill[];
 }
 
+export interface CrewNote {
+  crewNoteId: number;
+  crewId: number;
+  crewNoteDate: string;
+  note: string;
+  enteredBy: string;
+  lastModifiedDate: string;
+}
 
+export interface CrewNoteInput {
+  crewNoteId?: number,
+  crewId: number,
+  crewNoteDate: string,
+  note: string,
+  enteredBy?: string,
+  lastModifiedDate?: string
+}

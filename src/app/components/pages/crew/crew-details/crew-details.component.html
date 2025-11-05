@@ -4,8 +4,8 @@
       <app-card>
         <div class="user-info">
           <div class="flex flex-col items-center p-12 gap-12">
-            <img class="rounded-circle w-170 h-170 object-fit-cover"
-                 [src]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails()?.crewId" alt="">
+            <img class="rounded-circle w-170 h-170 object-fit-cover d-block" width="170" height="170"
+                 [ngSrc]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails()?.crewId" alt="">
             <div class="text-center">
               <p class="txt-dark f-18">{{ crewDetails()?.name }}</p>
               <p class="txt-secondary f-16">{{ crewDetails()?.levelText }}</p>
@@ -57,43 +57,43 @@
           <li [ngbNavItem]="'documents'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
             <ng-template ngbNavContent>
-              2
+              <app-crew-documents></app-crew-documents>
             </ng-template>
           </li>
           <li [ngbNavItem]="'feedback'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-comment-dots"></i>Feedback</a>
             <ng-template ngbNavContent>
-              3
+              <app-crew-feedback></app-crew-feedback>
             </ng-template>
           </li>
           <li [ngbNavItem]="'holidays'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Absences / Holidays</a>
             <ng-template ngbNavContent>
-              4
+              <app-crew-holidays></app-crew-holidays>
             </ng-template>
           </li>
           <li [ngbNavItem]="'notes'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-note-sticky"></i>Notes</a>
             <ng-template ngbNavContent>
-              5
+              <app-crew-notes [crewDetail]="crewDetails()"></app-crew-notes>
             </ng-template>
           </li>
           <li [ngbNavItem]="'deduction'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-minus-circle"></i>Deductions</a>
             <ng-template ngbNavContent>
-              6
+              <app-crew-deductions></app-crew-deductions>
             </ng-template>
           </li>
           <li [ngbNavItem]="'timesheet'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-clock"></i>Timesheets</a>
             <ng-template ngbNavContent>
-              7
+              <app-crew-timesheets></app-crew-timesheets>
             </ng-template>
           </li>
           <li [ngbNavItem]="'payments'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-credit-card"></i>Payments</a>
             <ng-template ngbNavContent>
-              8
+              <app-crew-payments></app-crew-payments>
             </ng-template>
           </li>
         </ul>

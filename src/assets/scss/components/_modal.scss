@@ -44,7 +44,7 @@
     }
 
     button {
-        >* {
+        >*:not(.inherit-params) {
             @include pixelstrap-size(16px, 16px);
         }
 

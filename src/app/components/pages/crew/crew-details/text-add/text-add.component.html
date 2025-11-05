@@ -1,0 +1,28 @@
+<form class="modal-content" [formGroup]="form">
+  <div class="modal-body social-profile text-start dark-sign-up">
+    <div class="modal-toggle-wrapper">
+      <div class="common-flex justify-content-between align-items-center m-b-10">
+        <h6 class="text-primary">Add Note</h6>
+
+        <div class="common-flex align-items-center gap-3">
+          <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(null)"></button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-12">
+        <input class=" w-300 form-control digits" type="date" formControlName="date">
+
+        <ngx-editor autofocus [editor]="editor" formControlName="note" [placeholder]="'Type here...'"></ngx-editor>
+      </div>
+
+      <div class="flex items-center justify-content-end m-t-12 w-100">
+        <button type="submit" class="btn btn-primary text-center" [disabled]="form.invalid" (click)="save()">
+          Save
+          @if (loading) {
+            <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

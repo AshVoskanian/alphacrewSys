@@ -12,6 +12,7 @@ import { NgOptimizedImage } from "@angular/common";
 export class ConfirmModalComponent {
   @Input() title: string;
   @Input() subTitle: string;
+  @Input() loading: boolean = false;
 
   @Output() closeModal: EventEmitter<'ok' | 'cancel'> = new EventEmitter<'ok' | 'cancel'>();
 }

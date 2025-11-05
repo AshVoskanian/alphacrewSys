@@ -1,0 +1,56 @@
+<div class="p-10 p-15">
+  @if (loading()) {
+    <div class="gap-15 flex-col flex">
+      @for (it of [].constructor(4); track it) {
+
+        <div class="flex items-center gap-12">
+          <div class="flex w-100 h-40 flex-col gap-12">
+            <div class="col-md h-10 w-200 rounded-md bg-gray-200 animate-pulse"></div>
+            <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+          <div class="flex w-90 h-10 flex-col gap-12">
+            <div class="col-md rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col gap-20 justify-content-end">
+      <div class="flex items-center justify-content-end gap-12">
+        <button class="btn p-x-40 btn-primary" type="button" (click)="openAddNoteModal()">
+          Add Note
+          <i class="t-10 r-10 position-absolute fa-solid fa-note-sticky"></i>
+        </button>
+      </div>
+
+      <app-main-list [list]="notesList()" (clickAction)="action($event)"></app-main-list>
+    </div>
+  }
+</div>
+
+<!--Edit Note-->
+<ng-template #textEdit let-textEdit>
+  <app-text-edit
+    [text]="editText()"
+    [loading]="modalLoading()"
+    (closeModal)="closeEditModal($event)"
+  ></app-text-edit>
+</ng-template>
+
+<!--Add Note-->
+<ng-template #addNote let-addNote>
+  <app-text-add
+    [loading]="modalLoading()"
+    (closeModal)="closeAddModal($event)"
+  ></app-text-add>
+</ng-template>
+
+
+<!--Confirm note removing-->
+<ng-template #confirmModal let-confirmModal>
+  <app-confirm-modal
+    [loading]="modalLoading()"
+    [title]="'Delete this note?'"
+    (closeModal)="closeConfirmModal($event)"
+  ></app-confirm-modal>
+</ng-template>

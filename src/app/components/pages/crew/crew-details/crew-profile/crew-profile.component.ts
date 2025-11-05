@@ -35,7 +35,6 @@ export class CrewProfileComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes['crewDetail'] && changes['crewDetail'].currentValue) {
       this.getDropdowns(changes['crewDetail'].currentValue);
-      console.log(5555, changes['crewDetail']);
     }
   }
 
@@ -108,7 +107,7 @@ export class CrewProfileComponent implements OnInit, OnChanges {
   }
 
   submit() {
-    if (this.form.valid) {
+    if (this.form.valid && this.crewDetail()) {
       this.save.emit({
         ...this.crewDetail(),
         ...this.form.getRawValue()

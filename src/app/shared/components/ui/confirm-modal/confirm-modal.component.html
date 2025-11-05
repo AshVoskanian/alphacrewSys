@@ -9,7 +9,12 @@
         {{subTitle}}
       </p>
       <div class="flex gap-10 m-t-10">
-        <button class="btn btn-primary flex-grow-1" type="button" (click)="closeModal.emit('ok')">ok</button>
+        <button class="btn btn-primary flex-grow-1" type="button" (click)="closeModal.emit('ok')">
+          ok
+          @if (loading) {
+            <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+          }
+        </button>
         <button class="btn btn-secondary flex-grow-1" type="button" (click)="closeModal.emit('cancel')">Cancel</button>
       </div>
     </div>
