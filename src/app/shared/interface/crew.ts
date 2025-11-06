@@ -131,3 +131,26 @@ export interface CrewHoliday {
   comments: string;
 }
 
+export interface CrewFeedback {
+  ratingId: number;
+  early: number;
+  presentation: number;
+  teamwork: number;
+  professionalism: number;
+  attitude: number;
+  modifiedBy: string;
+  modifiedDate: string;
+  rating: number;
+  ratingtext: string;
+}
+
+export interface CrewPayment {
+  crewPayId?: number;
+  crewId: number;
+  payDate: string;
+  payAmount: number;
+  comments: string | null;
+}
+
+
+

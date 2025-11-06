@@ -1,1 +1,22 @@
-<p>crew-feedback works!</p>
+<div class="p-10 p-15">
+  @if (loading()) {
+    <div class="gap-15 flex-col flex">
+      @for (it of [].constructor(4); track it) {
+
+        <div class="flex items-center gap-12">
+          <div class="flex w-100 h-40 flex-col gap-12">
+            <div class="col-md h-10 w-200 rounded-md bg-gray-200 animate-pulse"></div>
+            <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+          <div class="flex w-90 h-10 flex-col gap-12">
+            <div class="col-md rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col gap-20 justify-content-end p-t-50">
+      <app-main-list [list]="feedbacks()"></app-main-list>
+    </div>
+  }
+</div>

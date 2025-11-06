@@ -3,8 +3,8 @@ import { Editor, NgxEditorModule } from "ngx-editor";
 import { Select2Module } from "ng-select2-component";
 import { ClipboardModule } from "@angular/cdk/clipboard";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { GeneralService } from "../../../../../shared/services/general.service";
-import { CrewHoliday } from "../../../../../shared/interface/crew";
+import { GeneralService } from "../../../../../../shared/services/general.service";
+import { CrewHoliday } from "../../../../../../shared/interface/crew";
 
 @Component({
   selector: 'app-holiday-add-update',

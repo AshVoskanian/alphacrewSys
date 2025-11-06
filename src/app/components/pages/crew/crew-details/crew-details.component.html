@@ -63,7 +63,7 @@
           <li [ngbNavItem]="'feedback'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-comment-dots"></i>Feedback</a>
             <ng-template ngbNavContent>
-              <app-crew-feedback></app-crew-feedback>
+              <app-crew-feedback [crewDetail]="crewDetails()"></app-crew-feedback>
             </ng-template>
           </li>
           <li [ngbNavItem]="'holidays'">
@@ -93,7 +93,7 @@
           <li [ngbNavItem]="'payments'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-credit-card"></i>Payments</a>
             <ng-template ngbNavContent>
-              <app-crew-payments></app-crew-payments>
+              <app-crew-payments [crewDetail]="crewDetails()"></app-crew-payments>
             </ng-template>
           </li>
         </ul>

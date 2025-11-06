@@ -4,7 +4,6 @@ import {
   inject,
   input,
   OnChanges,
-  OnInit,
   signal,
   SimpleChanges,
   ViewChild
@@ -19,7 +18,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { finalize } from "rxjs";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { DatePipe } from "@angular/common";
-import { HolidayAddUpdateComponent } from "../holiday-add/holiday-add-update.component";
+import { HolidayAddUpdateComponent } from "./holiday-add-update/holiday-add-update.component";
 
 @Component({
   selector: 'app-crew-holidays',
@@ -29,7 +28,7 @@ import { HolidayAddUpdateComponent } from "../holiday-add/holiday-add-update.com
   providers: [ DatePipe ]
 })
 
-export class CrewHolidaysComponent extends ApiBase implements OnInit, OnChanges {
+export class CrewHolidaysComponent extends ApiBase implements OnChanges {
   private _modal = inject(NgbModal);
   private readonly _dr = inject(DestroyRef);
   private readonly _date = inject(DatePipe);
@@ -46,10 +45,6 @@ export class CrewHolidaysComponent extends ApiBase implements OnInit, OnChanges 
 
   private addEditModalRef!: NgbModalRef;
   private confirmModalRef!: NgbModalRef;
-
-  ngOnInit() {
-
-  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes['crewDetail'] && changes['crewDetail'].currentValue) {
@@ -193,52 +188,6 @@ export class CrewHolidaysComponent extends ApiBase implements OnInit, OnChanges 
       });
   }
 
-  //
-  // addNote(note: string, crewNoteDate: string) {
-  //   if (this.modalLoading()) return;
-  //
-  //   this.modalLoading.set(true);
-  //
-  //   const { crewId } = this.crewDetail();
-  //
-  //   const data: CrewNoteInput = {
-  //     crewId,
-  //     crewNoteDate: new Date(crewNoteDate).toISOString(),
-  //     note
-  //   };
-  //
-  //   this.post<CrewNote>('Crew/AddOrUpdateCrewNote', data)
-  //     .pipe(
-  //       takeUntilDestroyed(this._dr),
-  //       finalize(() => this.modalLoading.set(false))
-  //     )
-  //     .subscribe({
-  //       next: res => {
-  //         if (res.errors?.errorCode) {
-  //           GeneralService.showErrorMessage(res.errors.message);
-  //           return;
-  //         }
-  //
-  //         const newNote = res.data;
-  //
-  //         this.notesList.update(list => [
-  //           {
-  //             title: newNote.note,
-  //             desc: newNote.note,
-  //             date: newNote.crewNoteDate,
-  //             hasAction: true,
-  //             data: newNote
-  //           },
-  //           ...list
-  //         ]);
-  //
-  //         this.editModalRef?.close();
-  //         GeneralService.showSuccessMessage();
-  //       },
-  //       error: () => this.modalLoading.set(false)
-  //     });
-  // }
-  //
   removeHoliday(listItem: CrewHoliday) {
     if (!listItem || this.modalLoading()) return;
 
@@ -261,7 +210,7 @@ export class CrewHolidaysComponent extends ApiBase implements OnInit, OnChanges 
             list.filter(item => item.data.crewHolidayId !== this.selectedListItem().crewHolidayId)
           );
           this.confirmModalRef?.close();
-          GeneralService.showSuccessMessage('The note has been successfully deleted');
+          GeneralService.showSuccessMessage('The holiday has been successfully deleted');
         }
       })
   }

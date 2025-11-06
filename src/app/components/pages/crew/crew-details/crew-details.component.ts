@@ -51,7 +51,7 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
   profileLoading: WritableSignal<boolean> = signal<boolean>(false);
   skills: WritableSignal<TransformedSkill[]> = signal<TransformedSkill[]>(null);
 
-  activeTab: string = 'holidays';
+  activeTab: string = 'profile';
 
   ngOnInit() {
     this.getDetails();
