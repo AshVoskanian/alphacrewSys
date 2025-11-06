@@ -122,3 +122,12 @@ export interface CrewNoteInput {
   enteredBy?: string,
   lastModifiedDate?: string
 }
+
+export interface CrewHoliday {
+  crewHolidayId?: number;
+  crewId: number;
+  holidayStart: string;
+  holidayEnd: string;
+  comments: string;
+}
+

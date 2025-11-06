@@ -51,7 +51,7 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
   profileLoading: WritableSignal<boolean> = signal<boolean>(false);
   skills: WritableSignal<TransformedSkill[]> = signal<TransformedSkill[]>(null);
 
-  activeTab: string = 'notes';
+  activeTab: string = 'holidays';
 
   ngOnInit() {
     this.getDetails();
@@ -63,8 +63,7 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
     this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: params => {
-          this.get<CrewDetail>(`/Crew/GetCrewByCrewId?crewId=${ +params.get('id') }`)
-          // this.get<CrewDetail>(`/Crew/GetCrewByCrewId?crewId=${ +params.get('id') }`)
+          this.get<CrewDetail>(`Crew/GetCrewByCrewId?crewId=${ +params.get('id') }`)
             .pipe(
               takeUntilDestroyed(this._dr),
               finalize(() => this.layoutService.loading = false)

@@ -67,9 +67,9 @@
             </ng-template>
           </li>
           <li [ngbNavItem]="'holidays'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Absences / Holidays</a>
+            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Holidays</a>
             <ng-template ngbNavContent>
-              <app-crew-holidays></app-crew-holidays>
+              <app-crew-holidays [crewDetail]="crewDetails()"></app-crew-holidays>
             </ng-template>
           </li>
           <li [ngbNavItem]="'notes'">
