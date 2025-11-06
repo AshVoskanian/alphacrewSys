@@ -73,6 +73,10 @@ export class HeaderComponent implements OnInit {
       value: 10
     },
     {
+      label: 'Berlin',
+      value: 11
+    },
+    {
       label: 'SECURITY',
       value: 9
     },

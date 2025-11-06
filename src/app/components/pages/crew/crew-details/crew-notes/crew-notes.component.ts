@@ -152,7 +152,6 @@ export class CrewNotesComponent extends ApiBase implements OnInit, OnChanges {
       crewNoteId: selected.crewNoteId,
       crewId: selected.crewId,
       crewNoteDate: selected.crewNoteDate,
-      enteredBy: selected.enteredBy,
       note
     };
 
