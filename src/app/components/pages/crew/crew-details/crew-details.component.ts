@@ -47,8 +47,8 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
   private _route: ActivatedRoute = inject(ActivatedRoute);
   public layoutService = inject(LayoutService);
 
-  crewDetails: WritableSignal<CrewDetail> = signal<CrewDetail>(null);
   profileLoading: WritableSignal<boolean> = signal<boolean>(false);
+  crewDetails: WritableSignal<CrewDetail> = signal<CrewDetail>(null);
   skills: WritableSignal<TransformedSkill[]> = signal<TransformedSkill[]>(null);
 
   activeTab: string = 'profile';
