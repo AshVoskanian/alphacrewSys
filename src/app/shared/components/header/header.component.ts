@@ -65,6 +65,10 @@ export class HeaderComponent implements OnInit {
       value: 4
     },
     {
+      label: 'Manchester',
+      value: 5
+    },
+    {
       label: 'Barcelona',
       value: 8
     },

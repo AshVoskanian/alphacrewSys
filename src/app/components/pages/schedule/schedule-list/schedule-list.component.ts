@@ -864,6 +864,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         return 'Nice';
       case 4:
         return 'Paris';
+      case 5:
+        return 'Manchester';
       case 7:
         return 'Scotland';
       case 9:
