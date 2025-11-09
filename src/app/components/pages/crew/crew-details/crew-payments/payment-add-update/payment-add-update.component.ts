@@ -47,7 +47,7 @@ export class PaymentAddUpdateComponent implements OnInit {
 
     this.form = new FormGroup({
       payDate: new FormControl(payDate, Validators.required),
-      payAmount: new FormControl(this.selectedPayment?.payAmount || null, Validators.required),
+      payAmount: new FormControl(this.selectedPayment?.payAmount, Validators.required),
       comments: new FormControl(this.selectedPayment?.comments || '', Validators.required),
     })
   }

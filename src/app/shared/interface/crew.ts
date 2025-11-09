@@ -152,5 +152,13 @@ export interface CrewPayment {
   comments: string | null;
 }
 
-
+export interface CrewAdjustment {
+  adjustmentId: number;
+  crewId: number;
+  amount: number;
+  adjustmentDate: string;
+  description: string;
+  enteredBy?: string;
+  lastModifiedDate?: string;
+}
 

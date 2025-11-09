@@ -81,7 +81,7 @@
           <li [ngbNavItem]="'deduction'">
             <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-minus-circle"></i>Deductions</a>
             <ng-template ngbNavContent>
-              <app-crew-deductions></app-crew-deductions>
+              <app-crew-deductions [crewDetail]="crewDetails()"></app-crew-deductions>
             </ng-template>
           </li>
           <li [ngbNavItem]="'timesheet'">

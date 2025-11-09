@@ -1,1 +1,46 @@
-<p>crew-deductions works!</p>
+<div class="p-10 p-15">
+  @if (loading()) {
+    <div class="gap-15 flex-col flex">
+      @for (it of [].constructor(4); track it) {
+        <div class="flex items-center gap-12">
+          <div class="flex w-100 h-40 flex-col gap-12">
+            <div class="col-md h-10 w-200 rounded-md bg-gray-200 animate-pulse"></div>
+            <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+          <div class="flex w-90 h-10 flex-col gap-12">
+            <div class="col-md rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col gap-20 justify-content-end">
+      <div class="flex items-center justify-content-end gap-12">
+        <button class="btn p-x-40 btn-primary" type="button" (click)="openAddUpdateModal(true)">
+          Add New
+          <i class="t-10 r-10 position-absolute fa-solid fa-credit-card"></i>
+        </button>
+      </div>
+
+      <app-main-list [list]="deductions()" (clickAction)="action($event)"></app-main-list>
+    </div>
+  }
+</div>
+
+<!--Add or Update payment-->
+<ng-template #addUpdateDeduction>
+  <app-deduction-add-update
+    [loading]="modalLoading()"
+    [selectedPayment]="selectedListItem()"
+    (closeModal)="closeAddUpdateModal($event)"
+  ></app-deduction-add-update>
+</ng-template>
+
+<!--Confirm payment removing-->
+<ng-template #confirmModal>
+  <app-confirm-modal
+    [loading]="modalLoading()"
+    [title]="'Delete this deduction?'"
+    (closeModal)="closeConfirmModal($event)"
+  ></app-confirm-modal>
+</ng-template>

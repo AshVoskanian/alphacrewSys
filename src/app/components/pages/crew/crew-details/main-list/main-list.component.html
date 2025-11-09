@@ -11,9 +11,15 @@
                 {{ item.subtitle }}
               }
 
-              @if (item.date) {
-                {{ item.date | date }}
-              }
+
+              <span class="flex flex-col align-items-end">
+                @if (item.dateDesc) {
+                  <span>{{ item.dateDesc }}</span>
+                }
+                @if (item.date) {
+                  {{ item.date | date }}
+                }
+              </span>
 
               @if (item.hasAction) {
                 <i class="fa-solid fa-pen pointer text-danger" (click)="onAction('edit', item)"></i>

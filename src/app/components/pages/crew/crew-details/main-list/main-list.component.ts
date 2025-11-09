@@ -7,6 +7,7 @@ export interface CrewMainListItem<T = any> {
   subtitle?: string;
   desc?: string;
   date?: string;
+  dateDesc?: string;
   hasAction?: boolean;
   data?: T;
 }
