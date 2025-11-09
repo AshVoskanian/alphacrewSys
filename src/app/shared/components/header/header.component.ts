@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
 import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
@@ -11,7 +11,11 @@ import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select
 import { LocalStorageService } from "../../services/local-storage.service";
 import { AsyncPipe } from "@angular/common";
 import { FeatherIconComponent } from "../ui/feather-icon/feather-icon.component";
-import { toSignal } from "@angular/core/rxjs-interop";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
+import { ApiBase } from "../../bases/api-base";
+import { GeneralService } from "../../services/general.service";
+import { Region } from "../../interface/header";
+import { finalize } from "rxjs";
 
 @Component({
   selector: 'app-header',
@@ -24,84 +28,32 @@ import { toSignal } from "@angular/core/rxjs-interop";
   styleUrl: './header.component.scss'
 })
 
-export class HeaderComponent implements OnInit {
+export class HeaderComponent extends ApiBase implements OnInit {
   private router: Router = inject(Router);
+  private _router = inject(Router);
+  private _dr = inject(DestroyRef);
   private _fb = inject(FormBuilder);
   private _activatedRouter = inject(ActivatedRoute);
   private _localStorageService = inject(LocalStorageService);
-  private _router = inject(Router);
 
   public navService: NavService = inject(NavService);
 
+  regionLoading = false;
   isScheduleRoute = false;
 
-  regions = [
-    {
-      label: 'All',
-      value: 0
-    },
-    {
-      label: 'London',
-      value: 1
-    },
-    {
-      label: 'Birm/Man',
-      value: 2
-    },
-    {
-      label: 'Bristol',
-      value: 6
-    },
-    {
-      label: 'Scotland',
-      value: 7
-    },
-    {
-      label: 'Nice',
-      value: 3
-    },
-    {
-      label: 'Paris',
-      value: 4
-    },
-    {
-      label: 'Manchester',
-      value: 5
-    },
-    {
-      label: 'Barcelona',
-      value: 8
-    },
-    {
-      label: 'NewYork',
-      value: 10
-    },
-    {
-      label: 'Berlin',
-      value: 11
-    },
-    {
-      label: 'SECURITY',
-      value: 9
-    },
-  ]
-
-  userInfo = JSON.parse(this._localStorageService.getItem('user')) || {};
+  regions = [];
 
   form: FormGroup;
 
   queryParams = toSignal(this._activatedRouter.queryParamMap)
 
-  constructor() {
+  ngOnInit() {
     this.initForm();
     this.router.events.subscribe(() => {
       this.isScheduleRoute = this.router.url?.includes('/schedule');
     });
-    this.filterRegionsByRole();
+    this.getRegions();
     this.checkListView();
-  }
-
-  ngOnInit() {
   }
 
   checkListView() {
@@ -130,10 +82,22 @@ export class HeaderComponent implements OnInit {
     this.navService.filterParams.next({ date: this.form.get('date')?.value, jobId: +this.queryParams().get('jobId') });
   }
 
-  filterRegionsByRole() {
-    const roleRegionsIds = this.userInfo?.userRegions?.map(reg => reg.value);
+  getRegions() {
+    this.regionLoading = true;
 
-    this.regions = this.regions.filter(region => roleRegionsIds?.includes(region.value) || region.value === 0);
+    this.get<Region[]>('Schedule/GetJobRegions')
+      .pipe(takeUntilDestroyed(this._dr), finalize(() => this.regionLoading = false))
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.regions = res.data.map(reg => ({ label: reg.regionText, value: reg.jobRegionId }));
+          this.regions.unshift({ label: 'All', value: 0 });
+        }
+      })
   }
 
   toggleLanguage() {

@@ -12,3 +12,9 @@ export interface Notification {
     message: string;
     border_color: string;
 }
+
+export interface Region {
+  jobRegionId: number;
+  regionOrder: number;
+  regionText: string;
+}
