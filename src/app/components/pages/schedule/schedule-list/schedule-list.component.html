@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-center">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
-} @else {
+} @else if (list.length) {
   @for (schedule of list; track schedule.jobPartId) {
     @if (list[$index]?.startDate.substring(0, 10) !== list[$index - 1]?.startDate.substring(0, 10)) {
       <div class="p-x-15 m-b-15">
@@ -445,6 +445,15 @@
       </button>
     </div>
   }
+} @else {
+  <div class="flex gap-30 flex-col items-center justify-content-center">
+    <div class="">
+      <i class="f-40 text-warning fa-solid fa-calendar-xmark"></i>
+    </div>
+    <p class="f-20 text-warning">
+      No schedules found
+    </p>
+  </div>
 }
 
 <!--Crew Edit-->

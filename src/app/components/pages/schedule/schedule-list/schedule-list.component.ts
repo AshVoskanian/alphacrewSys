@@ -836,7 +836,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
                     GeneralService.showErrorMessage(res.errors.message);
                     return;
                   }
-                  this.statics.set(res.data[this.statisticByRegion()]);
+                  this.statics.set(res.data[this.statisticByRegion()] || []);
                 }
               })
           }
