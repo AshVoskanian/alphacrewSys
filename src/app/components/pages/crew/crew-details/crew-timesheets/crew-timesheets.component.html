@@ -1,1 +1,72 @@
-<p>crew-timesheets works!</p>
+<div class="p-10 p-15">
+  <form [formGroup]="form" class="row g-3 m-b-20">
+    <div class="col-2">
+      <select2 [data]="years()" formControlName="year" [templates]="template"
+               placeholder="Select Year" [displaySearchStatus]="'hidden'">
+        <ng-template #template let-category="label">
+          {{ category }}
+        </ng-template>
+      </select2>
+    </div>
+
+    <div class="col-2">
+      <select2 [data]="months()" formControlName="month" [templates]="template"
+               placeholder="Select Month" [displaySearchStatus]="'hidden'">
+        <ng-template #template let-category="label">
+          {{ category }}
+        </ng-template>
+      </select2>
+    </div>
+
+    <div class="col-2">
+      <button class="btn p-x-14 btn-primary"
+              (click)="getTimesheets(crewDetail())"
+              type="button">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="gap-15 flex-col flex">
+      @for (it of [].constructor(10); track $index) {
+        <div class="flex items-center gap-12">
+          <div class="flex w-100 h-40 flex-col gap-12">
+            <div class="col-md h-10 w-200 rounded-md bg-gray-200 animate-pulse"></div>
+            <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+          <div class="flex w-90 h-10 flex-col gap-12">
+            <div class="col-md rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (tableConfig().data?.length) {
+      <app-table [tableConfig]="tableConfig()"
+                 [search]="false"
+                 [maxHeight]="700"
+                 [hover]="true"
+                 [pagination]="false">
+      </app-table>
+    }
+  }
+</div>
+
+<!--&lt;!&ndash;Add or Update payment&ndash;&gt;-->
+<!--<ng-template #addUpdatePayment>-->
+<!--  <app-payment-add-update-->
+<!--    [loading]="modalLoading()"-->
+<!--    [selectedPayment]="selectedListItem()"-->
+<!--    (closeModal)="closeAddUpdateModal($event)"-->
+<!--  ></app-payment-add-update>-->
+<!--</ng-template>-->
+
+<!--&lt;!&ndash;Confirm payment removing&ndash;&gt;-->
+<!--<ng-template #confirmModal>-->
+<!--  <app-confirm-modal-->
+<!--    [loading]="modalLoading()"-->
+<!--    [title]="'Delete this payment?'"-->
+<!--    (closeModal)="closeConfirmModal($event)"-->
+<!--  ></app-confirm-modal>-->
+<!--</ng-template>-->

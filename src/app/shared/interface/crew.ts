@@ -162,3 +162,30 @@ export interface CrewAdjustment {
   lastModifiedDate?: string;
 }
 
+export interface Timesheet {
+  year: number;
+  month: number;
+  crewId: number;
+  crewIdPlus: number;
+  startDate: string;
+  endDate: string;
+  name: string;
+  extraHours: number;
+  travelHours: number;
+  skilledCost: number;
+  jobId: number;
+  jobPartId: number;
+  venueName: string;
+  companyName: string;
+  levelId: number;
+  pay: number;
+  bonus: number;
+  ootCost: number;
+  lateShiftCost: number;
+  lastMinuteBonus: number;
+  drivingBonus: number;
+  otherPaymentAdjustment: number;
+  otherPaymentAdjustmentTxt: string;
+  totalPay: number;
+  hours: number;
+}

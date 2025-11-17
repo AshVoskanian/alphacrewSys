@@ -44,9 +44,9 @@
 
     <div class="content">
       <app-card>
-        <ul class="nav nav-tabs" ngbNav #nav="ngbNav" [(activeId)]="activeTab">
+        <ul class="nav nav-pills nav-primary" ngbNav #nav="ngbNav" [(activeId)]="activeTab">
           <li [ngbNavItem]="'profile'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
+            <a class="nav-lin" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
             <ng-template ngbNavContent>
               <app-crew-profile [crewDetail]="crewDetails()"
                                 [loading]="profileLoading()"
@@ -55,43 +55,43 @@
             </ng-template>
           </li>
           <li [ngbNavItem]="'documents'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
             <ng-template ngbNavContent>
               <app-crew-documents></app-crew-documents>
             </ng-template>
           </li>
           <li [ngbNavItem]="'feedback'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-comment-dots"></i>Feedback</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-comment-dots"></i>Feedback</a>
             <ng-template ngbNavContent>
               <app-crew-feedback [crewDetail]="crewDetails()"></app-crew-feedback>
             </ng-template>
           </li>
           <li [ngbNavItem]="'holidays'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Holidays</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-calendar-day"></i>Holidays</a>
             <ng-template ngbNavContent>
               <app-crew-holidays [crewDetail]="crewDetails()"></app-crew-holidays>
             </ng-template>
           </li>
           <li [ngbNavItem]="'notes'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-note-sticky"></i>Notes</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-note-sticky"></i>Notes</a>
             <ng-template ngbNavContent>
               <app-crew-notes [crewDetail]="crewDetails()"></app-crew-notes>
             </ng-template>
           </li>
           <li [ngbNavItem]="'deduction'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-minus-circle"></i>Deductions</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-minus-circle"></i>Deductions</a>
             <ng-template ngbNavContent>
               <app-crew-deductions [crewDetail]="crewDetails()"></app-crew-deductions>
             </ng-template>
           </li>
           <li [ngbNavItem]="'timesheet'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-clock"></i>Timesheets</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-clock"></i>Timesheets</a>
             <ng-template ngbNavContent>
-              <app-crew-timesheets></app-crew-timesheets>
+              <app-crew-timesheets [crewDetail]="crewDetails()"></app-crew-timesheets>
             </ng-template>
           </li>
           <li [ngbNavItem]="'payments'">
-            <a class="nav-link txt-secondary" ngbNavLink><i class="fa-solid fa-credit-card"></i>Payments</a>
+            <a class="nav-link" ngbNavLink><i class="fa-solid fa-credit-card"></i>Payments</a>
             <ng-template ngbNavContent>
               <app-crew-payments [crewDetail]="crewDetails()"></app-crew-payments>
             </ng-template>
