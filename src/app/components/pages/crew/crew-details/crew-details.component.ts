@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { finalize } from "rxjs";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { LayoutService } from "../../../../shared/services/layout.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CrewDetail } from "../../../../shared/interface/crew";
@@ -37,7 +37,8 @@ import { CrewHolidaysComponent } from "./crew-holidays/crew-holidays.component";
     CrewFeedbackComponent,
     CrewTimesheetsComponent,
     CrewPaymentsComponent,
-    CrewHolidaysComponent
+    CrewHolidaysComponent,
+    RouterModule
   ],
   templateUrl: './crew-details.component.html',
   styleUrl: './crew-details.component.scss'

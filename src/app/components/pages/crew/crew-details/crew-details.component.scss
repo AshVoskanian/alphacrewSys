@@ -8,6 +8,14 @@
       p {
         margin: 0 !important;
       }
+
+      .back {
+        transition: all .2s ease-in-out;
+
+        &:hover {
+          scale: 1.1;
+        }
+      }
     }
   }
 }
