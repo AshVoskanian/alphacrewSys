@@ -4,8 +4,7 @@
       <app-card>
         <div class="user-info">
           <div class="flex flex-col items-center p-12 gap-12">
-            <a routerLink="/crew"><i
-              class="position-absolute pointer back t-20 l-20 fa-solid fa-circle-chevron-left f-36 txt-primary"></i></a>
+            <i (click)="goBack()" class="position-absolute pointer back t-20 l-20 fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
             <img class="rounded-circle w-170 h-170 object-fit-cover d-block" width="170" height="170"
                  [ngSrc]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails()?.crewId" alt="">
             <div class="text-center">

@@ -20,6 +20,7 @@ import { CrewFeedbackComponent } from "./crew-feedback/crew-feedback.component";
 import { CrewTimesheetsComponent } from "./crew-timesheets/crew-timesheets.component";
 import { CrewPaymentsComponent } from "./crew-payments/crew-payments.component";
 import { CrewHolidaysComponent } from "./crew-holidays/crew-holidays.component";
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-crew-details',
@@ -45,6 +46,7 @@ import { CrewHolidaysComponent } from "./crew-holidays/crew-holidays.component";
 })
 export class CrewDetailsComponent extends ApiBase implements OnInit {
   private _dr: DestroyRef = inject(DestroyRef);
+  private _location: Location = inject(Location);
   private _route: ActivatedRoute = inject(ActivatedRoute);
   public layoutService = inject(LayoutService);
 
@@ -119,5 +121,9 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
           GeneralService.showSuccessMessage();
         }
       })
+  }
+
+  goBack() {
+    this._location.back();
   }
 }
