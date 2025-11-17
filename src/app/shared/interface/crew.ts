@@ -22,6 +22,7 @@ export interface CrewIndex {
   phoneNumber: string;
   pliRequired: boolean;
   postcode: string;
+  statusText: string;
   ratings: number;
   regionText: string;
   hours?: string;
@@ -42,7 +43,7 @@ export interface FilterDropdowns {
 
 export interface CrewSearchParams {
   searchKey?: string;
-  acive?: number;
+  active?: number;
   crewLevel?: number;
   crewRegion?: number;
   paymentOption?: number;

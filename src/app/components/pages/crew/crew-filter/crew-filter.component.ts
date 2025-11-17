@@ -51,7 +51,7 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
   initForm() {
     this.form = this._fb.group({
       searchKey: [ '' ],
-      acive: [ null ],
+      active: [ null ],
       crewLevel: [ 0 ],
       crewRegion: [ 0 ],
       paymentOption: [ 0 ],
@@ -70,7 +70,7 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
           crewLevel: +params['crewLevel'] || 0,
           crewRegion: +params['crewRegion'] || 0,
           paymentOption: +params['paymentOption'] || 0,
-          acive: +params['acive'] || null,
+          active: (+params['active'] === 0 || +params['active'] === 1) ? +params['active'] : null,
         }
         if (Object.keys(transformedParams).length) {
           this.form.patchValue(transformedParams, { emitEvent: false });

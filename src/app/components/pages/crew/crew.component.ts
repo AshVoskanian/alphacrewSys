@@ -10,6 +10,7 @@ import { Select2Module } from "ng-select2-component";
 import { CrewFilterComponent } from "./crew-filter/crew-filter.component";
 import { NgxPaginationModule } from "ngx-pagination";
 import { ActivatedRoute, Router } from "@angular/router";
+import { DomSanitizer } from "@angular/platform-browser";
 
 @Component({
   selector: 'app-crew',
@@ -21,6 +22,7 @@ export class CrewComponent extends ApiBase implements OnInit {
   private _router: Router = inject(Router);
   private readonly _dr = inject(DestroyRef);
   private _route: ActivatedRoute = inject(ActivatedRoute);
+  private _sanitizer: DomSanitizer = inject(DomSanitizer);
 
   loading: WritableSignal<boolean> = signal(false);
   totalCount: WritableSignal<number> = signal<number>(null);
@@ -28,6 +30,7 @@ export class CrewComponent extends ApiBase implements OnInit {
 
   public tableConfig: TableConfigs = {
     columns: [
+      { title: '', field_value: 'statusText', sort: false },
       { title: 'Crew name', field_value: 'name', sort: true },
       { title: 'Hours', field_value: 'hours', sort: true },
       { title: 'Classif', field_value: 'classText', sort: true },
@@ -62,8 +65,14 @@ export class CrewComponent extends ApiBase implements OnInit {
           this.tableConfig.data = res.data.crewIndex.map((crew: CrewIndex) => ({
             ...crew,
             id: crew.crewId,
-            hours: `${ crew.completed }/${ crew.scheduled }`
+            hours: `${ crew.completed }/${ crew.scheduled }`,
+            statusText: this._sanitizer.bypassSecurityTrustHtml(
+              crew.isActive
+                ? '<i class="fa-solid fa-circle-check text-success"></i>'
+                : '<i class="fa-solid fa-minus-circle text-danger"></i>'
+            )
           }));
+
           this.totalCount.set(res.data.rowCount);
 
           this.loading.set(false);
@@ -87,7 +96,7 @@ export class CrewComponent extends ApiBase implements OnInit {
               crewLevel: +params['crewLevel'] || 0,
               crewRegion: +params['crewRegion'] || 0,
               paymentOption: +params['paymentOption'] || 0,
-              acive: +params['acive'] || null,
+              active: +params['active'] || null,
               pageSize: 20
             }
           )

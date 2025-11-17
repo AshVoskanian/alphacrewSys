@@ -43,7 +43,7 @@
 
     <div class="col-md">
       <label class="form-label">Status</label>
-      <select2 [data]="statuses()" [templates]="template" formControlName="acive"
+      <select2 [data]="statuses()" [templates]="template" formControlName="active"
                placeholder="Select Status" [displaySearchStatus]="'hidden'">
         <ng-template #template let-category="label">
           {{ category }}
