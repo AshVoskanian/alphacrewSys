@@ -1,9 +1,10 @@
 @if (!loading()) {
   <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
     <div class="col-md">
-      <label class="form-label">Classification</label>
-      <select2 [data]=dropdowns()?.classification [templates]="template" formControlName="classification"
-               placeholder="Select Classification" [displaySearchStatus]="'hidden'">
+      <label class="form-label">Region</label>
+      <select2 [data]="dropdowns()?.region" [disabled]="!dropdowns()" [templates]="template"
+               formControlName="crewRegion"
+               placeholder="Select Region" [displaySearchStatus]="'hidden'">
         <ng-template #template let-category="label">
           {{ category }}
         </ng-template>
@@ -21,10 +22,9 @@
     </div>
 
     <div class="col-md">
-      <label class="form-label">Region</label>
-      <select2 [data]="dropdowns()?.region" [disabled]="!dropdowns()" [templates]="template"
-               formControlName="crewRegion"
-               placeholder="Select Region" [displaySearchStatus]="'hidden'">
+      <label class="form-label">Status</label>
+      <select2 [data]="statuses()" [templates]="template" formControlName="active"
+               placeholder="Select Status" [displaySearchStatus]="'hidden'">
         <ng-template #template let-category="label">
           {{ category }}
         </ng-template>
@@ -42,22 +42,22 @@
     </div>
 
     <div class="col-md">
-      <label class="form-label">Status</label>
-      <select2 [data]="statuses()" [templates]="template" formControlName="active"
-               placeholder="Select Status" [displaySearchStatus]="'hidden'">
+      <label class="form-label">Classification</label>
+      <select2 [data]=dropdowns()?.classification [templates]="template" formControlName="classification"
+               placeholder="Select Classification" [displaySearchStatus]="'hidden'">
         <ng-template #template let-category="label">
           {{ category }}
         </ng-template>
       </select2>
     </div>
 
-    <div class="col-md">
-      <label class="form-label">Category Status</label>
-      <input class="form-control" type="text" formControlName="searchKey" placeholder="Search...">
+    <div class="col-md h-36">
+      <label class="form-label"></label>
+      <input class="form-control h-36 m-t-4" type="text" formControlName="searchKey" placeholder="Search...">
     </div>
 
     <div class="col d-flex justify-content-start align-items-center m-t-40">
-      <button type="submit" class="btn btn-primary h-38">
+      <button type="submit" class="btn btn-primary h-36">
         Search
       </button>
     </div>

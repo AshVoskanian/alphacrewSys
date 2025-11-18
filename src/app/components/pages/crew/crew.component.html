@@ -1,5 +1,5 @@
 <div class="p-x-10 p-y-15">
-  <app-card>
+  <app-card [cardClass]="'bg-dark'">
     <app-crew-filter></app-crew-filter>
   </app-card>
 
@@ -14,7 +14,7 @@
         } @else {
           <div class="table-responsive custom-scrollbar">
             @if (tableConfig?.data?.length) {
-              <div class="flex flex-col gap-20">
+              <div class="flex flex-col gap-20 m-auto">
                 <app-table [tableConfig]="tableConfig"
                            [search]="false"
                            [hover]="true"

@@ -25,4 +25,13 @@ export class CrewService extends ApiBase {
         })
       )
   }
+
+  addDocument(crewId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('crewId', crewId.toString());
+    formData.append('file', file, file.name);
+
+    // HTTP POST მოთხოვნა
+    return this.http.post(`${ this.apiUrl }/Crew/UploadCrewDocumentAsync?crewId=${ crewId }`, formData);
+  }
 }

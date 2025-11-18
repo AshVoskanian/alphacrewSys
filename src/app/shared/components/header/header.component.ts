@@ -5,7 +5,7 @@ import { NavService } from '../../services/nav.service';
 import { SearchComponent } from "./widgets/search/search.component";
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
 import { LocalStorageService } from "../../services/local-storage.service";
@@ -16,10 +16,12 @@ import { ApiBase } from "../../bases/api-base";
 import { GeneralService } from "../../services/general.service";
 import { Region } from "../../interface/header";
 import { finalize } from "rxjs";
+import { SvgIconComponent } from "../ui/svg-icon/svg-icon.component";
 
 @Component({
   selector: 'app-header',
   imports: [
+    SvgIconComponent, RouterModule,
     HeaderLogoComponent, HeaderLanguageComponent, SearchComponent,
     Select2Module, ReactiveFormsModule,
     ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent

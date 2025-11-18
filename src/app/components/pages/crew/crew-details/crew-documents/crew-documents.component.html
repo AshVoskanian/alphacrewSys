@@ -1,1 +1,29 @@
-<p>crew-documents works!</p>
+<div class="p-10 p-15">
+  @if (loading()) {
+    <div class="gap-15 flex-col flex">
+      @for (it of [].constructor(4); track it) {
+        <div class="flex items-center gap-12">
+          <div class="flex w-100 h-40 flex-col gap-12">
+            <div class="col-md h-10 w-200 rounded-md bg-gray-200 animate-pulse"></div>
+            <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+          <div class="flex w-90 h-10 flex-col gap-12">
+            <div class="col-md rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col p-t-30 gap-20 justify-content-end">
+      <input class="hidden" hidden #file (change)="onFileSelected($event)" type="file">
+      <button type="button" class="btn btn-primary w-300 h-36" (click)="file.click()">
+        Choose File
+      </button>
+      @if (tableConfig() && tableConfig().data.length) {
+        <app-table [tableConfig]="tableConfig()"
+                   (action)="handleAction($event)">
+        </app-table>
+      }
+    </div>
+  }
+</div>

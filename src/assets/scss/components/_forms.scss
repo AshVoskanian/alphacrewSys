@@ -13,9 +13,14 @@
 .form-space {
   margin-bottom: -10px;
 
-  >div {
+  > div {
     margin-bottom: 10px;
   }
+}
+
+.form-control {
+  height: 36px !important;
+  border-color: var(--dark-light-color);
 }
 
 .theme-form {
@@ -236,7 +241,7 @@
       &.is-valid {
         border-color: $success-color;
 
-        ~.valid-feedback {
+        ~ .valid-feedback {
           color: $success-color;
         }
       }
@@ -245,7 +250,7 @@
       &.is-invalid {
         border-color: $danger-color;
 
-        ~.invalid-feedback {
+        ~ .invalid-feedback {
           color: $danger-color;
         }
       }
@@ -291,11 +296,11 @@
         border-color: $danger-color;
       }
 
-      &:invalid~.form-check-label {
+      &:invalid ~ .form-check-label {
         color: $danger-color;
       }
 
-      &:valid~.form-check-label {
+      &:valid ~ .form-check-label {
         color: $success-color;
       }
 
@@ -454,7 +459,7 @@
 
   &.checkbox-primary {
     input[type=checkbox]:checked {
-      +label::before {
+      + label::before {
         color: transparent;
         border: 2px solid $primary-color;
       }
@@ -494,7 +499,7 @@
   flex-wrap: wrap;
   justify-content: center;
 
-  @media (max-width:1200px) {
+  @media (max-width: 1200px) {
     justify-content: unset;
   }
 
@@ -507,11 +512,11 @@
     @include pixelstrap-flex(flex, center, center);
     max-width: 130px;
 
-    @media (max-width:1335px) {
+    @media (max-width: 1335px) {
       max-width: 113px;
     }
 
-    @media (max-width:1232px) {
+    @media (max-width: 1232px) {
       padding: 10px;
       max-width: 105px;
     }
@@ -680,7 +685,7 @@
   }
 
   .form-floating {
-    >label {
+    > label {
       [dir="rtl"] & {
         left: unset;
         right: 0;

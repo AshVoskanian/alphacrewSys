@@ -31,7 +31,7 @@ export class CrewComponent extends ApiBase implements OnInit {
   public tableConfig: TableConfigs = {
     columns: [
       { title: '', field_value: 'statusText', sort: false },
-      { title: 'Crew name', field_value: 'name', sort: true },
+      { title: 'Crew name', field_value: 'name', sort: true, type: 'action' },
       { title: 'Hours', field_value: 'hours', sort: true },
       { title: 'Classif', field_value: 'classText', sort: true },
       { title: 'PayOpt', field_value: 'paymentOptionText', sort: true },
@@ -45,7 +45,7 @@ export class CrewComponent extends ApiBase implements OnInit {
   };
 
   ngOnInit() {
-    this.filter();
+    this.subToFilterParams();
   }
 
   getCrewList(params: CrewSearchParams) {
@@ -83,24 +83,27 @@ export class CrewComponent extends ApiBase implements OnInit {
       })
   }
 
-  filter() {
+  subToFilterParams() {
     this._route.queryParams
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (params: CrewSearchParams) => {
-          this.filterParams.set(
-            {
-              ...params,
-              page: +params['page'] || 1,
-              classification: +params['classification'] || 0,
-              crewLevel: +params['crewLevel'] || 0,
-              crewRegion: +params['crewRegion'] || 0,
-              paymentOption: +params['paymentOption'] || 0,
-              active: +params['active'] || null,
-              pageSize: 20
-            }
-          )
-          this.getCrewList(this.filterParams());
+          if (!GeneralService.isEmpty(params)) {
+            this.filterParams.set(
+              {
+                ...params,
+                page: +params['page'] || 1,
+                classification: +params['classification'] || 0,
+                crewLevel: +params['crewLevel'] || 0,
+                crewRegion: +params['crewRegion'] || 0,
+                paymentOption: +params['paymentOption'] || 0,
+                active: (+params['active'] === 0 || +params['active'] === 1) ? +params['active'] : null,
+                pageSize: 20
+              }
+            )
+
+            this.getCrewList(this.filterParams());
+          }
         }
       });
   }

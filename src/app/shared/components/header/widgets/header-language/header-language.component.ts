@@ -33,10 +33,10 @@ export class HeaderLanguageComponent {
   }
 
   setCurrentMenuItem() {
-    const currentPath = this.router.url;
+    const currentPath = this.router.url?.split('?')[0];
 
     this.selectedMenuItem = menuItems.find(item =>
-      item.type === 'link' && item.path === currentPath
+      item.type === 'link' && currentPath?.includes(item.path)
     );
 
     if (!this.selectedMenuItem) {

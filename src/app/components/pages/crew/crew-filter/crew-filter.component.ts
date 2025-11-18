@@ -6,6 +6,7 @@ import { CrewSearchParams, FilterDropdowns } from "../../../../shared/interface/
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { CrewService } from "../crew.service";
+import { GeneralService } from "../../../../shared/services/general.service";
 
 @Component({
   selector: 'app-crew-filter',
@@ -51,29 +52,33 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
   initForm() {
     this.form = this._fb.group({
       searchKey: [ '' ],
-      active: [ null ],
+      active: [ 1 ],
       crewLevel: [ 0 ],
       crewRegion: [ 0 ],
       paymentOption: [ 0 ],
       classification: [ 0 ],
     });
+
+    this.submit();
   }
 
   setExistingParams() {
     this._activatedRoute.queryParams
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe(params => {
-        const transformedParams = {
-          ...params,
-          page: +params['page'] || 1,
-          classification: +params['classification'] || 0,
-          crewLevel: +params['crewLevel'] || 0,
-          crewRegion: +params['crewRegion'] || 0,
-          paymentOption: +params['paymentOption'] || 0,
-          active: (+params['active'] === 0 || +params['active'] === 1) ? +params['active'] : null,
-        }
-        if (Object.keys(transformedParams).length) {
-          this.form.patchValue(transformedParams, { emitEvent: false });
+        if (!GeneralService.isEmpty(params)) {
+          const transformedParams = {
+            ...params,
+            page: +params['page'] || 1,
+            classification: +params['classification'] || 0,
+            crewLevel: +params['crewLevel'] || 0,
+            crewRegion: +params['crewRegion'] || 0,
+            paymentOption: +params['paymentOption'] || 0,
+            active: (+params['active'] === 0 || +params['active'] === 1) ? +params['active'] : null,
+          }
+          if (Object.keys(transformedParams).length) {
+            this.form.patchValue(transformedParams, { emitEvent: false });
+          }
         }
       });
   }

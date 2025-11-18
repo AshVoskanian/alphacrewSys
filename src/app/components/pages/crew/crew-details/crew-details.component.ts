@@ -8,7 +8,7 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { TransformedSkill } from "../../../../shared/interface/schedule";
 import { CREW_SKILLS } from "../../../../shared/data/skills";
-import { DatePipe, NgOptimizedImage, TitleCasePipe } from "@angular/common";
+import { DatePipe, Location, TitleCasePipe } from "@angular/common";
 import { NgbNavModule } from "@ng-bootstrap/ng-bootstrap";
 import { CrewProfileComponent } from "./crew-profile/crew-profile.component";
 import { GeneralService } from "../../../../shared/services/general.service";
@@ -20,7 +20,7 @@ import { CrewFeedbackComponent } from "./crew-feedback/crew-feedback.component";
 import { CrewTimesheetsComponent } from "./crew-timesheets/crew-timesheets.component";
 import { CrewPaymentsComponent } from "./crew-payments/crew-payments.component";
 import { CrewHolidaysComponent } from "./crew-holidays/crew-holidays.component";
-import { Location } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 
 @Component({
   selector: 'app-crew-details',
@@ -31,7 +31,6 @@ import { Location } from '@angular/common';
     CrewProfileComponent,
     DatePipe,
     FormsModule,
-    NgOptimizedImage,
     CrewNotesComponent,
     CrewDocumentsComponent,
     CrewDeductionsComponent,
@@ -48,9 +47,14 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
   private _dr: DestroyRef = inject(DestroyRef);
   private _location: Location = inject(Location);
   private _route: ActivatedRoute = inject(ActivatedRoute);
+  private _domSanitizer: DomSanitizer = inject(DomSanitizer);
   public layoutService = inject(LayoutService);
 
+  avatarUrl: WritableSignal<SafeResourceUrl> = signal<string>('');
+
+  avatarLoading: WritableSignal<boolean> = signal<boolean>(false);
   profileLoading: WritableSignal<boolean> = signal<boolean>(false);
+
   crewDetails: WritableSignal<CrewDetail> = signal<CrewDetail>(null);
   skills: WritableSignal<TransformedSkill[]> = signal<TransformedSkill[]>(null);
 
@@ -75,10 +79,41 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
               next: res => {
                 this.crewDetails.set(res.data);
                 this.setSkills(res.data);
+                this.getCrewAvatar(res.data);
               }
             })
         }
       })
+  }
+
+  getCrewAvatar(crewDetail: CrewDetail) {
+    this.avatarLoading.set(true);
+
+    const { crewId } = crewDetail;
+
+    this.get<string>(`Crew/GetCrewImage?id=${ crewId }`)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.avatarLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          const mime = this._detectMime(res.data);
+          this.avatarUrl.set(this._domSanitizer.bypassSecurityTrustUrl(`data:${ mime };base64,${ res.data }`));
+          console.log(res)
+        }
+      })
+  }
+
+  private _detectMime(base64: string): string {
+    if (base64.startsWith('/9j/')) return 'image/jpeg';
+    if (base64.startsWith('iVBOR')) return 'image/png';
+    if (base64.startsWith('R0lGOD')) return 'image/gif';
+    return 'application/octet-stream'; // default fallback
   }
 
   setSkills(crewDetails: CrewDetail) {
@@ -101,10 +136,14 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
 
     this.profileLoading.set(true);
 
-    this.post<CrewDetail>('Crew/AddOrUpdateCrew', {
+    const params = {
       ...crewData,
       crewSkillIds,
-    })
+    }
+
+    GeneralService.clearObject(params);
+
+    this.post<CrewDetail>('Crew/AddOrUpdateCrew', params)
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.profileLoading.set(false))
@@ -125,5 +164,18 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
 
   goBack() {
     this._location.back();
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // this.user.user_profile = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }

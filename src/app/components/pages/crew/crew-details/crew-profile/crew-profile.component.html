@@ -80,6 +80,29 @@
       <input class="form-control digits" type="date" formControlName="startDate">
     </div>
 
+    <div class="col col-sm-6 col-md-4">
+      <label class="form-label">Passport Expiry</label>
+      <input class="form-control digits" type="date" formControlName="passportExpiry">
+    </div>
+
+
+    <div class="col col-sm-6 col-md-4">
+      <label class="form-label">Visa Expiry</label>
+      <input class="form-control digits" type="date" formControlName="visaExpiry">
+    </div>
+
+    <div class="col flex justify-content-end gap-12 m-t-41">
+      <div class="h-38">
+        <input class="tgl tgl-flip h-100 l-h-38" [id]="1" type="checkbox" formControlName="isFulltime">
+        <label class="tgl-btn full-time m-0 h-100 l-h-38" data-tg-off="Full-time" data-tg-on="Part-time" [for]="1"></label>
+      </div>
+
+      <div class="h-38">
+        <input class="tgl tgl-flip h-100 l-h-38" [id]="12" type="checkbox" formControlName="isActive">
+        <label class="tgl-btn m-0 h-100 l-h-38" data-tg-off="Inactive" data-tg-on="Active" [for]="12"></label>
+      </div>
+    </div>
+
     <div class="col col-md-8">
       <label class="form-label">Address</label>
       <div class="input-group">
@@ -97,18 +120,6 @@
         <span class="input-group-text bg-light-secondary">
         <i class="fa-solid fa-location-dot txt-secondary"></i>
       </span>
-      </div>
-    </div>
-
-    <div class="col flex justify-content-end gap-12">
-      <div class="h-38">
-        <input class="tgl tgl-flip h-100 l-h-38" [id]="1" type="checkbox" formControlName="isFulltime">
-        <label class="tgl-btn m-0 h-100 l-h-38" data-tg-off="Full-time" data-tg-on="Part-time" [for]="1"></label>
-      </div>
-
-      <div class="h-38">
-        <input class="tgl tgl-flip h-100 l-h-38" [id]="12" type="checkbox" formControlName="isActive">
-        <label class="tgl-btn m-0 h-100 l-h-38" data-tg-off="Inactive" data-tg-on="Active" [for]="12"></label>
       </div>
     </div>
   </div>
@@ -188,12 +199,7 @@
       <input class="form-control digits" type="date" formControlName="pliExpiry">
     </div>
 
-    <div class="col-9">
-      <label class="form-label" for="formFileSimple">Default File Input Example</label>
-      <input class="form-control px-4" id="formFileSimple" type="file">
-    </div>
-
-    <div class="col-3 d-flex flex-col justify-content-end align-items-end text-end p-t-15">
+    <div class="col d-flex flex-col justify-content-end align-items-end text-end p-t-15">
       <button class="w-110 btn btn-primary" type="submit">
         Save
         @if (loading()) {

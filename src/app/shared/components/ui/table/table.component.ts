@@ -143,8 +143,8 @@ export class TableComponent implements OnInit {
       } else {
         Swal.fire({
           title: 'Are you sure?',
-          text: value.model_text ? value.model_text : 'Do you really want to delete the product?',
-          imageUrl: 'assets/images/gif/trash.gif',
+          text: value.model_text ? value.model_text : 'Do you really want to delete the file?',
+          imageUrl: './assets/images/gif/trash.gif',
           confirmButtonText: 'Yes, delete it!',
           showCancelButton: true,
           cancelButtonText: 'Cancel',
@@ -157,6 +157,10 @@ export class TableComponent implements OnInit {
       }
     }
     if (value.action_to_perform == 'view') {
+      this.action.emit({ action_to_perform: value.action_to_perform, data: details })
+    }
+
+    if (value.action_to_perform == 'edit') {
       this.action.emit({ action_to_perform: value.action_to_perform, data: details })
     }
   }

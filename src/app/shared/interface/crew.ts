@@ -80,6 +80,8 @@ export interface CrewDetail {
   startDate: string;        // ISO string
   checksId: number;
   documents: string;
+  passportExpiry: string;
+  visaExpiry: string;
   ltdCompanyName: string | null;
   ltdCompanyNumber: string | null;
   utrNumber: string | null;

@@ -33,18 +33,21 @@
         }
 
         @if (tableConfig.row_action) {
-          <th>{{ 'Actions' }}</th>
+          <th class="text-end">{{ 'Actions' }}</th>
         }
       </tr>
       </thead>
 
       @if (tableData && tableData.length) {
         <tbody>
-          @for (details of tableData | paginate: { itemsPerPage: pageSize, currentPage: pageNo, totalItems: totalCount }; track details) {
-            <tr class="pointer"
-                (click)="rowClicked.emit(details)"
-                [class.selected]="selected && selected.length && selected.includes(details.id)"
-                [class.hovered]="hover"
+          @for (details of tableData | paginate: {
+            itemsPerPage: pageSize,
+            currentPage: pageNo,
+            totalItems: totalCount
+          }; track details) {
+            <tr
+              [class.selected]="selected && selected.length && selected.includes(details.id)"
+              [class.hovered]="hover"
             >
               @if (hasCheckbox) {
                 <td class="datatable-checkbox">
@@ -70,6 +73,13 @@
                         <a target="_blank" [href]="'https://alphacrew.eu/Jobs/Edit/' + details[column.field_value]">
                           {{ details[column.field_value] }}
                         </a>
+                      </td>
+                    }
+                    @case ('action') {
+                      <td class="pointer" (click)="rowClicked.emit(details)" [innerHTML]="details[column.field_value]">
+                        @if (column.text) {
+                          {{ column.text }}
+                        }
                       </td>
                     }
                     @case ('date') {
@@ -108,7 +118,7 @@
               }
 
               @if (tableConfig.row_action) {
-                <td>
+                <td class="flex items-center justify-content-end">
                   <div class="product-action common-align gap-2 justify-content-start">
                     @for (rows of tableConfig.row_action; track rows) {
                       @if (rows.type == 'button') {
@@ -117,7 +127,7 @@
                       @if (rows.label == 'Create') {
                         <button class="plus-btn">+</button>
                       } @else if (rows.label == 'Edit' || rows.label == 'Delete') {
-                        <a class="square-white" href="javascript:void(0)" [routerLink]="rows.path"
+                        <a class="square-white" href="javascript:void(0)"
                            (click)="handleAction(rows, details)">
                           <app-svg-icon [icon]="rows.icon"></app-svg-icon>
                         </a>

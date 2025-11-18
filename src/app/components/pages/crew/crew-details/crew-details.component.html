@@ -4,9 +4,30 @@
       <app-card>
         <div class="user-info">
           <div class="flex flex-col items-center p-12 gap-12">
-            <i (click)="goBack()" class="position-absolute pointer back t-20 l-20 fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
-            <img class="rounded-circle w-170 h-170 object-fit-cover d-block" width="170" height="170"
-                 [ngSrc]="'https://alphacrew.eu/Crew/CrewImage/' + crewDetails()?.crewId" alt="">
+            <i (click)="goBack()"
+               class="position-absolute pointer back t-20 l-20 fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
+
+            <div class="avatar rounded-circle">
+              @if (avatarLoading()) {
+                <div class="w-180 h-180 rounded-md bg-gray-200 animate-pulse"></div>
+              } @else {
+                <div class="common-align rounded-circle">
+                  <div>
+                    @if (true) {
+                      <img [src]="avatarUrl()" alt="Profile Image"/>
+                    }
+                    <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput hidden/>
+                    @if (true) {
+                      <div class="icon-wrapper" (click)="fileInput.click()">
+                        <i class="icofont icofont-pencil-alt-5"></i>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+
             <div class="text-center">
               <p class="txt-dark f-18">{{ crewDetails()?.name }}</p>
               <p class="txt-secondary f-16">{{ crewDetails()?.levelText }}</p>
@@ -58,7 +79,7 @@
           <li [ngbNavItem]="'documents'">
             <a class="nav-link" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
             <ng-template ngbNavContent>
-              <app-crew-documents></app-crew-documents>
+              <app-crew-documents [crewDetail]="crewDetails()"></app-crew-documents>
             </ng-template>
           </li>
           <li [ngbNavItem]="'feedback'">

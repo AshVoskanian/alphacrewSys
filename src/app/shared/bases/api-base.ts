@@ -12,7 +12,7 @@ export class ApiBase {
   constructor(protected http: HttpClient) {
   }
 
-  private get apiUrl(): string {
+  get apiUrl(): string {
     return environment.apiUrl;
   }
 
@@ -24,6 +24,10 @@ export class ApiBase {
       });
     }
     return this.http.get<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }`, { params, headers })
+  }
+
+  getFile(endpoint: string, responseType: 'json' | 'blob' = 'json'): Observable<Blob> {
+    return this.http.get<Blob>(`${ this.apiUrl }/${ endpoint }`, { responseType: responseType as any })
   }
 
   post<T, U = any>(endpoint: string, data: U, headers?: HttpHeaders): Observable<ApiResponse<T>> {

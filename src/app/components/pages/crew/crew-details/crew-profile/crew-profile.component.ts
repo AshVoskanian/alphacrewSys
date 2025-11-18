@@ -61,6 +61,8 @@ export class CrewProfileComponent implements OnInit, OnChanges {
       pliCoverId: [ '' ],
       checksId: [ '' ],
       pliExpiry: [ '' ],
+      passportExpiry: [ '' ],
+      visaExpiry: [ '' ],
     });
   }
 
@@ -102,6 +104,8 @@ export class CrewProfileComponent implements OnInit, OnChanges {
       pliCoverId: data.pliCoverId,
       startDate: this._date.transform(data.startDate, 'yyyy-MM-dd'),
       checksId: data.checksId,
+      visaExpiry: this._date.transform(data.visaExpiry, 'yyyy-MM-dd'),
+      passportExpiry: this._date.transform(data.passportExpiry, 'yyyy-MM-dd')
     });
     this.form.updateValueAndValidity();
   }

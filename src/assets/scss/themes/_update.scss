@@ -1079,7 +1079,7 @@
 }
 
 
-// API Management 
+// API Management
 .api-manage {
     .card-header {
         .btn {
@@ -1548,14 +1548,14 @@
     }
 }
 
-// Form-validation 
+// Form-validation
 .select2-container--default {
     &.select2-container--below {
         .select2-selection {
-            height: auto !important;
+            height: 36px !important;
             line-height: 1.5;
             font-size: 1rem;
-            border: var(--bs-border-width) solid var(--bs-border-color) !important;
+            border: var(--bs-border-width) solid var(--dark-light-color) !important;
             background-color: $white !important;
 
             .select2-selection__reset {
@@ -1591,7 +1591,7 @@
     }
 }
 
-// Edit Toolbar 
+// Edit Toolbar
 .angular-editor-toolbar {
     .angular-editor-toolbar-set {
         .angular-editor-button {
@@ -1618,7 +1618,7 @@
     }
 }
 
-// Date & Time Picker 
+// Date & Time Picker
 .owl-dt-container {
     .owl-dt-calendar {
         .owl-dt-calendar-main {
@@ -1646,7 +1646,7 @@
     }
 }
 
-// Social app gallery 
+// Social app gallery
 .my-gallery {
     &.gallery-with-description {
         figure {
@@ -1690,7 +1690,7 @@
     }
 }
 
-// Datatable 
+// Datatable
 .default-datatable {
     &.table-components {
         .table-responsive {
@@ -1755,7 +1755,7 @@
     }
 }
 
-// ngx-editor 
+// ngx-editor
 .ngx-editor {
     .NgxEditor__Wrapper {
         .NgxEditor__MenuBar {

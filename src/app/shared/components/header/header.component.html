@@ -1,63 +1,71 @@
-<div class="header-wrapper row m-x-0">
-  <app-search></app-search>
-  <div class="header-logo-wrapper col-auto p-0">
-    <app-header-logo [icon]="'align-center'" [type]="'header'"></app-header-logo>
-  </div>
+<div class="header-wrapper flex justify-content-between h-92 m-x-0">
+  <div class="flex items-center">
+    <div class="header-logo-wrapper col-auto p-0 m-r-15">
+      <app-header-logo [icon]="'align-center'" [type]="'header'"></app-header-logo>
+    </div>
 
-  @if (isScheduleRoute) {
-    <form class="flex gap-10 align-items-center max-w-300" [formGroup]="form" (ngSubmit)="submit()">
-      <div class="flex gap-4">
-        <div class="col date-input">
-          <input class="form-control digits" id="datetime-local"
-                 placeholder="yyyy-mm-dd" name="from"
-                 formControlName="date"
-                 ngbDatepicker #fromDate="ngbDatepicker"
-                 (click)="fromDate.toggle()">
+    @if (!isScheduleRoute) {
+      <div class="breadcrumb-custom flex items-center justify-content-between">
+        <a class="text-info m-r-5" routerLink="/dashboard"><span class="f-16 pointer">Dashboard</span></a>
+        <a class="text-info m-r-5" routerLink="/schedule"> / <span class="f-16 pointer">Schedule</span></a>
+        <a class="text-info m-r-5" routerLink="/crew"> / <span class="f-16 pointer"> Crew</span></a>
+      </div>
+    }
+
+    @if (isScheduleRoute) {
+      <form class="flex gap-10 align-items-center max-w-300" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="flex gap-4">
+          <div class="col date-input">
+            <input class="form-control digits" id="datetime-local"
+                   placeholder="yyyy-mm-dd" name="from"
+                   formControlName="date"
+                   ngbDatepicker #fromDate="ngbDatepicker"
+                   (click)="fromDate.toggle()">
+          </div>
+          <div class="col-auto d-flex justify-content-start align-items-center">
+            <button class="btn p-x-14 btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
+          </div>
         </div>
-        <div class="col-auto d-flex justify-content-start align-items-center">
-          <button class="btn p-x-14 btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
+
+        <div class="flex gap-2">
+          <button type="button"
+                  [class.btn-primary]="navService.days === 2"
+                  [class.btn-secondary]="navService.days !== 2"
+                  class="btn example-popover mb-0 me-0 p-x-12"
+                  (click)="setDays(2)">
+            2
+          </button>
+          <button type="button"
+                  [class.btn-primary]="navService.days === 4"
+                  [class.btn-secondary]="navService.days !== 4"
+                  class="btn example-popover mb-0 me-0 p-x-12"
+                  (click)="setDays(4)">
+            4
+          </button>
+          <button type="button"
+                  [class.btn-primary]="navService.days === 7"
+                  [class.btn-secondary]="navService.days !== 7"
+                  class="btn example-popover mb-0 me-0 p-x-12"
+                  (click)="setDays(7)">
+            7
+          </button>
         </div>
-      </div>
 
-      <div class="flex gap-2">
-        <button type="button"
-                [class.btn-primary]="navService.days === 2"
-                [class.btn-secondary]="navService.days !== 2"
-                class="btn example-popover mb-0 me-0 p-x-12"
-                (click)="setDays(2)">
-          2
-        </button>
-        <button type="button"
-                [class.btn-primary]="navService.days === 4"
-                [class.btn-secondary]="navService.days !== 4"
-                class="btn example-popover mb-0 me-0 p-x-12"
-                (click)="setDays(4)">
-          4
-        </button>
-        <button type="button"
-                [class.btn-primary]="navService.days === 7"
-                [class.btn-secondary]="navService.days !== 7"
-                class="btn example-popover mb-0 me-0 p-x-12"
-                (click)="setDays(7)">
-          7
-        </button>
-      </div>
+        <div class="flex gap-2">
+          @if (regionLoading) {
+            <div class="col-md rounded-md h-35 w-110 bg-gray-200 animate-pulse"></div>
+          } @else {
+            <select2 [data]="regions" [value]="0" [templates]="template" [displaySearchStatus]="'hidden'"
+                     (update)="setRegion($event)" class="w-130 bg-light-secondary">
+              <ng-template #template let-item="label">
+                {{ item }}
+              </ng-template>
+            </select2>
+          }
+        </div>
 
-      <div class="flex gap-2">
-        @if (regionLoading) {
-          <div class="col-md rounded-md h-35 w-110 bg-gray-200 animate-pulse"></div>
-        } @else {
-          <select2 [data]="regions" [value]="0" [templates]="template" [displaySearchStatus]="'hidden'"
-                   (update)="setRegion($event)" class="w-130 bg-light-secondary">
-            <ng-template #template let-item="label">
-              {{ item }}
-            </ng-template>
-          </select2>
-        }
-      </div>
-
-      @if (queryParams() && queryParams().get('jobId')) {
-        <div class="badge-spacing image-badges">
+        @if (queryParams() && queryParams().get('jobId')) {
+          <div class="badge-spacing image-badges">
             <span
               class="badge common-align txt-primary rounded-pill badge-l-primary rounded-pill border border-primary">
                 {{ queryParams().get('jobId') }}
@@ -67,10 +75,11 @@
                 </app-feather-icon>
               </a>
             </span>
-        </div>
-      }
-    </form>
-  }
+          </div>
+        }
+      </form>
+    }
+  </div>
 
   <div class="nav-right col-auto pull-right right-header p-0 ms-auto">
     <ul class="nav-menus">
@@ -94,26 +103,6 @@
           </div>
         </li>
       }
-      <!--      <li class="fullscreen-body">-->
-      <!--        <app-toggle-screen></app-toggle-screen>-->
-      <!--      </li>-->
-
-      <!--            <li>-->
-      <!--                <app-svg-icon [icon]="'search'" (click)="openSearch()"></app-svg-icon>-->
-      <!--            </li>-->
-
-      <!--            <li class="onhover-dropdown">-->
-      <!--                <app-header-bookmark></app-header-bookmark>-->
-      <!--            </li>-->
-
-      <!--      <li class="mode">-->
-      <!--        <app-mode></app-mode>-->
-      <!--      </li>-->
-
-      <!--      <li class="onhover-dropdown">-->
-      <!--        <app-header-notification></app-header-notification>-->
-      <!--      </li>-->
-
       <li class="profile-nav onhover-dropdown pe-0 py-0">
         <app-profile></app-profile>
       </li>

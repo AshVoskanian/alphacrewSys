@@ -9,6 +9,18 @@
         &.hovered:hover {
           background: var(--chart-progress-light);
         }
+
+        &:nth-child(even) {
+          background: var(--light-background);
+        }
+
+        td {
+          &.pointer {
+            &:hover {
+              color: var(--theme-default);
+            }
+          }
+        }
       }
     }
   }

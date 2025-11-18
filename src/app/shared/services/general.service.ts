@@ -10,6 +10,10 @@ export class GeneralService {
   constructor() {
   }
 
+  public static isEmpty(obj: any): boolean {
+    return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+  }
+
   public static showSuccessMessage(title?: string) {
     Swal.fire({
       title: title || 'Successfully saved',
@@ -72,5 +76,14 @@ export class GeneralService {
         }
       }
     }
+  }
+
+  public downloadBlob(blob: Blob, filename: string): void {
+    const a = document.createElement('a');
+    const objectUrl = URL.createObjectURL(blob);
+    a.href = objectUrl;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(objectUrl);
   }
 }
