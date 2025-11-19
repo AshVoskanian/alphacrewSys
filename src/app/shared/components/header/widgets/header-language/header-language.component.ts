@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { language } from '../../../../data/header';
 import { Language } from '../../../../interface/header';
 import { NavService } from '../../../../services/nav.service';
@@ -7,7 +7,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { menuItems } from "../../../../data/menu";
 import { Menu } from "../../../../interface/menu";
 import { SvgIconComponent } from "../../../ui/svg-icon/svg-icon.component";
-import { Router, RouterModule } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 @Component({
   selector: 'app-header-language',
@@ -17,6 +17,7 @@ import { Router, RouterModule } from "@angular/router";
 })
 
 export class HeaderLanguageComponent {
+  private _activatedRouter = inject(ActivatedRoute);
 
   public languages = language;
   public selectedMenuItem: Menu;
@@ -32,6 +33,10 @@ export class HeaderLanguageComponent {
     this.setCurrentMenuItem();
   }
 
+  get textColor() {
+    return'';
+  }
+
   setCurrentMenuItem() {
     const currentPath = this.router.url?.split('?')[0];
 
@@ -45,11 +50,6 @@ export class HeaderLanguageComponent {
         item.type === 'extTabLink' && fullUrl.includes(item.path)
       );
     }
-  }
-
-  selectLanguage(language: Language) {
-    this.selectedLanguage = language;
-    this.translate.use(language.code)
   }
 
   selectedMenu(menuItem: Menu) {

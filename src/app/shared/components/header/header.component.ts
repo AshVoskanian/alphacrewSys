@@ -2,7 +2,6 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
 import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
-import { SearchComponent } from "./widgets/search/search.component";
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
@@ -16,14 +15,12 @@ import { ApiBase } from "../../bases/api-base";
 import { GeneralService } from "../../services/general.service";
 import { Region } from "../../interface/header";
 import { finalize } from "rxjs";
-import { SvgIconComponent } from "../ui/svg-icon/svg-icon.component";
 
 @Component({
   selector: 'app-header',
   imports: [
-    SvgIconComponent, RouterModule,
-    HeaderLogoComponent, HeaderLanguageComponent, SearchComponent,
-    Select2Module, ReactiveFormsModule,
+    RouterModule,
+    HeaderLogoComponent, HeaderLanguageComponent, Select2Module, ReactiveFormsModule,
     ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent
   ],
   templateUrl: './header.component.html',
@@ -31,7 +28,6 @@ import { SvgIconComponent } from "../ui/svg-icon/svg-icon.component";
 })
 
 export class HeaderComponent extends ApiBase implements OnInit {
-  private router: Router = inject(Router);
   private _router = inject(Router);
   private _dr = inject(DestroyRef);
   private _fb = inject(FormBuilder);
@@ -51,11 +47,19 @@ export class HeaderComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.initForm();
-    this.router.events.subscribe(() => {
-      this.isScheduleRoute = this.router.url?.includes('/schedule');
+    this._router.events.subscribe(() => {
+      this.isScheduleRoute = this._router.url?.includes('/schedule');
     });
     this.getRegions();
     this.checkListView();
+  }
+
+  get headerBg(): string {
+    return 'bg-dark';
+  }
+
+  get headerText(): string {
+    return 'text-danger';
   }
 
   checkListView() {
@@ -132,7 +136,7 @@ export class HeaderComponent extends ApiBase implements OnInit {
 
   resetJobIdFilter() {
     const queryParams = {};
-    this._router.navigate([ 'schedule' ], { queryParams });
+    this._router.navigate([ 'schedule' ], { queryParams }).then();
     setTimeout(() => this.submit());
   }
 }

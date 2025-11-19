@@ -13,11 +13,11 @@
               } @else {
                 <div class="common-align rounded-circle">
                   <div>
-                    @if (true) {
+                    @if (avatarUrl()) {
                       <img [src]="avatarUrl()" alt="Profile Image"/>
                     }
-                    <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput hidden/>
-                    @if (true) {
+                    <input type="file" accept="image/*" (change)="uploadFile($event)" #fileInput hidden/>
+                    @if (avatarUrl()) {
                       <div class="icon-wrapper" (click)="fileInput.click()">
                         <i class="icofont icofont-pencil-alt-5"></i>
                       </div>

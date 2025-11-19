@@ -1,7 +1,7 @@
 <div class="p-10 p-15">
   @if (loading()) {
     <div class="gap-15 flex-col flex">
-      @for (it of [].constructor(4); track it) {
+      @for (it of [].constructor(4); track $index) {
         <div class="flex items-center gap-12">
           <div class="flex w-100 h-40 flex-col gap-12">
             <div class="col-md h-10 w-200 rounded-md bg-gray-200 animate-pulse"></div>

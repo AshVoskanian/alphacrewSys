@@ -4,7 +4,7 @@
       <div>
         <app-svg-icon [icon]="selectedMenuItem?.icon" [class]="'h-15'" [change]="true"></app-svg-icon>
       </div>
-      <p class="m-0 p-t-3">
+      <p class="m-0 p-t-3 {{textColor}}">
         {{ selectedMenuItem?.title | titlecase }}
       </p>
     </div>

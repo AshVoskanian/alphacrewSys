@@ -62,6 +62,7 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getDetails();
+    this.getCrewAvatar();
   }
 
   getDetails() {
@@ -79,32 +80,33 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
               next: res => {
                 this.crewDetails.set(res.data);
                 this.setSkills(res.data);
-                this.getCrewAvatar(res.data);
               }
             })
         }
       })
   }
 
-  getCrewAvatar(crewDetail: CrewDetail) {
+  getCrewAvatar() {
     this.avatarLoading.set(true);
 
-    const { crewId } = crewDetail;
-
-    this.get<string>(`Crew/GetCrewImage?id=${ crewId }`)
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        finalize(() => this.avatarLoading.set(false))
-      )
+    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
       .subscribe({
-        next: res => {
-          if (res.errors?.errorCode) {
-            GeneralService.showErrorMessage(res.errors.message);
-            return;
-          }
-          const mime = this._detectMime(res.data);
-          this.avatarUrl.set(this._domSanitizer.bypassSecurityTrustUrl(`data:${ mime };base64,${ res.data }`));
-          console.log(res)
+        next: params => {
+          this.get<string>(`Crew/GetCrewImage?id=${ +params.get('id') }`)
+            .pipe(
+              takeUntilDestroyed(this._dr),
+              finalize(() => this.avatarLoading.set(false))
+            )
+            .subscribe({
+              next: res => {
+                if (res.errors?.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                  return;
+                }
+                const mime = this._detectMime(res.data);
+                this.avatarUrl.set(this._domSanitizer.bypassSecurityTrustUrl(`data:${ mime };base64,${ res.data }`));
+              }
+            })
         }
       })
   }
@@ -166,16 +168,39 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
     this._location.back();
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input?.files?.[0];
+  uploadFile(e: any) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        // this.user.user_profile = reader.result as string;
+    this.avatarLoading.set(true);
+
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(',')[1];
+      const fileName = file.name;
+
+      const payload = {
+        crewId: this.crewDetails()?.crewId,
+        fileName: fileName,
+        fileBase64: base64
       };
-      reader.readAsDataURL(file);
-    }
+
+      this.post('Crew/SaveImageAsync', payload)
+        .pipe(
+          takeUntilDestroyed(this._dr),
+          finalize(() => this.avatarLoading.set(false))
+        )
+        .subscribe({
+          next: res => {
+            if (res.errors?.errorCode) {
+              GeneralService.showErrorMessage(res.errors.message);
+              return;
+            }
+
+            this.getCrewAvatar();
+          }
+        })
+    };
+
+    reader.readAsDataURL(file);
   }
 }

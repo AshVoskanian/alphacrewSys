@@ -113,15 +113,23 @@ export class CrewDocumentsComponent extends ApiBase implements OnInit, OnChanges
       });
   }
 
-  onFileSelected(event: any): void {
-    this.uploadFile(8597, event.target.files[0]);
-  }
+  uploadFile(e: any) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
 
-  uploadFile(crewId: number, file: File): void {
-    if (file) {
-      this.loading.set(true);
+    this.loading.set(true);
 
-      this._crewService.addDocument(crewId, file)
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(',')[1];
+      const fileName = file.name;
+
+      const payload = {
+        crewId: this.crewDetail()?.crewId,
+        fileName: fileName,
+        fileBase64: base64
+      };
+
+      this._crewService.post('Crew/UploadCrewDocumentAsync', payload)
         .pipe(
           takeUntilDestroyed(this._dr),
           finalize(() => this.loading.set(false))
@@ -137,6 +145,8 @@ export class CrewDocumentsComponent extends ApiBase implements OnInit, OnChanges
             this._cdr.detectChanges();
           }
         });
-    }
+    };
+
+    reader.readAsDataURL(file);
   }
 }

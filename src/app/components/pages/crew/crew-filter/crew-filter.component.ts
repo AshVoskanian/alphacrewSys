@@ -45,7 +45,6 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
   ]);
 
   ngOnInit() {
-    this.getDropdownsData();
     this.initForm();
   }
 
@@ -59,7 +58,7 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
       classification: [ 0 ],
     });
 
-    this.submit();
+    this.getDropdownsData();
   }
 
   setExistingParams() {
@@ -80,6 +79,8 @@ export class CrewFilterComponent extends ApiBase implements OnInit {
             this.form.patchValue(transformedParams, { emitEvent: false });
           }
         }
+
+        this.submit();
       });
   }
 

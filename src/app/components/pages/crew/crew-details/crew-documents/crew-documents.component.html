@@ -15,7 +15,7 @@
     </div>
   } @else {
     <div class="flex flex-col p-t-30 gap-20 justify-content-end">
-      <input class="hidden" hidden #file (change)="onFileSelected($event)" type="file">
+      <input class="hidden" hidden #file (change)="uploadFile($event)" type="file">
       <button type="button" class="btn btn-primary w-300 h-36" (click)="file.click()">
         Choose File
       </button>
