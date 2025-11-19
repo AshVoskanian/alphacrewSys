@@ -54,14 +54,6 @@ export class HeaderComponent extends ApiBase implements OnInit {
     this.checkListView();
   }
 
-  get headerBg(): string {
-    return 'bg-dark';
-  }
-
-  get headerText(): string {
-    return 'text-danger';
-  }
-
   checkListView() {
     const view = this._localStorageService.getItem('listView') as 'grid' | 'list';
 
