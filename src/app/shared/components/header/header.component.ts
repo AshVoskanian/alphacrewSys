@@ -1,10 +1,10 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
 import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
-import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
 import { LocalStorageService } from "../../services/local-storage.service";
@@ -14,7 +14,8 @@ import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { ApiBase } from "../../bases/api-base";
 import { GeneralService } from "../../services/general.service";
 import { Region } from "../../interface/header";
-import { finalize } from "rxjs";
+import { filter, finalize, map } from "rxjs";
+import { LayoutService } from "../../services/layout.service";
 
 @Component({
   selector: 'app-header',
@@ -43,7 +44,25 @@ export class HeaderComponent extends ApiBase implements OnInit {
 
   form: FormGroup;
 
-  queryParams = toSignal(this._activatedRouter.queryParamMap)
+  queryParams = toSignal(this._activatedRouter.queryParamMap);
+
+  urlSig = toSignal(
+    this._router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects)
+    ),
+    { initialValue: this._router.url }
+  )
+
+  logoColor = computed(() => {
+    const url = this.urlSig();
+
+    if (url.includes('/dashboard')) return '#52526c';
+    if (url.includes('/crew')) return '#7366FF';
+    if (url.includes('/schedule')) return '#ffb829';
+
+    return '#111827';
+  });
 
   ngOnInit() {
     this.initForm();
