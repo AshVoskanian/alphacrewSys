@@ -437,6 +437,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           });
 
           this.selectSchedule(this.selectedSchedule);
+          GeneralService.showSuccessMessage('Crew has been successfully deleted');
         }
       });
   }
