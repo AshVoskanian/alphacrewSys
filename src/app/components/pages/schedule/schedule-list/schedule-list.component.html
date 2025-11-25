@@ -214,7 +214,9 @@
                   <ol class="list-group p-0">
                     @for (crew of schedule.crews; let i = $index; track i) {
                       <div>
-                        <li class="list-group-item {{!crew.isActive ? 'pointer' : ''}}"
+                        <li class="list-group-item
+                                  {{!crew.isActive ? 'pointer' : ''}}
+                                  {{crew.jobPartCrewStatusId === 6 ? 'bg-danger-subtle' : ''}}"
                             (click)="openCrewsPanel(crew, $event, schedule);">
                           @if (crew.isActive) {
                             <div class="status bg-dark-subtle"
@@ -233,17 +235,21 @@
                                   <app-feather-icon [class]="'w-14 h-14 text-white spin align-middle'"
                                                     [icon]="'loader'"></app-feather-icon>
                                 } @else {
-                                  @if (crew.jobPartCrewRoleId === 1) {
-                                    <i [style.color]="crew.jobPartCrewStatusColour"
-                                       class="fas fa-square me-2 f-14"></i>
-                                  }
-                                  @if (crew.jobPartCrewRoleId === 2) {
-                                    <i [style.color]="crew.jobPartCrewStatusColour"
-                                       class="far fa-solid fa-star me-2 f-14"></i>
-                                  }
-                                  @if (crew.jobPartCrewRoleId === 4) {
-                                    <i [style.color]="crew.jobPartCrewStatusColour"
-                                       class="fa-solid fa-flag me-2 f-14"></i>
+                                  @if (crew.jobPartCrewStatusId === 6) {
+                                    <i class="fa-solid fa-ban text-danger"></i>
+                                  } @else {
+                                    @if (crew.jobPartCrewRoleId === 1) {
+                                      <i [style.color]="crew.jobPartCrewStatusColour"
+                                         class="fas fa-square me-2 f-14"></i>
+                                    }
+                                    @if (crew.jobPartCrewRoleId === 2) {
+                                      <i [style.color]="crew.jobPartCrewStatusColour"
+                                         class="far fa-solid fa-star me-2 f-14"></i>
+                                    }
+                                    @if (crew.jobPartCrewRoleId === 4) {
+                                      <i [style.color]="crew.jobPartCrewStatusColour"
+                                         class="fa-solid fa-flag me-2 f-14"></i>
+                                    }
                                   }
                                 }
                               </div>
@@ -252,6 +258,7 @@
                                [class.fw-medium]="crew.byNotification && crew.byNotification > 0"
                                [class.fw-bold]="crew.byCrewManager && crew.byCrewManager > 0"
                                [class.text-decoration-underline]="crew.buddyDown > 0"
+                               [class.text-decoration-line-through]="crew.jobPartCrewStatusId === 6"
                                [class.fst-italic]="crew.buddyUp > 0"
                             >
                               @if (crew.hours) {
