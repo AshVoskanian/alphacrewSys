@@ -180,6 +180,7 @@ export interface JobPartCrewEdit {
   crewChiefNumber: number;
   crewSkills: CrewSkill[];
   jobPartSkills: CrewSkill[];
+  allSkills: CrewSkill[];
   jobPartCrewBuddy: JobPartCrewBuddy
 }
 
@@ -195,6 +196,7 @@ export interface JobPartCrewBuddy {
 }
 
 export interface CrewSkill {
+  pay?: number;
   crewSkillId: number;
   crewSkillText: string;
   crewSkillAbbr: string;

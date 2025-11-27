@@ -5,7 +5,7 @@ import { BonusResponse, CrewSkill, JobPartCrewEdit, Schedule } from "../../../..
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ROLES, SKILLS, STATUSES } from "../../../../../shared/data/schedule";
+import { ROLES, STATUSES } from "../../../../../shared/data/schedule";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { ScheduleService } from "../../schedule.service";
 
@@ -38,7 +38,7 @@ export class EditComponent extends ApiBase implements OnInit {
   crews: Select2Data = [];
   roles: Select2Data = ROLES;
   statuses: Select2Data = STATUSES;
-  skills: Array<CrewSkill> = SKILLS;
+  skills: Array<CrewSkill> = [];
 
   ngOnInit() {
     this.initForm();
@@ -62,6 +62,7 @@ export class EditComponent extends ApiBase implements OnInit {
   }
 
   setCrewSkills() {
+    this.skills = this.crewInfo.allSkills;
     const crewSkillIds: number[] = this.crewInfo.jobPartSkills.map(it => it.crewSkillId);
     this.skills.forEach(it => it.checked = crewSkillIds.includes(it.crewSkillId));
   }

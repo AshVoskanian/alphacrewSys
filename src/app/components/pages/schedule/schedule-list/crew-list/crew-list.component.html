@@ -201,6 +201,139 @@
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar min-h-100"
           [style.max-height]="maxHeight">
         @for (crew of crewList
+          | filter: [ { field: 'isAlreadyAssigned', condition: 'equals', value: true } ];
+          track crew.crewId + crew.name + $index * 0.1) {
+          <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3"
+              [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned">
+            @if (crew.jobNotes) {
+              <i class="fa-solid fa-tag position-absolute" style="left:0; top: -3px" [ngbTooltip]="crew.jobNotes"></i>
+            }
+            <div class="common-flex align-items-center">
+
+              <div class="w-15 h-15 flex items-center justify-content-center"
+                   (click)="getCrewDetails(crew, popoverRef)"
+                   #popoverRef="ngbPopover"
+                   triggers="manual"
+                   [popperOptions]=""
+                   [popoverClass]="'wide-popover border border-2 bg-dark'"
+                   [ngbPopover]="crewDetailsRef"
+                   [popoverTitle]="crew.name + '' + ' - ' + (selectedSchedule.startDate | date: 'dd MMM')">
+                @if (crewManagerLoader || crew.detailsLoading) {
+                  <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
+                } @else {
+                  <p class="badge pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
+                     [ngClass]="getBadgeClass(crew)"
+                     style="line-height: 15px;">
+                    @if (crew.holiday > 0) {
+                      <span [ngbTooltip]="'Holiday'">H</span>
+                    } @else if (crew.struckOut > 0) {
+                      <span class="d-inline-block w-100 h-100" [ngbTooltip]="'Struck Out'"></span>
+                    } @else if (crew.turnedDown > 0) {
+                      <span class="d-inline-block w-100 h-100" [ngbTooltip]="'Turned Down'"></span>
+                    } @else {
+                      {{ crew.crewHours }}
+                    }
+                  </p>
+                }
+              </div>
+
+              <div class="w-15 h-15 flex items-center justify-content-center">
+                @if (crewManagerLoader || crew.detailsLoading) {
+                  <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
+                } @else {
+                  <p class="badge l-h-15 pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
+                     [ngClass]="getBadgeClass(crew)" [ngbTooltip]="ratingInfo">
+                    <i class="fa-solid fa-info text-light m-0"></i>
+                  </p>
+
+                  <ng-template #ratingInfo>
+                    <div>
+                      <div class="flex items-center justify-content-between gap-20">
+                        <p class="m-0">Client Hours:</p>
+                        <p class="m-0">{{ crew.cleintHours }}</p>
+                      </div>
+                      <div class="flex items-center justify-content-between gap-20">
+                        <p class="m-0">Total Hours:</p>
+                        <p class="m-0">{{ crew.experienceHours }}</p>
+                      </div>
+
+                      <div class="flex items-center justify-content-between gap-20">
+                        <p class="m-0">Rating:</p>
+                        <p class="m-0">{{ crew.rating }}</p>
+                      </div>
+                    </div>
+                  </ng-template>
+                }
+              </div>
+
+              @if (crewClashingLoader) {
+                <span class="min-w-40"><i class="fas fa-spin fa-spinner text-warning f-15 m-0"></i></span>
+              } @else {
+                @if (jobPartClashing.length) {
+                  <span class="text-warning min-w-40">
+                    {{ jobPartClashing.length }}/{{ crew.notClashingInfo?.unassignedCrewCount }}
+                  </span>
+                }
+              }
+
+              <input class="form-check-input m-0 checkbox-warring" [id]="crew.crewId"
+                     type="checkbox" (change)="crewSelect(crew)"
+                     [checked]="crew.isChecked">
+
+              <label class="form-check-label txt-warring mb-0 pointer" (click)="selectCrewForSMS(crew)">
+                {{ crew.name }}
+                <span class="m-l-10">({{ crew.levelShortText }})</span>
+              </label>
+            </div>
+
+            <div class="common-flex align-items-center gap-1">
+              <ng-template #popoverContent>
+                <ul class="list-group">
+                  <li class="list-group-item border-bottom pointer text-success" (click)="sendNotification(crew)">
+                    <i class="fa-solid rounded fa-phone-square"></i>
+                    WhatsApp
+                  </li>
+                  <li class="list-group-item border-bottom pointer text-warning"
+                      (click)="sendNotification(crew, true, true)">
+                    <i class="fa-solid fa-mobile-phone"></i>
+                    App
+                  </li>
+                  <li class="list-group-item border-bottom pointer text-danger" (click)="removeNotification(crew)">
+                    <i class="fa-solid fa-close"></i>
+                    Remove
+                  </li>
+                </ul>
+              </ng-template>
+
+              <span class="badge badge-info rounded-pill">{{ crew.skills }}</span>
+
+              @if (!crew.isFulltime) {
+                <a href="javascript:void(0)" class="badge badge-warning rounded-circle badge-p-space m-l-10">PT</a>
+              }
+
+              @if (crew.notificationLoading) {
+                <i class="fas fa-spin fa-spinner f-12 m-l-10"></i>
+              } @else {
+                <i class="fa-solid rounded fa-phone-square text-success pointer m-l-10"
+                   [ngbPopover]="popoverContent"
+                   [popoverClass]="'bg-dark'"
+                   [popoverTitle]="'Contact'"
+                ></i>
+              }
+
+              <label class="form-check-label txt-warring m-0" [ngbTooltip]="crew.notificationStatusText"></label>
+
+              <input class="form-check-input m-0 checkbox-success"
+                     [ngStyle]="{ backgroundColor: crew.cssColour, borderColor: crew.cssColour }"
+                     type="checkbox" (change)="selectCrewForSMS(crew)"
+                     [checked]="crew.isCheckedForSMS">
+
+            </div>
+          </li>
+        }
+
+        @for (crew of crewList
+          | filter: [ { field: 'isAlreadyAssigned', condition: 'equals', value: false } ]
           | crewFilter
           :getSelectedData('regions')
             :getSelectedData('levels')
@@ -254,16 +387,16 @@
                     <div>
                       <div class="flex items-center justify-content-between gap-20">
                         <p class="m-0">Client Hours:</p>
-                        <p class="m-0">{{crew.cleintHours}}</p>
+                        <p class="m-0">{{ crew.cleintHours }}</p>
                       </div>
                       <div class="flex items-center justify-content-between gap-20">
                         <p class="m-0">Total Hours:</p>
-                        <p class="m-0">{{crew.experienceHours}}</p>
+                        <p class="m-0">{{ crew.experienceHours }}</p>
                       </div>
 
                       <div class="flex items-center justify-content-between gap-20">
                         <p class="m-0">Rating:</p>
-                        <p class="m-0">{{crew.rating}}</p>
+                        <p class="m-0">{{ crew.rating }}</p>
                       </div>
                     </div>
                   </ng-template>
