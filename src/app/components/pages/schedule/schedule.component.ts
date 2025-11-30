@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { Select2Module } from "ng-select2-component";
 import { NgbDateStruct, NgbModal, NgbOffcanvas } from "@ng-bootstrap/ng-bootstrap";
 import { ScheduleListComponent } from "./schedule-list/schedule-list.component";
@@ -11,7 +11,7 @@ import { ScheduleService } from "./schedule.service";
 import { SKILLS } from "../../../shared/data/skills";
 import { ScheduleGridComponent } from "./schedule-grid/schedule-grid.component";
 import { AsyncPipe } from "@angular/common";
-import { Router } from "@angular/router";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-schedule',
@@ -22,9 +22,10 @@ import { Router } from "@angular/router";
 })
 export class ScheduleComponent extends ApiBase implements OnInit {
   @ViewChild('scheduleModal') scheduleModal: any;
+  @ViewChild('rr') rr: any;
 
   private _modal = inject(NgbModal);
-  private _router = inject(Router);
+  private _dr = inject(DestroyRef);
   public _navService = inject(NavService);
   private _toast = inject(ToastrService);
   private _offcanvas = inject(NgbOffcanvas);
@@ -95,6 +96,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
     }
 
     this.post<Array<Schedule>>('schedule/getschedule', params)
+      .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           this.loading.set(false);
@@ -103,8 +105,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
           if (res.errors?.errorCode) {
             this._toast.error(res.errors.message)
           } else {
-            this.scheduleService.shiftsLoaded.next(true);
-
             if (jobId && openModal) {
               this.scheduleService.jobScopedShifts = res.data;
               this.scheduleService.jobScopedShifts.forEach(it => {
@@ -114,6 +114,7 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                 }
               );
               this._modal.open(this.scheduleModal, { centered: true, fullscreen: true });
+              setTimeout(() => console.log(this.rr))
               const url = `/schedule?jobId=${jobId}`;
               window.history.pushState({}, '', url);
             } else {
@@ -124,6 +125,8 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                 this.fillArray(it.crews, it.crewNumber);
               });
             }
+
+            this.scheduleService.shiftsLoaded.next(true);
           }
         }
       })

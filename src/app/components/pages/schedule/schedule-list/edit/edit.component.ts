@@ -29,6 +29,7 @@ export class EditComponent extends ApiBase implements OnInit {
   form!: FormGroup;
 
   pay: number = 0;
+  skilledCoast: number = 0;
 
   loading: boolean = false;
   showBuddy: boolean = false;
@@ -65,6 +66,8 @@ export class EditComponent extends ApiBase implements OnInit {
     this.skills = this.crewInfo.allSkills;
     const crewSkillIds: number[] = this.crewInfo.jobPartSkills.map(it => it.crewSkillId);
     this.skills.forEach(it => it.checked = crewSkillIds.includes(it.crewSkillId));
+
+    this.setSkilledCoast();
   }
 
   setCrewsList() {
@@ -82,6 +85,23 @@ export class EditComponent extends ApiBase implements OnInit {
       })
       ?.map(crew => ({ label: crew.name, value: crew.jobPartCrewId }));
     this.crews.unshift({ label: 'No Buddy', value: 0 });
+  }
+
+  setSkilledCoast() {
+    const selectedSkillsPay = this.skills
+      .filter(skill => skill.checked)
+      .map(it => it.pay);
+
+    const maxPay = selectedSkillsPay.length
+      ? Math.max(...selectedSkillsPay)
+      : 0;
+
+    this.skilledCoast =
+      maxPay * this.hoursDifference(this.scheduleInfo.startDate, this.scheduleInfo.endDate);
+  }
+
+  hoursDifference(startDateIso: string, endDateIso: string) {
+    return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
 
   bonusAction(type: 'REMOVE' | 'APPLY') {
@@ -134,6 +154,10 @@ export class EditComponent extends ApiBase implements OnInit {
       })
   }
 
+  applySkilledCoast() {
+    this.form.get('skilledCost').setValue(this.skilledCoast);
+  }
+
   save() {
     if (this.saveLoading) return;
 
@@ -171,5 +195,11 @@ export class EditComponent extends ApiBase implements OnInit {
           this.finish.emit(res.data);
         }
       })
+  }
+
+  changeSkill(item: CrewSkill) {
+    item.checked = !item.checked;
+
+    this.setSkilledCoast();
   }
 }

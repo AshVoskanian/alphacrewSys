@@ -6,7 +6,17 @@
           <h6 class="text-primary">
             ({{ crewInfo?.levelShortText }})
             {{ crewInfo?.name }},
-            {{ crewInfo?.postcode }}
+            {{ crewInfo?.postcode }};
+
+
+            {{ scheduleInfo.startDate | date: 'HH:mm' }} -  {{ scheduleInfo.endDate | date: 'HH:mm' }}
+            (
+            Cr: {{ scheduleInfo.crewNumber }},
+            Hrs: {{ hoursDifference(scheduleInfo.startDate, scheduleInfo.endDate) }}
+            )
+            @if (scheduleInfo?.travelHours > 0) {
+              +{{ scheduleInfo?.travelHours }}TrHr
+            }
           </h6>
 
           <div class="flex align-items-center gap-6">
@@ -125,6 +135,17 @@
                 </button>
               </div>
             </div>
+
+            <div class="flex items-center justify-content-end m-t-16">
+              <p class="text-nowrap text-primary m-0 m-r-12">Skills due: £{{ skilledCoast | number:'1.2-2' }}</p>
+
+              <button type="button"
+                      [class.btn-danger]="this.form.get('skilledCost').value != skilledCoast"
+                      [class.btn-primary]="this.form.get('skilledCost').value == skilledCoast"
+                      class="btn w-110" (click)="applySkilledCoast()">
+                Apply
+              </button>
+            </div>
           </div>
         </div>
 
@@ -141,7 +162,7 @@
           @for (item of skills; track item) {
             <div class="col form-check checkbox checkbox-solid-warning">
               <input class="form-check-input" [id]="item.crewSkillId" type="checkbox" [checked]="item.checked"
-                     (change)="item.checked = !item.checked">
+                     (change)="changeSkill(item)">
               <label class="form-check-label user-select-none" [for]="item.crewSkillId">{{ item.crewSkillText }}</label>
             </div>
           }

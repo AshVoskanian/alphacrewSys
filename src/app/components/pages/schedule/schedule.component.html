@@ -21,6 +21,6 @@
   </div>
 
   <div class="overflow-y-auto overflow-x-hidden">
-    <app-schedule-list [list]="scheduleService.jobScopedShifts" [isJobScoped]="true"></app-schedule-list>
+    <app-schedule-list #rr [list]="scheduleService.jobScopedShifts" [isJobScoped]="true"></app-schedule-list>
   </div>
 </ng-template>
