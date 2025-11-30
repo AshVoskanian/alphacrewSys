@@ -831,7 +831,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       .subscribe({
         next: (loaded) => {
           if (loaded) {
-            console.log(this.selectedSchedule)
             const params = {
               date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,

@@ -175,7 +175,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
       this._offcanvas.dismiss();
 
       setTimeout(() => {
-        this.scheduleService.closeJobScopedShiftModal$.next(true);
         modal.close();
         window.history.replaceState({}, '', '/schedule');
 
@@ -186,7 +185,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
         }, 100);
       }, 150);
     } else {
-      this.scheduleService.closeJobScopedShiftModal$.next(true);
       modal.close();
       window.history.replaceState({}, '', '/schedule');
     }

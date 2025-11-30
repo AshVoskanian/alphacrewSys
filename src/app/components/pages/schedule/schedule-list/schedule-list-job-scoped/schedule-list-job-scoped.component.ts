@@ -311,7 +311,6 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
-    console.log(3333)
     if (schedule.updateLoading) return;
 
     if (schedule) {
@@ -821,7 +820,6 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
       .subscribe({
         next: (loaded) => {
           if (loaded) {
-            console.log(this.selectedSchedule)
             const params = {
               date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
