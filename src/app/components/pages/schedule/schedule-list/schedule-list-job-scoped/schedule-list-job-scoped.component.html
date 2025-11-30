@@ -1,0 +1,553 @@
+@if (loading()) {
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+} @else if (list.length) {
+  @for (schedule of list; track schedule.jobPartId) {
+    @if (list[$index]?.startDate.substring(0, 10) !== list[$index - 1]?.startDate.substring(0, 10)) {
+      <div class="p-x-15 m-b-15">
+        <div class="divider p-y-5 p-x-30 rounded-3 m-0 bg-danger flex items-center justify-content-start gap-20">
+          <p class="text-dark m-0 p-0">
+            {{ schedule.startDate | date: 'dd MMMM, yyyy':'': 'en' }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            Hours/Crew:
+            {{ getStatisticByDate(schedule.startDate)?.total }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-success rounded-1"></span>
+            {{ getStatisticByDate(schedule.startDate)?.confirmed }}
+          </p>
+          <p class="text-dark m-0 p-0 l-h-20 flex items-center gap-5">
+            <span class="w-20 h-20 bg-light rounded-1"></span>
+            {{ getStatisticByDate(schedule.startDate)?.other }}
+          </p>
+        </div>
+      </div>
+    }
+    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)"
+         [attr.data-id]="schedule.jobPartId" #itemBlock>
+      <div class="col">
+        <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">
+          <div class="ribbon-vertical-right-wrapper border border-1 vertical-rp-space height-equal alert-light-light"
+               [style.background-color]="schedule.statusColour">
+            <div class="ribbon ribbon-bookmark ribbon-vertical-right ribbon-dark flex gap-5">
+              @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
+                <span>
+                  <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                </span>
+              } @else {
+                <span class="text-nowrap pointer" style="line-height: 22px;">
+                  {{ schedule.shiftNumber }} of {{ schedule.shiftCount }}
+                </span>
+              }
+              <a [href]="'https://alphacrew.eu/Jobs/Edit/' + schedule.jobId" target="_blank"
+                 class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
+                {{ schedule.statusText + ' ' + schedule.jobId }}
+              </a>
+            </div>
+
+            <div class="row g-3 justify-content-between">
+              <div class="col-lg-6">
+                <div class="flex-no-wrap">
+                  <div class="col-9 display-flex">
+                    <div class="flex-no-wrap">
+                      <div class="calendar pointer" [class.pulse]="schedule.importantNotes">
+                        <div class="date {{schedule.vehicleLoader && !hideVehicles ? 'loading' : ''}}"
+                             [class.bg-danger]="schedule.importantNotes"
+                             [class.bg-light]="!schedule.importantNotes"
+                             (click)="getVehicleInfo(schedule)">
+                          <em [class.text-light]="schedule.importantNotes">
+                            {{ schedule.startDate | date: 'EEEE':'': 'en' }}
+                          </em>
+                          <strong>{{ schedule.startDate | date: 'MMMM':'': 'en' }}</strong>
+                          <span>{{ schedule.startDate | date: 'dd' }}</span>
+                        </div>
+
+                        <div class="time bg-danger p-1 b-r-10">
+                          <h1 class="f-30 fw-bold text-white" style="font-size: 32px;">
+                            {{ schedule.startDate | date: 'HH:mm' }}
+                          </h1>
+                        </div>
+                      </div>
+
+                      <div class="info-icons">
+                        <div class="min-w-28 flex flex-col items-center justify-content-center">
+                          @if (schedule.ootCost > 0) {
+                            <i class="fa-solid fa-car txt-primary f-14"></i>
+                          }
+                        </div>
+                        @if (schedule.isNigthShiftPaid) {
+                          <div class="min-w-28 flex flex-col items-center justify-content-center">
+                            <i class="far fa-moon text-success f-14"></i>
+                          </div>
+                        } @else if (schedule.isNightShift) {
+                          <div class="min-w-28 flex flex-col items-center justify-content-center">
+                            <i class="far fa-moon f-14"></i>
+                          </div>
+                        }
+                        <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
+                             (click)="getVehicleInfo(schedule, true)">
+                          @if (schedule.vehicleLoader && hideVehicles) {
+                            <app-feather-icon [class]="'w-14 h-14 text-white spin'"
+                                              [icon]="'loader'"></app-feather-icon>
+                          } @else {
+                            @switch (schedule.messageStatus) {
+                              @case (-1) {
+                                <i class="icofont icofont-envelope f-14 text-dark"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @case (0) {
+                                <i class="icofont icofont-envelope f-14 text-warning"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @case (1) {
+                                <i class="icofont icofont-envelope f-14 text-warning"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @case (2) {
+                                <i class="icofont icofont-envelope-open f-14 text-success"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @case (3) {
+                                <i class="icofont icofont-envelope f-14 text-success-emphasis"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @case (4) {
+                                <i class="icofont icofont-envelope f-14 text-primary"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @case (5) {
+                                <i class="icofont icofont-envelope f-14 text-danger"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
+                              }
+                              @default {
+
+                              }
+                            }
+                          }
+                        </div>
+                        @if (schedule.jobPartTypeId === 2 || schedule.jobPartTypeId === 5) {
+                          <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
+                               [ngbTooltip]="schedule.jobPartTypeText">
+                            <i class="fa-solid fa-truck text-danger f-20"></i>
+                          </div>
+                        }
+
+                        @if (schedule.jobPartTypeId === 4 || schedule.jobPartTypeId === 6) {
+                          <div class="min-w-28 flex flex-col items-center justify-content-center pointer"
+                               [ngbTooltip]="schedule.jobPartTypeText">
+                            <i class="icofont icofont-shield-alt text-danger f-16"></i>
+                          </div>
+                        }
+                      </div>
+
+                      <div class="additional-info">
+                        <h6>
+                          {{ schedule.startDate | date: 'HH:mm' }} -  {{ schedule.endDate | date: 'HH:mm' }}
+                          (Cr: {{ schedule.crewNumber }},
+                          Hrs: {{ hoursDifference(schedule.startDate, schedule.endDate) }}
+                          @if (schedule?.travelHours > 0) {
+                            +{{ schedule?.travelHours }}TrHr
+                          }
+                          )
+                        </h6>
+                        @if (schedule.companyName) {
+                          <h6>{{ schedule.companyName }}</h6>
+                        }
+                        @if (schedule.venueName) {
+                          <h6 [innerHTML]="schedule.venueName | ukPostcodeLink"></h6>
+                        }
+                        @if (schedule.address) {
+                          <h6>{{ schedule.address }}</h6>
+                        }
+                        @if (schedule.onsiteContact) {
+                          <h6 class="fw-bold fst-italic">Onsite: {{ schedule.onsiteContact }}</h6>
+                        } @else {
+                          <h6 class="fw-bold text-danger fst-italic pulse">
+                            <i class="fa-solid fa-warning text-danger"></i> Onsite Contact Missing
+                          </h6>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
+                    <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;">
+                      <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                    </h6>
+                  } @else {
+                    <h6 class="fw-bold pointer m-0 text-primary">
+                      {{ schedule.shiftNumber }}
+                      of
+                      {{ schedule.shiftCount }}
+                    </h6>
+                  }
+                </div>
+
+                <div class="row g-1 row-gap-1 m-t-10">
+                  <div class="car-nums col-8">
+                    @for (vehicle of schedule.vehicles; track vehicle.vehicleId) {
+                      <div class="car-num" (click)="getVehicleInfo(schedule)">
+                        <app-uk-car-num>
+                          {{ vehicle.numberPlate }}
+                        </app-uk-car-num>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="skills col-4">
+                    @for (skill of schedule.transformedSkills | filter:[
+                      { field: 'active', condition: 'equals', value: true }
+                    ]; track skill.url + $index) {
+                      <i class="pointer border border-dark p-3 rounded text-danger f-20"
+                         [class]="skill.url"
+                         [ngbTooltip]="skill.name | titlecase"></i>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="list-wrapper col-lg-6 p-2 rounded" [ngStyle]="getCrewSectionStyles(schedule)">
+                @if (schedule?.crews?.length) {
+                  <ol class="list-group p-0">
+                    @for (crew of schedule.crews; let i = $index; track i) {
+                      <div>
+                        <li class="list-group-item
+                                  {{!crew.isActive ? 'pointer' : ''}}
+                                  {{crew.jobPartCrewStatusId === 6 ? 'bg-danger-subtle' : ''}}"
+                            (click)="openCrewsPanel(crew, $event, schedule);">
+                          @if (crew.isActive) {
+                            <div class="status bg-dark-subtle"
+                                 [class.half]="crew.lateChange && crew.jobPartLateChange === 0 && crew.inConflict > 0"
+                                 [class.black]="crew.lateChange && crew.jobPartLateChange === 0 && crew.inConflict === 0"
+                                 [class.orange]="crew.inConflict > 0 && !(crew.lateChange && crew.jobPartLateChange === 0)"
+                                 (click)="getCrewDetails(crew, popoverRef)"
+                                 #popoverRef="ngbPopover"
+                                 triggers="manual"
+                                 [popoverClass]="'wide-popover border bg-dark'"
+                                 [ngbPopover]="shiftCrewDetailsRef"
+                                 [popoverTitle]="crew.name + ' - ' + (schedule.startDate | date: 'dd MMM')"
+                            >
+                              <div class="icon">
+                                @if (crew.detailsLoading) {
+                                  <app-feather-icon [class]="'w-14 h-14 text-white spin align-middle'"
+                                                    [icon]="'loader'"></app-feather-icon>
+                                } @else {
+                                  @if (crew.jobPartCrewStatusId === 6) {
+                                    <i class="fa-solid fa-ban text-danger"></i>
+                                  } @else {
+                                    @if (crew.jobPartCrewRoleId === 1) {
+                                      <i [style.color]="crew.jobPartCrewStatusColour"
+                                         class="fas fa-square me-2 f-14"></i>
+                                    }
+                                    @if (crew.jobPartCrewRoleId === 2) {
+                                      <i [style.color]="crew.jobPartCrewStatusColour"
+                                         class="far fa-solid fa-star me-2 f-14"></i>
+                                    }
+                                    @if (crew.jobPartCrewRoleId === 4) {
+                                      <i [style.color]="crew.jobPartCrewStatusColour"
+                                         class="fa-solid fa-flag me-2 f-14"></i>
+                                    }
+                                  }
+                                }
+                              </div>
+                            </div>
+                            <p class="hide-scrollbar fw-bold f-14"
+                               [class.fw-medium]="crew.byNotification && crew.byNotification > 0"
+                               [class.fw-bold]="crew.byCrewManager && crew.byCrewManager > 0"
+                               [class.text-decoration-underline]="crew.buddyDown > 0"
+                               [class.text-decoration-line-through]="crew.jobPartCrewStatusId === 6"
+                               [class.fst-italic]="crew.buddyUp > 0"
+                            >
+                              @if (crew.hours) {
+                                ({{ crew.hours }})
+                              }
+                              {{ crew.name }}
+                            </p>
+                          }
+
+                          @if (crew.isActive) {
+                            <div class="buttons">
+                              <button class="btn b-ln-height btn-square" [ngbTooltip]="'Edit'"
+                                      [ngClass]="crew.additionalFees > 0 ? 'bg-danger' : 'btn-primary'"
+                                      (click)="getCrewInfo(crew)">
+                                @if (crew.editLoading) {
+                                  <app-feather-icon [class]="'w-14 h-14 text-white spin'"
+                                                    [icon]="'loader'"></app-feather-icon>
+                                } @else if (crew.additionalFees > 0) {
+                                  &pound;
+                                } @else {
+                                  <app-feather-icon [class]="'w-14 h-14'" [icon]="'edit'"></app-feather-icon>
+                                }
+                              </button>
+
+                              <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
+                                <button class="btn b-ln-height btn-info btn-square w-36" ngbDropdownToggle>
+                                  @if (crew.loading) {
+                                    <app-feather-icon [class]="'w-14 h-14 text-white spin'"
+                                                      [icon]="'loader'"></app-feather-icon>
+                                  } @else {
+                                    <app-feather-icon [class]="'w-14 h-14'" [icon]="'settings'"></app-feather-icon>
+                                  }
+                                </button>
+                                <ul class="dropdown-menu" ngbDropdownMenu>
+                                  @for (menu of menu(); track menu) {
+                                    <li class="pointer" (click)="menuAction(menu, crew)">
+                                      @if (menu.href) {
+                                        <a class="dropdown-item opacity-100 flex items-center"
+                                           target="_blank"
+                                           [href]="menu.href + crew.crewId"
+                                           ngbDropdownItem>
+                                          <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                          {{ menu.text }}
+                                        </a>
+                                      } @else {
+                                        <a class="dropdown-item opacity-100 flex items-center" ngbDropdownItem>
+                                          <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                          {{ menu.text }}
+                                        </a>
+                                      }
+
+
+                                      @if ([ 0, 3, 5, 6, 9, 10 ].includes($index)) {
+                                        <div class="divider-h-line m-0 bg-dark"></div>
+                                      }
+                                    </li>
+                                  }
+                                </ul>
+                              </div>
+                            </div>
+                          }
+                        </li>
+                        <div class="flex items-center gap-6" [class.gap-6]="crew.onHoliday > 0 || crew.onWarnings > 0">
+                          <p class="f-12 fw-bold m-t-2 lh-1 p-0 m-0 pulse text-{{colorsConfig[schedule.statusId]}}">
+                            @if (crew.onHoliday > 0) {
+                              <span class="text-danger m-r-3 pointer" [ngbTooltip]="crew.warningTitle">HOL</span>
+                            }
+
+                            @if (crew.onWarnings > 0) {
+                              <span class="text-danger">WARNING</span>
+                            }
+                          </p>
+                          <p class="f-10 m-t-2 lh-1 p-0 m-0 fw-bold text-{{colorsConfig[schedule.statusId]}}">
+                            {{ crew.crewSkillsText }}
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  </ol>
+                }
+                <div class="m-t-15">
+                  @if (schedule.notificationCount > 0 && !schedule.notificationsLoader) {
+                    @if (schedule.showNotifications) {
+                      <div class="d-flex justify-content-between">
+                        <ul class="common-flex gap-2">
+                          @for (notification of schedule.notifications; track notification.status + $index) {
+                            <li
+                              [ngbTooltip]="notification.statusText"
+                              [style.background-color]="notification.cssColour"
+                              class="
+                              pointer
+                              dashed border-1 rounded p-y-1 p-x-3">
+                              <p
+                                [class.text-light]="notification.status !== 1 && notification.status !== 6"
+                                [class.text-dark]="notification.status === 1 || notification.status === 6"
+                                class="f-10 p-0 m-0 fw-bold">
+                                {{ notification.name }}
+                              </p>
+                            </li>
+                          }
+                        </ul>
+                        <button type="button" class="btn-close py-0"
+                                (click)="schedule.showNotifications = false"></button>
+                      </div>
+                    } @else {
+                      <div class="notification-box w-fit position-relative pointer"
+                           (click)="getNotifications(schedule)">
+                        <i class="fa-solid fa-bell text-info f-20" style="animation: swing 1.5s ease infinite"></i>
+                        <span
+                          class="badge p-t-0 p-b-0 min-w-15 min-h-15 p-l-2 p-r-2 rounded-pill badge-danger position-absolute"
+                          style="top: -7px; left: 8px; line-height: 15px">
+                      {{ schedule.notificationCount }}
+                    </span>
+                      </div>
+                    }
+                  } @else if (schedule.notificationsLoader && schedule.jobPartId === selectedSchedule.jobPartId) {
+                    <app-feather-icon [class]="'w-17 h-17 text-white spin'" [icon]="'loader'"></app-feather-icon>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="main-divider">
+              <div class="divider-body divider-body-1 divider-{{colorsConfig[schedule.statusId]}}">
+                <div class="divider-p-{{colorsConfig[schedule.statusId]}} p-0">
+                  <i class="fa-solid fa-comments me-2 txt-{{colorsConfig[schedule.statusId]}} f-14"></i>
+                  <span class="txt-{{colorsConfig[schedule.statusId]}}">Comments</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row justify-content-between">
+              <div class="col-sm-5">
+                <label class="form-label justify-content-between common-flex f-12">
+                  Job Part Comments:
+                  @if (schedule.notes) {
+                    <i (click)="edit(schedule, 'job_note')"
+                       class="fas fa-pencil-alt me-2 pointer text-{{colorsConfig[schedule.statusId]}} f-16"></i>
+                  } @else {
+                    <span class="pointer"><i (click)="edit(schedule, 'job_note')"
+                                             class="fa-solid fa-plus me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i></span>
+                  }
+                </label>
+                @if (schedule.notes) {
+                  <div class="text-dark textarea" [innerText]="schedule.notes"></div>
+                }
+              </div>
+
+              <div class="col-sm-5">
+                <label class="form-label justify-content-between common-flex f-12">
+                  Crew Notes:
+                  @if (schedule.crewNotes) {
+                    <i (click)="edit(schedule, 'crew_note')"
+                       class="fas fa-pencil-alt pointer me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i>
+                  } @else {
+                    <span class="pointer"><i (click)="edit(schedule, 'crew_note')"
+                                             class="fa-solid fa-plus me-2 text-{{colorsConfig[schedule.statusId]}} f-16"></i></span>
+                  }
+                </label>
+                @if (schedule.crewNotes) {
+                  <div class="text-dark textarea" [innerText]="schedule.crewNotes"></div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="open-crew-panel pointer" (click)="openCrewsPanel(null, $event, schedule)">
+        <i class="fas fa-list f-14 z-3"></i>
+      </div>
+
+      <button type="button"
+              (click)="updateShift(schedule)"
+              [class.btn-danger]="schedule.changed"
+              [class.btn-primary]="!schedule.changed"
+              [class.pulse]="schedule.changed"
+              class="btn action-button w-30 h-30 p-0">
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+
+      <button type="button"
+              (click)="getActivities(schedule, popoverRef)"
+              #popoverRef="ngbPopover"
+              triggers="manual"
+              [autoClose]="'outside'"
+              [popoverClass]="'wide-popover border max-w-800'"
+              [ngbPopover]="activities"
+              class="btn btn-info action-button left w-30 h-30 p-0">
+        <i class="fa-solid fa-{{schedule.activityLoader ? 'spinner' : 'info'}} text-light"></i>
+      </button>
+    </div>
+  }
+} @else {
+  <div class="flex gap-30 flex-col items-center justify-content-center">
+    <div class="">
+      <i class="f-40 text-warning fa-solid fa-calendar-xmark"></i>
+    </div>
+    <p class="f-20 text-warning">
+      No schedules found
+    </p>
+  </div>
+}
+
+<!--Crew Edit-->
+<ng-template #editModal let-editModal>
+  <app-edit [crewInfo]="crewInfo()"
+            [scheduleInfo]="selectedSchedule"
+            (closeModal)="editModal.close()"
+            (finish)="editModal.close()">
+  </app-edit>
+</ng-template>
+
+<!--Set Vehicle or send SMS-->
+<ng-template #vehicleModal let-vehicleModal>
+  <app-vehicles (closeModal)="closeVehiclePopup(vehicleModal, $event)"
+                [scheduleInfo]="selectedSchedule"
+                [hideVehicles]="hideVehicles"
+                (selectVehicle)="onVehicleSelect($event)"
+                [vehicles]="vehiclesInfo()">
+  </app-vehicles>
+</ng-template>
+
+<!--Send SMS-->
+<ng-template #sendSmsModal let-sendSmsModal>
+  <app-send-sms (closeModal)="sendSmsModal.close()"
+                [smsInfo]="smsInfo()"
+                [scheduleInfo]="selectedSchedule">
+  </app-send-sms>
+</ng-template>
+
+<!--Send SMS To Crew-->
+<ng-template #sendSmsToCrewModal let-sendSmsToCrewModal>
+  <app-send-sms-to-crew
+    [selectedCrew]="selectedCrew"
+    [scheduleInfo]="selectedSchedule"
+    (closeModal)="sendSmsToCrewModal.close()">
+  </app-send-sms-to-crew>
+</ng-template>
+
+<!--Update Notes-->
+<ng-template #updateNotes let-updateNotesModal>
+  <app-updates-notes (closeModal)="updateNotesModal.close()"
+                     (finish)="finishNoteEdit($event); updateNotesModal.close()"
+                     [selectedSchedule]="selectedSchedule"
+  >
+  </app-updates-notes>
+</ng-template>
+
+<ng-template #shiftCrewDetailsRef>
+  <table class="table border-bottom-table max-w-700" style="width: 70dvw;">
+    <tbody>
+      @for (item of shiftCrewDetails() | filter:  [
+        { field: 'status', condition: 'greaterThan', value: 0 }
+      ]; track item.startdate + item.startTime + $index) {
+        <tr class="border-bottom-secondary"
+            [class.border-2]="item.jobPartId === selectedSchedule.jobPartId"
+            [class.border-danger]="item.jobPartId === selectedSchedule.jobPartId">
+          <td class="p-2 p-x-5 f-12 text-nowrap">
+            <div class="w-15 h-15 pointer rounded-circle" [ngbTooltip]="item.jobPartCrewStatusText"
+                 [ngStyle]="{'background': item.jobPartCrewStatusColourMvc}">
+            </div>
+          </td>
+          <td class="p-2 p-x-5 f-12 text-nowrap text-body-secondary">{{ item.roleName }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.jpStartDateTime | date:'dd MMM HH:mm' }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.jpEndDateTime | date:'dd MMM HH:mm' }}</td>
+          <td class="p-2 p-x-5 f-12 text-nowrap">{{ item.client }}</td>
+          <td class="p-2 p-x-5 f-12">{{ item.altVenue }}</td>
+          <td class="p-2 p-x-5 f-10 text-nowrap">{{ item.extraHours }}eh</td>
+          <td class="text-nowrap p-2 p-x-5 f-12">Sk: £{{ item.skilledCost }}</td>
+          <td class="text-nowrap p-2 p-x-5 f-12">Bon: £{{ item.bonus }}</td>
+        </tr>
+      }
+      @for (item of shiftCrewDetails() | filter: [
+        { field: 'status', condition: 'lessThanOrEqual', value: 0 },
+        { field: 'updateHistory', condition: 'isNotEmpty' }
+      ]; track item.startdate + item.startTime + $index) {
+        <tr class="border-bottom-secondary"
+            [class.bg-light-secondary]="item.status === 0"
+            [class.bg-info]="item.status === -1"
+            [class.bg-success]="item.status === -2"
+        >
+          <td class="f-12" colspan="9">{{ item.updateHistory }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</ng-template>
+
+<!--Recent Activities-->
+<ng-template #activities>
+  <app-activity [activityList]="activityList()"></app-activity>
+</ng-template>

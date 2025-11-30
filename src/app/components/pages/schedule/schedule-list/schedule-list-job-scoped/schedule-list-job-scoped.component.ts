@@ -30,11 +30,11 @@ import {
   ScheduleSmsInfo,
   Statistics,
   Vehicle
-} from "../../../../shared/interface/schedule";
+} from "../../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { DatePipe, NgClass, NgStyle, TitleCasePipe } from "@angular/common";
-import { FeatherIconComponent } from "../../../../shared/components/ui/feather-icon/feather-icon.component";
-import { UkCarNumComponent } from "../../../../shared/components/ui/uk-car-num/uk-car-num.component";
+import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
+import { UkCarNumComponent } from "../../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
   NgbAlertModule,
   NgbDropdownModule,
@@ -45,36 +45,36 @@ import {
   NgbPopoverModule,
   NgbTooltipModule
 } from "@ng-bootstrap/ng-bootstrap";
-import { EditComponent } from "./edit/edit.component";
+import { EditComponent } from "../edit/edit.component";
 import { FormsModule } from "@angular/forms";
-import { GeneralService } from "../../../../shared/services/general.service";
-import { CrewListComponent } from "./crew-list/crew-list.component";
-import { ApiBase } from "../../../../shared/bases/api-base";
-import { CrewAction } from "../../../../shared/enums/schedule";
-import { ScheduleService } from "../schedule.service";
+import { GeneralService } from "../../../../../shared/services/general.service";
+import { CrewListComponent } from "../crew-list/crew-list.component";
+import { ApiBase } from "../../../../../shared/bases/api-base";
+import { CrewAction } from "../../../../../shared/enums/schedule";
+import { ScheduleService } from "../../schedule.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { VehiclesComponent } from "./vehicles/vehicles.component";
-import { SendSmsComponent } from "./send-sms/send-sms.component";
-import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
+import { VehiclesComponent } from "../vehicles/vehicles.component";
+import { SendSmsComponent } from "../send-sms/send-sms.component";
+import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
 import { finalize, forkJoin, switchMap, take, timer } from "rxjs";
-import { NavService } from "../../../../shared/services/nav.service";
-import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
-import { SendSmsToCrewComponent } from "./send-sms-to-crew/send-sms-to-crew.component";
-import { UkPostcodeLinkPipe } from "../../../../shared/pipes/uk-post-code-link.pipe";
-import { ActivityComponent } from "./activity/activity.component";
-import { JobPartLog } from "../../../../shared/interface/activity";
+import { NavService } from "../../../../../shared/services/nav.service";
+import { UpdatesNotesComponent } from "../updates-notes/updates-notes.component";
+import { SendSmsToCrewComponent } from "../send-sms-to-crew/send-sms-to-crew.component";
+import { UkPostcodeLinkPipe } from "../../../../../shared/pipes/uk-post-code-link.pipe";
+import { ActivityComponent } from "../activity/activity.component";
+import { JobPartLog } from "../../../../../shared/interface/activity";
 import { ActivatedRoute } from "@angular/router";
 
 @Component({
-  selector: 'app-schedule-list',
+  selector: 'app-schedule-list-job-scoped',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent ],
   providers: [ DatePipe ],
-  templateUrl: './schedule-list.component.html',
-  styleUrl: './schedule-list.component.scss'
+  templateUrl: './schedule-list-job-scoped.component.html',
+  styleUrl: './schedule-list-job-scoped.component.scss'
 })
-export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewInit {
+export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, AfterViewInit {
   private _dr = inject(DestroyRef);
   private _modal = inject(NgbModal);
   private _navService = inject(NavService);
@@ -94,12 +94,12 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
 
   @Input() list: Array<Schedule> = [];
   @Output() openJobsShifts: EventEmitter<Schedule> = new EventEmitter<Schedule>();
+  @Input() selectedSchedule: Schedule;
 
   loading = input<boolean>(false);
   jobShiftsLoading = input<boolean>(false);
 
   selectedCrew: JobPartCrew
-  selectedSchedule: Schedule;
 
   crewInfo: WritableSignal<JobPartCrewEdit> = signal(null);
   statics: WritableSignal<Array<Statistics>> = signal([]);
@@ -188,11 +188,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
 
-  queryParams = toSignal(this._activatedRouter.queryParamMap);
-  isJobScoped = computed(() => {
-    return this.queryParams() && this.queryParams().get('jobId')
-  })
-
   hideVehicles: boolean = false;
 
   colorsConfig = {
@@ -259,7 +254,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
-              jobId: this.isJobScoped() ? this.isJobScoped() : null,
+              jobId: this.selectedSchedule?.jobId,
             };
 
             if (!params.jobId) {
@@ -316,6 +311,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
+    console.log(3333)
     if (schedule.updateLoading) return;
 
     if (schedule) {
@@ -338,7 +334,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       it.jobPartIds = []
     });
     this.offcanvasRef.componentInstance.crewList = this.crewList();
-    this.offcanvasRef.componentInstance.isJobScoped = this.isJobScoped();
+    this.offcanvasRef.componentInstance.isJobScoped = true;
 
     this.offcanvasRef.result.finally(() => {
       this.offcanvasRef = undefined;
@@ -542,10 +538,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     this._scheduleService.selectedShift$.next(this.selectedSchedule);
   }
 
-  openJobShifts(schedule: Schedule) {
-    this.openJobsShifts.emit(schedule);
-  }
-
   getNotifications(schedule: Schedule) {
     if (schedule.notificationsLoader) return;
 
@@ -745,7 +737,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             date: GeneralService.convertToDate(this._navService.filterParams.value.date),
             days: this._navService.days,
             regionFilter: this._navService.regionId,
-            jobId: this.isJobScoped() ? this.isJobScoped() : null,
+            jobId: this.selectedSchedule?.jobId,
           };
 
           if (!params.jobId) {
@@ -781,7 +773,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           date: GeneralService.convertToDate(this._navService.filterParams.value.date),
           days: this._navService.days,
           regionFilter: this._navService.regionId,
-          jobId: this.isJobScoped() ? this.isJobScoped() : null
+          jobId: this.selectedSchedule?.jobId
         };
         if (!params.jobId) delete params.jobId;
 
@@ -797,7 +789,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   getInfo() {
-    this._scheduleService.shiftsLoaded
+    this._scheduleService.jobScopedShiftsLoaded
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (date) => {
@@ -806,7 +798,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
-              jobId: this.isJobScoped() ? this.isJobScoped() : null
+              jobId: this.selectedSchedule?.jobId
             };
 
             if (!params.jobId) {
@@ -818,15 +810,13 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               .subscribe(res => {
                 this.updateSchedulesWithStatuses(res.data);
               });
-
-            this._scheduleService.shiftsLoaded.next(false);
           }
         }
       });
   }
 
   getStatistics() {
-    this._scheduleService.shiftsLoaded
+    this._scheduleService.jobScopedShiftsLoaded
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (loaded) => {
@@ -836,12 +826,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionId: this._navService.regionId,
-              jobId: this.isJobScoped() ? this.isJobScoped() : null
+              jobId: this.selectedSchedule?.jobId
             };
-
-            if (!params.jobId) {
-              delete params.jobId;
-            }
 
             this.post('Dashboard/GetDashboarUpcomingDaysWithScheduleFilter', params)
               .pipe(takeUntilDestroyed(this._dr))
@@ -854,8 +840,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
                   this.statics.set(res.data[this.statisticByRegion()] || []);
                 }
               })
-
-            this._scheduleService.shiftsLoaded.next(false);
           }
         }
       })
@@ -899,7 +883,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   getJobPartCrewAdditionalDetails() {
-    this._scheduleService.shiftsLoaded
+    this._scheduleService.jobScopedShiftsLoaded
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (date) => {
@@ -908,7 +892,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               date: GeneralService.convertToDate(this._navService.filterParams.value.date),
               days: this._navService.days,
               regionFilter: this._navService.regionId,
-              jobId: this.isJobScoped() ? this.isJobScoped() : null
+              jobId: this.selectedSchedule?.jobId
             };
 
             if (!params.jobId) {
@@ -920,8 +904,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
               .subscribe(res => {
                 this.updateSchedulesWithCrewChanges(res.data);
               });
-
-            this._scheduleService.shiftsLoaded.next(false);
           }
         }
       });
