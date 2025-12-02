@@ -261,7 +261,7 @@
                                [class.text-decoration-line-through]="crew.jobPartCrewStatusId === 6"
                                [class.fst-italic]="crew.buddyUp > 0"
                             >
-                              @if (crew.hours) {
+                              @if (crew.hours || crew.hours === 0) {
                                 ({{ crew.hours }})
                               }
                               {{ crew.name }}
