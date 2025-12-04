@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { CardDropdownButtonComponent } from "./card-dropdown-button/card-dropdown-button.component";
@@ -25,6 +25,7 @@ export class CardComponent {
   @Input() rightSideDetails: boolean = false;
   @Input() dropdownClass: string = '';
   @Input() headerClass: string = '';
+  @Input() headerBtnText: string = '';
   @Input() header: string = '';
   @Input() border: boolean = false;
   @Input() cardType: string = 'simple';
@@ -32,4 +33,9 @@ export class CardComponent {
   @Input() buttonText: string;
   @Input() path: string;
 
+  @Output() headerBtnAction: EventEmitter<string> = new EventEmitter();
+
+  onHeaderBtnAction() {
+    this.headerBtnAction.emit('newCrew');
+  }
 }

@@ -13,15 +13,11 @@
               } @else {
                 <div class="common-align rounded-circle">
                   <div>
-                    @if (avatarUrl()) {
-                      <img [src]="avatarUrl()" alt="Profile Image"/>
-                    }
+                    <img [src]="avatarUrl()" alt="Profile Image"/>
                     <input type="file" accept="image/*" (change)="uploadFile($event)" #fileInput hidden/>
-                    @if (avatarUrl()) {
-                      <div class="icon-wrapper" (click)="fileInput.click()">
-                        <i class="icofont icofont-pencil-alt-5"></i>
-                      </div>
-                    }
+                    <div class="icon-wrapper" (click)="fileInput.click()">
+                      <i class="icofont icofont-pencil-alt-5"></i>
+                    </div>
                   </div>
                 </div>
               }
@@ -70,10 +66,12 @@
           <li [ngbNavItem]="'profile'">
             <a class="nav-lin" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
             <ng-template ngbNavContent>
-              <app-crew-profile [crewDetail]="crewDetails()"
-                                [loading]="profileLoading()"
-                                (save)="saveCrewProfile($event)">
-              </app-crew-profile>
+              <div class="p-t-30">
+                <app-crew-profile [crewDetail]="crewDetails()"
+                                  [loading]="profileLoading()"
+                                  (save)="saveCrewProfile($event)">
+                </app-crew-profile>
+              </div>
             </ng-template>
           </li>
           <li [ngbNavItem]="'documents'">

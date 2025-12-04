@@ -1,10 +1,11 @@
 import { Component, DestroyRef, inject, input, OnChanges, OnInit, output, signal, SimpleChanges } from '@angular/core';
 import { Select2Module } from "ng-select2-component";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { CrewDetail, FilterDropdowns } from "../../../../../shared/interface/crew";
 import { CrewService } from "../../crew.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
+import { GeneralService } from "../../../../../shared/services/general.service";
 
 @Component({
   selector: 'app-crew-profile',
@@ -30,6 +31,7 @@ export class CrewProfileComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.initForm();
+    this.getDropdowns();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -40,20 +42,20 @@ export class CrewProfileComponent implements OnInit, OnChanges {
 
   initForm() {
     this.form = this._fb.group({
-      name: [ '' ],
-      phoneNumber: [ '' ],
-      email: [ '' ],
+      name: [ '', [ Validators.required ] ],
+      phoneNumber: [ '', [ Validators.required ] ],
+      email: [ '', [ Validators.required, Validators.email ] ],
       login: [ '' ],
       password: [ '' ],
       deactivationDate: [ '' ],
       loyaltyBonus: [ '' ],
       jobNotes: [ '' ],
-      startDate: [ '' ],
-      postcode: [ '' ],
-      address: [ '' ],
+      startDate: [ '', [ Validators.required ] ],
+      postcode: [ '', [ Validators.required ] ],
+      address: [ '', [ Validators.required ] ],
       isActive: [ '' ],
       isFulltime: [ '' ],
-      regionId: [ '' ],
+      regionId: [ 1 ],
       levelId: [ '' ],
       groupId: [ '' ],
       classificationId: [ '' ],
@@ -66,17 +68,38 @@ export class CrewProfileComponent implements OnInit, OnChanges {
     });
   }
 
-  getDropdowns(data: CrewDetail) {
+  getDropdowns(data?: CrewDetail) {
     this._crewService.getDropdownsData()
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           if (res) {
             this.dropdowns.set(res.data);
-            setTimeout(() => this.setFormData(data), 10)
+            if (data) {
+              setTimeout(() => this.setFormData(data), 10);
+            } else {
+              setTimeout(() => this.setFormDefaultValues(), 10)
+            }
           }
         }
       });
+  }
+
+  setFormDefaultValues() {
+    this.form.patchValue({
+      regionId: 1,
+      levelId: 5,
+      groupId: 1,
+      classificationId: 4,
+      paymentOptionId: 14,
+      pliCoverId: 1,
+      checksId: 1,
+      loyaltyBonus: 0,
+      isFulltime: true,
+      isActive: true,
+      startDate: this._date.transform(new Date(), 'yyyy-MM-dd'),
+    });
+    this.form.updateValueAndValidity();
   }
 
   setFormData(data: CrewDetail) {
@@ -111,7 +134,9 @@ export class CrewProfileComponent implements OnInit, OnChanges {
   }
 
   submit() {
-    if (this.form.valid && this.crewDetail()) {
+    GeneralService.markFormGroupTouched(this.form);
+
+    if (this.form.valid) {
       this.save.emit({
         ...this.crewDetail(),
         ...this.form.getRawValue()

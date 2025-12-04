@@ -6,6 +6,8 @@
   <div class="container-fluid p-0">
     <div class="row table-components default-datatable">
       <app-card [headerTitle]="'Crew'"
+                [headerBtnText]="'Add New Crew'"
+                (headerBtnAction)="addNewCrew(addCrew)"
                 [cardBodyClass]="'common-option'">
         @if (loading()) {
           <div class="h-300 w-100 flex items-center justify-content-center">
@@ -13,7 +15,7 @@
           </div>
         } @else {
           <div class="table-responsive custom-scrollbar">
-            @if (tableConfig?.data?.length) {
+            @if (tableConfig?.data?.length && !loading()) {
               <div class="flex flex-col gap-20 m-auto">
                 <app-table [tableConfig]="tableConfig"
                            [search]="false"
@@ -45,3 +47,13 @@
     </div>
   </div>
 </div>
+
+<!--Add New Crew-->
+<ng-template #addCrew let-addCrew>
+
+  <app-card [headerTitle]="'Add New Crew'">
+    <app-crew-profile [loading]="profileLoading()"
+                      (save)="saveCrewProfile($event)">
+    </app-crew-profile>
+  </app-card>
+</ng-template>

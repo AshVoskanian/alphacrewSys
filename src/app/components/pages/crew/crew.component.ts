@@ -1,30 +1,35 @@
-import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { TableConfigs } from "../../../shared/interface/common";
 import { CardComponent } from "../../../shared/components/ui/card/card.component";
 import { TableComponent } from "../../../shared/components/ui/table/table.component";
 import { ApiBase } from "../../../shared/bases/api-base";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GeneralService } from "../../../shared/services/general.service";
-import { CrewIndex, CrewIndexResponse, CrewSearchParams } from "../../../shared/interface/crew";
+import { CrewDetail, CrewIndex, CrewIndexResponse, CrewSearchParams } from "../../../shared/interface/crew";
 import { Select2Module } from "ng-select2-component";
 import { CrewFilterComponent } from "./crew-filter/crew-filter.component";
 import { NgxPaginationModule } from "ngx-pagination";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DomSanitizer } from "@angular/platform-browser";
+import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { CrewProfileComponent } from "./crew-details/crew-profile/crew-profile.component";
+import { finalize } from "rxjs";
 
 @Component({
   selector: 'app-crew',
-  imports: [ CardComponent, TableComponent, Select2Module, CrewFilterComponent, NgxPaginationModule ],
+  imports: [ CardComponent, TableComponent, Select2Module, CrewFilterComponent, NgxPaginationModule, CrewProfileComponent ],
   templateUrl: './crew.component.html',
   styleUrl: './crew.component.scss'
 })
 export class CrewComponent extends ApiBase implements OnInit {
   private _router: Router = inject(Router);
+  private _modal = inject(NgbModal);
   private readonly _dr = inject(DestroyRef);
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _sanitizer: DomSanitizer = inject(DomSanitizer);
 
   loading: WritableSignal<boolean> = signal(false);
+  profileLoading: WritableSignal<boolean> = signal(false);
   totalCount: WritableSignal<number> = signal<number>(null);
   filterParams: WritableSignal<CrewSearchParams> = signal({ page: 1, pageSize: 20 });
 
@@ -43,6 +48,8 @@ export class CrewComponent extends ApiBase implements OnInit {
     ],
     data: [] as CrewIndex[]
   };
+
+  private modalRef!: NgbModalRef;
 
   ngOnInit() {
     this.subToFilterParams();
@@ -120,5 +127,44 @@ export class CrewComponent extends ApiBase implements OnInit {
 
   itemSelect(crew: CrewIndex) {
     this._router.navigate([ 'crew', crew.crewId ]);
+  }
+
+  addNewCrew(temp: TemplateRef<NgbModal>) {
+    this.modalRef = this._modal.open(temp, { centered: true, size: 'xl' })
+  }
+
+  saveCrewProfile(crewData: any) {
+    if (this.profileLoading()) return;
+
+    // const crewSkillIds = this.skills().filter(it => it.active).map(it => it.id);
+    const crewSkillIds = [];
+
+    this.profileLoading.set(true);
+
+    const params = {
+      ...crewData,
+      crewSkillIds,
+    }
+
+    GeneralService.clearObject(params);
+
+    this.post<CrewDetail>('Crew/AddOrUpdateCrew', params)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.loading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.modalRef.close();
+          this._router.navigate([ 'crew', res?.data.crewId ]);
+
+          GeneralService.showSuccessMessage();
+        }
+      })
   }
 }

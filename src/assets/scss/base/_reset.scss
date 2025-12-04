@@ -2060,6 +2060,8 @@ tbody {
       height: 180px;
       max-width: 180px;
       max-height: 180px;
+      min-width: 180px;
+      min-height: 180px;
       border-radius: 4px;
       object-fit: cover;
     }
@@ -2182,6 +2184,10 @@ tbody {
 
 .input-group-text {
   border-color: var(--dark-light-color) !important;
+}
+
+.ng-invalid.ng-touched {
+  border-color: $danger-color !important;
 }
 
 @media (min-width: 1200px) {
