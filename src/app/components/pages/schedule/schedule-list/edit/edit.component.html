@@ -52,12 +52,21 @@
               </div>
               <div class="col w-1-5">
                 <label class="form-label w-100">
-                  Skills
-                  <input class="form-control" formControlName="skilledCost" type="text">
-                </label>
-                <label class="form-label w-100">
                   Last Minute Bonus
                   <input class="form-control" formControlName="lastMinuteBonus" type="text">
+                </label>
+                <label class="form-label w-100">
+                  Skills
+                  <input class="form-control bbl-r-0 bbr-r-0 bb-none" formControlName="skilledCost" type="text">
+                  <div class="border b-r-6 btl-r-0 btr-r-0 border-dark p-b-3 p-x-3">
+                                      <p class="text-nowrap text-primary m-0 m-r-4 f-12">Skills due: £{{ skilledCoast | number:'1.2-2' }}</p>
+                  <button type="button"
+                          [class.btn-danger]="this.form.get('skilledCost').value != skilledCoast"
+                          [class.btn-primary]="this.form.get('skilledCost').value == skilledCoast"
+                          class="btn h-20 p-0 f-12 w-110" (click)="applySkilledCoast()">
+                    Apply
+                  </button>
+                  </div>
                 </label>
               </div>
             </div>
@@ -115,7 +124,7 @@
             </div>
 
             <div class="row g-3">
-              <div class="col justify-content-between flex-sm-col gap-5 flex">
+              <div class="col justify-content-between flex-sm-col gap-5 flex m-t-18">
                 <button type="button" class="btn btn-warning w-1-5" (click)="bonusAction('APPLY')">
                   Apply Bonus
                   <span class="d-inline-block" style="width: 30px; height: 13px;">
@@ -134,17 +143,6 @@
                   </span>
                 </button>
               </div>
-            </div>
-
-            <div class="flex items-center justify-content-end m-t-16">
-              <p class="text-nowrap text-primary m-0 m-r-12">Skills due: £{{ skilledCoast | number:'1.2-2' }}</p>
-
-              <button type="button"
-                      [class.btn-danger]="this.form.get('skilledCost').value != skilledCoast"
-                      [class.btn-primary]="this.form.get('skilledCost').value == skilledCoast"
-                      class="btn w-110" (click)="applySkilledCoast()">
-                Apply
-              </button>
             </div>
           </div>
         </div>

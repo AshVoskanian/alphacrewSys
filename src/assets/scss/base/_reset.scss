@@ -1863,6 +1863,39 @@ $i: 1;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+
+  .btr-r-#{$i} {
+    border-top-right-radius: #{$i}px !important;
+  }
+
+  .btl-r-#{$i} {
+    border-top-left-radius: #{$i}px !important;
+  }
+
+  .bbr-r-#{$i} {
+    border-bottom-right-radius: #{$i}px !important;
+  }
+
+  .bbl-r-#{$i} {
+    border-bottom-left-radius: #{$i}px !important;
+  }
+}
+
+.bt-none {
+  border-top: none !important;
+}
+
+.bb-none {
+  border-bottom: none !important;
+}
+
+.br-none {
+  border-right: none !important;
+}
+
+.bl-none {
+  border-left: none !important;
 }
 
 .pointer {
