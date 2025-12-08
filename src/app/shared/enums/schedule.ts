@@ -11,4 +11,6 @@ export enum CrewAction {
   MARK_AS_NO_SHOW = 'MARK_AS_NO_SHOW',
   CHANGE = 'CHANGE',
   PROFILE = 'PROFILE',
+  EMAIL = 'EMAIL',
+  PHONE = 'PHONE',
 }

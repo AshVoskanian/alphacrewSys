@@ -64,10 +64,11 @@ import { UkPostcodeLinkPipe } from "../../../../../shared/pipes/uk-post-code-lin
 import { ActivityComponent } from "../activity/activity.component";
 import { JobPartLog } from "../../../../../shared/interface/activity";
 import { ActivatedRoute } from "@angular/router";
+import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
 
 @Component({
   selector: 'app-schedule-list-job-scoped',
-  imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent,
+  imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
     UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent ],
   providers: [ DatePipe ],
@@ -77,6 +78,7 @@ import { ActivatedRoute } from "@angular/router";
 export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, AfterViewInit {
   private _dr = inject(DestroyRef);
   private _modal = inject(NgbModal);
+  private _clipboard = inject(Clipboard);
   private _navService = inject(NavService);
   private _offCanvasService = inject(NgbOffcanvas);
   private _activatedRouter = inject(ActivatedRoute);
@@ -184,6 +186,20 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
       color: 'text-dark',
       icon: 'fa-solid fa-user f-16',
       href: `https://alphacrew.eu/Crew/Edit/`
+    },
+    {
+      text: 'Phone',
+      action: CrewAction.PHONE,
+      color: 'text-success',
+      icon: 'fa-solid fa-phone f-14',
+      iconAfter: 'fa-solid fa-copy f-14'
+    },
+    {
+      text: 'Email',
+      action: CrewAction.EMAIL,
+      color: 'text-success',
+      icon: 'fa-solid fa-envelope f-14',
+      iconAfter: 'fa-solid fa-copy f-14'
     }
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
@@ -524,6 +540,22 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
 
       case CrewAction.CHANGE:
         this.openCrewsPanel(null, null, this.selectedSchedule);
+        break;
+
+      case CrewAction.PHONE:
+        const copedPhone = this._clipboard.copy(crew.phoneNumber);
+
+        if (copedPhone && crew?.phoneNumber) {
+          GeneralService.showSuccessMessage('Phone number copied successfully');
+        }
+        break;
+
+      case CrewAction.EMAIL:
+        const copedEmail = this._clipboard.copy(crew.email);
+
+        if (copedEmail && crew?.email) {
+          GeneralService.showSuccessMessage('Email address copied successfully');
+        }
         break;
 
       default:

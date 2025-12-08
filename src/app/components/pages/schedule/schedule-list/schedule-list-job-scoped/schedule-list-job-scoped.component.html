@@ -301,6 +301,10 @@
                                            ngbDropdownItem>
                                           <i class="{{menu.icon}} {{menu.color}} me-2"></i>
                                           {{ menu.text }}
+
+                                          @if (menu.iconAfter) {
+                                            <i class="{{menu.iconAfter}} {{menu.color}} me-2 position-absolute r-0"></i>
+                                          }
                                         </a>
                                       } @else {
                                         <a class="dropdown-item opacity-100 flex items-center" ngbDropdownItem>
