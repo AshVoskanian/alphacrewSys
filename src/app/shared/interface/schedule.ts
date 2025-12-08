@@ -100,6 +100,7 @@ export interface JobPartCrew extends JobPartCrewAdditionalDetail{
   levelCrewingWeighting?: number;
   name?: string;
   email?: string;
+  isCheckedForSms?: boolean;
   phoneNumber?: string;
   jobPartCrewStatusColour?: string;
   regionId?: number;
