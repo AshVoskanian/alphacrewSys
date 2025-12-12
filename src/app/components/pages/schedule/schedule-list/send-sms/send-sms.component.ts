@@ -1,25 +1,36 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Schedule, ScheduleSmsInfo } from "../../../../../shared/interface/schedule";
 import { NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
 import { FormsModule } from "@angular/forms";
 import { ClipboardModule } from "@angular/cdk/clipboard";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { ApiBase } from "../../../../../shared/bases/api-base";
+import { PhoneInputDirective } from "../../../../../shared/directives/phone-input.directive";
+import { ToastrService } from "ngx-toastr";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { finalize } from "rxjs";
+import { PHONE_COUNTRY_RULES } from "../../../../../shared/utils/date";
+import parsePhoneNumber from 'libphonenumber-js'
 
 @Component({
   selector: 'app-send-sms',
-  imports: [ NgbTooltip, FormsModule, ClipboardModule ],
+  imports: [ NgbTooltip, FormsModule, ClipboardModule, PhoneInputDirective ],
   templateUrl: './send-sms.component.html',
   styleUrl: './send-sms.component.scss'
 })
 export class SendSmsComponent extends ApiBase implements OnInit {
+  private _dr: DestroyRef = inject(DestroyRef);
+  private _toast = inject(ToastrService);
+
   @Input() scheduleInfo: Schedule;
   @Input() smsInfo: Array<ScheduleSmsInfo> = [];
 
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
 
-  checkboxList: any = [];
   loading: boolean = false;
+  mightyLoading: boolean = false;
+  phoneValid: boolean = true;
+  onSiteContact: string = '';
   text: string = `Here is the breakdown of your crew. We kindly request you to review the information provided and reach out to our office immediately if any discrepancies are detected.
 
 CLIENT: {{companyName}}
@@ -32,7 +43,7 @@ Alpha Crew
 `;
 
   ngOnInit() {
-    this.fillCheckboxes();
+    this.setOnsiteContact();
     this.text = this.generateMessage(this.smsInfo);
   }
 
@@ -53,50 +64,45 @@ Alpha Crew
   }
 
   private extractAllPhoneNumbers(text: string): string {
-    const matches = text?.match(/(?:\+44\s?7\d{3}|\(?07\d{3}\)?|\b\d{9,})\s?\d{3,}\s?\d{3,}/g) || [];
-    const cleaned = matches.map(m => m.replace(/\s+/g, ''));
-    return cleaned.join(';');
-  }
+    if (!text) return '';
 
-  fillCheckboxes() {
-    const onsiteContact = this.extractAllPhoneNumbers(this.scheduleInfo.onsiteContact || '');
+    const normalizedText = text.replace(/[()\s-]/g, '');
 
-    this.checkboxList = [
-      {
-        id: 1,
-        value: '',
-        title: 'Venue contact 1',
-        checked: false,
-      },
-      {
-        id: 2,
-        value: '',
-        title: 'Venue contact 2',
-        checked: false,
-      },
-      {
-        id: 3,
-        value: onsiteContact,
-        title: 'On-site contact',
-        checked: false,
-      }
-    ]
+    const combinedRegex = new RegExp(
+      PHONE_COUNTRY_RULES.map(rule => rule.regex.source.replace(/^\^|\$$/g, '')).join('|'),
+      'g'
+    );
 
-    this.checkboxList.forEach(it => it.checked = it.value ?? false)
-  }
+    const matches = normalizedText.match(combinedRegex) || [];
 
-  getCombinedPhoneNumbers(): string {
-    const allValues = this.checkboxList
-      .filter(item => item.checked)
-      .map(item => item.value)
-      .filter(Boolean)
-      .flatMap(value => value.split(';'))
-      .map(num => num.trim())
-      .filter(num => num.length > 0);
-    const uniqueValues = Array.from(new Set(allValues));
+    const uniqueValues = Array.from(new Set(
+      matches.map(m => m.replace(/[^+\d]/g, ''))
+    ));
 
     return uniqueValues.join(';');
   }
+
+
+  setOnsiteContact(): void {
+    // const phoneNumber = parsePhoneNumber(this.scheduleInfo.onsiteContact, "GB");
+    this.onSiteContact = this.extractAllPhoneNumbers(this.scheduleInfo.onsiteContact || '');
+  }
+
+  getCombinedPhoneNumbers(): string {
+    if (!this.onSiteContact) return '';
+
+    const uniqueValues = Array.from(
+      new Set(
+        this.onSiteContact
+          .split(';')
+          .map(v => v.trim())
+          .filter(Boolean)
+      )
+    );
+
+    return uniqueValues.join(';');
+  }
+
 
   showSuccess() {
     GeneralService.showSuccessMessage('Copied to clipboard');
@@ -114,6 +120,7 @@ Alpha Crew
     };
 
     this.post('Schedule/AddClientCommnication', data)
+      .pipe(takeUntilDestroyed(this._dr), finalize(() => this.loading = false))
       .subscribe({
         next: (res => {
           this.loading = false;
@@ -127,5 +134,38 @@ Alpha Crew
           this.closeModal.emit();
         })
       })
+  }
+
+
+  mightyText() {
+    if (this.mightyLoading) return;
+
+    this.mightyLoading = true;
+
+    const phoneNumbers = this.getCombinedPhoneNumbers()?.split(';')
+
+    const data = {
+      phoneNumbers,
+      message: GeneralService.stripHtmlTags(this.text)
+    }
+    this.post('Schedule/MightyText', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          this.mightyLoading = false;
+
+          if (res?.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Successfully sent');
+          this.closeModal.emit();
+        }
+      })
+  }
+
+  validatePastedPhone() {
+    this._toast.error('Invalid phone number format');
   }
 }

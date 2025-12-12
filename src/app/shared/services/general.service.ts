@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
 import Swal from "sweetalert2";
+import { FormGroup } from "@angular/forms";
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,16 @@ import Swal from "sweetalert2";
 export class GeneralService {
 
   constructor() {
+  }
+
+  public static markFormGroupTouched(formGroup: FormGroup) {
+    (Object as any).values(formGroup.controls).forEach((control) => {
+      control.markAsTouched();
+
+      if (control.controls) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
 
   public static isEmpty(obj: any): boolean {

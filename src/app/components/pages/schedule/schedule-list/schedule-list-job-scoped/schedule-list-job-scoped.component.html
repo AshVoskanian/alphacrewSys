@@ -37,7 +37,7 @@
                   <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
                 </span>
               } @else {
-                <span class="text-nowrap pointer" style="line-height: 22px;" (click)="openJobShifts(schedule)">
+                <span class="text-nowrap pointer" style="line-height: 22px;">
                   {{ schedule.shiftNumber }} of {{ schedule.shiftCount }}
                 </span>
               }
@@ -155,12 +155,11 @@
                   </div>
 
                   @if (jobShiftsLoading() && schedule.jobPartId === selectedSchedule.jobPartId) {
-                    <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;"
-                        (click)="openJobShifts(schedule)">
+                    <h6 class="fw-bold pointer m-0 common-flex justify-content-center" style="min-width: 45px;">
                       <app-feather-icon [class]="'w-14 text-white spin'" [icon]="'loader'"></app-feather-icon>
                     </h6>
                   } @else {
-                    <h6 class="fw-bold pointer m-0 text-primary" (click)="openJobShifts(schedule)">
+                    <h6 class="fw-bold pointer m-0 text-primary">
                       {{ schedule.shiftNumber }}
                       of
                       {{ schedule.shiftCount }}
@@ -284,15 +283,15 @@
                                            ngbDropdownItem>
                                           <i class="{{menu.icon}} {{menu.color}} me-2"></i>
                                           {{ menu.text }}
+
+                                          @if (menu.iconAfter) {
+                                            <i class="{{menu.iconAfter}} {{menu.color}} me-2 position-absolute r-0"></i>
+                                          }
                                         </a>
                                       } @else {
                                         <a class="dropdown-item opacity-100 flex items-center" ngbDropdownItem>
                                           <i class="{{menu.icon}} {{menu.color}} me-2"></i>
                                           {{ menu.text }}
-
-                                          @if (menu.iconAfter) {
-                                            <i class="{{menu.iconAfter}} {{menu.color}} me-2 position-absolute r-0"></i>
-                                          }
                                         </a>
                                       }
 

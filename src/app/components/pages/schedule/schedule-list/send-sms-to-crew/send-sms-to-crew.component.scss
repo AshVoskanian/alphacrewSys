@@ -1,0 +1,6 @@
+.hover {
+  transition: color .3s;
+  &:hover {
+    color: var(--bs-info) !important;
+  }
+}

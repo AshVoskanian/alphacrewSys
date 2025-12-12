@@ -6,8 +6,8 @@ import { JobPartCrew, Schedule } from "../../../shared/interface/schedule";
   providedIn: 'root'
 })
 export class ScheduleService {
-  closeJobScopedShiftModal$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   shiftsLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  jobScopedShiftsLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   crewListLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   selectedShift$: BehaviorSubject<Schedule | null> = new BehaviorSubject<Schedule | null>(null);
   crewUpdate$: BehaviorSubject<Array<Schedule> | null> = new BehaviorSubject<Array<Schedule> | null>(null);

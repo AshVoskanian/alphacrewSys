@@ -9,33 +9,35 @@
         </div>
       </div>
 
-      <ul class="list-group m-b-12">
-        @for (list of checkboxList; track list) {
-          <li class="list-group-item pointer m-b-2 flex items-center gap-12">
-            <input class="form-check-input m-0 checkbox-primary"
-                   [id]="list.id"
-                   type="checkbox"
-                   [(ngModel)]="list.checked"
-                   [name]="list.id"
-            >
-            <label class="form-check-label m-0 text-nowrap txt-primary"
-                   [for]="list.id" [ngbTooltip]="!list.value ? 'Enter Contact' : ''">{{ list.title }}</label>
-            <input class="form-control"
-                   #phone="ngModel"
-                   [class.is-invalid]="!phone.valid"
-                   type="text"
-                   placeholder="Enter Contact"
-                   [(ngModel)]="list.value">
-          </li>
-        }
-      </ul>
+      <label class="form-check-label w-100 m-0 m-b-12 text-nowrap txt-primary"
+             for="siteContact" [ngbTooltip]="!onSiteContact ? 'Enter Contact' : ''">
+        On-site contact
+        <input class="form-control w-100"
+               phoneInput
+               (isValidChange)="phoneValid = $event"
+               (invalidPhone)="validatePastedPhone()"
+               [phoneCountries]="['UK','FR', 'ES', 'DE', 'US', 'PT', 'IT', 'CH', 'NL', 'BE', 'AT']"
+               type="text"
+               placeholder="Enter Contact"
+               [(ngModel)]="onSiteContact">
+      </label>
 
       <div class="form-floating">
         <textarea [(ngModel)]="text" class="form-control min-h-i-230" id="floatingTextarea" placeholder=""></textarea>
       </div>
 
       <div class="flex justify-between items-center m-t-12 gap-10">
-        <button type="submit" class="btn btn-primary w-100 text-center"
+        <button type="submit" [disabled]="!phoneValid || !onSiteContact" class="btn btn-primary w-100 text-center"
+                style="flex: 1" (click)="mightyText()">
+          MightyText
+          <span class="d-inline-block w-30 h-15">
+            @if (mightyLoading) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
+            }
+          </span>
+        </button>
+
+        <button type="submit" [disabled]="!phoneValid || !onSiteContact" class="btn btn-primary w-100 text-center"
                 style="flex: 1" (click)="sendSMS()">
           Send SMS
           <span class="d-inline-block w-30 h-15">

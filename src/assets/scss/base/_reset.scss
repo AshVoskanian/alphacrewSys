@@ -1863,6 +1863,39 @@ $i: 1;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+
+  .btr-r-#{$i} {
+    border-top-right-radius: #{$i}px !important;
+  }
+
+  .btl-r-#{$i} {
+    border-top-left-radius: #{$i}px !important;
+  }
+
+  .bbr-r-#{$i} {
+    border-bottom-right-radius: #{$i}px !important;
+  }
+
+  .bbl-r-#{$i} {
+    border-bottom-left-radius: #{$i}px !important;
+  }
+}
+
+.bt-none {
+  border-top: none !important;
+}
+
+.bb-none {
+  border-bottom: none !important;
+}
+
+.br-none {
+  border-right: none !important;
+}
+
+.bl-none {
+  border-left: none !important;
 }
 
 .pointer {
@@ -2060,6 +2093,8 @@ tbody {
       height: 180px;
       max-width: 180px;
       max-height: 180px;
+      min-width: 180px;
+      min-height: 180px;
       border-radius: 4px;
       object-fit: cover;
     }
@@ -2182,6 +2217,11 @@ tbody {
 
 .input-group-text {
   border-color: var(--dark-light-color) !important;
+}
+
+.ng-invalid.ng-touched {
+  border-color: $danger-color !important;
+  border-width: 2px !important;
 }
 
 @media (min-width: 1200px) {

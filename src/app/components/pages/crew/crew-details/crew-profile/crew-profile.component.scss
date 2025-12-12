@@ -1,9 +1,9 @@
 .tgl-flip + .full-time:before {
-  background: var(--success-70);
+  background: var(--fc-button-bg-color);
 }
 
 .tgl-flip + .full-time:after {
-  background: var(--fc-button-bg-color);
+  background: #65c15c;
 }
 
 .tgl-flip + .tgl-btn:before {

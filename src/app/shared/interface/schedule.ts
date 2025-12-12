@@ -99,6 +99,9 @@ export interface JobPartCrew extends JobPartCrewAdditionalDetail{
   jobPartId?: number;
   levelCrewingWeighting?: number;
   name?: string;
+  email?: string;
+  isCheckedForSms?: boolean;
+  phoneNumber?: string;
   jobPartCrewStatusColour?: string;
   regionId?: number;
   levelId?: number;
@@ -145,6 +148,7 @@ export interface CrewActionItem {
   color: string;
   id?: number;
   icon: string;
+  iconAfter?: string;
   href?: string;
 }
 

@@ -2,7 +2,12 @@
 
   @if (cardType == 'simple') {
     @if (headerTitle) {
-      <div class="card-header" [class.card-no-border]="!border" [class.pb-2]="padding" [ngClass]="header">
+      <div class="card-header"
+           [class.card-no-border]="!border"
+           [class.pb-2]="padding"
+           [class.flex]="headerBtnText"
+           [class.justify-content-between]="headerBtnText"
+           [ngClass]="header">
         @if (dropdownType && options || rightSideDetails) {
           <div class="header-top">
             @if (headerTitle) {
@@ -28,6 +33,10 @@
             <ng-content select="[header4]"></ng-content>
           </h5>
           <ng-content select="[header5]"></ng-content>
+
+          @if (headerBtnText) {
+            <button class="btn btn-primary" (click)="onHeaderBtnAction()">{{ headerBtnText }}</button>
+          }
         }
       </div>
     }

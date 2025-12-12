@@ -1,12 +1,31 @@
 <div class="modal-content">
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
-      <div class="common-flex justify-content-between align-items-center m-b-10">
+      <div class="common-flex justify-content-between align-items-center p-b-5 m-b-10 border-1 border-bottom">
         <h6 class="text-primary">Send SMS</h6>
 
         <div class="common-flex align-items-center gap-3">
           <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(null)"></button>
         </div>
+      </div>
+
+      <div class="flex m-t-12 gap-8 m-b-12 flex-wrap">
+        @for (crew of scheduleInfo?.crews | filter:[ {
+          field: 'isActive',
+          condition: 'equals',
+          value: true
+        } ]; track crew.crewId) {
+          <div class="checkbox checkbox-solid-primary form-check">
+            <input type="checkbox" class="form-check-input" [id]="crew.crewId" [(ngModel)]="crew.isCheckedForSms">
+            <label class="form-check-label m-0" [for]="crew.crewId">
+              {{ crew.name }}
+            </label>
+            <span class="m-l-5 text-dark pointer hover" [cdkCopyToClipboard]="crew.phoneNumber" (click)="copyPhone(crew)">
+              ({{ crew.phoneNumber }}
+              <i class="fa-solid fa-copy f-12"></i>)
+            </span>
+          </div>
+        }
       </div>
 
       <div class="form-floating">
@@ -15,7 +34,24 @@
 
       <div class="row m-t-12 gap-y-8">
         <div class="col-12 col-sm-3 text-nowrap flex flex-no-wrap">
-          <button type="submit" class="btn btn-primary w-100 text-center" (click)="sendSMS()">
+          <button type="button"
+                  class="btn btn-primary w-100 text-center"
+                  [disabled]="!isAnyCrewSelected"
+                  (click)="mightyText()">
+            MightyText
+            <span class="d-inline-block w-30 h-15">
+            @if (mightyLoading) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
+            }
+          </span>
+          </button>
+        </div>
+
+        <div class="col-12 col-sm-3 text-nowrap flex flex-no-wrap">
+          <button type="button"
+                  class="btn btn-primary w-100 text-center"
+                  [disabled]="!isAnyCrewSelected"
+                  (click)="sendSMS()">
             Send SMS
             <span class="d-inline-block w-30 h-15">
             @if (loading) {
@@ -26,21 +62,21 @@
         </div>
 
         <div class="col-12 col-sm-3">
-          <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
+          <button type="button" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
                   [cdkCopyToClipboard]="stripHtmlTags(text)">
             Copy
           </button>
         </div>
 
         <div class="col-12 col-sm-3">
-          <button type="submit" class="btn btn-primary w-100 text-center" (click)="closeModal.emit()"
+          <button type="button" class="btn btn-primary w-100 text-center" (click)="closeModal.emit()"
                   [cdkCopyToClipboard]="stripHtmlTags(text)">
             Copy and Close
           </button>
         </div>
 
-        <div class="col-12 col-sm-3">
-          <button type="submit" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
+        <div class="col">
+          <button type="button" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
             Cancel
           </button>
         </div>

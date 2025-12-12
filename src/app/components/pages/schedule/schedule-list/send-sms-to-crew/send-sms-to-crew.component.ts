@@ -7,13 +7,15 @@ import { GeneralService } from "../../../../../shared/services/general.service";
 import { DatePipe } from "@angular/common";
 import { ClipboardModule } from "@angular/cdk/clipboard";
 import { Editor, NgxEditorModule } from "ngx-editor";
+import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
 
 @Component({
   selector: 'app-send-sms-to-crew',
   imports: [
     Select2Module,
     ClipboardModule,
-    NgxEditorModule
+    NgxEditorModule,
+    FilterPipe
   ],
   templateUrl: './send-sms-to-crew.component.html',
   styleUrl: './send-sms-to-crew.component.scss'
@@ -27,7 +29,7 @@ export class SendSmsToCrewComponent extends ApiBase implements OnInit {
   private _date = inject(DatePipe);
 
   loading = false;
-
+  mightyLoading = false;
   public editor: Editor;
 
   text: string = `
@@ -42,6 +44,11 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
   ngOnInit() {
     this.initEditor();
     this.fillTemplate();
+    this.selectCrew();
+  }
+
+  get isAnyCrewSelected(): boolean {
+    return this.scheduleInfo.crews.some(crew => crew.isCheckedForSms);
   }
 
   initEditor() {
@@ -67,6 +74,12 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
     this.text = this.fillText(this.text, values);
   }
 
+  selectCrew() {
+    const selectedCrewId = this.selectedCrew.crewId;
+
+    this.scheduleInfo.crews.forEach(crew => crew.isCheckedForSms = crew.crewId === selectedCrewId);
+  }
+
   hoursDifference(startDateIso: string, endDateIso: string) {
     return GeneralService.calculateHoursDifference(startDateIso, endDateIso);
   }
@@ -76,10 +89,14 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
 
     this.loading = true;
 
+    const selectedCrewIds = this.scheduleInfo.crews
+      .filter(crew => crew.isCheckedForSms)
+      .map(crew => crew.crewId);
+
     const data = {
       jobId: this.scheduleInfo.jobId,
       jobPartId: [ this.scheduleInfo.jobPartId ],
-      crewId: [ this.selectedCrew.crewId ],
+      crewId: selectedCrewIds,
       message: GeneralService.stripHtmlTags(this.text)
     }
     this.post('Schedule/AddJobNotifiction', data)
@@ -96,11 +113,45 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
       })
   }
 
+  mightyText() {
+    if (this.mightyLoading) return;
+
+    this.mightyLoading = true;
+
+    const phoneNumbers = this.scheduleInfo?.crews
+      .filter(crew => crew.isCheckedForSms)
+      .map(crew => crew.phoneNumber);
+
+    const data = {
+      phoneNumbers,
+      message: GeneralService.stripHtmlTags(this.text)
+    }
+    this.post('Schedule/MightyText', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          this.mightyLoading = false;
+
+          if (res?.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Successfully sent');
+          this.closeModal.emit();
+        }
+      })
+  }
+
   showSuccess() {
     GeneralService.showSuccessMessage('Copied to clipboard');
   }
 
   stripHtmlTags(html: string): string {
     return GeneralService.stripHtmlTags(html);
+  }
+
+  copyPhone(crew: JobPartCrew) {
+    GeneralService.showSuccessMessage('Copied to clipboard');
   }
 }

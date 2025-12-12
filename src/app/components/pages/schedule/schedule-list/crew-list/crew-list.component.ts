@@ -58,8 +58,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
   private _scheduleService = inject(ScheduleService);
   private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
-  public scheduleService = inject(ScheduleService);
-
 
   @Input() title: string;
 
@@ -75,7 +73,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   searchKey: string = '';
   loading: boolean = false;
-  crewManagerHeight = 0;
   allAreSelected: boolean = false;
   allAreSelectedForSMS: boolean = false;
   showBtnOptions: boolean = false;
@@ -124,7 +121,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getSelectedSchedule();
-    this.checkIfJobScopedShiftsModalClosed();
   }
 
   get maxHeight(): string {
@@ -135,19 +131,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
     }
 
     return `calc(100dvh - ${ offsetHeight + 440 }px)`;
-  }
-
-  checkIfJobScopedShiftsModalClosed() {
-    this.scheduleService.closeJobScopedShiftModal$
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe({
-        next: res => {
-          if (res) {
-            this.closeOffcanvas();
-            this.scheduleService.closeJobScopedShiftModal$.next(false)
-          }
-        }
-      })
   }
 
   getAlreadyAssignedCrewCountByLevel(levelId: number) {
