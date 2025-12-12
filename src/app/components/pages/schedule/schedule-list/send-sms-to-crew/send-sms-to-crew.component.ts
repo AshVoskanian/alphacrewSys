@@ -29,7 +29,7 @@ export class SendSmsToCrewComponent extends ApiBase implements OnInit {
   private _date = inject(DatePipe);
 
   loading = false;
-
+  mightyLoading = false;
   public editor: Editor;
 
   text: string = `
@@ -106,6 +106,36 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
           this.loading = false;
 
           if (res?.errors?.errorCode) return;
+
+          GeneralService.showSuccessMessage('Successfully sent');
+          this.closeModal.emit();
+        }
+      })
+  }
+
+  mightyText() {
+    if (this.mightyLoading) return;
+
+    this.mightyLoading = true;
+
+    const phoneNumbers = this.scheduleInfo?.crews
+      .filter(crew => crew.isCheckedForSms)
+      .map(crew => crew.phoneNumber);
+
+    const data = {
+      phoneNumbers,
+      message: GeneralService.stripHtmlTags(this.text)
+    }
+    this.post('Schedule/MightyText', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          this.mightyLoading = false;
+
+          if (res?.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
 
           GeneralService.showSuccessMessage('Successfully sent');
           this.closeModal.emit();

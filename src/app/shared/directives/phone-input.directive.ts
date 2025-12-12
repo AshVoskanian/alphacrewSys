@@ -103,43 +103,43 @@ export class PhoneInputDirective implements OnInit, Validator {
     }
   }
 
-  // ******** PASTE *********
-  @HostListener('paste', [ '$event' ])
-  onPaste(e: ClipboardEvent) {
-    e.preventDefault();
-
-    let text = e.clipboardData?.getData('text')?.trim() ?? '';
-    text = text.replace(/\s+/g, '');
-
-    const parts = text
-      .split(/[; \n]/)
-      .map(v => v.trim())
-      .filter(Boolean);
-
-    let output = '';
-
-    for (const part of parts) {
-      let isValid = false;
-
-      for (const country of this.countries) {
-        const cleaned = country.normalize(part); // +44 7123214111 -> +447123214111
-
-        if (country.regex.test(cleaned)) {
-          output += cleaned + '; '; // გამოიყენე სუფთა normalize ნომერი
-          this.validPhoneAdded.emit(cleaned);
-          isValid = true;
-          break;
-        }
-      }
-
-      if (!isValid) {
-        this.invalidPhone.emit(part);
-      }
-    }
-
-    this.el.nativeElement.value = (this.el.nativeElement.value + output).trim();
-    this.el.nativeElement.dispatchEvent(new Event('input'));
-  }
+  // // ******** PASTE *********
+  // @HostListener('paste', [ '$event' ])
+  // onPaste(e: ClipboardEvent) {
+  //   e.preventDefault();
+  //
+  //   let text = e.clipboardData?.getData('text')?.trim() ?? '';
+  //   text = text.replace(/\s+/g, '');
+  //
+  //   const parts = text
+  //     .split(/[; \n]/)
+  //     .map(v => v.trim())
+  //     .filter(Boolean);
+  //
+  //   let output = '';
+  //
+  //   for (const part of parts) {
+  //     let isValid = false;
+  //
+  //     for (const country of this.countries) {
+  //       const cleaned = country.normalize(part); // +44 7123214111 -> +447123214111
+  //
+  //       if (country.regex.test(cleaned)) {
+  //         output += cleaned + '; '; // გამოიყენე სუფთა normalize ნომერი
+  //         this.validPhoneAdded.emit(cleaned);
+  //         isValid = true;
+  //         break;
+  //       }
+  //     }
+  //
+  //     if (!isValid) {
+  //       this.invalidPhone.emit(part);
+  //     }
+  //   }
+  //
+  //   this.el.nativeElement.value = (this.el.nativeElement.value + output).trim();
+  //   this.el.nativeElement.dispatchEvent(new Event('input'));
+  // }
 
   validate(control: AbstractControl): ValidationErrors | null {
     const value = control.value || '';

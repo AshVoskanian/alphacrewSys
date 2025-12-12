@@ -34,7 +34,21 @@
 
       <div class="row m-t-12 gap-y-8">
         <div class="col-12 col-sm-3 text-nowrap flex flex-no-wrap">
-          <button type="submit"
+          <button type="button"
+                  class="btn btn-primary w-100 text-center"
+                  [disabled]="!isAnyCrewSelected"
+                  (click)="mightyText()">
+            MightyText
+            <span class="d-inline-block w-30 h-15">
+            @if (mightyLoading) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
+            }
+          </span>
+          </button>
+        </div>
+
+        <div class="col-12 col-sm-3 text-nowrap flex flex-no-wrap">
+          <button type="button"
                   class="btn btn-primary w-100 text-center"
                   [disabled]="!isAnyCrewSelected"
                   (click)="sendSMS()">
@@ -48,21 +62,21 @@
         </div>
 
         <div class="col-12 col-sm-3">
-          <button type="submit" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
+          <button type="button" class="btn btn-primary w-100 text-center" (click)="showSuccess()"
                   [cdkCopyToClipboard]="stripHtmlTags(text)">
             Copy
           </button>
         </div>
 
         <div class="col-12 col-sm-3">
-          <button type="submit" class="btn btn-primary w-100 text-center" (click)="closeModal.emit()"
+          <button type="button" class="btn btn-primary w-100 text-center" (click)="closeModal.emit()"
                   [cdkCopyToClipboard]="stripHtmlTags(text)">
             Copy and Close
           </button>
         </div>
 
-        <div class="col-12 col-sm-3">
-          <button type="submit" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
+        <div class="col">
+          <button type="button" class="btn btn-secondary w-100 text-center" (click)="closeModal.emit()">
             Cancel
           </button>
         </div>

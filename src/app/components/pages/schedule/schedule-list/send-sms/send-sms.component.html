@@ -28,6 +28,16 @@
 
       <div class="flex justify-between items-center m-t-12 gap-10">
         <button type="submit" [disabled]="!phoneValid || !onSiteContact" class="btn btn-primary w-100 text-center"
+                style="flex: 1" (click)="mightyText()">
+          MightyText
+          <span class="d-inline-block w-30 h-15">
+            @if (mightyLoading) {
+              <i class="fa-solid fa-spinner fa-spin-pulse m-l-10 h-14"></i>
+            }
+          </span>
+        </button>
+
+        <button type="submit" [disabled]="!phoneValid || !onSiteContact" class="btn btn-primary w-100 text-center"
                 style="flex: 1" (click)="sendSMS()">
           Send SMS
           <span class="d-inline-block w-30 h-15">

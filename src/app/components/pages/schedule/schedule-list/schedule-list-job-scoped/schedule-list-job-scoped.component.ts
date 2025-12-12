@@ -32,7 +32,7 @@ import {
   Vehicle
 } from "../../../../../shared/interface/schedule";
 import { NgxSpinnerModule } from "ngx-spinner";
-import { DatePipe, NgClass, NgStyle, TitleCasePipe } from "@angular/common";
+import { DatePipe, LowerCasePipe, NgClass, NgStyle, TitleCasePipe } from "@angular/common";
 import { FeatherIconComponent } from "../../../../../shared/components/ui/feather-icon/feather-icon.component";
 import { UkCarNumComponent } from "../../../../../shared/components/ui/uk-car-num/uk-car-num.component";
 import {
@@ -70,7 +70,7 @@ import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
   selector: 'app-schedule-list-job-scoped',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list-job-scoped.component.html',
   styleUrl: './schedule-list-job-scoped.component.scss'
@@ -696,7 +696,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   openSendSms() {
-    this._modal.open(this.sendSmsModal, { centered: true, size: 'lg' })
+    this._modal.open(this.sendSmsModal, { centered: true, size: 'xl' })
   }
 
   openSendSmsToCrew() {

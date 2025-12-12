@@ -1,6 +1,6 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Select2Data, Select2Module } from "ng-select2-component";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { BonusResponse, CrewSkill, JobPartCrewEdit, Schedule } from "../../../../../shared/interface/schedule";
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
@@ -50,15 +50,15 @@ export class EditComponent extends ApiBase implements OnInit {
 
   initForm() {
     this.form = this._fb.group({
-      expences: [ this.crewInfo?.expences || 0 ],
-      extraHours: [ this.crewInfo?.extraHours || 0 ],
+      expences: [ this.crewInfo?.expences || 0, [Validators.required] ],
+      extraHours: [ this.crewInfo?.extraHours || 0, [Validators.required] ],
       jobPartCrewRoleId: [ this.crewInfo?.jobPartCrewRoleId || 0 ],
       jobPartCrewStatusId: [ this.crewInfo?.jobPartCrewStatusId || 0 ],
-      lastMinuteBonus: [ this.crewInfo?.lastMinuteBonus || 0 ],
-      otherPaymentAdjustment: [ this.crewInfo?.otherPaymentAdjustment || 0 ],
+      lastMinuteBonus: [ this.crewInfo?.lastMinuteBonus || 0, [Validators.required] ],
+      otherPaymentAdjustment: [ this.crewInfo?.otherPaymentAdjustment || 0, [Validators.required] ],
       buddyDown: [ this.crewInfo?.jobPartCrewBuddy?.buddyDown || 0 ],
       otherPaymentAdjustmentTxt: [ this.crewInfo?.otherPaymentAdjustmentTxt || '' ],
-      skilledCost: [ this.crewInfo?.skilledCost || 0 ],
+      skilledCost: [ this.crewInfo?.skilledCost || 0, [Validators.required] ],
     });
   }
 
@@ -159,7 +159,8 @@ export class EditComponent extends ApiBase implements OnInit {
   }
 
   save() {
-    if (this.saveLoading) return;
+    console.log(this.form.controls)
+    if (this.saveLoading || this.form.invalid) return;
 
     this.saveLoading = true;
 

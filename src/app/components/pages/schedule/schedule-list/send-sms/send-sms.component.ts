@@ -10,6 +10,7 @@ import { ToastrService } from "ngx-toastr";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { finalize } from "rxjs";
 import { PHONE_COUNTRY_RULES } from "../../../../../shared/utils/date";
+import parsePhoneNumber from 'libphonenumber-js'
 
 @Component({
   selector: 'app-send-sms',
@@ -27,6 +28,7 @@ export class SendSmsComponent extends ApiBase implements OnInit {
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
 
   loading: boolean = false;
+  mightyLoading: boolean = false;
   phoneValid: boolean = true;
   onSiteContact: string = '';
   text: string = `Here is the breakdown of your crew. We kindly request you to review the information provided and reach out to our office immediately if any discrepancies are detected.
@@ -82,6 +84,7 @@ Alpha Crew
 
 
   setOnsiteContact(): void {
+    // const phoneNumber = parsePhoneNumber(this.scheduleInfo.onsiteContact, "GB");
     this.onSiteContact = this.extractAllPhoneNumbers(this.scheduleInfo.onsiteContact || '');
   }
 
@@ -130,6 +133,35 @@ Alpha Crew
           GeneralService.showSuccessMessage('SMS sent successfully');
           this.closeModal.emit();
         })
+      })
+  }
+
+
+  mightyText() {
+    if (this.mightyLoading) return;
+
+    this.mightyLoading = true;
+
+    const phoneNumbers = this.getCombinedPhoneNumbers()?.split(';')
+
+    const data = {
+      phoneNumbers,
+      message: GeneralService.stripHtmlTags(this.text)
+    }
+    this.post('Schedule/MightyText', data)
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          this.mightyLoading = false;
+
+          if (res?.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Successfully sent');
+          this.closeModal.emit();
+        }
       })
   }
 

@@ -2221,6 +2221,7 @@ tbody {
 
 .ng-invalid.ng-touched {
   border-color: $danger-color !important;
+  border-width: 2px !important;
 }
 
 @media (min-width: 1200px) {

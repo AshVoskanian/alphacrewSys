@@ -168,7 +168,7 @@
 
         <div class="row m-t-20">
           <div class="col col-md-3 offset-md-9">
-            <button type="submit" class="w-100 btn btn-primary float-end p-l-52">
+            <button type="submit" class="w-100 btn btn-primary float-end p-l-52" [disabled]="form.invalid">
               Save
               <span class="d-inline-block w-30 h-13">
                       @if (saveLoading) {

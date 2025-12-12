@@ -92,37 +92,19 @@
                             <app-feather-icon [class]="'w-14 h-14 text-white spin'"
                                               [icon]="'loader'"></app-feather-icon>
                           } @else {
+                            @let statusColor = schedule.smsStatusColour | lowercase;
+
                             @switch (schedule.messageStatus) {
-                              @case (-1) {
-                                <i class="icofont icofont-envelope f-14 text-dark"
-                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
-                              }
-                              @case (0) {
-                                <i class="icofont icofont-envelope f-14 text-warning"
-                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
-                              }
-                              @case (1) {
-                                <i class="icofont icofont-envelope f-14 text-warning"
-                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
-                              }
                               @case (2) {
-                                <i class="icofont icofont-envelope-open f-14 text-success"
-                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
-                              }
-                              @case (3) {
-                                <i class="icofont icofont-envelope f-14 text-success-emphasis"
-                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
-                              }
-                              @case (4) {
-                                <i class="icofont icofont-envelope f-14 text-primary"
-                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
-                              }
-                              @case (5) {
-                                <i class="icofont icofont-envelope f-14 text-danger"
+                                <i class="icofont icofont-envelope-open f-14"
+                                   [ngStyle]="{ color: schedule.smsStatusColour}"
                                    [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                               @default {
-
+                                <i class="icofont icofont-envelope f-14"
+                                   [ngStyle]="{ color: schedule.smsStatusColour}"
+                                   [class.pulse]="statusColor && statusColor.includes('red')"
+                                   [ngbTooltip]="schedule.smsStatusTitle"></i>
                               }
                             }
                           }
