@@ -10,7 +10,6 @@ import { ToastrService } from "ngx-toastr";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { finalize } from "rxjs";
 import { PHONE_COUNTRY_RULES } from "../../../../../shared/utils/date";
-import parsePhoneNumber from 'libphonenumber-js'
 
 @Component({
   selector: 'app-send-sms',
