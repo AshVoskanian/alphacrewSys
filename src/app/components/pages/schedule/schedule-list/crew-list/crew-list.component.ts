@@ -121,6 +121,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getSelectedSchedule();
+    this.getCrewClashing();
   }
 
   get maxHeight(): string {
@@ -538,6 +539,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
     if (crew.turnedDown > 0) {
       return 'badge-danger'
+    }
+
+    if (crew.recommended) {
+      return 'badge-success'
     }
 
     return 'badge-primary';

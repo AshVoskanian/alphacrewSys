@@ -234,6 +234,7 @@ export interface CrewManager {
   rating: number;
   struckOut: number;
   turnedDown: number;
+  recommended: boolean;
 }
 
 export interface JobPartClashing {
