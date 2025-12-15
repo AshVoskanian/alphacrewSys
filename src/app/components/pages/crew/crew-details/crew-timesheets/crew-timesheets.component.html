@@ -53,7 +53,8 @@
 
     <button class="btn p-x-14 btn-primary"
             (click)="sendToEmail(crewDetail())"
-            type="button">Send To Email
+            type="button">
+      Email To: {{crewDetail()?.email}}
       @if (emailLoading()) {
         <i class="fa-solid fa-spinner fa-spin m-l-5"></i>
       } @else {
