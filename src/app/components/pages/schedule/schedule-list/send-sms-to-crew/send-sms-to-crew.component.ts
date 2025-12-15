@@ -124,7 +124,7 @@ VENUE: <strong><i>{{venueName}}</i></strong> </br>
 
     const data = {
       phoneNumbers,
-      message: GeneralService.stripHtmlTags(this.text)
+      message: GeneralService.stripHtmlTagsWithLineBreaks(this.text)
     }
     this.post('Schedule/MightyText', data)
       .pipe(takeUntilDestroyed(this._dr))
