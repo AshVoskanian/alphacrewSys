@@ -101,20 +101,20 @@ export class VenueFormComponent extends ApiBase implements OnInit, OnChanges {
   submit() {
     if (this.loading()) return;
 
-    this.loading.set(true);
-
-    const data: VenueDetails = {
-      ...this.venueDetails(),
-      ...this.form.getRawValue()
-    }
-
-    if (!this.venueDetails()) {
-      delete data.venueId;
-    }
-
-    GeneralService.clearObject(data);
-
     if (this.form.valid) {
+      this.loading.set(true);
+
+      const data: VenueDetails = {
+        ...this.venueDetails(),
+        ...this.form.getRawValue()
+      }
+
+      if (!this.venueDetails()) {
+        delete data.venueId;
+      }
+
+      GeneralService.clearObject(data);
+
       this.post<VenueDetails>('Venues/AddOrUpdateVenue', data)
         .pipe(
           takeUntilDestroyed(this._dr),

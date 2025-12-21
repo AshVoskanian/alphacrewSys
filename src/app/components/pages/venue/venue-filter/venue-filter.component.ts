@@ -26,6 +26,12 @@ export class VenueFilterComponent extends ApiBase implements OnInit {
   loading: WritableSignal<boolean> = signal<boolean>(false);
   statuses: WritableSignal<IconsRadio[]> = signal<IconsRadio[]>([
     {
+      text: 'All',
+      icon: 'fa-layer-group',
+      check: false,
+      id: null
+    },
+    {
       text: 'Yes',
       icon: 'fa-circle-check text-success',
       check: true,
@@ -36,12 +42,6 @@ export class VenueFilterComponent extends ApiBase implements OnInit {
       icon: 'fa-minus-circle text-danger',
       check: false,
       id: 0
-    },
-    {
-      text: 'All',
-      icon: 'fa-fa-list-group text-primary',
-      check: false,
-      id: null
     }
   ]);
 
@@ -52,7 +52,7 @@ export class VenueFilterComponent extends ApiBase implements OnInit {
   initForm() {
     this.form = this._fb.group({
       searchKey: [ '' ],
-      includeTemporary: [ 1 ],
+      includeTemporary: [ null ],
       venueId: [ 0 ]
     });
 
