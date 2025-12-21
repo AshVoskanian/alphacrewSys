@@ -18,7 +18,7 @@
   }
 }
 
-.form-control {
+input.form-control {
   height: 36px !important;
   border-color: var(--dark-light-color);
 }
@@ -496,7 +496,7 @@
 .checkbox-wrapper {
   display: flex;
   gap: calc(8px + (16 - 8) * ((100vw - 320px) / (1920 - 320)));
-  flex-wrap: wrap;
+  //flex-wrap: wrap;
   justify-content: center;
 
   @media (max-width: 1200px) {
@@ -542,7 +542,7 @@
       }
 
       &:checked {
-        border: 2px solid $primary-color;
+        border: 2px solid $danger-color;
         background-color: transparent;
 
         &[type=radio] {

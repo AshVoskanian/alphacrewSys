@@ -81,3 +81,10 @@ export interface IdName {
   id: number;
   name: string;
 }
+
+export interface IconsRadio {
+  text: string;
+  icon: string;
+  check: boolean;
+  id: string | number;
+}

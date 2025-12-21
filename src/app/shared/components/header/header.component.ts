@@ -16,6 +16,7 @@ import { GeneralService } from "../../services/general.service";
 import { Region } from "../../interface/header";
 import { filter, finalize, map } from "rxjs";
 import { LayoutService } from "../../services/layout.service";
+import { RegionsService } from "../../services/regions.service";
 
 @Component({
   selector: 'app-header',
@@ -32,6 +33,7 @@ export class HeaderComponent extends ApiBase implements OnInit {
   private _router = inject(Router);
   private _dr = inject(DestroyRef);
   private _fb = inject(FormBuilder);
+  private _regionsService = inject(RegionsService);
   private _activatedRouter = inject(ActivatedRoute);
   private _localStorageService = inject(LocalStorageService);
 
@@ -60,6 +62,7 @@ export class HeaderComponent extends ApiBase implements OnInit {
     if (url.includes('/dashboard')) return '#52526c';
     if (url.includes('/crew')) return '#7366FF';
     if (url.includes('/schedule')) return '#ffb829';
+    if (url.includes('/venue')) return '#fc564a';
 
     return '#111827';
   });
@@ -113,6 +116,8 @@ export class HeaderComponent extends ApiBase implements OnInit {
 
           this.regions = res.data.map(reg => ({ label: reg.regionText, value: reg.jobRegionId }));
           this.regions.unshift({ label: 'All', value: 0 });
+
+          this._regionsService.regionsData = this.regions;
         }
       })
   }

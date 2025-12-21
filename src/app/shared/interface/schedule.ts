@@ -347,6 +347,7 @@ export interface CrewDetailForShift {
   jobPartId: number;
   skilledCost: number;
   bonus: number;
+  drivingBonus: number;
   updateHistory: string;
   jobPartCrewStatusColourMvc: string;
   jobPartCrewStatusText: string;

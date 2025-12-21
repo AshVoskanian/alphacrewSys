@@ -316,6 +316,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
               crew.rating = match.rating;
               crew.cleintHours = match.cleintHours;
               crew.experienceHours = match.experienceHours;
+              crew.recommended = match.recommended;
             }
           }
         }
@@ -525,6 +526,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
   }
 
   getBadgeClass(crew: Crew): string {
+    console.log(crew)
     if (crew.conflict > 0) {
       return 'badge-danger'
     }
