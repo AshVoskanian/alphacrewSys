@@ -1,7 +1,6 @@
 import { Component, DestroyRef, inject, input, OnChanges, OnInit, output, signal, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
-import { VenueDetails } from "../../../../shared/interface/venue";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -50,6 +49,17 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
     }
   }
 
+  get profile() {
+    return this.form.get('profile') as FormGroup;
+  }
+
+  get accountancy() {
+    return this.form.get('accountancy') as FormGroup;
+  }
+
+  get notes() {
+    return this.form.get('notes') as FormGroup;
+  }
 
   subToRegions() {
     this._regionsService.regions.pipe(
@@ -67,37 +77,38 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
   initForm() {
     this.form = this._fb.group({
       profile: this._fb.group({
-        companyName: [null, Validators.required],
-        contactName: [null, Validators.required],
-        phoneNumber: [null, Validators.required],
-        emailAddress: [null, Validators.required, Validators.email],
-        rateCardId: [null, Validators.required],
-        accounpetTypeId: [null, Validators.required],
-        creditLimit: [null, Validators.required],
-        paymentDueDays: [null, Validators.required],
-        requiresPO: [null, Validators.required],
-        address: [null, Validators.required],
-        postcode: [null, Validators.required],
-        accountOpenDate: [null, Validators.required],
-        isActive: [null, Validators.required],
+        companyName: [null],
+        contactName: [null],
+        phoneNumber: [null],
+        emailAddress: [null, [Validators.email]],
+        rateCardId: [null],
+        accounpetTypeId: [null],
+        creditLimit: [null],
+        paymentDueDays: [null],
+        requiresPO: [null],
+        address: [null],
+        postcode: [null],
+        accountOpenDate: [null],
+        isActive: [null],
       }),
       accountancy: this._fb.group({
-        quickBooksId: [null],
-        qboId: [null],
-        qbLastModified: [null],
         full_LegalName: [null],
-        contactAccountsFirstName: [null],
-        contactAccountsFullName: [null],
-        contactAccountsEmailAddress: [null],
-        contactAccountsCCEmailAddress: [null],
-        contactAccountsTel: [null],
-        creditRating: [null],
-        paymentPerformance: [null],
-        recommendedCreditLimit: [null],
         companyRegistrationNumber: [null],
         vatRegistrationNumber: [null],
+        contactAccountsFirstName: [null],
+        contactAccountsFullName: [null],
+        contactAccountsTel: [null],
+        contactAccountsEmailAddress: [null, [Validators.email]],
+        contactAccountsCCEmailAddress: [null, [Validators.email]],
+        creditRating: [null],
+        recommendedCreditLimit: [null],
+        paymentPerformance: [null],
       }),
-      notes: this._fb.group({})
+      notes: this._fb.group({
+        notes: [null],
+        crewNotes: [null],
+        officeNotes: [null],
+      })
     })
   }
 
@@ -121,20 +132,22 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
         isActive: clientDetails.isActive,
       },
       accountancy: {
-        quickBooksId: clientDetails.quickBooksId,
-        qboId: clientDetails.qboId,
-        qbLastModified: clientDetails.qbLastModified,
         full_LegalName: clientDetails.full_LegalName,
-        contactAccountsFirstName: clientDetails.contactAccountsFirstName,
-        contactAccountsFullName: clientDetails.contactAccountsFullName,
-        contactAccountsEmailAddress: clientDetails.contactAccountsEmailAddress,
-        contactAccountsCCEmailAddress: clientDetails.contactAccountsCCEmailAddress,
-        contactAccountsTel: clientDetails.contactAccountsTel,
-        creditRating: clientDetails.creditRating,
-        paymentPerformance: clientDetails.paymentPerformance,
-        recommendedCreditLimit: clientDetails.recommendedCreditLimit,
         companyRegistrationNumber: clientDetails.companyRegistrationNumber,
         vatRegistrationNumber: clientDetails.vatRegistrationNumber,
+        contactAccountsFirstName: clientDetails.contactAccountsFirstName,
+        contactAccountsFullName: clientDetails.contactAccountsFullName,
+        contactAccountsTel: clientDetails.contactAccountsTel,
+        contactAccountsEmailAddress: clientDetails.contactAccountsEmailAddress,
+        contactAccountsCCEmailAddress: clientDetails.contactAccountsCCEmailAddress,
+        creditRating: clientDetails.creditRating,
+        recommendedCreditLimit: clientDetails.recommendedCreditLimit,
+        paymentPerformance: clientDetails.paymentPerformance,
+      },
+      notes: {
+        notes: clientDetails.notes,
+        crewNotes: clientDetails.crewNotes,
+        officeNotes: clientDetails.officeNotes,
       }
     });
 
@@ -143,24 +156,25 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
 
   submit() {
     console.log(this.form.controls);
-    return;
     if (this.loading()) return;
 
     if (this.form.valid) {
       this.loading.set(true);
 
-      const data: VenueDetails = {
+      const data: ClientDetails = {
         ...this.clientDetails(),
-        ...this.form.getRawValue()
+        ...this.profile.getRawValue(),
+        ...this.accountancy.getRawValue(),
+        ...this.notes.getRawValue()
       }
 
       if (!this.clientDetails()) {
-        delete data.venueId;
+        delete data.clientId;
       }
 
       GeneralService.clearObject(data);
 
-      this.post<VenueDetails>('Venues/AddOrUpdateVenue', data)
+      this.post<ClientDetails>('Clients/AddOrUpdateClient', data)
         .pipe(
           takeUntilDestroyed(this._dr),
           finalize(() => this.loading.set(false))
@@ -172,9 +186,9 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
               return;
             }
 
-            // this.setFormData(res.data);
-            // this.finish.emit(res.data);
-            // GeneralService.showSuccessMessage();
+            this.setFormData(res.data);
+            this.finish.emit(res.data);
+            GeneralService.showSuccessMessage();
           }
         })
     }
