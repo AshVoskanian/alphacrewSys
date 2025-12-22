@@ -1,5 +1,3 @@
-import { CrewIndex } from "./crew";
-
 export interface Venue {
   venueId: number;
   venueName: string;
