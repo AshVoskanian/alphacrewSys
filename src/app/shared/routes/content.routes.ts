@@ -35,29 +35,5 @@ export const content: Routes = [
     path: 'crew/:id',
     data: { title: 'Crew Details' },
     loadComponent: () => import('../../components/pages/crew/crew-details/crew-details.component').then(c => c.CrewDetailsComponent)
-  },
-  {
-    path: 'venue',
-    data: {
-      title: "Venue"
-    },
-    loadComponent: () => import('../../components/pages/venue/venue.component').then(r => r.VenueComponent)
-  },
-  {
-    path: 'venue/:id',
-    data: { title: 'Venue Details' },
-    loadComponent: () => import('../../components/pages/venue/venue-details/venue-details.component').then(c => c.VenueDetailsComponent)
-  },
-  {
-    path: 'clients',
-    data: {
-      title: "Venue"
-    },
-    loadComponent: () => import('../../components/pages/clients/clients.component').then(r => r.ClientsComponent)
-  },
-  {
-    path: 'clients/:id',
-    data: { title: 'Venue Details' },
-    loadComponent: () => import('../../components/pages/clients/clients-details/clients-details.component').then(c => c.ClientsDetailsComponent)
   }
 ];
