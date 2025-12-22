@@ -71,8 +71,8 @@ export class VenueComponent extends ApiBase implements OnInit {
             id: venue.venueId,
             statusText: this._sanitizer.bypassSecurityTrustHtml(
               venue.temporaryEntry
-                ? '<i class="fa-solid fa-circle-check text-success"></i>'
-                : '<i class="fa-solid fa-minus-circle text-danger"></i>'
+                ? '<i class="fa-solid fa-clock text-success"></i>'
+                : '<i class="fa-solid fa-rotate text-danger"></i>'
             )
           }));
 

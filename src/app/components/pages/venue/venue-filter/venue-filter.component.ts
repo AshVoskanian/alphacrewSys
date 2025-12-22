@@ -9,7 +9,7 @@ import { IconsRadio } from "../../../../shared/interface/common";
 
 @Component({
   selector: 'app-venue-filter',
-  imports: [ReactiveFormsModule],
+  imports: [ ReactiveFormsModule ],
   templateUrl: './venue-filter.component.html',
   styleUrl: './venue-filter.component.scss'
 })
@@ -32,17 +32,17 @@ export class VenueFilterComponent extends ApiBase implements OnInit {
       id: null
     },
     {
+      text: 'No',
+      icon: 'fa-rotate text-danger',
+      check: false,
+      id: 0
+    },
+    {
       text: 'Yes',
-      icon: 'fa-circle-check text-success',
+      icon: 'fa-clock text-success',
       check: true,
       id: 1
     },
-    {
-      text: 'No',
-      icon: 'fa-minus-circle text-danger',
-      check: false,
-      id: 0
-    }
   ]);
 
   ngOnInit() {
@@ -52,11 +52,22 @@ export class VenueFilterComponent extends ApiBase implements OnInit {
   initForm() {
     this.form = this._fb.group({
       searchKey: [ '' ],
-      includeTemporary: [ null ],
+      includeTemporary: [ 0 ],
       venueId: [ 0 ]
     });
 
     this.setExistingParams();
+    this.subToStatusChange();
+  }
+
+  subToStatusChange() {
+    this.form.get('includeTemporary').valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: _ => {
+          this.submit()
+        }
+      })
   }
 
   setExistingParams() {
