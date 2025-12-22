@@ -144,8 +144,161 @@
     <li [ngbNavItem]="'accountancy'">
       <a class="nav-lin" ngbNavLink><i class="fa-solid fa-file-invoice-dollar"></i>Accountancy</a>
       <ng-template ngbNavContent>
-        <div class="p-t-30">
-          Tab 2
+        <div formGroupName="accountancy">
+          <div class="row g-3">
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">QuickBooks ID</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="quickBooksId">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-hashtag txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">QBO ID</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="qboId">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-hashtag txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">QB Last Modified</label>
+              <input class="form-control digits" type="date" formControlName="qbLastModified">
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Full Legal Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="full_LegalName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-building txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="main-divider m-y-24">
+              <div class="divider-body divider-body-1 divider-secondary">
+                <div class="divider-p-secondary p-0"></div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Contact First Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactAccountsFirstName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-user txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Contact Full Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactAccountsFullName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-user txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Contact Email</label>
+              <div class="input-group">
+                <input class="form-control" type="email" formControlName="contactAccountsEmailAddress">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-envelope txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts CC Email</label>
+              <div class="input-group">
+                <input class="form-control" type="email" formControlName="contactAccountsCCEmailAddress">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-envelope txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Contact Tel</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactAccountsTel">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-phone txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="main-divider m-y-24">
+              <div class="divider-body divider-body-1 divider-secondary">
+                <div class="divider-p-secondary p-0"></div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Credit Rating</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="creditRating">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-star txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Payment Performance</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="paymentPerformance">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-chart-line txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Recommended Credit Limit</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="recommendedCreditLimit">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-credit-card txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="main-divider m-y-24">
+              <div class="divider-body divider-body-1 divider-secondary">
+                <div class="divider-p-secondary p-0"></div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Company Registration Number</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="companyRegistrationNumber">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-file-contract txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">VAT Registration Number</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="vatRegistrationNumber">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-file-invoice txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </ng-template>
     </li>

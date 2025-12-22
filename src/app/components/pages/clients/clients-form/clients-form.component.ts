@@ -81,7 +81,22 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
         accountOpenDate: [null, Validators.required],
         isActive: [null, Validators.required],
       }),
-      accountancy: this._fb.group({}),
+      accountancy: this._fb.group({
+        quickBooksId: [null],
+        qboId: [null],
+        qbLastModified: [null],
+        full_LegalName: [null],
+        contactAccountsFirstName: [null],
+        contactAccountsFullName: [null],
+        contactAccountsEmailAddress: [null],
+        contactAccountsCCEmailAddress: [null],
+        contactAccountsTel: [null],
+        creditRating: [null],
+        paymentPerformance: [null],
+        recommendedCreditLimit: [null],
+        companyRegistrationNumber: [null],
+        vatRegistrationNumber: [null],
+      }),
       notes: this._fb.group({})
     })
   }
@@ -89,22 +104,39 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges {
   setFormData(clientDetails: ClientDetails) {
     if (!clientDetails) return;
 
-    // this.form.patchValue({
-    //   venueName: venueDetails.venueName,
-    //   regionId: venueDetails.regionId,
-    //   onSiteContact: venueDetails.onSiteContact,
-    //   onSiteContact2: venueDetails.onSiteContact2,
-    //   temporaryEntry: venueDetails.temporaryEntry,
-    //   address: venueDetails.address,
-    //   postCode: venueDetails.postCode,
-    //   importantNotes: venueDetails.importantNotes,
-    //   notes: venueDetails.notes,
-    //   crewNotes: venueDetails.crewNotes,
-    //   officeNotes: venueDetails.officeNotes,
-    //   riskAssessment: venueDetails.riskAssessment,
-    //   oot: venueDetails.oot,
-    //   drivingBonus: venueDetails.drivingBonus,
-    // });
+    this.form.patchValue({
+      profile: {
+        companyName: clientDetails.companyName,
+        contactName: clientDetails.contactName,
+        phoneNumber: clientDetails.phoneNumber,
+        emailAddress: clientDetails.emailAddress,
+        rateCardId: clientDetails.rateCardId,
+        accounpetTypeId: clientDetails.accounpetTypeId,
+        creditLimit: clientDetails.creditLimit,
+        paymentDueDays: clientDetails.paymentDueDays,
+        requiresPO: clientDetails.requiresPO,
+        address: clientDetails.address,
+        postcode: clientDetails.postcode,
+        accountOpenDate: clientDetails.accountOpenDate,
+        isActive: clientDetails.isActive,
+      },
+      accountancy: {
+        quickBooksId: clientDetails.quickBooksId,
+        qboId: clientDetails.qboId,
+        qbLastModified: clientDetails.qbLastModified,
+        full_LegalName: clientDetails.full_LegalName,
+        contactAccountsFirstName: clientDetails.contactAccountsFirstName,
+        contactAccountsFullName: clientDetails.contactAccountsFullName,
+        contactAccountsEmailAddress: clientDetails.contactAccountsEmailAddress,
+        contactAccountsCCEmailAddress: clientDetails.contactAccountsCCEmailAddress,
+        contactAccountsTel: clientDetails.contactAccountsTel,
+        creditRating: clientDetails.creditRating,
+        paymentPerformance: clientDetails.paymentPerformance,
+        recommendedCreditLimit: clientDetails.recommendedCreditLimit,
+        companyRegistrationNumber: clientDetails.companyRegistrationNumber,
+        vatRegistrationNumber: clientDetails.vatRegistrationNumber,
+      }
+    });
 
     this.form.updateValueAndValidity();
   }
