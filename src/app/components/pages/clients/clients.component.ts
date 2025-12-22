@@ -12,9 +12,8 @@ import { NgxPaginationModule } from "ngx-pagination";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DomSanitizer } from "@angular/platform-browser";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { Venue, VenueDetails } from "../../../shared/interface/venue";
 import { ClientsFormComponent } from "./clients-form/clients-form.component";
-import { Client, ClientIndexResponse, ClientSearchParams } from "../../../shared/interface/clients";
+import { Client, ClientDetails, ClientIndexResponse, ClientSearchParams } from "../../../shared/interface/clients";
 
 @Component({
   selector: 'app-venue',
@@ -121,12 +120,12 @@ export class ClientsComponent extends ApiBase implements OnInit {
     this._router.navigate([ 'clients', client.clientId ]);
   }
 
-  addNewVenue(temp: TemplateRef<NgbModal>) {
+  addNewClient(temp: TemplateRef<NgbModal>) {
     this.modalRef = this._modal.open(temp, { centered: true, size: 'xl' })
   }
 
-  goToCreatedVenueDetails(venueDetails: VenueDetails) {
+  goToCreatedClientDetails(clientDetails: ClientDetails) {
     this.modalRef.close();
-    this._router.navigate([ 'venue', venueDetails?.venueId ]);
+    this._router.navigate([ 'clients', clientDetails?.clientId ]);
   }
 }
