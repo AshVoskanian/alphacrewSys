@@ -884,7 +884,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   statisticByRegion() {
     switch (this._navService.regionId) {
       case 0:
-        return 'London';
+        return 'All';
       case 1:
         return 'London';
       case 2:

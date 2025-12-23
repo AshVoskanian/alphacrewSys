@@ -901,7 +901,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   statisticByRegion() {
     switch (this._navService.regionId) {
       case 0:
-        return 'London';
+        return 'All';
       case 1:
         return 'London';
       case 2:
