@@ -34,6 +34,7 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
 
   today = signal(new Date());
   loading = signal<boolean>(false);
+  emailLoading = signal<boolean>(false);
   years = signal<Select2Option[]>(YEARS);
   months = signal<Select2Option[]>(MONTHS);
 
@@ -124,6 +125,33 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
             startDate: item.venueName?.toUpperCase() === 'TOTAL' ? '' : item.startDate,
             companyName: item.venueName?.toUpperCase() === 'TOTAL' ? '' : item.companyName,
           }));
+        }
+      })
+  }
+
+  sendToEmail(crewDetail: CrewDetail) {
+    this.emailLoading.set(true);
+    const { crewId } = crewDetail;
+
+    const params = {
+      crewId,
+      month: this.form?.get('month')?.value || this.getCalculatedMonth(),
+      year: this.form?.get('year')?.value || this.today().getFullYear()
+    }
+
+    this.post<Timesheet[]>(`Crew/SendCrewTimeSheetsByMail`, params)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.emailLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Email has been sent');
         }
       })
   }

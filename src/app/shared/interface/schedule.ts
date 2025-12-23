@@ -234,6 +234,7 @@ export interface CrewManager {
   rating: number;
   struckOut: number;
   turnedDown: number;
+  recommended: boolean;
 }
 
 export interface JobPartClashing {
@@ -346,6 +347,7 @@ export interface CrewDetailForShift {
   jobPartId: number;
   skilledCost: number;
   bonus: number;
+  drivingBonus: number;
   updateHistory: string;
   jobPartCrewStatusColourMvc: string;
   jobPartCrewStatusText: string;

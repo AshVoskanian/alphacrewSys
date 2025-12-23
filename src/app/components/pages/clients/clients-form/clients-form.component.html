@@ -1,0 +1,309 @@
+<form class="flex flex-col gap-12" [formGroup]="form" (ngSubmit)="submit()">
+  <ul class="nav nav-pills nav-primary p-b-20" ngbNav #nav="ngbNav"
+      [(activeId)]="activeTab" [destroyOnHide]="false">
+    <li [ngbNavItem]="'profile'">
+      <a class="nav-lin" ngbNavLink><i class="fa-solid fa-user"></i>Profile</a>
+      <ng-template ngbNavContent>
+        <div formGroupName="profile">
+          <div class="row g-3">
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Company Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="companyName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-building txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Contact Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-user txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Contact Number(s)</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="phoneNumber">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-phone txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Contact Email</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="emailAddress">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-envelope txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="main-divider m-y-24">
+              <div class="divider-body divider-body-1 divider-secondary">
+                <div class="divider-p-secondary p-0"></div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label" for="region">Rate card</label>
+              <select2 [data]="regions()" [templates]="template" id="region" formControlName="rateCardId">
+                <ng-template #template let-item="label">
+                  {{ item }}
+                </ng-template>
+              </select2>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label" for="region">Account Type</label>
+              <select2 [data]="regions()" [templates]="template" id="region" formControlName="accounpetTypeId">
+                <ng-template #template let-item="label">
+                  {{ item }}
+                </ng-template>
+              </select2>
+            </div>
+
+            <div class="col col-sm-6 col-md-2">
+              <label class="form-label">Credit Limit</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="creditLimit">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-credit-card txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-2">
+              <label class="form-label">Payment Due (Days)</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="paymentDueDays">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-clock txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-2">
+              <div class="flex h-100 align-items-end">
+                <div class="checkbox checkbox-solid-primary form-check">
+                  <input type="checkbox" class="form-check-input" id="requiresPO" formControlName="requiresPO">
+                  <label class="form-check-label" for="requiresPO">
+                    Requires PO?
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Address</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="address">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-map-pin txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Postal Code</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="postcode">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-location-dot txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Account Opened (Date)</label>
+              <input class="form-control digits" type="date" formControlName="accountOpenDate">
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <div class="flex h-100 align-items-end">
+                <div class="checkbox checkbox-solid-primary form-check">
+                  <input type="checkbox" class="form-check-input" id="isActive" formControlName="isActive">
+                  <label class="form-check-label" for="isActive">
+                    Is Active?
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="'accountancy'">
+      <a class="nav-lin" ngbNavLink><i class="fa-solid fa-file-invoice-dollar"></i>Accountancy</a>
+      <ng-template ngbNavContent>
+        <div formGroupName="accountancy">
+          <div class="row g-3">
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Full Legal Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="full_LegalName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-building txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Company Registration Number</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="companyRegistrationNumber">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-file-contract txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">VAT Registration Number</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="vatRegistrationNumber">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-file-invoice txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="main-divider m-y-24">
+              <div class="divider-body divider-body-1 divider-secondary">
+                <div class="divider-p-secondary p-0"></div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts First Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactAccountsFirstName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-user txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Full Name</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactAccountsFullName">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-user txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Tel</label>
+              <div class="input-group">
+                <input class="form-control" type="text" formControlName="contactAccountsTel">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-phone txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts Email Addresss</label>
+              <div class="input-group">
+                <input class="form-control" type="email" formControlName="contactAccountsEmailAddress">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-envelope txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Accounts CC Email Address</label>
+              <div class="input-group">
+                <input class="form-control" type="email" formControlName="contactAccountsCCEmailAddress">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-envelope txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="main-divider m-y-24">
+              <div class="divider-body divider-body-1 divider-secondary">
+                <div class="divider-p-secondary p-0"></div>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Credit Rating</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="creditRating">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-star txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Recommended Credit Limit</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="recommendedCreditLimit">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-credit-card txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="col col-sm-6 col-md-3">
+              <label class="form-label">Payment Performance (Days)</label>
+              <div class="input-group">
+                <input class="form-control" type="number" formControlName="paymentPerformance">
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-chart-line txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="'notes'">
+      <a class="nav-lin" ngbNavLink><i class="fa-solid fa-note-sticky"></i>Notes</a>
+      <ng-template ngbNavContent>
+        <div formGroupName="notes">
+          <div class="row g-3">
+            <div class="col col-sm-6 col-md-12">
+              <label class="form-label">General Client Notes:</label>
+              <textarea class="form-control" formControlName="notes" rows="5"></textarea>
+            </div>
+
+            <div class="col col-sm-6 col-md-6">
+              <label class="form-label">Crew Notes (Copied on all shifts):</label>
+              <textarea class="form-control" formControlName="crewNotes" rows="5"></textarea>
+            </div>
+
+            <div class="col col-sm-6 col-md-6">
+              <label class="form-label">Office notes (Copied on all shifts):</label>
+              <textarea class="form-control" formControlName="officeNotes" rows="5"></textarea>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav"></div>
+  <div class="col d-flex flex-col justify-content-end align-items-end text-end p-t-15">
+    <button class="w-130 btn btn-primary" type="submit">
+      {{ clientDetails() ? 'Save' : 'Add Client' }}
+      @if (loading()) {
+        <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+      }
+    </button>
+  </div>
+
+</form>

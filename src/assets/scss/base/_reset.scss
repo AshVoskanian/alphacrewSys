@@ -1741,6 +1741,10 @@ $i: 1;
     width: #{$i}px;
   }
 
+  .w-i-#{$i} {
+    width: #{$i}px !important;
+  }
+
   .h-#{$i} {
     height: #{$i}px;
   }
@@ -2216,6 +2220,7 @@ tbody {
 }
 
 .input-group-text {
+  height: 36px;
   border-color: var(--dark-light-color) !important;
 }
 

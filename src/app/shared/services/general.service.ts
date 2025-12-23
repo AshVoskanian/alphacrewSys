@@ -67,6 +67,14 @@ export class GeneralService {
     return doc.body.innerText || "";
   }
 
+  public static stripHtmlTagsWithLineBreaks(html: string): string {
+    const withLineBreaks = html.replace(/<br\s*\/?>/gi, '\n');
+
+    const doc = new DOMParser().parseFromString(withLineBreaks, 'text/html');
+
+    return doc.body.textContent || '';
+  }
+
   public static clearObject(object: any, zeroCheck: boolean = false): any {
     for (const item in object) {
       if (object.hasOwnProperty(item)) {

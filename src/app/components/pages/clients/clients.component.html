@@ -1,0 +1,56 @@
+<div class="p-x-10 p-y-15">
+  <app-card [cardClass]="'bg-dark'">
+    <app-clients-filter></app-clients-filter>
+  </app-card>
+
+  <div class="container-fluid p-0">
+    <div class="row table-components default-datatable">
+      <app-card [headerTitle]="'Clients'"
+                [headerBtnText]="'Add New Client'"
+                (headerBtnAction)="addNewClient(addClient)"
+                [cardBodyClass]="'common-option'">
+        @if (loading()) {
+          <div class="h-300 w-100 flex items-center justify-content-center">
+            <p class="text-primary f-24">Loading...</p>
+          </div>
+        } @else {
+          <div class="table-responsive custom-scrollbar">
+            @if (tableConfig?.data?.length && !loading()) {
+              <div class="flex flex-col gap-20 m-auto">
+                <app-table [tableConfig]="tableConfig"
+                           [search]="false"
+                           [hover]="true"
+                           [pageNo]="filterParams().page"
+                           [totalCount]="totalCount()"
+                           [pageSize]="filterParams().pageSize"
+                           [hasCheckbox]="false"
+                           [pagination]="true"
+                           (rowClicked)="itemSelect($event)">
+                </app-table>
+
+                <div class="flex w-full justify-content-end">
+                  <pagination-controls
+                    (pageChange)="pageChanged($event)"
+                    (pageBoundsCorrection)="pageChanged($event)"
+                    [maxSize]="9"
+                    [directionLinks]="true"
+                    [responsive]="true">
+                  </pagination-controls>
+                </div>
+              </div>
+            } @else {
+              <p class="text-primary f-20 text-center">No results to display</p>
+            }
+          </div>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>
+
+<!--Add New Venue-->
+<ng-template #addClient let-addClient>
+  <app-card [headerTitle]="'Add New Client'">
+    <app-clients-form (finish)="goToCreatedClientDetails($event)"></app-clients-form>
+  </app-card>
+</ng-template>

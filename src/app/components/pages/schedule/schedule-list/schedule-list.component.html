@@ -516,6 +516,9 @@
           <td class="p-2 p-x-5 f-10 text-nowrap">{{ item.extraHours }}eh</td>
           <td class="text-nowrap p-2 p-x-5 f-12">Sk: £{{ item.skilledCost }}</td>
           <td class="text-nowrap p-2 p-x-5 f-12">Bon: £{{ item.bonus }}</td>
+          @if (item.drivingBonus > 0) {
+            <td class="text-nowrap p-2 p-x-5 f-12">Dr: £{{ item.drivingBonus }}</td>
+          }
         </tr>
       }
       @for (item of shiftCrewDetails() | filter: [

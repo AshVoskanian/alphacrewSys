@@ -50,6 +50,17 @@
                  [pagination]="false">
       </app-table>
     }
+
+    <button class="btn p-x-14 btn-primary"
+            (click)="sendToEmail(crewDetail())"
+            type="button">
+      Email To: {{crewDetail()?.email}}
+      @if (emailLoading()) {
+        <i class="fa-solid fa-spinner fa-spin m-l-5"></i>
+      } @else {
+        <i class="fa-solid fa-envelope m-l-5"></i>
+      }
+    </button>
   }
 </div>
 

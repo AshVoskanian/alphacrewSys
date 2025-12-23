@@ -1,0 +1,51 @@
+@if (!loading()) {
+  <form class="flex gap-20 items-center" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-check radio radio-primary p-0 w-350">
+      <ul class="radio-wrapper justify-content-start gap-12 flex items-center flex-no-wrap">
+        @for (item of statuses(); track item.id) {
+          <li class="h-36 p-0 text-light">
+            <input
+              class="form-check-input b-r-5 h-36"
+              [id]="item.text"
+              type="radio"
+              formControlName="active"
+              name="active"
+              [value]="item.id"
+            />
+
+            <label class="form-check-label" [for]="item.id">
+              <i class="fa {{ item.icon }}"></i>
+              <span>{{ item.text }}</span>
+            </label>
+          </li>
+        }
+
+      </ul>
+    </div>
+
+    <div class="">
+      <input class="form-control h-36" type="text" formControlName="searchKey" placeholder="Search...">
+    </div>
+
+    <div class="d-flex justify-content-start align-items-center m-0">
+      <button type="submit" class="btn btn-primary h-36">
+        Search
+      </button>
+    </div>
+  </form>
+} @else {
+  <div class="gap-12 flex flex-col">
+    <div class="flex gap-12">
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+    </div>
+    <div class="flex gap-12">
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+    </div>
+  </div>
+}
