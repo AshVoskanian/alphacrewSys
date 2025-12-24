@@ -54,7 +54,7 @@
 
             <div class="col col-sm-6 col-md-3">
               <label class="form-label" for="region">Rate card</label>
-              <select2 [data]="regions()" [templates]="template" id="region" formControlName="rateCardId">
+              <select2 [data]="rateCards()" [templates]="template" id="region" formControlName="rateCardId">
                 <ng-template #template let-item="label">
                   {{ item }}
                 </ng-template>
@@ -63,7 +63,7 @@
 
             <div class="col col-sm-6 col-md-3">
               <label class="form-label" for="region">Account Type</label>
-              <select2 [data]="regions()" [templates]="template" id="region" formControlName="accounpetTypeId">
+              <select2 [data]="accountTypes()" [templates]="template" id="region" formControlName="accountTypeId">
                 <ng-template #template let-item="label">
                   {{ item }}
                 </ng-template>

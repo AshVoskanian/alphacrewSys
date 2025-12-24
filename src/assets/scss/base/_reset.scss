@@ -2187,6 +2187,15 @@ tbody {
   }
 }
 
+.pac-container {
+  z-index: 2000 !important; /* must be higher than modal */
+
+  &:after {
+    display: none !important;
+  }
+}
+
+
 .loading {
   position: relative;
 

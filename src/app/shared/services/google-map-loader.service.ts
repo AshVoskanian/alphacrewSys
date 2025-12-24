@@ -23,7 +23,7 @@ export class GoogleMapsLoaderService {
     }
 
     setOptions({
-      key: 'AIzaSyDEw2Zg3kDdciZwmpkCE-cL55QD3ktWGaU',
+      key: 'AIzaSyAh2RrJ3jfW7sBKmB4QNIiZwEAudY_-FqI',
       language: 'en',
       region: 'gb'
     });

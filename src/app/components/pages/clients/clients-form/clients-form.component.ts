@@ -9,18 +9,17 @@ import {
   OnInit,
   output,
   signal,
-  SimpleChanges, ViewChild
+  SimpleChanges,
+  ViewChild
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { finalize } from "rxjs";
-import { RegionsService } from "../../../../shared/services/regions.service";
-import { ClientDetails } from "../../../../shared/interface/clients";
+import { finalize, forkJoin } from "rxjs";
+import { AccountType, ClientDetails, RateCard } from "../../../../shared/interface/clients";
 import { NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavOutlet } from "@ng-bootstrap/ng-bootstrap";
-import { GoogleMapsLoaderService } from "../../../../shared/services/google-map-loader.service";
 
 @Component({
   selector: 'app-clients-form',
@@ -39,15 +38,14 @@ import { GoogleMapsLoaderService } from "../../../../shared/services/google-map-
 export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, AfterViewInit {
   private _dr: DestroyRef = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
-  private _regionsService = inject(RegionsService);
-  private readonly _googleMapsLoader = inject(GoogleMapsLoaderService);
 
   clientDetails = input<ClientDetails>(null);
 
   finish = output<ClientDetails>();
 
   loading = signal<boolean>(false);
-  regions = signal<Select2Option[]>([]);
+  rateCards = signal<Select2Option[]>([]);
+  accountTypes = signal<Select2Option[]>([]);
 
   activeTab: string = 'profile';
   form: FormGroup;
@@ -56,30 +54,27 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
 
   ngOnInit() {
     this.initForm();
-    this.subToRegions();
+    this.getDropdownInfo();
   }
 
 
   async ngAfterViewInit(): Promise<void> {
-    // await this._googleMapsLoader.loadPlaces();
-    //
-    // const autocomplete = new google.maps.places.Autocomplete(
-    //   this.addressInput.nativeElement,
-    //   {
-    //     types: ['address'],
-    //     componentRestrictions: { country: 'gb' }
-    //   }
-    // );
-    //
-    // autocomplete.addListener('place_changed', () => {
-    //   const place = autocomplete.getPlace();
-    //   console.log(place.formatted_address);
-    // });
+    const autocomplete = new google.maps.places.Autocomplete(
+      this.addressInput.nativeElement,
+      {
+        types: [ 'address' ],
+        // componentRestrictions: { country: 'gb' }
+      }
+    );
+
+    autocomplete.addListener('place_changed', () => {
+      autocomplete.getPlace();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes['clientDetails'] && changes['clientDetails'].currentValue) {
-      this.setFormData(this.clientDetails());
+      this.getDropdownInfo(true);
     }
   }
 
@@ -95,19 +90,6 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
     return this.form.get('notes') as FormGroup;
   }
 
-  subToRegions() {
-    this._regionsService.regions.pipe(
-      takeUntilDestroyed(this._dr),
-      finalize(() => this.loading.set(false))
-    ).subscribe({
-      next: regions => {
-        this.regions.set(
-          regions.filter(it => it.label !== 'All')
-        );
-      }
-    })
-  }
-
   initForm() {
     this.form = this._fb.group({
       profile: this._fb.group({
@@ -116,7 +98,7 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         phoneNumber: [ null, [ Validators.required ] ],
         emailAddress: [ null, [ Validators.email, Validators.required ] ],
         rateCardId: [ 8, [ Validators.required ] ],
-        accounpetTypeId: [ 1, [ Validators.required ] ],
+        accountTypeId: [ 1, [ Validators.required ] ],
         creditLimit: [ null, [ Validators.required ] ],
         paymentDueDays: [ null, [ Validators.required ] ],
         requiresPO: [ null ],
@@ -156,7 +138,7 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         phoneNumber: clientDetails.phoneNumber,
         emailAddress: clientDetails.emailAddress,
         rateCardId: clientDetails.rateCardId,
-        accounpetTypeId: clientDetails.accounpetTypeId,
+        accountTypeId: clientDetails.accountTypeId,
         creditLimit: clientDetails.creditLimit,
         paymentDueDays: clientDetails.paymentDueDays,
         requiresPO: clientDetails.requiresPO,
@@ -186,6 +168,34 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
     });
 
     this.form.updateValueAndValidity();
+  }
+
+  getDropdownInfo(fillForm = false) {
+    const rateCards$ = this.get<RateCard[]>("Clients/GetRateCardDescription");
+    const accountTypes$ = this.get<AccountType[]>("Clients/GetAccountTypes");
+
+    forkJoin([
+      rateCards$,
+      accountTypes$
+    ]).pipe(
+      takeUntilDestroyed(this._dr),
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: (res) => {
+        if (res[0]?.errors?.errorCode || res[1]?.errors.errorCode) {
+          GeneralService.showErrorMessage(
+            res[0]?.errors?.message || res[1]?.errors?.message
+          )
+          return;
+        }
+        this.rateCards.set(res[0].data.map(it => ({ label: it.description, value: it.rateCardId })));
+        this.accountTypes.set(res[1].data.map(it => ({ label: it.accountTypeText, value: it.accountTypeId })));
+
+        if (fillForm) {
+          setTimeout(() => this.setFormData(this.clientDetails()), 100);
+        }
+      }
+    })
   }
 
   submit() {
