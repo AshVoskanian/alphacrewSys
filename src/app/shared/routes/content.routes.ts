@@ -51,13 +51,25 @@ export const content: Routes = [
   {
     path: 'clients',
     data: {
-      title: "Venue"
+      title: "Clients"
     },
     loadComponent: () => import('../../components/pages/clients/clients.component').then(r => r.ClientsComponent)
   },
   {
     path: 'clients/:id',
-    data: { title: 'Venue Details' },
+    data: { title: 'Clients Details' },
     loadComponent: () => import('../../components/pages/clients/clients-details/clients-details.component').then(c => c.ClientsDetailsComponent)
+  },
+  {
+    path: 'jobs',
+    data: {
+      title: "Jobs"
+    },
+    loadComponent: () => import('../../components/pages/jobs/jobs.component').then(r => r.JobsComponent)
+  },
+  {
+    path: 'jobs/:id',
+    data: { title: 'Jobs Details' },
+    loadComponent: () => import('../../components/pages/jobs/jobs-details/jobs-details.component').then(c => c.JobsDetailsComponent)
   }
 ];
