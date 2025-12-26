@@ -26,6 +26,8 @@ export class AddJobComponent extends ApiBase implements OnInit {
   finish = output<JobDetails>();
 
   loading = signal<boolean>(false);
+  venueLoading = signal<boolean>(false);
+  clientLoading = signal<boolean>(false);
   jobVenues: WritableSignal<Select2Data> = signal<Select2Data>([]);
   jobClients: WritableSignal<Select2Data> = signal<Select2Data>([]);
   regions = toSignal(this._regionsService.regions);
@@ -77,10 +79,12 @@ export class AddJobComponent extends ApiBase implements OnInit {
   }
 
   getJobVenues(clientId?: number, all = 1) {
+    this.venueLoading.set(true);
+
     this.post<JobVenue[]>('jobs/GetJobVenue', { id: clientId, all })
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.loading.set(false))
+        finalize(() => this.venueLoading.set(false))
       ).subscribe({
       next: res => {
         if (res.errors && res.errors.errorCode) {
@@ -94,10 +98,12 @@ export class AddJobComponent extends ApiBase implements OnInit {
   }
 
   getJobClients() {
+    this.clientLoading.set(true);
+
     this.get<JobClient[]>('Jobs/GetClientForJobDropDown')
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.loading.set(false))
+        finalize(() => this.clientLoading.set(false))
       ).subscribe({
       next: res => {
         if (res.errors && res.errors.errorCode) {

@@ -18,18 +18,25 @@
       </select2>
     </div>
 
-    <div class="col col-sm-6 col-md-3">
-      <label class="form-label" for="clientId">Client</label>
-      <select2 [data]="jobClients()" [templates]="template" id="clientId" formControlName="clientId">
-        <ng-template #template let-item="label">
-          {{ item }}
-        </ng-template>
-      </select2>
-    </div>
-
-    @if (true) {
+    @if (clientLoading()) {
       <div class="col col-sm-6 col-md-3">
-        <label class="form-label">d</label>
+        <label class="form-label h-15"></label>
+        <div class="bg-gray-200 animate-pulse rounded-md h-36"></div>
+      </div>
+    } @else {
+      <div class="col col-sm-6 col-md-3">
+        <label class="form-label" for="clientId">Client</label>
+        <select2 [data]="jobClients()" [templates]="template" id="clientId" formControlName="clientId">
+          <ng-template #template let-item="label">
+            {{ item }}
+          </ng-template>
+        </select2>
+      </div>
+    }
+
+    @if (venueLoading()) {
+      <div class="col col-sm-6 col-md-3">
+        <label class="form-label h-15"></label>
         <div class="bg-gray-200 animate-pulse rounded-md h-36"></div>
       </div>
     } @else {
