@@ -12,6 +12,8 @@ export interface Job {
   venueName: string;
   statusText: string;
   statusContent: string;
+  statusColour: string;
+  statusId: number;
   paidDate: string | null;
   paidDateString: string;
   regionText: string;

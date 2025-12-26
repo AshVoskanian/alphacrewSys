@@ -100,9 +100,9 @@
                     @case ('price') {
                       <td [ngClass]="column.class ? column.class : ''">
                         @if (column.decimal_number) {
-                          ${{ details[column.field_value] | number: '1.2-2' }}
+                          £{{ details[column.field_value] | number: '1.2-2' }}
                         } @else {
-                          ${{ details[column.field_value] }}
+                          £{{ details[column.field_value] }}
                         }
                       </td>
                     }

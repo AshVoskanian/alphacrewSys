@@ -42,7 +42,7 @@ export class JobsComponent extends ApiBase implements OnInit {
       { title: 'Start', field_value: 'starts', type: 'date' },
       { title: 'End', field_value: 'ends', type: 'date' },
       { title: 'Hours', field_value: 'totalHours' },
-      { title: 'Cost', field_value: 'cost' },
+      { title: 'Cost', field_value: 'cost', type: 'price' },
     ],
     data: [] as Job[]
   };
@@ -70,7 +70,10 @@ export class JobsComponent extends ApiBase implements OnInit {
           this.tableConfig.data = res.data.jobIndex.map((job: Job) => ({
             ...job,
             id: job.jobId,
-            statusText: this._sanitizer.bypassSecurityTrustHtml(`<i class="${this._getStatusIcon(14)}"></i> ${ job.statusText }`)
+            statusText: this._sanitizer.bypassSecurityTrustHtml(
+              `<p class="m-0 w-fit p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
+                     <p class="m-0" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`
+            )
           }));
 
           this.totalCount.set(res.data.rowCount);
@@ -82,39 +85,6 @@ export class JobsComponent extends ApiBase implements OnInit {
         }
       })
   }
-
-  private _getStatusIcon(statusId: number): string {
-    const map: Record<number, string> = {
-      0:  'fa-solid fa-layer-group text-dark',
-
-      1:  'fa-solid fa-file text-dark',                 // Draft
-      2:  'fa-solid fa-quote-right text-primary',        // Quote
-      3:  'fa-solid fa-circle-check text-success',       // Confirmed
-      4:  'fa-solid fa-ban text-danger',                 // Cancelled
-
-      6:  'fa-solid fa-flag-checkered text-success',     // Completed
-      60: 'fa-solid fa-flag text-success',               // Completed (Non-AC)
-
-      7:  'fa-solid fa-file-invoice text-primary',       // Invoiced
-      8:  'fa-solid fa-check-double text-success',       // Paid
-      9:  'fa-solid fa-coins text-warning',               // Part-Paid
-
-      10: 'fa-solid fa-scale-balanced text-warning-emphasis', // In-Dispute
-      12: 'fa-solid fa-trash-can text-dark',              // Writeoff
-
-      14: 'fa-solid fa-file-lines text-primary',         // Pro-Forma
-
-      30: 'fa-solid fa-bell text-warning',               // Due Reminder
-      40: 'fa-solid fa-bell-concierge text-warning-emphasis', // Due First Chaseup
-      50: 'fa-solid fa-bell-slash text-danger-emphasis', // Due Second Chaseup
-
-      [-1]: 'fa-solid fa-triangle-exclamation text-danger' // Overdue
-    };
-
-    return map[statusId] ?? 'fa-regular fa-circle text-dark';
-  }
-
-
 
   subToFilterParams() {
     this._route.queryParams
