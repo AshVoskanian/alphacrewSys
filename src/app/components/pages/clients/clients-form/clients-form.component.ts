@@ -97,7 +97,7 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         contactName: [ null, [ Validators.required ] ],
         phoneNumber: [ null, [ Validators.required ] ],
         emailAddress: [ null, [ Validators.email, Validators.required ] ],
-        rateCardId: [ 8, [ Validators.required ] ],
+        rateCardId: [ 14, [ Validators.required ] ],
         accountTypeId: [ 1, [ Validators.required ] ],
         creditLimit: [ null, [ Validators.required ] ],
         paymentDueDays: [ null, [ Validators.required ] ],
@@ -137,8 +137,8 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         contactName: clientDetails.contactName,
         phoneNumber: clientDetails.phoneNumber,
         emailAddress: clientDetails.emailAddress,
-        rateCardId: clientDetails.rateCardId,
-        accountTypeId: clientDetails.accountTypeId,
+        rateCardId: clientDetails.rateCardId || 14,
+        accountTypeId: clientDetails.accountTypeId || 1,
         creditLimit: clientDetails.creditLimit,
         paymentDueDays: clientDetails.paymentDueDays,
         requiresPO: clientDetails.requiresPO,
@@ -193,6 +193,11 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
 
         if (fillForm) {
           setTimeout(() => this.setFormData(this.clientDetails()), 100);
+        } else {
+          setTimeout(() => {
+            this.profile.get('rateCardId').patchValue(14);
+            this.profile.get('accountTypeId').patchValue(1);
+          }, 100);
         }
       }
     })

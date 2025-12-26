@@ -34,3 +34,56 @@ export interface JobSearchParams {
   page?: number;
   pageSize?: number;
 }
+
+export interface JobVenue {
+  jobs: number;
+  venueId: number;
+  venueName: string;
+}
+
+export interface JobClient {
+  clientId: number;
+  companyName: string;
+  isActive: boolean;
+}
+
+export interface JobDetails {
+  jobId: number;
+  quickBooksId: number;
+  qboId: number;
+  clientId: number;
+  venueId: number;
+  jobRegionId: number;
+  jobRateCardId: number;
+  statusId: number;
+
+  dateCreated: string;
+  dateEdited: string;
+  invoiceDate: string;
+  paidDate: string;
+  paymentDueDate: string;
+  importantDate: string;
+
+  purchaseOrder: string;
+  invoiceNumber: string;
+  editedBy: string;
+  orderedBy: string;
+  jobContact: string;
+
+  vatRateId: number;
+  prePayment: number;
+  discount: number;
+  discountPercent: number;
+  paymentTypeId: number;
+
+  numberOfJobParts: number;
+  currencyId: number;
+
+  publish: boolean;
+
+  notes: string;
+  updateHistory: string;
+  revision: number;
+
+  venue: string;
+}

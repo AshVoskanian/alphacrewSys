@@ -13,10 +13,11 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Client, ClientDetails } from "../../../shared/interface/clients";
 import { JobsFilterComponent } from "./jobs-filter/jobs-filter.component";
 import { Job, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
+import { AddJobComponent } from "./add-job/add-job.component";
 
 @Component({
   selector: 'app-jobs',
-  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent ],
+  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss'
 })
@@ -127,8 +128,8 @@ export class JobsComponent extends ApiBase implements OnInit {
     this.modalRef = this._modal.open(temp, { centered: true, size: 'xl' })
   }
 
-  goToCreatedClientDetails(clientDetails: ClientDetails) {
+  goToCreatedClientDetails(job: Job) {
     this.modalRef.close();
-    this._router.navigate([ 'clients', clientDetails?.clientId ]);
+    this._router.navigate([ 'jobs', job?.jobId ]);
   }
 }

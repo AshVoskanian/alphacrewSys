@@ -7,7 +7,7 @@
     <div class="row table-components default-datatable">
       <app-card [headerTitle]="'Jobs'"
                 [headerBtnText]="'Add New Job'"
-                (headerBtnAction)="addNewClient(addClient)"
+                (headerBtnAction)="addNewClient(addJob)"
                 [cardBodyClass]="'common-option'">
         @if (loading()) {
           <div class="h-300 w-100 flex items-center justify-content-center">
@@ -49,8 +49,8 @@
 </div>
 
 <!--Add New Venue-->
-<ng-template #addClient let-addClient>
+<ng-template #addJob let-job>
   <app-card [headerTitle]="'Add New Job'">
-<!--    <app-clients-form (finish)="goToCreatedClientDetails($event)"></app-clients-form>-->
+    <app-add-job (finish)="goToCreatedClientDetails($event)"></app-add-job>
   </app-card>
 </ng-template>
