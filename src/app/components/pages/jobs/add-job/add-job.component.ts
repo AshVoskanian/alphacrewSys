@@ -1,24 +1,28 @@
-import { Component, DestroyRef, inject, OnInit, output, signal, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, output, signal, ViewChild, WritableSignal } from '@angular/core';
 import { JobClient, JobDetails, JobVenue } from "../../../../shared/interface/jobs";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Select2Data, Select2Module } from "ng-select2-component";
+import { Select2Module, Select2Option } from "ng-select2-component";
 import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
 import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { finalize } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
 import { GeneralService } from "../../../../shared/services/general.service";
+import { NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-add-job',
   imports: [
     ReactiveFormsModule,
-    Select2Module
+    Select2Module,
+    NgbTypeahead
   ],
   templateUrl: './add-job.component.html',
   styleUrl: './add-job.component.scss'
 })
 export class AddJobComponent extends ApiBase implements OnInit {
+  @ViewChild('instance', { static: true }) instance: NgbTypeahead;
+
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
   private _regionsService = inject(RegionsService);
@@ -28,12 +32,15 @@ export class AddJobComponent extends ApiBase implements OnInit {
   loading = signal<boolean>(false);
   venueLoading = signal<boolean>(false);
   clientLoading = signal<boolean>(false);
-  jobVenues: WritableSignal<Select2Data> = signal<Select2Data>([]);
-  jobClients: WritableSignal<Select2Data> = signal<Select2Data>([]);
+  jobVenues: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
+  jobClients: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   regions = toSignal(this._regionsService.regions);
-  statuses: WritableSignal<Select2Data> = signal<Select2Data>(JOB_STATUSES);
+  statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
 
   form: FormGroup;
+
+  public focus$ = new Subject<string>();
+  public click$ = new Subject<string>();
 
   ngOnInit() {
     this.initForm();
@@ -45,7 +52,8 @@ export class AddJobComponent extends ApiBase implements OnInit {
       statusId: [ 0, [ Validators.required ] ],
       jobRegionId: [ 0, [ Validators.required ] ],
       clientId: [ null, [ Validators.required ] ],
-      venueId: [ null, [ Validators.required ] ],
+      venueId: [ null ],
+      venue: [ null, [ Validators.required ] ],
       showAllVenues: [ false, [ Validators.required ] ],
     });
 
@@ -60,6 +68,7 @@ export class AddJobComponent extends ApiBase implements OnInit {
 
         if (clientId || clientId === 0) {
           this.form.get('venueId').setValue(null);
+          this.form.get('venue').setValue(null);
           this.getJobVenues(clientId, 0);
         }
       }
@@ -69,14 +78,49 @@ export class AddJobComponent extends ApiBase implements OnInit {
   subToVenueFilterChange() {
     this.form.get('showAllVenues').valueChanges.subscribe({
       next: all => {
-        const clientId = this.form.get('clientId').value;
         if (!all) {
           this.form.get('venueId').setValue(null);
         }
-        this.getJobVenues(clientId, Number(all));
+        this.getJobVenues(0, Number(all));
       }
     })
   }
+
+  inputFormatter = (item: any) =>
+    typeof item === 'string' ? item : item?.label;
+
+  resultFormatter = (item: Select2Option) => item.label;
+
+  onVenueSelect(event: any) {
+    const selected: Select2Option = event.item;
+
+    this.form.patchValue({
+      venueId: selected.value,
+      venue: selected.label
+    });
+  }
+
+
+  search = (text$: Observable<string>) => {
+    const debouncedText$ = text$.pipe(debounceTime(200), distinctUntilChanged());
+    const clicksWithClosedPopup$ = this.click$.pipe(filter(() => !this.instance?.isPopupOpen()));
+    const inputFocus$ = this.focus$;
+
+    return merge(debouncedText$, inputFocus$, clicksWithClosedPopup$).pipe(
+      map(term => {
+        const venues = this.jobVenues() as Select2Option[];
+
+        if (!term) {
+          return venues;
+        }
+
+        return venues.filter(v =>
+          v.label.toLowerCase().includes(term.toLowerCase())
+        );
+      })
+    );
+  };
+
 
   getJobVenues(clientId?: number, all = 1) {
     this.venueLoading.set(true);
@@ -121,9 +165,16 @@ export class AddJobComponent extends ApiBase implements OnInit {
 
     this.loading.set(true);
 
+    const venue = this.form.get('venue').value?.label || this.form.get('venue').value;
+
+    const isVenueFromList = this.jobVenues()?.find(v => {
+      return v.label.trim().toLowerCase() === venue?.trim().toLowerCase()
+    })
+
     const data = {
       clientId: this.form.get('clientId').value,
-      venueId: this.form.get('venueId').value,
+      venueId: isVenueFromList ? this.form.get('venueId').value : 0,
+      venue,
       jobRegionId: this.form.get('jobRegionId').value,
       statusId: this.form.get('statusId').value
     }

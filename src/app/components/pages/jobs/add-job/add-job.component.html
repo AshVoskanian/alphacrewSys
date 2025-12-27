@@ -42,14 +42,18 @@
     } @else {
       <div class="col col-sm-6 col-md-3">
         <label class="form-label" for="venueId">Venue</label>
-        <select2 [data]="jobVenues()"
-                 [templates]="template" id="venueId"
-                 [disabled]="!form.get('clientId').value"
-                 formControlName="venueId">
-          <ng-template #template let-item="label">
-            {{ item }}
-          </ng-template>
-        </select2>
+        <input
+          type="text"
+          #instance
+          class="form-control"
+          formControlName="venue"
+          [ngbTypeahead]="search"
+          [inputFormatter]="inputFormatter"
+          [resultFormatter]="resultFormatter"
+          [container]="'custom-scrollbar'"
+          (click)="click$.next($any($event).target.value)"
+          (selectItem)="onVenueSelect($event)"
+        />
       </div>
     }
 

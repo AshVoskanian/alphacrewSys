@@ -12,7 +12,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Client, ClientDetails } from "../../../shared/interface/clients";
 import { JobsFilterComponent } from "./jobs-filter/jobs-filter.component";
-import { Job, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
+import { Job, JobDetails, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
 import { AddJobComponent } from "./add-job/add-job.component";
 
 @Component({
@@ -128,7 +128,7 @@ export class JobsComponent extends ApiBase implements OnInit {
     this.modalRef = this._modal.open(temp, { centered: true, size: 'xl' })
   }
 
-  goToCreatedClientDetails(job: Job) {
+  goToCreatedClientDetails(job: JobDetails) {
     this.modalRef.close();
     this._router.navigate([ 'jobs', job?.jobId ]);
   }
