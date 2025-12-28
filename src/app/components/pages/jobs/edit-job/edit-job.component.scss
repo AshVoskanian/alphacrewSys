@@ -1,0 +1,9 @@
+// Tooltip width styling
+// Note: tooltip is rendered in body, so we use :host ::ng-deep to pierce view encapsulation
+:host ::ng-deep .wide-tooltip {
+  .tooltip-inner {
+    max-width: 300px !important;
+    white-space: normal;
+  }
+}
+
