@@ -76,8 +76,8 @@ export class JobsComponent extends ApiBase implements OnInit {
               <p class="m-0 text-gray">@ ${ job.venueName }</p>
             `,
             statusText: this._sanitizer.bypassSecurityTrustHtml(
-              `<p class="m-0 w-fit p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
-                     <p class="m-0" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`
+              `<p class="m-0 text-center p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
+                     <p class="m-0 text-nowrap text-center" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`
             )
           }));
 

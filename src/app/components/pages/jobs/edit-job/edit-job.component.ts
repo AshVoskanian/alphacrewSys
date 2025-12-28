@@ -1,6 +1,5 @@
 import { Component, DestroyRef, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
 import { JobDetails } from "../../../../shared/interface/jobs";
-import { NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
@@ -8,7 +7,6 @@ import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
 @Component({
   selector: 'app-edit-job',
   imports: [
-    NgbTypeahead,
     ReactiveFormsModule,
     Select2Module
   ],
