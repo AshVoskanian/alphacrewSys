@@ -7,6 +7,7 @@ export interface Job {
   jobId: number;
   clientId: number;
   companyName: string;
+  company_venue?: string;
   purchaseOrder: string | null;
   requiresPO: boolean;
   venueName: string;

@@ -35,7 +35,7 @@ export class JobsComponent extends ApiBase implements OnInit {
   public tableConfig: TableConfigs = {
     columns: [
       { title: '', field_value: 'jobId' },
-      { title: 'Company/Venue', field_value: 'companyName', sort: true, type: 'action' },
+      { title: 'Company/Venue', field_value: 'company_venue', sort: true, type: 'action' },
       { title: 'Status', field_value: 'statusText', sort: true },
       { title: '', field_value: 'statusContent' },
       { title: 'Region', field_value: 'regionText', sort: true },
@@ -71,6 +71,10 @@ export class JobsComponent extends ApiBase implements OnInit {
           this.tableConfig.data = res.data.jobIndex.map((job: Job) => ({
             ...job,
             id: job.jobId,
+            company_venue: `
+              <p class="m-0 text-black">${ job.companyName }</p>
+              <p class="m-0 text-gray">@ ${ job.venueName }</p>
+            `,
             statusText: this._sanitizer.bypassSecurityTrustHtml(
               `<p class="m-0 w-fit p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
                      <p class="m-0" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`
