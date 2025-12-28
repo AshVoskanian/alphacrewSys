@@ -3,11 +3,11 @@
     <div class="flex items-center gap-12">
       <i (click)="goBack()"
          class="pointer fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
-      <h3>Client Details</h3>
+      <h3>Job Details</h3>
     </div>
 
     <div class="m-t-20">
-<!--      <app-clients-form [clientDetails]="clientDetails()"></app-clients-form>-->
+      <app-edit-job [jobDetails]="jobDetails()"></app-edit-job>
     </div>
   </app-card>
 </div>

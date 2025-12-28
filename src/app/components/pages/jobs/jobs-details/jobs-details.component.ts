@@ -7,13 +7,15 @@ import { finalize } from "rxjs";
 import { LayoutService } from "../../../../shared/services/layout.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
-import { ClientDetails } from "../../../../shared/interface/clients";
+import { EditJobComponent } from "../edit-job/edit-job.component";
+import { JobDetails } from "../../../../shared/interface/jobs";
 
 @Component({
   selector: 'app-jobs-details',
   imports: [
     CardComponent,
     RouterModule,
+    EditJobComponent,
   ],
   templateUrl: './jobs-details.component.html',
   styleUrl: './jobs-details.component.scss'
@@ -25,7 +27,7 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
 
   public layoutService = inject(LayoutService);
 
-  clientDetails: WritableSignal<ClientDetails> = signal<ClientDetails>(null);
+  jobDetails: WritableSignal<JobDetails> = signal<JobDetails>(null);
 
   ngOnInit() {
     this.getDetails();
@@ -37,7 +39,7 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
     this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: params => {
-          this.get<ClientDetails>(`Clients/GetClientByClientId?clientID=${ +params.get('id') }`)
+          this.get<JobDetails>(`Jobs/GetJobByJobId?jobId=${ +params.get('id') }`)
             .pipe(
               takeUntilDestroyed(this._dr),
               finalize(() => this.layoutService.loading = false)
@@ -49,7 +51,7 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
                   return;
                 }
 
-                this.clientDetails.set(res.data);
+                this.jobDetails.set(res.data);
               }
             })
         }

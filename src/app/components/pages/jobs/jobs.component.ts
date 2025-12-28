@@ -120,8 +120,8 @@ export class JobsComponent extends ApiBase implements OnInit {
     });
   }
 
-  itemSelect(client: Client) {
-    this._router.navigate([ 'clients', client.clientId ]);
+  itemSelect(job: JobDetails) {
+    this._router.navigate([ 'jobs', job.jobId ]);
   }
 
   addNewClient(temp: TemplateRef<NgbModal>) {
