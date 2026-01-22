@@ -23,6 +23,10 @@ input.form-control {
   border-color: var(--dark-light-color);
 }
 
+textarea.form-control {
+  border-color: var(--dark-light-color);
+}
+
 .theme-form {
   .form-control {
     :focus {

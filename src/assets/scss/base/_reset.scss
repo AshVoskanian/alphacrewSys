@@ -2195,6 +2195,10 @@ tbody {
   }
 }
 
+.form-check-input {
+  border: 1px solid var(--dark-light-color) !important;
+}
+
 ngb-typeahead-window {
   max-height: 260px;
   overflow: hidden auto;

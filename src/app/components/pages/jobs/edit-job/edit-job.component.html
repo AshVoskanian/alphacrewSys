@@ -50,6 +50,15 @@
     <div class="col-auto ms-auto">
       <div class="txt-primary f-14 fw-bold text-decoration-underline">Regional Rate Card 2024</div>
     </div>
+
+    <div class="col-auto">
+      <button class="w-130 btn btn-primary" [disabled]="form.invalid || loading()" type="submit">
+        Save
+        @if (loading()) {
+          <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+        }
+      </button>
+    </div>
   </div>
 
   <div class="main-divider m-y-12">
@@ -183,7 +192,12 @@
         <div class="row align-items-center g-0">
           <div class="col-auto">
             <div class="f-12">P.O.</div>
-            <div class="f-14 fw-bold">{{ form.get('purchaseOrder')?.value || 'PO Required' }}</div>
+            <input
+              type="text"
+              class="form-control bg-transparent border-0 text-white f-14 fw-bold p-0"
+              formControlName="purchaseOrder"
+              placeholder="PO Required"
+              style="color: white !important; border-bottom: 1px solid rgba(255,255,255,0.5) !important; border-radius: 0;">
           </div>
           <div class="col text-center">
             <div class="f-12">NET</div>
@@ -212,18 +226,6 @@
   <div class="main-divider m-y-12">
     <div class="divider-body divider-body-1 divider-secondary">
       <div class="divider-p-secondary p-0"></div>
-    </div>
-  </div>
-
-  <!-- Submit Button -->
-  <div class="row g-3">
-    <div class="col d-flex flex-col justify-content-end align-items-end text-end p-t-15">
-      <button class="w-130 btn btn-primary" [disabled]="form.invalid || loading()" type="submit">
-        Save
-        @if (loading()) {
-          <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
-        }
-      </button>
     </div>
   </div>
 </form>

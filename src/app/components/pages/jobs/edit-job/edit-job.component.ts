@@ -87,7 +87,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       paidDate: [ null ],
       notes: [ null ],
       publish: [ false ],
-      purchaseOrder: [ null ]
+      purchaseOrder: [ null, [ Validators.required ] ]
     });
 
     this.subToClientChange();
@@ -154,7 +154,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
           // If we need to set venue after loading (from setFormData)
           if (setVenueAfterLoad && details?.venue) {
             // Check if venue exists in the list, if not add it
-            const venueExists = venues.find(v => 
+            const venueExists = venues.find(v =>
               v.label.trim().toLowerCase() === details.venue.trim().toLowerCase()
             );
             if (!venueExists && details.venueId) {
@@ -197,7 +197,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
     if (details.clientId && details.clientId !== 0) {
       this.getJobVenues(details.clientId, true);
     }
-    
+
     // Set venue value for typeahead
     if (details.venue) {
       this.form.patchValue({
