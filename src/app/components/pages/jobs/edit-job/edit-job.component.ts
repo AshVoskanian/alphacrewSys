@@ -8,7 +8,7 @@ import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
-import { DatePipe } from "@angular/common";
+import { CurrencyPipe, DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 
@@ -19,7 +19,8 @@ import { NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
     Select2Module,
     NgbTooltip,
     NgbTypeahead,
-    DatePipe
+    DatePipe,
+    CurrencyPipe
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',

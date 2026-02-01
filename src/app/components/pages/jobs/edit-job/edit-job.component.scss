@@ -7,3 +7,26 @@
   }
 }
 
+// Publish to App toggle styling - make it more noticeable
+.publish-toggle {
+  .form-check-input {
+    width: 3.5rem !important;
+    height: 1.75rem !important;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+
+    &:checked {
+      background-color: var(--theme-default) !important;
+      border-color: var(--theme-default) !important;
+      box-shadow: 0 2px 8px rgba(171, 140, 228, 0.4);
+    }
+
+    &:hover {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+    }    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(171, 140, 228, 0.25);
+    }
+  }
+}

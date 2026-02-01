@@ -186,6 +186,8 @@
   </div>
 
   <!-- Financial Summary Section (Read-only display) -->
+  @let jobCost = jobDetails()?.jobCost;
+
   <div class="row g-3">
     <div class="col-12">
       <div class="bg-primary p-15 rounded text-white">
@@ -201,19 +203,19 @@
           </div>
           <div class="col text-center">
             <div class="f-12">NET</div>
-            <div class="f-16 fw-bold">749.00</div>
+            <div class="f-16 fw-bold">{{ jobCost?.net | currency:'GBP':'symbol':'1.2-2' }}</div>
           </div>
           <div class="col text-center">
             <div class="f-12">VAT</div>
-            <div class="f-16 fw-bold">149.80</div>
+            <div class="f-16 fw-bold">{{ jobCost?.vat | currency:'GBP':'symbol':'1.2-2' }}</div>
           </div>
           <div class="col text-center">
             <div class="f-12">GROSS</div>
-            <div class="f-16 fw-bold">898.80</div>
+            <div class="f-16 fw-bold">{{ jobCost?.gross | currency:'GBP':'symbol':'1.2-2' }}</div>
           </div>
           <div class="col text-center">
             <div class="f-12">OUTSTANDING</div>
-            <div class="f-16 fw-bold">898.80</div>
+            <div class="f-16 fw-bold">{{ jobCost?.outstanding | currency:'GBP':'symbol':'1.2-2' }}</div>
           </div>
           <div class="col-auto ms-auto">
             <i class="fa-solid fa-bars-staggered f-20 cursor-pointer"></i>

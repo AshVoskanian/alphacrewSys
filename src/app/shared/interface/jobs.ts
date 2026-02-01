@@ -50,41 +50,94 @@ export interface JobClient {
 
 export interface JobDetails {
   jobId: number;
-  quickBooksId: number;
-  qboId: number;
+  quickBooksId: number | null;
+  qboId: number | null;
   clientId: number;
   venueId: number;
   jobRegionId: number;
-  jobRateCardId: number;
+  jobRateCardId: number | null;
   statusId: number;
-
   dateCreated: string;
   dateEdited: string;
   invoiceDate: string;
   paidDate: string;
   paymentDueDate: string;
-  importantDate: string;
-
-  purchaseOrder: string;
-  invoiceNumber: string;
+  purchaseOrder: string | null;
+  invoiceNumber: string | null;
   editedBy: string;
   orderedBy: string;
   jobContact: string;
-
   vatRateId: number;
+  vat: boolean;
   prePayment: number;
   discount: number;
-  discountPercent: number;
-  paymentTypeId: number;
-
-  numberOfJobParts: number;
-  currencyId: number;
-
+  discountPercent: number | null;
+  paymentTypeId: number | null;
+  numberOfJobParts: number | null;
+  importantDate: string;
+  currencyId: number | null;
   publish: boolean;
-
   notes: string;
-  updateHistory: string;
+  updateHistory: unknown | null;
   revision: number;
-
   venue: string;
+  jobCost: JobCost;
+  clientLimit: ClientLimit;
+  jobParts: JobPart[];
+  jobRegionAccess: unknown[];
+  documents: unknown[];
+  partialPayments: unknown[];
+}
+
+export interface JobCost {
+  net: number;
+  vat: number;
+  partialPayment: number;
+  gross: number;
+  outstanding: number;
+}
+
+export interface JobPart {
+  jobPartId: number;
+  jobId: number;
+  jobPartTypeId: number;
+  typeText: string;
+  startDate: string; // ISO date
+  endDate: string;   // ISO date
+  hours: number;
+  starts: string;
+  time: string;
+  ends: string;
+  crewNumber: number;
+  crewChiefNumber: number;
+  ootCost: number;
+  lateShiftCost: number;
+  lateShift: boolean;
+  currencyId: number;
+  currencyName: string;
+  currencySign: string;
+  skillDriver: boolean;
+  skillForklift: boolean;
+  skillIpaf: boolean;
+  skillSafety: boolean;
+  skillConstruction: boolean;
+  skillCarpenter: boolean;
+  skillLightning: boolean;
+  skillSound: boolean;
+  skillVideo: boolean;
+  skillTfm: boolean;
+  skillTelehandler: boolean;
+  skillScissorlift: boolean;
+  skillCherrypicker: boolean;
+  skillFirstAid: boolean;
+  skillPasma: boolean;
+  skillFollowspot: boolean;
+  quoteCost: number;
+  quoteCostVat: number;
+}
+
+export interface ClientLimit {
+  creditLimit: number;
+  creditRating: number;
+  recommendedCreditLimit: number;
 }
