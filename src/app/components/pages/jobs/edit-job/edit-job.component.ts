@@ -1,5 +1,5 @@
-import { Component, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
-import { JobClient, JobDetails, JobVenue } from "../../../../shared/interface/jobs";
+import { Component, DestroyRef, effect, inject, input, OnInit, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
+import { JobClient, JobDetails, JobPart, JobVenue } from "../../../../shared/interface/jobs";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
@@ -10,7 +10,10 @@ import { GeneralService } from "../../../../shared/services/general.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
-import { NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
+import { TableComponent } from "../../../../shared/components/ui/table/table.component";
+import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
+import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
 
 @Component({
   selector: 'app-edit-job',
@@ -20,7 +23,9 @@ import { NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
     NgbTooltip,
     NgbTypeahead,
     DatePipe,
-    CurrencyPipe
+    CurrencyPipe,
+    TableComponent,
+    AddJobpartComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
@@ -35,6 +40,9 @@ export class EditJobComponent extends ApiBase implements OnInit {
   private readonly _fb = inject(FormBuilder);
   private readonly _regionsService = inject(RegionsService);
   private readonly _datePipe = inject(DatePipe);
+  private readonly _modal = inject(NgbModal);
+
+  private modalRef: NgbModalRef;
 
   statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
   regions = toSignal(this._regionsService.regions);
@@ -46,6 +54,27 @@ export class EditJobComponent extends ApiBase implements OnInit {
   venueLoading = signal<boolean>(false);
 
   form: FormGroup;
+
+  jobPartsTableConfig: WritableSignal<TableConfigs> = signal<TableConfigs>({
+    columns: [
+      { title: '', field_value: 'typeIcon' },
+      { title: 'Starts', field_value: 'starts' },
+      { title: 'Time', field_value: 'time' },
+      { title: 'Hours', field_value: 'hours' },
+      { title: 'Crew', field_value: 'crewNumber' },
+      { title: 'Travel', field_value: 'travelFormatted' },
+      { title: 'Skills', field_value: 'skills' },
+      { title: 'Ends', field_value: 'ends' },
+      { title: 'Net', field_value: 'netFormatted' },
+      { title: 'Gross', field_value: 'grossFormatted' }
+    ],
+    row_action: [
+      { label: 'Delete', icon: 'fa-solid fa-trash txt-danger', class: 'square-white', action_to_perform: 'delete', modal: true, model_text: 'Are you sure you want to delete this job part?' },
+      { label: 'Edit', icon: 'fa-solid fa-pen-to-square txt-primary', class: 'square-white', action_to_perform: 'edit' },
+      { label: 'Copy', icon: 'fa-solid fa-copy txt-secondary', class: 'square-white', action_to_perform: 'copy' }
+    ],
+    data: []
+  });
 
   public focus$ = new Subject<string>();
   public click$ = new Subject<string>();
@@ -59,6 +88,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       const details = this.jobDetails();
       if (details && this.form) {
         this.setFormData();
+        this.updateJobPartsTable(details.jobParts);
       }
     });
   }
@@ -305,5 +335,117 @@ export class EditJobComponent extends ApiBase implements OnInit {
           GeneralService.showSuccessMessage('Job updated successfully');
         }
       });
+  }
+
+  updateJobPartsTable(jobParts: JobPart[]) {
+    if (!jobParts?.length) {
+      this.jobPartsTableConfig.update(config => ({
+        ...config,
+        data: []
+      }));
+      return;
+    }
+
+    const tableData = jobParts.map(part => ({
+      ...part,
+      id: part.jobPartId,
+      typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
+      skills: this.getSkillsString(part),
+      travelFormatted: this.formatCurrency(part.ootCost, part.currencySign),
+      netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
+      grossFormatted: this.formatCurrency(part.quoteCostVat, part.currencySign)
+    }));
+
+    this.jobPartsTableConfig.update(config => ({
+      ...config,
+      data: tableData
+    }));
+  }
+
+  formatCurrency(value: number, currencySign: string): string {
+    const sign = currencySign || '£';
+    return `${sign}${value?.toFixed(2) ?? '0.00'}`;
+  }
+
+  getJobPartTypeIcon(typeId: number, typeText: string): string {
+    const tooltip = typeText ? `title="${typeText}"` : '';
+
+    switch (typeId) {
+      case 1:
+        return `<i class="fa-solid fa-users txt-primary f-18" ${tooltip}></i>`;
+      case 2:
+      case 5:
+        return `<i class="fa-solid fa-truck txt-danger f-18" ${tooltip}></i>`;
+      case 4:
+      case 6:
+        return `<i class="icofont icofont-shield-alt txt-danger f-18" ${tooltip}></i>`;
+      default:
+        return `<i class="fa-solid fa-briefcase txt-secondary f-18" ${tooltip}></i>`;
+    }
+  }
+
+  getSkillsString(part: JobPart): string {
+    const skillMap: { key: keyof JobPart; label: string }[] = [
+      { key: 'skillDriver', label: 'Driver' },
+      { key: 'skillForklift', label: 'Forklift' },
+      { key: 'skillIpaf', label: 'IPAF' },
+      { key: 'skillSafety', label: 'Safety' },
+      { key: 'skillConstruction', label: 'Construction' },
+      { key: 'skillCarpenter', label: 'Carpenter' },
+      { key: 'skillLightning', label: 'Lightning' },
+      { key: 'skillSound', label: 'Sound' },
+      { key: 'skillVideo', label: 'Video' },
+      { key: 'skillTfm', label: 'TFM' },
+      { key: 'skillTelehandler', label: 'Telehandler' },
+      { key: 'skillScissorlift', label: 'Scissorlift' },
+      { key: 'skillCherrypicker', label: 'Cherrypicker' },
+      { key: 'skillFirstAid', label: 'First Aid' },
+      { key: 'skillPasma', label: 'PASMA' },
+      { key: 'skillFollowspot', label: 'Followspot' }
+    ];
+
+    const activeSkills = skillMap
+      .filter(skill => part[skill.key] === true)
+      .map(skill => skill.label);
+
+    return activeSkills.join(' - ');
+  }
+
+  handleJobPartAction(event: TableClickedAction) {
+    switch (event.action_to_perform) {
+      case 'delete':
+        this.deleteJobPart(event.data);
+        break;
+      case 'edit':
+        this.editJobPart(event.data);
+        break;
+      case 'copy':
+        this.copyJobPart(event.data);
+        break;
+    }
+  }
+
+  deleteJobPart(part: JobPart) {
+    // TODO: Implement delete API call
+    console.log('Delete job part:', part);
+  }
+
+  editJobPart(part: JobPart) {
+    // TODO: Implement edit functionality
+    console.log('Edit job part:', part);
+  }
+
+  copyJobPart(part: JobPart) {
+    // TODO: Implement copy functionality
+    console.log('Copy job part:', part);
+  }
+
+  openAddJobPartModal(template: TemplateRef<NgbModal>) {
+    this.modalRef = this._modal.open(template, { centered: true, size: 'xl' });
+  }
+
+  onJobPartAdded() {
+    this.modalRef?.close();
+    // TODO: Refresh job details to get updated job parts
   }
 }

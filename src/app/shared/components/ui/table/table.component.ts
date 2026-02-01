@@ -163,6 +163,10 @@ export class TableComponent implements OnInit {
     if (value.action_to_perform == 'edit') {
       this.action.emit({ action_to_perform: value.action_to_perform, data: details })
     }
+
+    if (value.action_to_perform == 'copy') {
+      this.action.emit({ action_to_perform: value.action_to_perform, data: details })
+    }
   }
 
   openRowDetails(id: number) {

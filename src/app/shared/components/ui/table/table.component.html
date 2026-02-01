@@ -126,10 +126,10 @@
                       }
                       @if (rows.label == 'Create') {
                         <button class="plus-btn">+</button>
-                      } @else if (rows.label == 'Edit' || rows.label == 'Delete') {
-                        <a class="square-white" href="javascript:void(0)"
+                      } @else if (rows.label == 'Edit' || rows.label == 'Delete' || rows.label == 'Copy') {
+                        <a [class]="rows.class ?? 'square-white'" href="javascript:void(0)"
                            (click)="handleAction(rows, details)">
-                          <app-svg-icon [icon]="rows.icon"></app-svg-icon>
+                          <i [class]="rows.icon"></i>
                         </a>
                       } @else if (rows.label == 'View') {
                         <a class="square-white" href="javascript:void(0)" (click)="handleAction(rows, details)"
