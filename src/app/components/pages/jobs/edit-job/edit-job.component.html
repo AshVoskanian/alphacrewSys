@@ -33,7 +33,7 @@
             <div class="documents-list w-425 flex flex-wrap m-t-10 max-h-100 overflow-y-auto custom-scrollbar">
               @for (doc of documents(); track doc.fileName) {
                 <div class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
-                  <span class="f-12 text-dark text-truncate max-w-150" [title]="doc.fileName">{{ doc.fileName }}</span>
+                  <span class="f-12 text-dark text-truncate max-w-50" [title]="doc.fileName">{{ doc.fileName }}</span>
                   @if (downloadingDocument() === doc.fileName) {
                     <i class="fa-solid fa-spinner fa-spin txt-primary f-12"></i>
                   } @else {
@@ -75,7 +75,22 @@
     </div>
 
     <div class="col-auto ms-auto">
-      <div class="txt-primary f-14 fw-bold text-decoration-underline">Regional Rate Card 2024</div>
+      @if (rateCardLoading()) {
+        <div class="txt-secondary f-14">Loading rate cards...</div>
+      } @else {
+        <div class="min-w-180">
+          <select2
+            [data]="rateCards()"
+            [templates]="template"
+            id="jobRateCardId"
+            formControlName="jobRateCardId"
+            placeholder="Choose Rate Card">
+            <ng-template #template let-item="label">
+              {{ item }}
+            </ng-template>
+          </select2>
+        </div>
+      }
     </div>
 
     <div class="col-auto">

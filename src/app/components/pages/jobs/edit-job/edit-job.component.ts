@@ -8,6 +8,7 @@ import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
 import { GeneralService } from "../../../../shared/services/general.service";
+import { RateCard } from "../../../../shared/interface/clients";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
@@ -52,10 +53,12 @@ export class EditJobComponent extends ApiBase implements OnInit {
   regions = toSignal(this._regionsService.regions);
   jobClients: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   jobVenues: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
+  rateCards: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
 
   loading = signal<boolean>(false);
   clientLoading = signal<boolean>(false);
   venueLoading = signal<boolean>(false);
+  rateCardLoading = signal<boolean>(false);
   uploadLoading = signal<boolean>(false);
   documents = signal<JobDocument[]>([]);
   deletingDocument = signal<string | null>(null);
@@ -127,7 +130,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
       paidDate: [ null ],
       notes: [ null ],
       publish: [ false ],
-      purchaseOrder: [ null, [ Validators.required ] ]
+      purchaseOrder: [ null, [ Validators.required ] ],
+      jobRateCardId: [ null ]
     });
 
     this.subToClientChange();
@@ -151,6 +155,26 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   getDropdownData() {
     this.getJobClients();
+    this.getRateCards();
+  }
+
+  getRateCards() {
+    this.rateCardLoading.set(true);
+
+    this.get<RateCard[]>('Clients/GetRateCardDescription')
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.rateCardLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.rateCards.set(res.data.map(it => ({ label: it.description, value: it.rateCardId })));
+        }
+      });
   }
 
   getJobClients() {
@@ -221,6 +245,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       statusId: details.statusId,
       jobRegionId: details.jobRegionId,
       clientId: details.clientId,
+      jobRateCardId: details.jobRateCardId ?? null,
       orderedBy: details.orderedBy,
       jobContact: details.jobContact,
       importantDate: formatDate(details.importantDate),
@@ -385,6 +410,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       statusId: formValue.statusId,
       jobRegionId: formValue.jobRegionId,
       clientId: formValue.clientId,
+      jobRateCardId: formValue.jobRateCardId ?? null,
       venueId: isVenueFromList ? formValue.venueId : 0,
       venue: venueName,
       orderedBy: formValue.orderedBy,
