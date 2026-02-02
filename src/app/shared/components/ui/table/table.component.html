@@ -129,7 +129,15 @@
                       } @else if (rows.label == 'Edit' || rows.label == 'Delete' || rows.label == 'Copy') {
                         <a [class]="rows.class ?? 'square-white'" href="javascript:void(0)"
                            (click)="handleAction(rows, details)">
-                          <i [class]="rows.icon"></i>
+                          @if (rows.label === 'Copy' && details.copyLoading) {
+                            <i class="fa-solid fa-spinner fa-spin txt-primary"></i>
+                          } @else if (rows.label === 'Delete' && details.deleteLoading) {
+                            <i class="fa-solid fa-spinner fa-spin txt-danger"></i>
+                          } @else if (rows.icon?.startsWith('fa-')) {
+                            <i [class]="rows.icon"></i>
+                          } @else {
+                            <app-svg-icon [icon]="rows.icon"></app-svg-icon>
+                          }
                         </a>
                       } @else if (rows.label == 'View') {
                         <a class="square-white" href="javascript:void(0)" (click)="handleAction(rows, details)"

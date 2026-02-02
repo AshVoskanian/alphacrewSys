@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
@@ -26,7 +26,7 @@ import { NgxPaginationModule } from "ngx-pagination";
   templateUrl: './table.component.html',
   styleUrls: [ './table.component.scss' ]
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements OnInit, OnChanges {
 
   @Input() tableConfig: TableConfigs;
   @Input() hasCheckbox: boolean;
@@ -68,6 +68,12 @@ export class TableComponent implements OnInit {
 
   ngOnInit() {
     this.applyFilters();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['tableConfig'] && !changes['tableConfig'].firstChange) {
+      this.applyFilters();
+    }
   }
 
   checkUncheckAll(event: Event) {
@@ -139,33 +145,37 @@ export class TableComponent implements OnInit {
   handleAction(value: TableRows, details: any) {
     if (value.action_to_perform == 'delete') {
       if (!value.modal) {
-        this.action.emit({ action_to_perform: value.action_to_perform, data: details })
+        this.action.emit({ action_to_perform: value.action_to_perform, data: details });
       } else {
-        Swal.fire({
-          title: 'Are you sure?',
-          text: value.model_text ? value.model_text : 'Do you really want to delete the file?',
-          imageUrl: './assets/images/gif/trash.gif',
-          confirmButtonText: 'Yes, delete it!',
-          showCancelButton: true,
-          cancelButtonText: 'Cancel',
-          cancelButtonColor: '#FC4438'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.action.emit({ action_to_perform: value.action_to_perform, data: details })
-          }
-        })
+        setTimeout(() => {
+          Swal.fire({
+            title: 'Are you sure?',
+            text: value.model_text ? value.model_text : 'Do you really want to delete the file?',
+            imageUrl: './assets/images/gif/trash.gif',
+            confirmButtonText: 'Yes, delete it!',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            cancelButtonColor: '#FC4438'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.action.emit({ action_to_perform: value.action_to_perform, data: details });
+            }
+          });
+        });
       }
+      return;
     }
+
     if (value.action_to_perform == 'view') {
-      this.action.emit({ action_to_perform: value.action_to_perform, data: details })
+      this.action.emit({ action_to_perform: value.action_to_perform, data: details });
     }
 
     if (value.action_to_perform == 'edit') {
-      this.action.emit({ action_to_perform: value.action_to_perform, data: details })
+      this.action.emit({ action_to_perform: value.action_to_perform, data: details });
     }
 
     if (value.action_to_perform == 'copy') {
-      this.action.emit({ action_to_perform: value.action_to_perform, data: details })
+      this.action.emit({ action_to_perform: value.action_to_perform, data: details });
     }
   }
 

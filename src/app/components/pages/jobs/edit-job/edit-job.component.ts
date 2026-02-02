@@ -426,8 +426,40 @@ export class EditJobComponent extends ApiBase implements OnInit {
   }
 
   deleteJobPart(part: JobPart) {
-    // TODO: Implement delete API call
-    console.log('Delete job part:', part);
+    this.setPartDeleteLoading(part.jobPartId, true);
+
+    this.get<void>(`Jobs/RemoveJobPart?jobPartId=${part.jobPartId}`)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.setPartDeleteLoading(part.jobPartId, false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.removeJobPartFromTable(part.jobPartId);
+          GeneralService.showSuccessMessage('Job part deleted successfully');
+        }
+      });
+  }
+
+  setPartDeleteLoading(partId: number, loading: boolean) {
+    this.jobPartsTableConfig.update(config => ({
+      ...config,
+      data: config.data.map(item =>
+        item.jobPartId === partId ? { ...item, deleteLoading: loading } : item
+      )
+    }));
+  }
+
+  removeJobPartFromTable(partId: number) {
+    this.jobPartsTableConfig.update(config => ({
+      ...config,
+      data: config.data.filter(item => item.jobPartId !== partId)
+    }));
   }
 
   editJobPart(part: JobPart) {
@@ -436,8 +468,37 @@ export class EditJobComponent extends ApiBase implements OnInit {
   }
 
   copyJobPart(part: JobPart) {
-    // TODO: Implement copy functionality
-    console.log('Copy job part:', part);
+    const jobId = this.jobDetails()?.jobId;
+    if (!jobId) return;
+
+    // Set loading state on the row
+    this.setPartCopyLoading(part.jobPartId, true);
+
+    this.post<JobPart[]>('Jobs/CopyJobPart', { jobId, jobPartId: part.jobPartId })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.setPartCopyLoading(part.jobPartId, false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.updateJobPartsTable(res.data);
+          GeneralService.showSuccessMessage('Job part copied successfully');
+        }
+      });
+  }
+
+  setPartCopyLoading(partId: number, loading: boolean) {
+    this.jobPartsTableConfig.update(config => ({
+      ...config,
+      data: config.data.map(item =>
+        item.jobPartId === partId ? { ...item, copyLoading: loading } : item
+      )
+    }));
   }
 
   openAddJobPartModal(template: TemplateRef<NgbModal>) {
