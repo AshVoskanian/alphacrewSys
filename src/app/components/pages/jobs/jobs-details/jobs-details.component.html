@@ -1,13 +1,26 @@
 <div class="p-x-10 p-y-15">
   <app-card>
-    <div class="flex items-center gap-12">
-      <i (click)="goBack()"
-         class="pointer fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
-      <h3>Job Details</h3>
+    <div class="d-flex align-items-center justify-content-between gap-12">
+      <div class="d-flex align-items-center gap-12">
+        <i (click)="goBack()"
+           class="pointer fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
+        <h3 class="m-0">Job Details</h3>
+      </div>
+      <button
+        class="w-130 btn btn-primary position-relative"
+        type="button"
+        (click)="editJobRef.submit()"
+        [disabled]="!editJobRef?.form?.valid || editJobRef?.loading?.()">
+        Save
+        @if (editJobRef?.loading?.()) {
+          <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+        }
+      </button>
     </div>
 
     <div class="m-t-20">
       <app-edit-job
+        #editJobRef
         [jobDetails]="jobDetails()"
         (partialPaymentsUpdated)="onPartialPaymentsUpdated($event)">
       </app-edit-job>
