@@ -83,7 +83,14 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
   regions = toSignal(this._regionsService.regions);
   regionNames = computed(() => {
-    return this.regions().map(reg => reg.label)
+    return this.regions()
+      .filter(reg => reg.label !== 'All')
+      .map(reg => {
+        return {
+          display: reg.label,
+          value: reg.value
+        }
+      })
   })
   jobClients: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   jobVenues: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
@@ -101,6 +108,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   deletingPartialPayment = signal<number | null>(null);
 
   form: FormGroup;
+  jobRegionAccess: Array<string> = [];
 
   jobPartsTableConfig: WritableSignal<TableConfigs> = signal<TableConfigs>({
     columns: [
@@ -204,10 +212,10 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
       prePayment: [ 0 ],
       discount: [ 0 ],
       jobRegionAccess: [ [] as number[] ],
-      additionalRegionPlace: [ null ] // Google Places Autocomplete result (region/place name)
     });
 
     this.subToClientChange();
+    this.subToJobRegionAccessChange();
   }
 
   subToClientChange() {
@@ -222,6 +230,16 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
           } else {
             this.jobVenues.set([]);
           }
+        }
+      });
+  }
+
+  subToJobRegionAccessChange() {
+    this.form.get('jobRegionAccess')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: region => {
+          console.log(region)
         }
       });
   }
