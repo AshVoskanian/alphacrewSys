@@ -269,6 +269,32 @@
     </div>
   </div>
 
+  <!-- Partial Payments List -->
+  @if (jobDetails()?.partialPayments?.length) {
+    <div class="row g-3">
+      <div class="col-12">
+        <div class="partial-payments-list d-flex flex-wrap gap-10">
+          @for (payment of jobDetails()?.partialPayments; track payment.partialPaymentId) {
+            <div class="partial-payment-chip d-inline-flex align-items-center gap-8 rounded p-x-12 p-y-8">
+              <span class="f-12 fw-bold">{{ payment.amount | currency:'GBP':'symbol':'1.2-2' }}</span>
+              <span class="f-12">{{ formatPaymentDate(payment.paidDate) }}</span>
+              @if (payment.comments) {
+                <span class="f-12 partial-payment-comments text-truncate max-w-120" [title]="payment.comments">{{ payment.comments }}</span>
+              }
+              @if (deletingPartialPayment() === payment.partialPaymentId) {
+                <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
+              } @else {
+                <i class="fa-solid fa-times txt-danger f-12 cursor-pointer"
+                   (click)="confirmDeletePartialPayment(payment)"
+                   title="Remove payment"></i>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="main-divider m-y-12">
     <div class="divider-body divider-body-1 divider-secondary">
       <div class="divider-p-secondary p-0"></div>

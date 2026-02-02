@@ -39,6 +39,36 @@
   overflow-y: auto;
 }
 
+// Partial payments list - visible on white background
+.partial-payments-list {
+  .partial-payment-chip {
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    color: #212529;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #dee2e6 !important;
+    }
+
+    .max-w-120 {
+      max-width: 120px;
+    }
+
+    .partial-payment-comments {
+      color: #6c757d;
+    }
+
+    i {
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.2);
+      }
+    }
+  }
+}
+
 // Documents list styling
 .documents-list {
   max-height: 100px;

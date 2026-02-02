@@ -8,6 +8,7 @@ import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
 import { GeneralService } from "../../../../shared/services/general.service";
+import Swal from 'sweetalert2';
 import { RateCard } from "../../../../shared/interface/clients";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CurrencyPipe, DatePipe } from "@angular/common";
@@ -63,6 +64,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   documents = signal<JobDocument[]>([]);
   deletingDocument = signal<string | null>(null);
   downloadingDocument = signal<string | null>(null);
+  deletingPartialPayment = signal<number | null>(null);
 
   form: FormGroup;
 
@@ -627,5 +629,55 @@ export class EditJobComponent extends ApiBase implements OnInit {
   onPaymentAdded(partialPayments: PartialPayment[]) {
     this.modalRef?.close();
     this.partialPaymentsUpdated.emit(partialPayments);
+  }
+
+  confirmDeletePartialPayment(payment: PartialPayment) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to remove this payment?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, remove it',
+      cancelButtonText: 'Cancel',
+      cancelButtonColor: '#FC4438'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.deletePartialPayment(payment);
+      }
+    });
+  }
+
+  deletePartialPayment(payment: PartialPayment) {
+    const jobId = this.jobDetails()?.jobId;
+    if (!jobId) return;
+
+    this.deletingPartialPayment.set(payment.partialPaymentId);
+
+    this.post<void>('Jobs/RemovePartialPayment', {
+      partialPaymentId: payment.partialPaymentId,
+      jobId
+    })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.deletingPartialPayment.set(null))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          const current = this.jobDetails()?.partialPayments ?? [];
+          const updated = current.filter(p => p.partialPaymentId !== payment.partialPaymentId);
+          this.partialPaymentsUpdated.emit(updated);
+          GeneralService.showSuccessMessage('Payment removed successfully');
+        }
+      });
+  }
+
+  formatPaymentDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return this._datePipe.transform(dateStr, 'dd MMM yyyy') ?? dateStr;
   }
 }
