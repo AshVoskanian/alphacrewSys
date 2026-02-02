@@ -1,4 +1,78 @@
 <form class="flex flex-col gap-12" [formGroup]="form" (ngSubmit)="submit()">
+  <!-- Currency, Pre payment, Discount, Inc. VAT, Rate card (top as on screen) -->
+  <app-card>
+    <div class="flex flex-col gap-12">
+      <div class="row g-3 align-items-end">
+        <div class="col col-sm-6 col-md-2">
+          <label class="form-label">Currency</label>
+          <select2
+            [data]="currencies()"
+            [templates]="template"
+            id="currencyId"
+            formControlName="currencyId"
+            placeholder="Currency">
+            <ng-template #template let-item="label">
+              {{ item }}
+            </ng-template>
+          </select2>
+        </div>
+        <div class="col col-sm-6 col-md-2">
+          <label class="form-label">Pre payment</label>
+          <input class="form-control" type="number" formControlName="prePayment" placeholder="0.0000" step="0.0001"
+                 min="0">
+        </div>
+        <div class="col col-sm-6 col-md-2">
+          <label class="form-label">Discount</label>
+          <input class="form-control" type="number" formControlName="discount" placeholder="0.0000" step="0.0001"
+                 min="0">
+        </div>
+        <div class="col col-sm-6 col-md-2 d-flex align-items-center pb-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="vat" formControlName="vat">
+            <label class="form-check-label" for="vat">Inc. VAT</label>
+          </div>
+        </div>
+        <div class="col col-sm-6 col-md-4">
+          <label class="form-label">Rate card</label>
+          @if (rateCardLoading()) {
+            <div class="txt-secondary f-14">Loading...</div>
+          } @else {
+            <select2
+              [data]="rateCards()"
+              [templates]="template"
+              id="jobRateCardId"
+              formControlName="jobRateCardId"
+              placeholder="Choose Rate Card">
+              <ng-template #template let-item="label">
+                {{ item }}
+              </ng-template>
+            </select2>
+          }
+        </div>
+      </div>
+
+      <!-- Additional Regions (Google Places Autocomplete) -->
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Additional Regions</label>
+          <input
+            #additionalRegionInput
+            type="text"
+            class="form-control"
+            formControlName="additionalRegionPlace"
+            placeholder="Select additional region..."
+          />
+        </div>
+      </div>
+    </div>
+  </app-card>
+
+  <div class="main-divider m-y-12">
+    <div class="divider-body divider-body-1 divider-secondary">
+      <div class="divider-p-secondary p-0"></div>
+    </div>
+  </div>
+
   <!-- Header Section with File Upload, Credit Info, and Toggle -->
   <div class="row g-3 align-items-center m-b-20">
     <div class="col-auto">
@@ -21,8 +95,10 @@
         </ng-template>
         <div class="d-flex flex-column">
           <div class="d-flex align-items-center">
-            <input type="file" id="fileUpload" class="d-none" (change)="onFileSelected($event)" [disabled]="uploadLoading()">
-            <label for="fileUpload" class="btn btn-sm btn-outline-primary m-b-0 cursor-pointer" [class.disabled]="uploadLoading()">
+            <input type="file" id="fileUpload" class="d-none" (change)="onFileSelected($event)"
+                   [disabled]="uploadLoading()">
+            <label for="fileUpload" class="btn btn-sm btn-outline-primary m-b-0 cursor-pointer"
+                   [class.disabled]="uploadLoading()">
               @if (uploadLoading()) {
                 <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
               }
@@ -32,7 +108,8 @@
           @if (documents().length) {
             <div class="documents-list w-450 flex flex-wrap m-t-10 max-h-100 overflow-y-auto custom-scrollbar">
               @for (doc of documents(); track doc.fileName) {
-                <div class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
+                <div
+                  class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
                   <span class="f-12 text-dark text-truncate max-w-50" [title]="doc.fileName">{{ doc.fileName }}</span>
                   @if (downloadingDocument() === doc.fileName) {
                     <i class="fa-solid fa-spinner fa-spin txt-primary f-12"></i>
@@ -72,25 +149,6 @@
           <input class="form-check-input" type="checkbox" id="publish" formControlName="publish">
         </div>
       </div>
-    </div>
-
-    <div class="col-auto ms-auto">
-      @if (rateCardLoading()) {
-        <div class="txt-secondary f-14">Loading rate cards...</div>
-      } @else {
-        <div class="min-w-180">
-          <select2
-            [data]="rateCards()"
-            [templates]="template"
-            id="jobRateCardId"
-            formControlName="jobRateCardId"
-            placeholder="Choose Rate Card">
-            <ng-template #template let-item="label">
-              {{ item }}
-            </ng-template>
-          </select2>
-        </div>
-      }
     </div>
 
     <div class="col-auto">
@@ -218,8 +276,8 @@
                  [ngbTooltip]="payment.comments || '—'"
                  tooltipClass="payment-comment-tooltip"
                  container="body"></i>
-              <span class="f-12 fw-bold">{{ payment.amount | currency:'GBP':'symbol':'1.2-2' }}</span>
               <span class="ms-auto">
+                <span class="f-12 fw-bold m-r-8">{{ payment.amount | currency:'GBP':'symbol':'1.2-2' }}</span>
                 @if (deletingPartialPayment() === payment.partialPaymentId) {
                   <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
                 } @else {

@@ -1,4 +1,18 @@
-import { Component, DestroyRef, effect, inject, input, OnInit, output, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  OnInit,
+  output,
+  signal,
+  TemplateRef,
+  ViewChild,
+  WritableSignal
+} from '@angular/core';
 import { JobClient, JobDetails, JobDocument, JobPart, JobVenue, PartialPayment } from "../../../../shared/interface/jobs";
 import { AddPaymentComponent } from "../add-payment/add-payment.component";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -17,6 +31,8 @@ import { NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/n
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
 import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
+import { GoogleMapsLoaderService } from "../../../../shared/services/google-map-loader.service";
+import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 
 @Component({
   selector: 'app-edit-job',
@@ -29,14 +45,16 @@ import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
     CurrencyPipe,
     TableComponent,
     AddJobpartComponent,
-    AddPaymentComponent
+    AddPaymentComponent,
+    CardComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
   styleUrl: './edit-job.component.scss'
 })
-export class EditJobComponent extends ApiBase implements OnInit {
+export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   @ViewChild('venueInstance', { static: true }) venueInstance: NgbTypeahead;
+  @ViewChild('additionalRegionInput') additionalRegionInput!: ElementRef<HTMLInputElement>;
 
   jobDetails = input<JobDetails>();
   partialPaymentsUpdated = output<PartialPayment[]>();
@@ -47,6 +65,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   private readonly _datePipe = inject(DatePipe);
   private readonly _modal = inject(NgbModal);
   private readonly _generalService = inject(GeneralService);
+  private readonly _googleMapsLoader = inject(GoogleMapsLoaderService);
 
   private modalRef: NgbModalRef;
 
@@ -55,6 +74,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   jobClients: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   jobVenues: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   rateCards: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
+  currencies: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
 
   loading = signal<boolean>(false);
   clientLoading = signal<boolean>(false);
@@ -117,6 +137,25 @@ export class EditJobComponent extends ApiBase implements OnInit {
     }
   }
 
+  async ngAfterViewInit(): Promise<void> {
+    if (!this.additionalRegionInput?.nativeElement) return;
+
+    await this._googleMapsLoader.loadPlaces();
+
+    if (typeof google === 'undefined' || !google.maps?.places) return;
+
+    const autocomplete = new google.maps.places.Autocomplete(
+      this.additionalRegionInput.nativeElement,
+      { types: [ '(regions)' ] }
+    );
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      const value = place?.formatted_address ?? place?.name ?? '';
+      this.form?.get('additionalRegionPlace')?.setValue(value || null);
+    });
+  }
+
   initForm() {
     this.form = this._fb.group({
       statusId: [ 0, [ Validators.required ] ],
@@ -133,7 +172,13 @@ export class EditJobComponent extends ApiBase implements OnInit {
       notes: [ null ],
       publish: [ false ],
       purchaseOrder: [ null, [ Validators.required ] ],
-      jobRateCardId: [ null ]
+      jobRateCardId: [ null ],
+      currencyId: [ null ],
+      vat: [ true ],
+      prePayment: [ 0 ],
+      discount: [ 0 ],
+      jobRegionAccess: [ [] as number[] ],
+      additionalRegionPlace: [ null ] // Google Places Autocomplete result (region/place name)
     });
 
     this.subToClientChange();
@@ -158,6 +203,14 @@ export class EditJobComponent extends ApiBase implements OnInit {
   getDropdownData() {
     this.getJobClients();
     this.getRateCards();
+    this.getCurrencies();
+  }
+
+  getCurrencies() {
+    // TODO: replace with API when list is provided (e.g. GET /api/Currencies or similar)
+    this.currencies.set([
+      { label: '£ GBP', value: 1 }
+    ]);
   }
 
   getRateCards() {
@@ -248,6 +301,11 @@ export class EditJobComponent extends ApiBase implements OnInit {
       jobRegionId: details.jobRegionId,
       clientId: details.clientId,
       jobRateCardId: details.jobRateCardId ?? null,
+      currencyId: details.currencyId ?? null,
+      vat: details.vat ?? true,
+      prePayment: details.prePayment ?? 0,
+      discount: details.discount ?? 0,
+      jobRegionAccess: Array.isArray(details.jobRegionAccess) ? details.jobRegionAccess : [],
       orderedBy: details.orderedBy,
       jobContact: details.jobContact,
       importantDate: formatDate(details.importantDate),
@@ -413,6 +471,12 @@ export class EditJobComponent extends ApiBase implements OnInit {
       jobRegionId: formValue.jobRegionId,
       clientId: formValue.clientId,
       jobRateCardId: formValue.jobRateCardId ?? null,
+      currencyId: formValue.currencyId ?? null,
+      vat: formValue.vat ?? true,
+      prePayment: Number(formValue.prePayment) ?? 0,
+      discount: Number(formValue.discount) ?? 0,
+      jobRegionAccess: Array.isArray(formValue.jobRegionAccess) ? formValue.jobRegionAccess : [],
+      additionalRegionPlace: formValue.additionalRegionPlace ?? null,
       venueId: isVenueFromList ? formValue.venueId : 0,
       venue: venueName,
       orderedBy: formValue.orderedBy,
