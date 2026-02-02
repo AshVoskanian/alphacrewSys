@@ -19,12 +19,35 @@
             </p>
           </div>
         </ng-template>
-        <div>
-          <input type="file" id="fileUpload" class="d-none" (change)="onFileSelected($event)">
-          <label for="fileUpload" class="btn btn-sm btn-outline-primary m-b-0 cursor-pointer">
-            Choose file
-          </label>
-          <span class="m-l-10 txt-secondary">No file chosen</span>
+        <div class="d-flex flex-column">
+          <div class="d-flex align-items-center">
+            <input type="file" id="fileUpload" class="d-none" (change)="onFileSelected($event)" [disabled]="uploadLoading()">
+            <label for="fileUpload" class="btn btn-sm btn-outline-primary m-b-0 cursor-pointer" [class.disabled]="uploadLoading()">
+              @if (uploadLoading()) {
+                <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
+              }
+              Choose file
+            </label>
+          </div>
+          @if (documents().length) {
+            <div class="documents-list w-425 flex flex-wrap m-t-10 max-h-100 overflow-y-auto custom-scrollbar">
+              @for (doc of documents(); track doc.fileName) {
+                <div class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
+                  <span class="f-12 text-dark text-truncate max-w-150" [title]="doc.fileName">{{ doc.fileName }}</span>
+                  <i class="fa-solid fa-download txt-primary f-12 cursor-pointer"
+                     (click)="downloadDocument(doc.fileName)"
+                     title="Download"></i>
+                  @if (deletingDocument() === doc.fileName) {
+                    <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
+                  } @else {
+                    <i class="fa-solid fa-times txt-danger f-12 cursor-pointer"
+                       (click)="deleteDocument(doc.fileName)"
+                       title="Delete"></i>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
       </div>
     </div>

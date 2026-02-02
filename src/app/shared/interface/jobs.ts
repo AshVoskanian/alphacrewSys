@@ -85,8 +85,12 @@ export interface JobDetails {
   clientLimit: ClientLimit;
   jobParts: JobPart[];
   jobRegionAccess: unknown[];
-  documents: unknown[];
+  documents: JobDocument[];
   partialPayments: unknown[];
+}
+
+export interface JobDocument {
+  fileName: string;
 }
 
 export interface JobCost {

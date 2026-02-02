@@ -1,5 +1,5 @@
 import { Component, DestroyRef, effect, inject, input, OnInit, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
-import { JobClient, JobDetails, JobPart, JobVenue } from "../../../../shared/interface/jobs";
+import { JobClient, JobDetails, JobDocument, JobPart, JobVenue } from "../../../../shared/interface/jobs";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
@@ -52,6 +52,9 @@ export class EditJobComponent extends ApiBase implements OnInit {
   loading = signal<boolean>(false);
   clientLoading = signal<boolean>(false);
   venueLoading = signal<boolean>(false);
+  uploadLoading = signal<boolean>(false);
+  documents = signal<JobDocument[]>([]);
+  deletingDocument = signal<string | null>(null);
 
   form: FormGroup;
 
@@ -89,6 +92,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       if (details && this.form) {
         this.setFormData();
         this.updateJobPartsTable(details.jobParts);
+        this.documents.set(details.documents || []);
       }
     });
   }
@@ -274,11 +278,71 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      // Handle file upload logic here if needed
-      console.log('File selected:', file.name);
-    }
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    const jobId = this.jobDetails()?.jobId;
+    if (!jobId) return;
+
+    this.uploadLoading.set(true);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(',')[1];
+
+      this.post<string>('Jobs/UploadJobDocumentAsync', {
+        crewId: 0,
+        jobId,
+        fileName: file.name,
+        fileBase64: base64
+      })
+        .pipe(
+          takeUntilDestroyed(this._dr),
+          finalize(() => {
+            this.uploadLoading.set(false);
+            input.value = '';
+          })
+        )
+        .subscribe({
+          next: res => {
+            if (res.errors?.errorCode) {
+              GeneralService.showErrorMessage(res.errors.message);
+              return;
+            }
+
+            const fileName = res.data ?? file.name;
+            this.documents.update(docs => [...docs, { fileName }]);
+            GeneralService.showSuccessMessage('File uploaded successfully');
+          }
+        });
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  deleteDocument(fileName: string) {
+    this.deletingDocument.set(fileName);
+
+    this.get<void>(`Jobs/DeleteJobDocumentAsync?fileName=${encodeURIComponent(fileName)}`)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.deletingDocument.set(null))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.documents.update(docs => docs.filter(d => d.fileName !== fileName));
+          GeneralService.showSuccessMessage('File deleted successfully');
+        }
+      });
+  }
+
+  downloadDocument(fileName: string) {
+    window.open(`${this.apiUrl}/Jobs/download/${encodeURIComponent(fileName)}`, '_blank');
   }
 
   submit() {
