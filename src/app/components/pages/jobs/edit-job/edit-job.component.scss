@@ -39,33 +39,40 @@
   overflow-y: auto;
 }
 
-// Partial payments list - visible on white background
+// Partial payments list - under Paid date, same column width; max 4 visible, then scroll
 .partial-payments-list {
-  .partial-payment-chip {
-    background-color: #e9ecef;
-    border: 1px solid #dee2e6;
-    color: #212529;
-    transition: all 0.2s ease;
+  max-width: 100%;
+  max-height: calc(4 * (2.5rem)); // ~4 rows (py-2 + line height)
+  overflow-y: auto;
 
-    &:hover {
-      background-color: #dee2e6 !important;
+  .partial-payment-row {
+    flex-wrap: wrap;
+    gap: 4px;
+
+    &:last-child {
+      border-bottom: none !important;
     }
 
-    .max-w-120 {
-      max-width: 120px;
+    .fa-trash:hover {
+      opacity: 0.8;
     }
 
-    .partial-payment-comments {
-      color: #6c757d;
+    // Keep content compact in narrow column
+    span:first-child {
+      flex-shrink: 0;
     }
-
-    i {
-      transition: transform 0.2s ease;
-
-      &:hover {
-        transform: scale(1.2);
-      }
+    span.fw-bold {
+      flex-shrink: 0;
     }
+  }
+}
+
+// Tooltip for payment comment (multi-line, readable)
+:host ::ng-deep .payment-comment-tooltip {
+  .tooltip-inner {
+    max-width: 280px;
+    white-space: normal;
+    text-align: left;
   }
 }
 

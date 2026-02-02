@@ -209,6 +209,29 @@
     <div class="col col-sm-6 col-md-3">
       <label class="form-label">Paid date</label>
       <input class="form-control digits" type="date" formControlName="paidDate">
+      @if (jobDetails()?.partialPayments?.length) {
+        <ul class="partial-payments-list list-unstyled m-0 m-t-10 custom-scrollbar">
+          @for (payment of jobDetails()?.partialPayments; track payment.partialPaymentId) {
+            <li class="partial-payment-row d-flex align-items-center gap-8 py-2 border-bottom border-light">
+              <span class="f-12">{{ formatPaymentDate(payment.paidDate) }}</span>
+              <i class="fa-solid fa-circle-info txt-primary f-14 cursor-default"
+                 [ngbTooltip]="payment.comments || '—'"
+                 tooltipClass="payment-comment-tooltip"
+                 container="body"></i>
+              <span class="f-12 fw-bold">{{ payment.amount | currency:'GBP':'symbol':'1.2-2' }}</span>
+              <span class="ms-auto">
+                @if (deletingPartialPayment() === payment.partialPaymentId) {
+                  <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
+                } @else {
+                  <i class="fa-solid fa-trash txt-danger f-12 cursor-pointer"
+                     (click)="confirmDeletePartialPayment(payment)"
+                     title="Remove payment"></i>
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
 
@@ -268,32 +291,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Partial Payments List -->
-  @if (jobDetails()?.partialPayments?.length) {
-    <div class="row g-3">
-      <div class="col-12">
-        <div class="partial-payments-list d-flex flex-wrap gap-10">
-          @for (payment of jobDetails()?.partialPayments; track payment.partialPaymentId) {
-            <div class="partial-payment-chip d-inline-flex align-items-center gap-8 rounded p-x-12 p-y-8">
-              <span class="f-12 fw-bold">{{ payment.amount | currency:'GBP':'symbol':'1.2-2' }}</span>
-              <span class="f-12">{{ formatPaymentDate(payment.paidDate) }}</span>
-              @if (payment.comments) {
-                <span class="f-12 partial-payment-comments text-truncate max-w-120" [title]="payment.comments">{{ payment.comments }}</span>
-              }
-              @if (deletingPartialPayment() === payment.partialPaymentId) {
-                <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
-              } @else {
-                <i class="fa-solid fa-times txt-danger f-12 cursor-pointer"
-                   (click)="confirmDeletePartialPayment(payment)"
-                   title="Remove payment"></i>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  }
 
   <div class="main-divider m-y-12">
     <div class="divider-body divider-body-1 divider-secondary">
