@@ -426,7 +426,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       id: part.jobPartId,
       typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
       skills: this.getSkillsString(part),
-      travelFormatted: this.formatCurrency(part.ootCost, part.currencySign),
+      travelFormatted: this.getTravelFormatted(part.ootCost, part.currencySign),
       netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
       grossFormatted: this.formatCurrency(part.quoteCostVat, part.currencySign)
     }));
@@ -440,6 +440,12 @@ export class EditJobComponent extends ApiBase implements OnInit {
   formatCurrency(value: number, currencySign: string): string {
     const sign = currencySign || '£';
     return `${sign}${value?.toFixed(2) ?? '0.00'}`;
+  }
+
+  getTravelFormatted(ootCost: number, currencySign: string): string {
+    if (ootCost == null || ootCost <= 0) return '_';
+    const amount = this.formatCurrency(ootCost, currencySign);
+    return `<i class="fa-solid fa-train txt-primary f-16" title="${amount}"></i>`;
   }
 
   getJobPartTypeIcon(typeId: number, typeText: string): string {
@@ -483,7 +489,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       .filter(skill => part[skill.key] === true)
       .map(skill => skill.label);
 
-    return activeSkills.join(' - ');
+    return activeSkills.join(' - ') || '_'
   }
 
   handleJobPartAction(event: TableClickedAction) {
