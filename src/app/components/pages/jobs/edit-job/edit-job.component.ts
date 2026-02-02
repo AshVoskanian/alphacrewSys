@@ -1,10 +1,8 @@
 import {
-  AfterViewInit,
   Component,
   computed,
   DestroyRef,
   effect,
-  ElementRef,
   inject,
   input,
   OnInit,
@@ -16,6 +14,7 @@ import {
 } from '@angular/core';
 import {
   AddPaymentResponse,
+  Currency,
   JobClient,
   JobDetails,
   JobDocument,
@@ -40,7 +39,6 @@ import { NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/n
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
 import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
-import { GoogleMapsLoaderService } from "../../../../shared/services/google-map-loader.service";
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { TagInputModule } from "ngx-chips";
 
@@ -63,9 +61,8 @@ import { TagInputModule } from "ngx-chips";
   templateUrl: './edit-job.component.html',
   styleUrl: './edit-job.component.scss'
 })
-export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
+export class EditJobComponent extends ApiBase implements OnInit {
   @ViewChild('venueInstance', { static: true }) venueInstance: NgbTypeahead;
-  @ViewChild('additionalRegionInput') additionalRegionInput!: ElementRef<HTMLInputElement>;
 
   jobDetails = input<JobDetails>();
   partialPaymentsUpdated = output<AddPaymentResponse>();
@@ -76,7 +73,6 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   private readonly _datePipe = inject(DatePipe);
   private readonly _modal = inject(NgbModal);
   private readonly _generalService = inject(GeneralService);
-  private readonly _googleMapsLoader = inject(GoogleMapsLoaderService);
 
   private modalRef: NgbModalRef;
 
@@ -108,7 +104,6 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   deletingPartialPayment = signal<number | null>(null);
 
   form: FormGroup;
-  jobRegionAccess: Array<string> = [];
 
   jobPartsTableConfig: WritableSignal<TableConfigs> = signal<TableConfigs>({
     columns: [
@@ -169,25 +164,6 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
     if (this.jobDetails()) {
       this.setFormData();
     }
-  }
-
-  async ngAfterViewInit(): Promise<void> {
-    if (!this.additionalRegionInput?.nativeElement) return;
-
-    await this._googleMapsLoader.loadPlaces();
-
-    if (typeof google === 'undefined' || !google.maps?.places) return;
-
-    const autocomplete = new google.maps.places.Autocomplete(
-      this.additionalRegionInput.nativeElement,
-      { types: [ '(regions)' ] }
-    );
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      const value = place?.formatted_address ?? place?.name ?? '';
-      this.form?.get('additionalRegionPlace')?.setValue(value || null);
-    });
   }
 
   initForm() {
@@ -267,10 +243,19 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   }
 
   getCurrencies() {
-    // TODO: replace with API when list is provided (e.g. GET /api/Currencies or similar)
-    this.currencies.set([
-      { label: '£ GBP', value: 1 }
-    ]);
+    this.get<Currency[]>('Jobs/GetCurrency')
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.currencies.set(
+            (res.data ?? []).map(c => ({ label: `${c.sign} ${c.code}`, value: c.id }))
+          );
+        }
+      });
   }
 
   getRateCards() {
@@ -746,11 +731,6 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
 
   openAddJobPartModal(template: TemplateRef<NgbModal>) {
     this.modalRef = this._modal.open(template, { centered: true, size: 'xl' });
-  }
-
-  onJobPartAdded() {
-    this.modalRef?.close();
-    // TODO: Refresh job details to get updated job parts
   }
 
   openAddPaymentModal(template: TemplateRef<NgbModal>) {

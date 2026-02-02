@@ -48,6 +48,13 @@ export interface JobClient {
   isActive: boolean;
 }
 
+export interface Currency {
+  id: number;
+  code: string;
+  name: string;
+  sign: string;
+}
+
 export interface JobDetails {
   jobId: number;
   quickBooksId: number | null;
