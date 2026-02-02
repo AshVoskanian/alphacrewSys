@@ -13,7 +13,15 @@ import {
   ViewChild,
   WritableSignal
 } from '@angular/core';
-import { JobClient, JobDetails, JobDocument, JobPart, JobVenue, PartialPayment } from "../../../../shared/interface/jobs";
+import {
+  AddPaymentResponse,
+  JobClient,
+  JobDetails,
+  JobDocument,
+  JobPart,
+  JobVenue,
+  PartialPayment
+} from "../../../../shared/interface/jobs";
 import { AddPaymentComponent } from "../add-payment/add-payment.component";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
@@ -57,7 +65,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   @ViewChild('additionalRegionInput') additionalRegionInput!: ElementRef<HTMLInputElement>;
 
   jobDetails = input<JobDetails>();
-  partialPaymentsUpdated = output<PartialPayment[]>();
+  partialPaymentsUpdated = output<AddPaymentResponse>();
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -102,8 +110,20 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
       { title: 'Gross', field_value: 'grossFormatted' }
     ],
     row_action: [
-      { label: 'Delete', icon: 'fa-solid fa-trash txt-danger', class: 'square-white', action_to_perform: 'delete', modal: true, model_text: 'Are you sure you want to delete this job part?' },
-      { label: 'Edit', icon: 'fa-solid fa-pen-to-square txt-primary', class: 'square-white', action_to_perform: 'edit' },
+      {
+        label: 'Delete',
+        icon: 'fa-solid fa-trash txt-danger',
+        class: 'square-white',
+        action_to_perform: 'delete',
+        modal: true,
+        model_text: 'Are you sure you want to delete this job part?'
+      },
+      {
+        label: 'Edit',
+        icon: 'fa-solid fa-pen-to-square txt-primary',
+        class: 'square-white',
+        action_to_perform: 'edit'
+      },
       { label: 'Copy', icon: 'fa-solid fa-copy txt-secondary', class: 'square-white', action_to_perform: 'copy' }
     ],
     data: []
@@ -401,7 +421,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
             }
 
             const fileName = res.data ?? file.name;
-            this.documents.update(docs => [...docs, { fileName }]);
+            this.documents.update(docs => [ ...docs, { fileName } ]);
             GeneralService.showSuccessMessage('File uploaded successfully');
           }
         });
@@ -413,7 +433,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   deleteDocument(fileName: string) {
     this.deletingDocument.set(fileName);
 
-    this.get<void>(`Jobs/DeleteJobDocumentAsync?fileName=${encodeURIComponent(fileName)}`)
+    this.get<void>(`Jobs/DeleteJobDocumentAsync?fileName=${ encodeURIComponent(fileName) }`)
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.deletingDocument.set(null))
@@ -434,7 +454,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   downloadDocument(fileName: string) {
     this.downloadingDocument.set(fileName);
 
-    this._generalService.downloadFile(`Jobs/download/${encodeURIComponent(fileName)}`, fileName)
+    this._generalService.downloadFile(`Jobs/download/${ encodeURIComponent(fileName) }`, fileName)
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.downloadingDocument.set(null))
@@ -534,29 +554,29 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
 
   formatCurrency(value: number, currencySign: string): string {
     const sign = currencySign || '£';
-    return `${sign}${value?.toFixed(2) ?? '0.00'}`;
+    return `${ sign }${ value?.toFixed(2) ?? '0.00' }`;
   }
 
   getTravelFormatted(ootCost: number, currencySign: string): string {
     if (ootCost == null || ootCost <= 0) return '_';
     const amount = this.formatCurrency(ootCost, currencySign);
-    return `<i class="fa-solid fa-train txt-primary f-16" title="${amount}"></i>`;
+    return `<i class="fa-solid fa-train txt-primary f-16" title="${ amount }"></i>`;
   }
 
   getJobPartTypeIcon(typeId: number, typeText: string): string {
-    const tooltip = typeText ? `title="${typeText}"` : '';
+    const tooltip = typeText ? `title="${ typeText }"` : '';
 
     switch (typeId) {
       case 1:
-        return `<i class="fa-solid fa-users txt-primary f-18" ${tooltip}></i>`;
+        return `<i class="fa-solid fa-users txt-primary f-18" ${ tooltip }></i>`;
       case 2:
       case 5:
-        return `<i class="fa-solid fa-truck txt-danger f-18" ${tooltip}></i>`;
+        return `<i class="fa-solid fa-truck txt-danger f-18" ${ tooltip }></i>`;
       case 4:
       case 6:
-        return `<i class="icofont icofont-shield-alt txt-danger f-18" ${tooltip}></i>`;
+        return `<i class="icofont icofont-shield-alt txt-danger f-18" ${ tooltip }></i>`;
       default:
-        return `<i class="fa-solid fa-briefcase txt-secondary f-18" ${tooltip}></i>`;
+        return `<i class="fa-solid fa-briefcase txt-secondary f-18" ${ tooltip }></i>`;
     }
   }
 
@@ -604,7 +624,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
   deleteJobPart(part: JobPart) {
     this.setPartDeleteLoading(part.jobPartId, true);
 
-    this.get<void>(`Jobs/RemoveJobPart?jobPartId=${part.jobPartId}`)
+    this.get<void>(`Jobs/RemoveJobPart?jobPartId=${ part.jobPartId }`)
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.setPartDeleteLoading(part.jobPartId, false))
@@ -690,7 +710,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
     this.modalRef = this._modal.open(template, { centered: true });
   }
 
-  onPaymentAdded(partialPayments: PartialPayment[]) {
+  onPaymentAdded(partialPayments: AddPaymentResponse) {
     this.modalRef?.close();
     this.partialPaymentsUpdated.emit(partialPayments);
   }
@@ -717,7 +737,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
 
     this.deletingPartialPayment.set(payment.partialPaymentId);
 
-    this.post<void>('Jobs/RemovePartialPayment', {
+    this.post<AddPaymentResponse>('Jobs/RemovePartialPayment', {
       partialPaymentId: payment.partialPaymentId,
       jobId
     })
@@ -733,8 +753,11 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
           }
 
           const current = this.jobDetails()?.partialPayments ?? [];
-          const updated = current.filter(p => p.partialPaymentId !== payment.partialPaymentId);
-          this.partialPaymentsUpdated.emit(updated);
+          const updatedPayments = res.data?.partialPayments ?? current.filter(p => p.partialPaymentId !== payment.partialPaymentId);
+          this.partialPaymentsUpdated.emit({
+            partialPayments: updatedPayments,
+            ...(res.data?.jobCost != null && { jobCost: res.data.jobCost })
+          });
           GeneralService.showSuccessMessage('Payment removed successfully');
         }
       });

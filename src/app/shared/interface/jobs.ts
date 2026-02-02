@@ -111,6 +111,11 @@ export interface JobCost {
   outstanding: number;
 }
 
+export interface AddPaymentResponse {
+  jobCost?: JobCost;
+  partialPayments: PartialPayment[];
+}
+
 export interface JobPart {
   jobPartId: number;
   jobId: number;

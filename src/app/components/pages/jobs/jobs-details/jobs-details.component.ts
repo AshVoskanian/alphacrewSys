@@ -8,7 +8,7 @@ import { LayoutService } from "../../../../shared/services/layout.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
-import { JobDetails, PartialPayment } from "../../../../shared/interface/jobs";
+import { AddPaymentResponse, JobDetails, PartialPayment } from "../../../../shared/interface/jobs";
 
 @Component({
   selector: 'app-jobs-details',
@@ -62,9 +62,14 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
     this._location.back();
   }
 
-  onPartialPaymentsUpdated(partialPayments: PartialPayment[]) {
-    this.jobDetails.update(details =>
-      details ? { ...details, partialPayments } : details
-    );
+  onPartialPaymentsUpdated(data: AddPaymentResponse) {
+    this.jobDetails.update(details => {
+      if (!details) return details;
+      return {
+        ...details,
+        partialPayments: data.partialPayments ?? details.partialPayments,
+        ...(data.jobCost != null && { jobCost: data.jobCost })
+      };
+    });
   }
 }

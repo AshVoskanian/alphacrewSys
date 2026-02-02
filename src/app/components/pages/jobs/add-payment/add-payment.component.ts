@@ -6,7 +6,7 @@ import { finalize } from 'rxjs';
 import { GeneralService } from '../../../../shared/services/general.service';
 import { ApiBase } from '../../../../shared/bases/api-base';
 import { HttpClient } from '@angular/common/http';
-import { PartialPayment } from '../../../../shared/interface/jobs';
+import { AddPaymentResponse, PartialPayment } from '../../../../shared/interface/jobs';
 
 @Component({
   selector: 'app-add-payment',
@@ -19,7 +19,7 @@ import { PartialPayment } from '../../../../shared/interface/jobs';
 export class AddPaymentComponent extends ApiBase {
   jobId = input<number>();
 
-  partialPaymentsAdded = output<PartialPayment[]>();
+  partialPaymentsAdded = output<AddPaymentResponse>();
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -52,7 +52,7 @@ export class AddPaymentComponent extends ApiBase {
 
     this.loading.set(true);
 
-    this.post<PartialPayment[]>('Jobs/AddPartialPayment', {
+    this.post<AddPaymentResponse>('Jobs/AddPartialPayment', {
       partialPaymentId: 0,
       jobId,
       amount: Number(value.amount),
@@ -73,7 +73,7 @@ export class AddPaymentComponent extends ApiBase {
           }
 
           GeneralService.showSuccessMessage('Payment added successfully');
-          this.partialPaymentsAdded.emit(res.data ?? []);
+          this.partialPaymentsAdded.emit(res.data);
         }
       });
   }
