@@ -7,7 +7,10 @@
     </div>
 
     <div class="m-t-20">
-      <app-edit-job [jobDetails]="jobDetails()"></app-edit-job>
+      <app-edit-job
+        [jobDetails]="jobDetails()"
+        (partialPaymentsUpdated)="onPartialPaymentsUpdated($event)">
+      </app-edit-job>
     </div>
   </app-card>
 </div>

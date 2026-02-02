@@ -244,8 +244,10 @@
             <div class="f-12">OUTSTANDING</div>
             <div class="f-16 fw-bold">{{ jobCost?.outstanding | currency:'GBP':'symbol':'1.2-2' }}</div>
           </div>
-          <div class="col-auto ms-auto">
-            <i class="fa-solid fa-bars-staggered f-20 cursor-pointer"></i>
+          <div class="col-auto ms-auto pointer">
+            <i class="fa-solid fa-calendar-plus f-20 text-white cursor-pointer"
+               (click)="openAddPaymentModal(addPaymentModal)"
+               title="Add Payment"></i>
           </div>
         </div>
       </div>
@@ -287,6 +289,32 @@
     </div>
   </div>
 </form>
+
+<!-- Add Payment Modal -->
+<ng-template #addPaymentModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Add Payment</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <app-add-payment
+      #addPaymentRef
+      [jobId]="jobDetails()?.jobId"
+      (partialPaymentsAdded)="onPaymentAdded($event)">
+    </app-add-payment>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger"
+            (click)="addPaymentRef.submit()"
+            [disabled]="!addPaymentRef || addPaymentRef.paymentForm?.invalid || addPaymentRef.loading()">
+      @if (addPaymentRef?.loading?.()) {
+        <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
+      }
+      ADD
+    </button>
+  </div>
+</ng-template>
 
 <!-- Add Job Part Modal -->
 <ng-template #addJobPartModal let-modal>

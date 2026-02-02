@@ -1,5 +1,6 @@
-import { Component, DestroyRef, effect, inject, input, OnInit, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
-import { JobClient, JobDetails, JobDocument, JobPart, JobVenue } from "../../../../shared/interface/jobs";
+import { Component, DestroyRef, effect, inject, input, OnInit, output, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
+import { JobClient, JobDetails, JobDocument, JobPart, JobVenue, PartialPayment } from "../../../../shared/interface/jobs";
+import { AddPaymentComponent } from "../add-payment/add-payment.component";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
@@ -25,7 +26,8 @@ import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
     DatePipe,
     CurrencyPipe,
     TableComponent,
-    AddJobpartComponent
+    AddJobpartComponent,
+    AddPaymentComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
@@ -35,6 +37,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   @ViewChild('venueInstance', { static: true }) venueInstance: NgbTypeahead;
 
   jobDetails = input<JobDetails>();
+  partialPaymentsUpdated = output<PartialPayment[]>();
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -67,11 +70,11 @@ export class EditJobComponent extends ApiBase implements OnInit {
       { title: 'Time', field_value: 'time' },
       { title: 'Hours', field_value: 'hours' },
       { title: 'Crew', field_value: 'crewNumber' },
-      { title: 'Travel', field_value: 'travelFormatted' }, //
+      { title: 'Travel', field_value: 'travelFormatted' },
       { title: 'Skills', field_value: 'skills' },
       { title: 'Ends', field_value: 'ends' },
-      { title: 'Net', field_value: 'netFormatted' }, //
-      { title: 'Gross', field_value: 'grossFormatted' } //
+      { title: 'Net', field_value: 'netFormatted' },
+      { title: 'Gross', field_value: 'grossFormatted' }
     ],
     row_action: [
       { label: 'Delete', icon: 'fa-solid fa-trash txt-danger', class: 'square-white', action_to_perform: 'delete', modal: true, model_text: 'Are you sure you want to delete this job part?' },
@@ -589,5 +592,14 @@ export class EditJobComponent extends ApiBase implements OnInit {
   onJobPartAdded() {
     this.modalRef?.close();
     // TODO: Refresh job details to get updated job parts
+  }
+
+  openAddPaymentModal(template: TemplateRef<NgbModal>) {
+    this.modalRef = this._modal.open(template, { centered: true });
+  }
+
+  onPaymentAdded(partialPayments: PartialPayment[]) {
+    this.modalRef?.close();
+    this.partialPaymentsUpdated.emit(partialPayments);
   }
 }

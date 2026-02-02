@@ -1,0 +1,26 @@
+<form [formGroup]="paymentForm">
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      <label class="form-label">Date</label>
+      <div class="input-group">
+        <input type="date" class="form-control" formControlName="paidDate">
+        <span class="input-group-text bg-light-secondary">
+          <i class="fa-solid fa-calendar txt-secondary"></i>
+        </span>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="form-label">Amount</label>
+      <div class="input-group">
+        <input type="number" step="0.01" min="0" class="form-control" formControlName="amount" placeholder="Amount">
+        <span class="input-group-text bg-light-secondary">
+          <i class="fa-solid fa-credit-card txt-secondary"></i>
+        </span>
+      </div>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Comments (optional)</label>
+      <textarea class="form-control" formControlName="comments" rows="3" placeholder="Comments"></textarea>
+    </div>
+  </div>
+</form>

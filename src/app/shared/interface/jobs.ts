@@ -86,7 +86,17 @@ export interface JobDetails {
   jobParts: JobPart[];
   jobRegionAccess: unknown[];
   documents: JobDocument[];
-  partialPayments: unknown[];
+  partialPayments: PartialPayment[];
+}
+
+export interface PartialPayment {
+  partialPaymentId: number;
+  jobId: number;
+  amount: number;
+  paidDate: string;
+  updatedBy: string;
+  updatedDate: string;
+  comments: string | null;
 }
 
 export interface JobDocument {

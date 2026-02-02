@@ -8,7 +8,7 @@ import { LayoutService } from "../../../../shared/services/layout.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
-import { JobDetails } from "../../../../shared/interface/jobs";
+import { JobDetails, PartialPayment } from "../../../../shared/interface/jobs";
 
 @Component({
   selector: 'app-jobs-details',
@@ -60,5 +60,11 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
 
   goBack() {
     this._location.back();
+  }
+
+  onPartialPaymentsUpdated(partialPayments: PartialPayment[]) {
+    this.jobDetails.update(details =>
+      details ? { ...details, partialPayments } : details
+    );
   }
 }
