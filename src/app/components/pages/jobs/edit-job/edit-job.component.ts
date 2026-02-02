@@ -543,7 +543,6 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
       vat: formValue.vat ?? true,
       prePayment: Number(formValue.prePayment) ?? 0,
       discount: Number(formValue.discount) ?? 0,
-      jobRegionAccess: Array.isArray(formValue.jobRegionAccess) ? formValue.jobRegionAccess : [],
       additionalRegionPlace: formValue.additionalRegionPlace ?? null,
       venueId: isVenueFromList ? formValue.venueId : 0,
       venue: venueName,
