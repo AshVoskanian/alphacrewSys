@@ -41,6 +41,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   private readonly _regionsService = inject(RegionsService);
   private readonly _datePipe = inject(DatePipe);
   private readonly _modal = inject(NgbModal);
+  private readonly _generalService = inject(GeneralService);
 
   private modalRef: NgbModalRef;
 
@@ -55,6 +56,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   uploadLoading = signal<boolean>(false);
   documents = signal<JobDocument[]>([]);
   deletingDocument = signal<string | null>(null);
+  downloadingDocument = signal<string | null>(null);
 
   form: FormGroup;
 
@@ -65,11 +67,11 @@ export class EditJobComponent extends ApiBase implements OnInit {
       { title: 'Time', field_value: 'time' },
       { title: 'Hours', field_value: 'hours' },
       { title: 'Crew', field_value: 'crewNumber' },
-      { title: 'Travel', field_value: 'travelFormatted' },
+      { title: 'Travel', field_value: 'travelFormatted' }, //
       { title: 'Skills', field_value: 'skills' },
       { title: 'Ends', field_value: 'ends' },
-      { title: 'Net', field_value: 'netFormatted' },
-      { title: 'Gross', field_value: 'grossFormatted' }
+      { title: 'Net', field_value: 'netFormatted' }, //
+      { title: 'Gross', field_value: 'grossFormatted' } //
     ],
     row_action: [
       { label: 'Delete', icon: 'fa-solid fa-trash txt-danger', class: 'square-white', action_to_perform: 'delete', modal: true, model_text: 'Are you sure you want to delete this job part?' },
@@ -342,7 +344,16 @@ export class EditJobComponent extends ApiBase implements OnInit {
   }
 
   downloadDocument(fileName: string) {
-    window.open(`${this.apiUrl}/Jobs/download/${encodeURIComponent(fileName)}`, '_blank');
+    this.downloadingDocument.set(fileName);
+
+    this._generalService.downloadFile(`Jobs/download/${encodeURIComponent(fileName)}`, fileName)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.downloadingDocument.set(null))
+      )
+      .subscribe({
+        error: () => GeneralService.showErrorMessage('Download failed')
+      });
   }
 
   submit() {

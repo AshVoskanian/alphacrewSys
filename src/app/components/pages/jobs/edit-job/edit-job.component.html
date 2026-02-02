@@ -34,9 +34,13 @@
               @for (doc of documents(); track doc.fileName) {
                 <div class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
                   <span class="f-12 text-dark text-truncate max-w-150" [title]="doc.fileName">{{ doc.fileName }}</span>
-                  <i class="fa-solid fa-download txt-primary f-12 cursor-pointer"
-                     (click)="downloadDocument(doc.fileName)"
-                     title="Download"></i>
+                  @if (downloadingDocument() === doc.fileName) {
+                    <i class="fa-solid fa-spinner fa-spin txt-primary f-12"></i>
+                  } @else {
+                    <i class="fa-solid fa-download txt-primary f-12 cursor-pointer"
+                       (click)="downloadDocument(doc.fileName)"
+                       title="Download"></i>
+                  }
                   @if (deletingDocument() === doc.fileName) {
                     <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
                   } @else {
