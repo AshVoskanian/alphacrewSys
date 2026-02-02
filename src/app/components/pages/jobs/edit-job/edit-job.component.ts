@@ -238,8 +238,24 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
     this.form.get('jobRegionAccess')?.valueChanges
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
-        next: region => {
-          console.log(region)
+        next: raw => {
+          const jobId = this.jobDetails()?.jobId;
+          if (!jobId) return;
+
+          const jobRegionIds = Array.isArray(raw)
+            ? raw.map((r: unknown) => (typeof r === 'number' ? r : (r as { value: number })?.value))
+              .filter((id): id is number => typeof id === 'number')
+            : [];
+
+          this.post<unknown>('Jobs/ReplaceJobRegionAccess', { jobId, jobRegionIds })
+            .pipe(takeUntilDestroyed(this._dr))
+            .subscribe({
+              next: res => {
+                if (res.errors?.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                }
+              }
+            });
         }
       });
   }
@@ -340,6 +356,14 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
       return this._datePipe.transform(dateStr, 'yyyy-MM-dd') || null;
     };
 
+    const regionNamesList = this.regionNames();
+    const jobRegionAccessValue = Array.isArray(details.jobRegionAccess)
+      ? details.jobRegionAccess.map((id: number) => {
+          const found = regionNamesList.find(r => r.value === id);
+          return found ? { value: found.value, display: found.display } : { value: id, display: String(id) };
+        })
+      : [];
+
     this.form.patchValue({
       statusId: details.statusId,
       jobRegionId: details.jobRegionId,
@@ -349,7 +373,7 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
       vat: details.vat ?? true,
       prePayment: details.prePayment ?? 0,
       discount: details.discount ?? 0,
-      jobRegionAccess: Array.isArray(details.jobRegionAccess) ? details.jobRegionAccess : [],
+      jobRegionAccess: jobRegionAccessValue,
       orderedBy: details.orderedBy,
       jobContact: details.jobContact,
       importantDate: formatDate(details.importantDate),
