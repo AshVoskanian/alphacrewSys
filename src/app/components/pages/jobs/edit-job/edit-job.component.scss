@@ -33,9 +33,18 @@
   }
 }
 
+// Header: only the files column scrolls, right side stays at top
+.header-files-col {
+  max-height: 140px;
+  overflow-y: auto;
+}
+
 // Documents list styling
 .documents-list {
   max-height: 100px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
 
   .document-chip {
     border: 1px solid #e0e0e0;
