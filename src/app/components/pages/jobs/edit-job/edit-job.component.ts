@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   DestroyRef,
   effect,
   ElementRef,
@@ -41,6 +42,7 @@ import { TableClickedAction, TableConfigs } from "../../../../shared/interface/c
 import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
 import { GoogleMapsLoaderService } from "../../../../shared/services/google-map-loader.service";
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
+import { TagInputModule } from "ngx-chips";
 
 @Component({
   selector: 'app-edit-job',
@@ -54,7 +56,8 @@ import { CardComponent } from "../../../../shared/components/ui/card/card.compon
     TableComponent,
     AddJobpartComponent,
     AddPaymentComponent,
-    CardComponent
+    CardComponent,
+    TagInputModule
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
@@ -79,6 +82,9 @@ export class EditJobComponent extends ApiBase implements OnInit, AfterViewInit {
 
   statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
   regions = toSignal(this._regionsService.regions);
+  regionNames = computed(() => {
+    return this.regions().map(reg => reg.label)
+  })
   jobClients: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   jobVenues: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   rateCards: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);

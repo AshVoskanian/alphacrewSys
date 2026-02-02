@@ -55,13 +55,23 @@
       <div class="row g-3">
         <div class="col-12">
           <label class="form-label">Additional Regions</label>
-          <input
-            #additionalRegionInput
-            type="text"
-            class="form-control"
-            formControlName="additionalRegionPlace"
-            placeholder="Select additional region..."
-          />
+          <tag-input name="select" [onlyFromAutocomplete]="true">
+            <tag-input-dropdown [autocompleteItems]="[
+  'aZ3kP9',
+  'Qm7X2L',
+  'rT8Wc4',
+  '9FJdE1',
+  'Lp0sA6',
+  'M4YxH2',
+  'C7KqN5',
+  '8RZBvS',
+  'D3UeJ9',
+  'w5P0tX'
+]
+"
+                                [showDropdownIfEmpty]="true">
+            </tag-input-dropdown>
+          </tag-input>
         </div>
       </div>
     </div>
