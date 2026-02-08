@@ -3,7 +3,11 @@
   <div class="row g-3 m-b-15">
     <div class="col-12 col-md-4">
       <label class="form-label">Type</label>
-      <select2 [data]="jobPartTypes" formControlName="jobPartTypeId"></select2>
+      @if (jobPartTypesLoading()) {
+        <div class="form-control bg-light animate-pulse" style="height: 38px;"></div>
+      } @else {
+        <select2 [data]="jobPartTypes()" formControlName="jobPartTypeId"></select2>
+      }
     </div>
   </div>
 
@@ -21,11 +25,11 @@
     </div>
     <div class="col-12 col-sm-6 col-md">
       <label class="form-label">Hours</label>
-      <select2 [data]="hoursOptions" formControlName="jobPartHours"></select2>
+      <select2 [data]="hoursOptions()" formControlName="jobPartHours"></select2>
     </div>
     <div class="col-12 col-sm-6 col-md">
       <label class="form-label">Crew</label>
-      <select2 [data]="crewOptions" formControlName="crewNumber"></select2>
+      <select2 [data]="crewOptions()" formControlName="crewNumber"></select2>
     </div>
     <div class="col-12 col-sm-6 col-md">
       <label class="form-label">CC Suppl</label>
@@ -49,7 +53,7 @@
               <div class="col">
                 <label class="form-label">Travel Hours:</label>
                 <select class="form-select form-select-sm" formControlName="travelHours">
-                  @for (h of travelHoursOptions; track h.value) {
+                  @for (h of travelHoursOptions(); track h.value) {
                     <option [value]="h.value">{{ h.label }}</option>
                   }
                 </select>
@@ -108,7 +112,7 @@
                 <label class="form-label">Required skills:</label>
                 <select class="form-select form-select-sm" formControlName="requiredSkills">
                   <option [ngValue]="null">Choose skills</option>
-                  @for (s of skillsOptions; track s.value) {
+                  @for (s of skillsOptions(); track s.value) {
                     <option [ngValue]="s.value">{{ s.label }}</option>
                   }
                 </select>
@@ -138,7 +142,7 @@
               <div class="col">
                 <label class="form-label">Number of Extra Crew:</label>
                 <select class="form-select form-select-sm" formControlName="extraCrew">
-                  @for (ec of extraCrewOptions; track ec.value) {
+                  @for (ec of extraCrewOptions(); track ec.value) {
                     <option [value]="ec.value">{{ ec.label }}</option>
                   }
                 </select>
@@ -195,31 +199,31 @@
       </div>
       <ul class="nav notes-tabs flex-grow-1 m-0">
         <li class="nav-item">
-          <button type="button" class="nav-link" [class.active]="activeNotesTab === 1"
-                  (click)="activeNotesTab = 1">OFFICE NOTES</button>
+          <button type="button" class="nav-link" [class.active]="activeNotesTab() === 1"
+                  (click)="activeNotesTab.set(1)">OFFICE NOTES</button>
         </li>
         <li class="nav-item">
-          <button type="button" class="nav-link" [class.active]="activeNotesTab === 2"
-                  (click)="activeNotesTab = 2">CREW (APP) NOTES</button>
+          <button type="button" class="nav-link" [class.active]="activeNotesTab() === 2"
+                  (click)="activeNotesTab.set(2)">CREW (APP) NOTES</button>
         </li>
         <li class="nav-item">
-          <button type="button" class="nav-link" [class.active]="activeNotesTab === 3"
-                  (click)="activeNotesTab = 3">PAPERWORK NOTES</button>
+          <button type="button" class="nav-link" [class.active]="activeNotesTab() === 3"
+                  (click)="activeNotesTab.set(3)">PAPERWORK NOTES</button>
         </li>
       </ul>
     </div>
     <div class="notes-content">
-      @if (activeNotesTab === 1) {
+      @if (activeNotesTab() === 1) {
         <textarea class="form-control border-0" rows="4"
                   formControlName="notes"
                   placeholder="Office notes..."></textarea>
       }
-      @if (activeNotesTab === 2) {
+      @if (activeNotesTab() === 2) {
         <textarea class="form-control border-0" rows="4"
                   formControlName="crewNotes"
                   placeholder="Crew notes..."></textarea>
       }
-      @if (activeNotesTab === 3) {
+      @if (activeNotesTab() === 3) {
         <textarea class="form-control border-0" rows="4"
                   formControlName="paperworkNotes"
                   placeholder="Paperwork notes..."></textarea>

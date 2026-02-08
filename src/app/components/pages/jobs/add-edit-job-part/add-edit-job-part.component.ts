@@ -1,8 +1,13 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, output, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClient } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { GeneralService } from "../../../../shared/services/general.service";
+import { ApiBase } from "../../../../shared/bases/api-base";
+import { JobPartTypeItem } from "../../../../shared/interface/jobs";
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -14,46 +19,79 @@ import { GeneralService } from "../../../../shared/services/general.service";
   templateUrl: './add-edit-job-part.component.html',
   styleUrl: './add-edit-job-part.component.scss'
 })
-export class AddEditJobPartComponent {
+export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _fb = inject(FormBuilder);
+  private readonly _dr = inject(DestroyRef);
 
   jobId = input<number>();
 
   finish = output<void>();
 
-  activeNotesTab = 1;
+  activeNotesTab: WritableSignal<number> = signal(1);
 
-  jobPartTypes: Select2Option[] = [
-    { value: 1, label: 'CREW' },
-    { value: 2, label: 'MAN&VAN (LUTON)' },
-    { value: 3, label: 'MAN&VAN (TRANSIT)' },
-    { value: 4, label: 'SECURITY' },
-    { value: 5, label: 'SECURITY (EVENT)' },
-    { value: 6, label: 'SECURITY (SITE)' },
-    { value: 7, label: 'OFFICE' },
-  ];
+  jobPartTypes: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
 
-  hoursOptions: Select2Option[] = Array.from({ length: 25 }, (_, i) => ({
-    value: i,
-    label: `${ i } Hour${ i !== 1 ? 's' : '' }`
-  }));
+  jobPartTypesLoading = signal(false);
 
-  crewOptions: Select2Option[] = Array.from({ length: 21 }, (_, i) => ({
-    value: i,
-    label: `${ i } Crew`
-  }));
+  constructor() {
+    super(inject(HttpClient));
+  }
 
-  travelHoursOptions = Array.from({ length: 13 }, (_, i) => ({
-    value: i,
-    label: `${ i }hrs`
-  }));
+  ngOnInit(): void {
+    this.loadJobPartTypes();
+  }
 
-  extraCrewOptions = Array.from({ length: 11 }, (_, i) => ({
-    value: i,
-    label: `${ i } Extra Crew`
-  }));
+  private loadJobPartTypes(): void {
+    this.jobPartTypesLoading.set(true);
+    this.get<JobPartTypeItem[]>('Jobs/GetJobPartType')
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.jobPartTypesLoading.set(false))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          const items = res.data ?? [];
+          const options = items.map((item) => ({
+            value: item.jobPartTypeId ?? item.id ?? 0,
+            label: item.typeText ?? item.name ?? ''
+          })).filter((opt) => opt.label !== '');
+          this.jobPartTypes.set(options);
+          const currentId = this.form.get('jobPartTypeId')?.value;
+          const exists = options.some((opt) => opt.value === currentId);
+          if (options.length && !exists) {
+            this.form.patchValue({ jobPartTypeId: options[0].value });
+          }
+        }
+      });
+  }
 
-  skillsOptions = [
+  readonly hoursOptions = signal<Select2Option[]>(
+    Array.from({ length: 25 }, (_, i) => ({
+      value: i,
+      label: `${ i } Hour${ i !== 1 ? 's' : '' }`
+    }))
+  );
+
+  readonly crewOptions = signal<Select2Option[]>(
+    Array.from({ length: 21 }, (_, i) => ({
+      value: i,
+      label: `${ i } Crew`
+    }))
+  );
+
+  readonly travelHoursOptions = signal(
+    Array.from({ length: 13 }, (_, i) => ({ value: i, label: `${ i }hrs` }))
+  );
+
+  readonly extraCrewOptions = signal(
+    Array.from({ length: 11 }, (_, i) => ({ value: i, label: `${ i } Extra Crew` }))
+  );
+
+  readonly skillsOptions = signal<{ value: string; label: string }[]>([
     { value: 'driver', label: 'Driver' },
     { value: 'forklift', label: 'Forklift' },
     { value: 'ipaf', label: 'IPAF' },
@@ -64,7 +102,7 @@ export class AddEditJobPartComponent {
     { value: 'sound', label: 'Sound' },
     { value: 'video', label: 'Video' },
     { value: 'firstaid', label: 'First Aid' },
-  ];
+  ]);
 
   form: FormGroup = this._fb.group({
     jobPartTypeId: [ 1 ],

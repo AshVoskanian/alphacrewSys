@@ -162,6 +162,13 @@ export interface JobPart {
   quoteCostVat: number;
 }
 
+export interface JobPartTypeItem {
+  jobPartTypeId?: number;
+  id?: number;
+  typeText?: string;
+  name?: string;
+}
+
 export interface ClientLimit {
   creditLimit: number;
   creditRating: number;
