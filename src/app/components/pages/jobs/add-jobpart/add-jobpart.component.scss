@@ -1,0 +1,120 @@
+// Notes section with teal tab bar
+.notes-section {
+  .notes-header {
+    background-color: #26c6da;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+  }
+
+  .important-check {
+    padding: 0 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    color: #fff;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+
+    .form-check-input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      border-color: rgba(255, 255, 255, 0.7);
+
+      &:checked {
+        background-color: #fff;
+        border-color: #fff;
+      }
+    }
+  }
+
+  .notes-tabs {
+    border: none;
+    margin-bottom: 0;
+    padding: 0;
+
+    .nav-item {
+      .nav-link {
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        border: none !important;
+        border-radius: 0;
+        padding: 10px 20px;
+        background: transparent;
+
+        &.active {
+          background-color: rgba(255, 255, 255, 0.15);
+          color: #fff;
+        }
+
+        &:hover:not(.active) {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .notes-content {
+    border: 1px solid #dee2e6;
+    border-top: 3px solid #fdd835;
+    border-radius: 0 0 4px 4px;
+    padding: 15px;
+
+    .notes-editor {
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}
+
+// Accordion custom styling
+:host ::ng-deep .accordion {
+  .accordion-item {
+    border-color: #e0e0e0;
+
+    .accordion-button {
+      padding: 12px 16px;
+      background-color: #fff;
+      box-shadow: none;
+
+      &:not(.collapsed) {
+        background-color: #f8f9fa;
+        box-shadow: none;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+.accordion-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #26c6da;
+}
+
+.cost-badge {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+// Total cost display
+.total-cost {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+}

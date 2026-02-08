@@ -1,1 +1,126 @@
-<p>add-jobpart works!</p>
+<form [formGroup]="form">
+  <!-- Job Part Type Dropdown -->
+  <div class="row g-3 m-b-15">
+    <div class="col-12 col-md-4">
+      <label class="form-label">Type</label>
+      <select2 [data]="jobPartTypes" formControlName="jobPartTypeId"></select2>
+    </div>
+  </div>
+
+  <hr class="m-t-5 m-b-15">
+
+  <!-- Main Fields Row -->
+  <div class="row g-3 m-b-20">
+    <div class="col-12 col-sm-6 col-md">
+      <label class="form-label">Start date:</label>
+      <input type="date" class="form-control" formControlName="startDate">
+    </div>
+    <div class="col-12 col-sm-6 col-md">
+      <label class="form-label">Time:</label>
+      <input type="time" class="form-control" formControlName="time">
+    </div>
+    <div class="col-12 col-sm-6 col-md">
+      <label class="form-label">Hours</label>
+      <select2 [data]="hoursOptions" formControlName="jobPartHours"></select2>
+    </div>
+    <div class="col-12 col-sm-6 col-md">
+      <label class="form-label">Crew</label>
+      <select2 [data]="crewOptions" formControlName="crewNumber"></select2>
+    </div>
+    <div class="col-12 col-sm-6 col-md">
+      <label class="form-label">CC Suppl</label>
+      <input type="number" step="0.01" class="form-control" formControlName="ccSupplement">
+    </div>
+  </div>
+
+  <!-- Accordion Section -->
+  <div class="accordion m-b-20" ngbAccordion>
+    <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+      <h2 class="accordion-header" ngbAccordionHeader>
+        <button class="accordion-button" type="button" ngbAccordionButton>
+          <span class="accordion-title">OOT - Out of town / travel costs</span>
+          <span class="cost-badge ms-auto me-2">£0.00</span>
+        </button>
+      </h2>
+      <div ngbAccordionCollapse>
+        <div ngbAccordionBody>
+          <ng-template>
+            <!-- Content to be configured -->
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Fields Row -->
+  <div class="row g-3 m-b-20">
+    <div class="col-12 col-md-3">
+      <label class="form-label">Alternative venue:</label>
+      <input type="text" class="form-control" formControlName="jobPartVenueName">
+    </div>
+    <div class="col-12 col-md-2">
+      <label class="form-label">Postcode:</label>
+      <input type="text" class="form-control" formControlName="jobPartVenuePostcode">
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label">Onsite contact:</label>
+      <input type="text" class="form-control" formControlName="onsiteContact">
+    </div>
+    <div class="col-6 col-md-1">
+      <label class="form-label">AlpDr:</label>
+      <input type="number" class="form-control" formControlName="alphaDrivers">
+    </div>
+    <div class="col-6 col-md-3 d-flex align-items-end justify-content-end">
+      <span class="total-cost">£0.00</span>
+    </div>
+  </div>
+
+  <!-- Notes Section -->
+  <div class="notes-section m-b-20">
+    <div class="notes-header d-flex align-items-stretch">
+      <label class="important-check d-flex align-items-center gap-2">
+        <input type="checkbox" class="form-check-input m-0" formControlName="importantNotes">
+        <span class="fw-bold">Important</span>
+      </label>
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeNotesTab" class="nav-tabs notes-tabs flex-grow-1">
+        <li [ngbNavItem]="1">
+          <button ngbNavLink>OFFICE NOTES</button>
+          <ng-template ngbNavContent>
+            <div class="notes-editor">
+              <textarea class="form-control border-0" rows="4"
+                        formControlName="notes"
+                        placeholder="Office notes..."></textarea>
+            </div>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="2">
+          <button ngbNavLink>CREW (APP) NOTES</button>
+          <ng-template ngbNavContent>
+            <div class="notes-editor">
+              <textarea class="form-control border-0" rows="4"
+                        formControlName="crewNotes"
+                        placeholder="Crew notes..."></textarea>
+            </div>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="3">
+          <button ngbNavLink>PAPERWORK NOTES</button>
+          <ng-template ngbNavContent>
+            <div class="notes-editor">
+              <textarea class="form-control border-0" rows="4"
+                        formControlName="paperworkNotes"
+                        placeholder="Paperwork notes..."></textarea>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+    </div>
+    <div [ngbNavOutlet]="nav" class="notes-content"></div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="d-flex justify-content-end gap-3">
+    <button type="button" class="btn btn-danger px-4" (click)="save.emit()">SAVE</button>
+    <button type="button" class="btn btn-danger px-4" (click)="cancel.emit()">CANCEL</button>
+  </div>
+</form>
