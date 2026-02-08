@@ -78,10 +78,13 @@
   <!-- Notes Section -->
   <div class="notes-section m-b-20">
     <div class="notes-header d-flex align-items-stretch">
-      <label class="important-check d-flex align-items-center gap-2">
-        <input type="checkbox" class="form-check-input m-0" formControlName="importantNotes">
-        <span class="fw-bold">Important</span>
-      </label>
+      <div class="form-check important-check d-flex align-items-center gap-2 flex-shrink-0">
+        <input type="checkbox" id="importantNotesCheckbox" class="form-check-input m-0"
+               formControlName="importantNotes">
+        <label class="form-check-label fw-bold m-0 cursor-pointer" for="importantNotesCheckbox">
+          Important
+        </label>
+      </div>
       <ul ngbNav #nav="ngbNav" [(activeId)]="activeNotesTab" class="nav-tabs notes-tabs flex-grow-1">
         <li [ngbNavItem]="1">
           <button ngbNavLink>OFFICE NOTES</button>

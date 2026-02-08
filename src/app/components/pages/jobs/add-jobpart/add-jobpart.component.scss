@@ -8,21 +8,28 @@
 
   .important-check {
     padding: 0 20px;
-    cursor: pointer;
     white-space: nowrap;
     color: #fff;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
 
     .form-check-input {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       cursor: pointer;
       border-color: rgba(255, 255, 255, 0.7);
+      pointer-events: auto;
+      flex-shrink: 0;
 
       &:checked {
         background-color: #fff;
         border-color: #fff;
       }
+    }
+
+    .form-check-label {
+      cursor: pointer;
+      pointer-events: auto;
+      user-select: none;
     }
   }
 
