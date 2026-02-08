@@ -107,6 +107,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   jobPartsTableConfig: WritableSignal<TableConfigs> = signal<TableConfigs>({
     columns: [
+      { title: '', field_value: 'infoIcon' },
       { title: '', field_value: 'typeIcon' },
       { title: 'Starts', field_value: 'starts' },
       { title: 'Time', field_value: 'time' },
@@ -572,6 +573,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       ...part,
       id: part.jobPartId,
       typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
+      infoIcon: this.getJobPartInfoIcon(part.jobPartTypeId, part.typeText),
       skills: this.getSkillsString(part),
       travelFormatted: this.getTravelFormatted(part.ootCost, part.currencySign),
       netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
@@ -609,6 +611,24 @@ export class EditJobComponent extends ApiBase implements OnInit {
         return `<i class="icofont icofont-shield-alt txt-danger f-18" ${ tooltip }></i>`;
       default:
         return `<i class="fa-solid fa-briefcase txt-secondary f-18" ${ tooltip }></i>`;
+    }
+  }
+
+  getJobPartInfoIcon(typeId: number, typeText: string): string {
+    const tooltip = typeText ? `title="${ typeText }"` : '';
+
+    switch (typeId) {
+      case 12:
+        return `<i class="fas fa-triangle-exclamation txt-danger f-18" ${ tooltip }></i>`;
+      case 22:
+      case 52:
+        return `<i class="fas fa-triangle-exclamation f-18" ${ tooltip }></i>`;
+      case 42:
+      case 62:
+        return `<i class="fas fa-triangle-exclamation f-18" ${ tooltip }></i>`;
+      default:
+        // return `<i class="fas fa-triangle-exclamation txt-warning f-18" ${ tooltip }></i>`;
+        return '';
     }
   }
 
