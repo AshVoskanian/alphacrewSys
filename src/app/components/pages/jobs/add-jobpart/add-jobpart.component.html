@@ -83,6 +83,79 @@
         </div>
       </div>
     </div>
+
+    <!-- Miscellaneous costs and skills -->
+    <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+      <h2 class="accordion-header" ngbAccordionHeader>
+        <button class="accordion-button" type="button" ngbAccordionButton>
+          <span class="accordion-title">Miscellaneous costs and skills</span>
+          <span class="cost-badge ms-auto me-2">£0.00</span>
+        </button>
+      </h2>
+      <div ngbAccordionCollapse>
+        <div ngbAccordionBody>
+          <ng-template>
+            <div class="row g-3 p-t-10">
+              <div class="col">
+                <label class="form-label">Miscellaneous</label>
+                <input type="text" class="form-control form-control-sm" formControlName="misc" placeholder="e.g. LMB">
+              </div>
+              <div class="col">
+                <label class="form-label">Misc cost:</label>
+                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="miscCost">
+              </div>
+              <div class="col">
+                <label class="form-label">Required skills:</label>
+                <select class="form-select form-select-sm" formControlName="requiredSkills">
+                  <option [ngValue]="null">Choose skills</option>
+                  @for (s of skillsOptions; track s.value) {
+                    <option [ngValue]="s.value">{{ s.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col">
+                <label class="form-label">Skills cost:</label>
+                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="skillSupplement">
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extra Hours -->
+    <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+      <h2 class="accordion-header" ngbAccordionHeader>
+        <button class="accordion-button" type="button" ngbAccordionButton>
+          <span class="accordion-title">Extra Hours</span>
+          <span class="cost-badge ms-auto me-2">£0.00</span>
+        </button>
+      </h2>
+      <div ngbAccordionCollapse>
+        <div ngbAccordionBody>
+          <ng-template>
+            <div class="row g-3 p-t-10">
+              <div class="col">
+                <label class="form-label">Number of Extra Crew:</label>
+                <select class="form-select form-select-sm" formControlName="extraCrew">
+                  @for (ec of extraCrewOptions; track ec.value) {
+                    <option [value]="ec.value">{{ ec.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col">
+                <label class="form-label">Total Extra man-hours:</label>
+                <input type="number" step="0.0001" class="form-control form-control-sm" formControlName="extraHours">
+              </div>
+              <div class="col">
+                <label class="form-label">Extra Hours Cost:</label>
+                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="extraCost">
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Fields Row -->

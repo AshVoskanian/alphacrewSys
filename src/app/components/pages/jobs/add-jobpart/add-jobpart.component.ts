@@ -48,6 +48,24 @@ export class AddJobpartComponent {
     label: `${i}hrs`
   }));
 
+  extraCrewOptions = Array.from({ length: 11 }, (_, i) => ({
+    value: i,
+    label: `${i} Extra Crew`
+  }));
+
+  skillsOptions = [
+    { value: 'driver', label: 'Driver' },
+    { value: 'forklift', label: 'Forklift' },
+    { value: 'ipaf', label: 'IPAF' },
+    { value: 'safety', label: 'Safety' },
+    { value: 'construction', label: 'Construction' },
+    { value: 'carpenter', label: 'Carpenter' },
+    { value: 'lightning', label: 'Lightning' },
+    { value: 'sound', label: 'Sound' },
+    { value: 'video', label: 'Video' },
+    { value: 'firstaid', label: 'First Aid' },
+  ];
+
   form: FormGroup = this._fb.group({
     jobPartTypeId: [1],
     startDate: [null],
@@ -71,11 +89,12 @@ export class AddJobpartComponent {
     extraHours: [0],
     extraCost: [0],
 
-    // Miscellaneous costs
+    // Miscellaneous costs and skills
     misc: [null],
     miscCost: [0],
     fuel: [0],
     skillSupplement: [0],
+    requiredSkills: [null as string | null],
 
     // Venue / Contact
     jobPartVenueName: [null],
