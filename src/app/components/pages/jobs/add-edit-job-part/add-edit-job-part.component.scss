@@ -1,7 +1,6 @@
 // Notes section with teal tab bar
 .notes-section {
   .notes-header {
-    background-color: #26c6da;
     border-radius: 4px 4px 0 0;
     overflow: hidden;
   }
@@ -119,9 +118,29 @@
   white-space: nowrap;
 }
 
-// Total cost display
-.total-cost {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #333;
+// Total amount - visually separated box
+.total-amount-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  min-width: 100px;
+
+  .total-amount-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+  }
+
+  .total-cost {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+  }
 }

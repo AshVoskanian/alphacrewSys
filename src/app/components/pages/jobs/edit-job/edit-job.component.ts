@@ -38,9 +38,9 @@ import { HttpClient } from "@angular/common/http";
 import { NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
-import { AddJobpartComponent } from "../add-jobpart/add-jobpart.component";
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { TagInputModule } from "ngx-chips";
+import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.component";
 
 @Component({
   selector: 'app-edit-job',
@@ -52,10 +52,10 @@ import { TagInputModule } from "ngx-chips";
     DatePipe,
     CurrencyPipe,
     TableComponent,
-    AddJobpartComponent,
     AddPaymentComponent,
     CardComponent,
-    TagInputModule
+    TagInputModule,
+    AddEditJobPartComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
