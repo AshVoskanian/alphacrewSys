@@ -67,15 +67,15 @@
     border-top: 3px solid #fdd835;
     border-radius: 0 0 4px 4px;
     padding: 15px;
+    min-height: 140px;
 
-    .notes-editor {
-      textarea {
-        resize: vertical;
-        min-height: 100px;
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 100px;
 
-        &:focus {
-          box-shadow: none;
-        }
+      &:focus {
+        box-shadow: none;
       }
     }
   }

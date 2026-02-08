@@ -1,15 +1,14 @@
 import { Component, inject, input, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
-import { NgbAccordionModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-add-jobpart',
   imports: [
     ReactiveFormsModule,
     Select2Module,
-    NgbAccordionModule,
-    NgbNavModule
+    NgbAccordionModule
   ],
   templateUrl: './add-jobpart.component.html',
   styleUrl: './add-jobpart.component.scss'
@@ -42,6 +41,11 @@ export class AddJobpartComponent {
   crewOptions: Select2Option[] = Array.from({ length: 21 }, (_, i) => ({
     value: i,
     label: `${i} Crew`
+  }));
+
+  travelHoursOptions = Array.from({ length: 13 }, (_, i) => ({
+    value: i,
+    label: `${i}hrs`
   }));
 
   form: FormGroup = this._fb.group({
