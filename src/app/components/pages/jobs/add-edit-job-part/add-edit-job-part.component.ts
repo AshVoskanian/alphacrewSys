@@ -4,9 +4,9 @@ import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { GeneralService } from "../../../../shared/services/general.service";
-import { ApiBase } from "../../../../shared/bases/api-base";
-import { JobPartTypeItem } from "../../../../shared/interface/jobs";
+import { GeneralService } from '../../../../shared/services/general.service';
+import { ApiBase } from '../../../../shared/bases/api-base';
+import { AddOrUpdateJobPartRequest, JobPartTypeItem } from '../../../../shared/interface/jobs';
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -23,8 +23,14 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _dr = inject(DestroyRef);
 
   jobId = input<number>();
+  jobPartId = input<number>(0);
 
+  /** Emitted when user cancels or when modal should close without refetch */
   finish = output<void>();
+  /** Emitted after job part is saved successfully (parent should close modal and refetch) */
+  saved = output<void>();
+
+  submitLoading = signal(false);
 
   activeNotesTab: WritableSignal<number> = signal(1);
 
@@ -82,6 +88,20 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     Array.from({ length: 11 }, (_, i) => ({ value: i, label: `${ i } Extra Crew` }))
   );
 
+  /** Dropdown value -> form control name for required skill. */
+  private static readonly REQUIRED_SKILL_TO_CONTROL: Record<string, string> = {
+    driver: 'skillDriver',
+    forklift: 'skillForklift',
+    ipaf: 'skillIpaf',
+    safety: 'skillSafety',
+    construction: 'skillConstruction',
+    carpenter: 'skillCarpenter',
+    lightning: 'skillLightning',
+    sound: 'skillSound',
+    video: 'skillVideo',
+    firstaid: 'skillFirstAid',
+  };
+
   readonly skillsOptions = signal<{ value: string; label: string }[]>([
     { value: 'driver', label: 'Driver' },
     { value: 'forklift', label: 'Forklift' },
@@ -100,9 +120,12 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     startDate: [ null ],
     time: [ null ],
     jobPartHours: [ 10 ],
+    jobPartNumber: [ 0 ],
     crewNumber: [ 6 ],
     crewChiefNumber: [ 0 ],
     ccSupplement: [ null ],
+    quoteCost: [ 0 ],
+    eventId: [ '' ],
 
     // OOT - Out of town / travel costs
     travelHours: [ 0 ],
@@ -167,14 +190,145 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   ngOnInit(): void {
     this.loadJobPartTypes();
+    this.syncRequiredSkillToForm();
   }
 
-  submit() {
+  /** When "Required skills" dropdown changes, set the corresponding skill control to true. */
+  private syncRequiredSkillToForm(): void {
+    this.form.get('requiredSkills')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe((value: string | null) => {
+        const controlName = value ? AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL[value] : null;
+        const updates: Record<string, boolean> = {};
+        Object.values(AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL).forEach((ctrl) => {
+          updates[ctrl] = ctrl === controlName;
+        });
+        this.form.patchValue(updates, { emitEvent: false });
+      });
+  }
+
+  /** Builds start/end from form: exact local date/time, no UTC parsing. */
+  private buildStartEndDates(): { startDate: string; endDate: string } {
+    const dateVal = this.form.get('startDate')?.value as string | null;
+    const timeVal = this.form.get('time')?.value as string | null;
+    const hours = Number(this.form.get('jobPartHours')?.value ?? 0);
+    const date = dateVal ?? new Date().toISOString().slice(0, 10);
+    const time = timeVal ?? '00:00';
+    const timePart = time.includes(':') && time.length <= 5 ? `${ time }:00` : time;
+    const startDate = `${ date }T${ timePart }`;
+
+    const [y, m, d] = date.split('-').map(Number);
+    const timeParts = time.split(':').map(Number);
+    const h = timeParts[0] ?? 0;
+    const min = timeParts[1] ?? 0;
+    const startLocal = new Date(y, m - 1, d, h, min, 0, 0);
+    const endLocal = new Date(startLocal.getTime() + hours * 60 * 60 * 1000);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const endDate =
+      `${ endLocal.getFullYear() }-${ pad(endLocal.getMonth() + 1) }-${ pad(endLocal.getDate()) }T${ pad(endLocal.getHours()) }:${ pad(endLocal.getMinutes()) }:${ pad(endLocal.getSeconds()) }`;
+
+    return { startDate, endDate };
+  }
+
+  private getSkillPayloadFromForm(v: Record<string, unknown>): Record<string, boolean> {
+    const requiredControl = v['requiredSkills'] ? AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL[v['requiredSkills'] as string] : null;
+    const skillKeys = [
+      'skillDriver', 'skillForklift', 'skillIpaf', 'skillIpaf3b', 'skillSafety', 'skillConstruction',
+      'skillCarpenter', 'skillLightning', 'skillSound', 'skillVideo', 'skillTfm', 'skillTelehandler',
+      'skillScissorlift', 'skillCherrypicker', 'skillFirstAid', 'skillPasma', 'skillFollowspot',
+      'skillAudioTech', 'skillRoughTerrainForklift', 'skillHealhAndSafety', 'skillWorkingAtHeight',
+    ];
+    const out: Record<string, boolean> = {};
+    skillKeys.forEach((key) => {
+      out[key] = key === requiredControl ? true : Boolean(v[key]);
+    });
+    return out;
+  }
+
+  private buildPayload(): Partial<AddOrUpdateJobPartRequest> {
+    const v = this.form.getRawValue();
+    const { startDate, endDate } = this.buildStartEndDates();
+    return {
+      jobPartId: this.jobPartId() ?? 0,
+      jobId: this.jobId() ?? 0,
+      jobPartTypeId: Number(v.jobPartTypeId ?? 0),
+      eventId: v.eventId ?? '',
+      jobPartVenueName: v.jobPartVenueName ?? '',
+      jobPartVenuePostcode: v.jobPartVenuePostcode ?? '',
+      alphaDrivers: Number(v.alphaDrivers ?? 0),
+      startDate,
+      endDate,
+      crewNumber: Number(v.crewNumber ?? 0),
+      crewChiefNumber: Number(v.crewChiefNumber ?? 0),
+      ccSupplement: Number(v.ccSupplement ?? 0),
+      quoteCost: Number(v.quoteCost ?? 0),
+      extraCrew: Number(v.extraCrew ?? 0),
+      extraHours: Number(v.extraHours ?? 0),
+      extraCost: Number(v.extraCost ?? 0),
+      ootCost: Number(v.ootCost ?? 0),
+      travelHours: Number(v.travelHours ?? 0),
+      travelHoursCost: Number(v.travelHoursCost ?? 0),
+      lateShiftCost: Number(v.lateShiftCost ?? 0),
+      returnMileage: Number(v.returnMileage ?? 0),
+      misc: v.misc ?? '',
+      miscCost: Number(v.miscCost ?? 0),
+      fuel: Number(v.fuel ?? 0),
+      fuelCost: Number(v.fuelCost ?? 0),
+      fuelCostCrew: Number(v.fuelCostCrew ?? 0),
+      notes: v.notes ?? '',
+      crewNotes: v.crewNotes ?? '',
+      skillsNotes: v.skillsNotes ?? '',
+      paperworkNotes: v.paperworkNotes ?? '',
+      importantNotes: Boolean(v.importantNotes),
+      lateChange: Boolean(v.lateChange),
+      jobPartNumber: Number(v.jobPartNumber ?? 0),
+      jobPartHours: Number(v.jobPartHours ?? 0),
+      ...this.getSkillPayloadFromForm(v),
+      skillSupplement: Number(v.skillSupplement ?? 0),
+      onsiteContact: v.onsiteContact ?? '',
+      editedBy: '',
+      lastModified: new Date().toISOString(),
+      updateHistory: '',
+      revision: 0,
+      rateCard: {
+        crewRate: 0,
+        crewChiefSupplement: 0,
+        extraHour: 0,
+        skillSupplement: 0,
+        milage: 0,
+      },
+    };
+  }
+
+  submit(): void {
     if (this.form.invalid) {
       GeneralService.markFormGroupTouched(this.form);
       return;
     }
-
-    // Post
+    const jobId = this.jobId();
+    if (jobId == null || jobId <= 0) {
+      GeneralService.showErrorMessage('Job is required to add a part.');
+      return;
+    }
+    this.submitLoading.set(true);
+    const payload = this.buildPayload();
+    this.post<unknown, AddOrUpdateJobPartRequest>('Jobs/AddOrUpdateJobPart', payload as AddOrUpdateJobPartRequest)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.submitLoading.set(false))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          GeneralService.showSuccessMessage('Job part saved successfully');
+          this.saved.emit();
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Failed to save job part');
+        },
+      });
   }
 }

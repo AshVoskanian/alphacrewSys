@@ -174,3 +174,77 @@ export interface ClientLimit {
   creditRating: number;
   recommendedCreditLimit: number;
 }
+
+/** Request body for POST Jobs/AddOrUpdateJobPart */
+export interface JobPartRateCard {
+  crewRate: number;
+  crewChiefSupplement: number;
+  extraHour: number;
+  skillSupplement: number;
+  milage: number;
+}
+
+export interface AddOrUpdateJobPartRequest {
+  jobPartId: number;
+  jobId: number;
+  jobPartTypeId: number;
+  eventId: string;
+  jobPartVenueName: string;
+  jobPartVenuePostcode: string;
+  alphaDrivers: number;
+  startDate: string;
+  endDate: string;
+  crewNumber: number;
+  crewChiefNumber: number;
+  ccSupplement: number;
+  quoteCost: number;
+  extraCrew: number;
+  extraHours: number;
+  extraCost: number;
+  ootCost: number;
+  travelHours: number;
+  travelHoursCost: number;
+  lateShiftCost: number;
+  returnMileage: number;
+  misc: string;
+  miscCost: number;
+  fuel: number;
+  fuelCost: number;
+  fuelCostCrew: number;
+  notes: string;
+  crewNotes: string;
+  skillsNotes: string;
+  paperworkNotes: string;
+  importantNotes: boolean;
+  lateChange: boolean;
+  jobPartNumber: number;
+  jobPartHours: number;
+  skillDriver: boolean;
+  skillForklift: boolean;
+  skillIpaf: boolean;
+  skillIpaf3b: boolean;
+  skillSafety: boolean;
+  skillConstruction: boolean;
+  skillCarpenter: boolean;
+  skillLightning: boolean;
+  skillSound: boolean;
+  skillVideo: boolean;
+  skillTfm: boolean;
+  skillTelehandler: boolean;
+  skillScissorlift: boolean;
+  skillCherrypicker: boolean;
+  skillFirstAid: boolean;
+  skillPasma: boolean;
+  skillFollowspot: boolean;
+  skillAudioTech: boolean;
+  skillRoughTerrainForklift: boolean;
+  skillHealhAndSafety: boolean;
+  skillWorkingAtHeight: boolean;
+  skillSupplement: number;
+  onsiteContact: string;
+  editedBy: string;
+  lastModified: string;
+  updateHistory: string;
+  revision: number;
+  rateCard: JobPartRateCard;
+}

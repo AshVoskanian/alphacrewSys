@@ -414,6 +414,9 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
-    <app-add-edit-job-part></app-add-edit-job-part>
+    <app-add-edit-job-part
+      [jobId]="jobDetails()?.jobId"
+      (finish)="onJobPartCancel()"
+      (saved)="onJobPartSaved()"></app-add-edit-job-part>
   </div>
 </ng-template>

@@ -22,7 +22,8 @@
       <app-edit-job
         #editJobRef
         [jobDetails]="jobDetails()"
-        (partialPaymentsUpdated)="onPartialPaymentsUpdated($event)">
+        (partialPaymentsUpdated)="onPartialPaymentsUpdated($event)"
+        (jobPartsUpdated)="getDetails()">
       </app-edit-job>
     </div>
   </app-card>

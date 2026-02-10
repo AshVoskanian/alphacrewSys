@@ -66,6 +66,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   jobDetails = input<JobDetails>();
   partialPaymentsUpdated = output<AddPaymentResponse>();
+  jobPartsUpdated = output<void>();
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -751,6 +752,15 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   openAddJobPartModal(template: TemplateRef<NgbModal>) {
     this.modalRef = this._modal.open(template, { centered: true, size: 'xl' });
+  }
+
+  onJobPartSaved(): void {
+    this.modalRef?.close();
+    this.jobPartsUpdated.emit();
+  }
+
+  onJobPartCancel(): void {
+    this.modalRef?.close();
   }
 
   openAddPaymentModal(template: TemplateRef<NgbModal>) {
