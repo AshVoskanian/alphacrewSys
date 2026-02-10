@@ -26,11 +26,11 @@
     </div>
     <div class="col-12 col-sm-6 col-md">
       <label class="form-label">Hours</label>
-      <select2 [data]="hoursOptions()" formControlName="jobPartHours"></select2>
+      <select2 [data]="hoursOptions()" [displaySearchStatus]="'hidden'" formControlName="jobPartHours"></select2>
     </div>
     <div class="col-12 col-sm-6 col-md">
       <label class="form-label">Crew</label>
-      <select2 [data]="crewOptions()" formControlName="crewNumber"></select2>
+      <select2 [data]="crewOptions()" [displaySearchStatus]="'hidden'" formControlName="crewNumber"></select2>
     </div>
     <div class="col-12 col-sm-6 col-md">
       <label class="form-label">CC Suppl</label>
