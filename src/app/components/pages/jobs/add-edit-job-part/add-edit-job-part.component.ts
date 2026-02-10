@@ -118,7 +118,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   form: FormGroup = this._fb.group({
     jobPartTypeId: [ 1 ],
     startDate: [ null ],
-    time: [ null ],
     jobPartHours: [ 10 ],
     jobPartNumber: [ 0 ],
     crewNumber: [ 6 ],
@@ -207,27 +206,31 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       });
   }
 
-  /** Builds start/end from form: exact local date/time, no UTC parsing. */
+  /** Builds start/end from "Start date and time" (datetime-local → YYYY-MM-DDTHH:mm). */
   private buildStartEndDates(): { startDate: string; endDate: string } {
-    const dateVal = this.form.get('startDate')?.value as string | null;
-    const timeVal = this.form.get('time')?.value as string | null;
+    const startVal = this.form.get('startDate')?.value as string | null;
     const hours = Number(this.form.get('jobPartHours')?.value ?? 0);
-    const date = dateVal ?? new Date().toISOString().slice(0, 10);
-    const time = timeVal ?? '00:00';
-    const timePart = time.includes(':') && time.length <= 5 ? `${ time }:00` : time;
-    const startDate = `${ date }T${ timePart }`;
+    const raw = startVal?.trim() ?? '';
+    const startDate = raw.length >= 16
+      ? (raw.length === 16 ? `${ raw }:00` : raw.slice(0, 19))
+      : this.getDefaultStartLocalIso();
 
-    const [y, m, d] = date.split('-').map(Number);
-    const timeParts = time.split(':').map(Number);
-    const h = timeParts[0] ?? 0;
-    const min = timeParts[1] ?? 0;
-    const startLocal = new Date(y, m - 1, d, h, min, 0, 0);
+    const [datePart, timePart] = startDate.split('T');
+    const [y, m, d] = (datePart ?? '').split('-').map(Number);
+    const [h, min] = (timePart ?? '00:00:00').split(':').map(Number);
+    const startLocal = new Date(y, m - 1, d, h ?? 0, min ?? 0, 0, 0);
     const endLocal = new Date(startLocal.getTime() + hours * 60 * 60 * 1000);
     const pad = (n: number) => String(n).padStart(2, '0');
     const endDate =
       `${ endLocal.getFullYear() }-${ pad(endLocal.getMonth() + 1) }-${ pad(endLocal.getDate()) }T${ pad(endLocal.getHours()) }:${ pad(endLocal.getMinutes()) }:${ pad(endLocal.getSeconds()) }`;
 
     return { startDate, endDate };
+  }
+
+  private getDefaultStartLocalIso(): string {
+    const d = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }:00`;
   }
 
   private getSkillPayloadFromForm(v: Record<string, unknown>): Record<string, boolean> {
@@ -285,18 +288,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       jobPartHours: Number(v.jobPartHours ?? 0),
       ...this.getSkillPayloadFromForm(v),
       skillSupplement: Number(v.skillSupplement ?? 0),
-      onsiteContact: v.onsiteContact ?? '',
-      editedBy: '',
-      lastModified: new Date().toISOString(),
-      updateHistory: '',
-      revision: 0,
-      rateCard: {
-        crewRate: 0,
-        crewChiefSupplement: 0,
-        extraHour: 0,
-        skillSupplement: 0,
-        milage: 0,
-      },
+      onsiteContact: v.onsiteContact ?? ''
     };
   }
 
