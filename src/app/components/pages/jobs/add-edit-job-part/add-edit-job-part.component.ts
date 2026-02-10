@@ -1,4 +1,5 @@
-import { Component, DestroyRef, inject, input, OnInit, output, signal, WritableSignal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, DestroyRef, effect, inject, input, OnInit, output, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
@@ -6,7 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { GeneralService } from '../../../../shared/services/general.service';
 import { ApiBase } from '../../../../shared/bases/api-base';
-import { AddOrUpdateJobPartRequest, JobPartTypeItem } from '../../../../shared/interface/jobs';
+import { AddOrUpdateJobPartRequest, JobPartDetailsResponse, JobPartTypeItem } from '../../../../shared/interface/jobs';
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -37,6 +38,17 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   jobPartTypes: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
 
   jobPartTypesLoading = signal(false);
+  partDetailsLoading = signal(false);
+
+  constructor(http: HttpClient) {
+    super(http);
+    effect(() => {
+      const id = this.jobPartId();
+      if (id != null && id > 0) {
+        this.loadJobPartDetails(id);
+      }
+    });
+  }
 
   loadJobPartTypes(): void {
     this.jobPartTypesLoading.set(true);
@@ -190,6 +202,111 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   ngOnInit(): void {
     this.loadJobPartTypes();
     this.syncRequiredSkillToForm();
+  }
+
+  /** GET Jobs/GetJobPart and patch form (edit mode). */
+  private loadJobPartDetails(jobPartId: number): void {
+    this.partDetailsLoading.set(true);
+    this.get<JobPartDetailsResponse>('Jobs/GetJobPart', { jobPartId })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.partDetailsLoading.set(false))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          const part = res.data;
+          if (part) this.patchFormWithPart(part);
+        },
+      });
+  }
+
+  private patchFormWithPart(part: JobPartDetailsResponse): void {
+    const startForInput = this.isoToDatetimeLocal(part.startDate);
+    const jobPartHours = part.jobPartHours ?? this.computeHoursFromStartEnd(part.startDate, part.endDate);
+    const bool = (v: boolean | null | undefined) => v === true;
+    this.form.patchValue({
+      jobPartTypeId: part.jobPartTypeId,
+      startDate: startForInput,
+      jobPartHours: jobPartHours ?? 0,
+      jobPartNumber: part.jobPartNumber ?? 0,
+      crewNumber: part.crewNumber,
+      crewChiefNumber: part.crewChiefNumber,
+      ccSupplement: part.ccSupplement,
+      quoteCost: part.quoteCost,
+      eventId: part.eventId ?? '',
+      travelHours: part.travelHours,
+      travelHoursCost: part.travelHoursCost,
+      returnMileage: part.returnMileage,
+      ootCost: part.ootCost,
+      lateShiftCost: part.lateShiftCost,
+      fuelCost: part.fuelCost,
+      fuelCostCrew: part.fuelCostCrew,
+      extraCrew: part.extraCrew,
+      extraHours: part.extraHours,
+      extraCost: part.extraCost,
+      misc: part.misc ?? '',
+      miscCost: part.miscCost,
+      fuel: part.fuel ?? 0,
+      skillSupplement: part.skillSupplement,
+      jobPartVenueName: part.jobPartVenueName ?? '',
+      jobPartVenuePostcode: part.jobPartVenuePostcode ?? '',
+      onsiteContact: part.onsiteContact ?? '',
+      alphaDrivers: part.alphaDrivers,
+      importantNotes: part.importantNotes,
+      notes: part.notes ?? '',
+      crewNotes: part.crewNotes ?? '',
+      skillsNotes: part.skillsNotes ?? '',
+      paperworkNotes: part.paperworkNotes ?? '',
+      lateChange: part.lateChange ?? false,
+      skillDriver: bool(part.skillDriver),
+      skillForklift: bool(part.skillForklift),
+      skillIpaf: bool(part.skillIpaf),
+      skillIpaf3b: bool(part.skillIpaf3b),
+      skillSafety: bool(part.skillSafety),
+      skillConstruction: bool(part.skillConstruction),
+      skillCarpenter: bool(part.skillCarpenter),
+      skillLightning: bool(part.skillLightning),
+      skillSound: bool(part.skillSound),
+      skillVideo: bool(part.skillVideo),
+      skillTfm: bool(part.skillTfm),
+      skillTelehandler: bool(part.skillTelehandler),
+      skillScissorlift: bool(part.skillScissorlift),
+      skillCherrypicker: bool(part.skillCherrypicker),
+      skillFirstAid: bool(part.skillFirstAid),
+      skillPasma: bool(part.skillPasma),
+      skillFollowspot: bool(part.skillFollowspot),
+      skillAudioTech: bool(part.skillAudioTech),
+      skillRoughTerrainForklift: bool(part.skillRoughTerrainForklift),
+      skillHealhAndSafety: bool(part.skillHealhAndSafety),
+      skillWorkingAtHeight: bool(part.skillWorkingAtHeight),
+    }, { emitEvent: false });
+    this.setRequiredSkillsFromPart(part);
+  }
+
+  private computeHoursFromStartEnd(startIso: string, endIso: string): number {
+    const start = new Date(startIso);
+    const end = new Date(endIso);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+    return Math.max(0, Math.round((end.getTime() - start.getTime()) / (60 * 60 * 1000)));
+  }
+
+  private setRequiredSkillsFromPart(part: JobPartDetailsResponse): void {
+    const entry = Object.entries(AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL)
+      .find(([, ctrl]) => (part as unknown as Record<string, unknown>)[ctrl] === true);
+    if (entry) this.form.patchValue({ requiredSkills: entry[0] }, { emitEvent: false });
+  }
+
+  /** ISO string to datetime-local value YYYY-MM-DDTHH:mm. */
+  private isoToDatetimeLocal(iso: string): string {
+    if (!iso?.trim()) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }`;
   }
 
   /** When "Required skills" dropdown changes, set the corresponding skill control to true. */

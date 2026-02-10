@@ -1,3 +1,8 @@
+@if (partDetailsLoading()) {
+  <div class="d-flex justify-content-center align-items-center p-5">
+    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
+  </div>
+} @else {
 <form [formGroup]="form" (ngSubmit)="submit()">
   <!-- Job Part Type Dropdown -->
   <div class="row g-3 m-b-15">
@@ -227,6 +232,12 @@
   <!-- Action Buttons -->
   <div class="d-flex justify-content-end gap-3">
     <button type="button" class="btn btn-secondary px-4" (click)="finish.emit()">CANCEL</button>
-    <button type="submit" class="btn btn-primary px-4">SAVE</button>
+    <button type="submit" class="btn btn-primary px-4" [disabled]="submitLoading()">
+      @if (submitLoading()) {
+        <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
+      }
+      SAVE
+    </button>
   </div>
 </form>
+}

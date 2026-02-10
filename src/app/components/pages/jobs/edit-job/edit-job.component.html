@@ -356,7 +356,8 @@
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center m-b-15">
         <h5 class="m-0">Job Parts</h5>
-        <button type="button" class="btn btn-primary btn-sm" (click)="openAddJobPartModal(addJobPartModal)">
+        <button type="button" class="btn btn-primary btn-sm"
+          (click)="editingJobPartId.set(null); openAddJobPartModal(addJobPartModal)">
           <i class="fa-solid fa-plus m-r-5"></i>
           Add new Part
         </button>
@@ -407,15 +408,16 @@
   </div>
 </ng-template>
 
-<!-- Add Job Part Modal -->
+<!-- Add / Edit Job Part Modal -->
 <ng-template #addJobPartModal let-modal>
   <div class="modal-header">
-    <h5 class="modal-title">Add New Job Part</h5>
+    <h5 class="modal-title">{{ editingJobPartId() ? 'Edit Job Part' : 'Add New Job Part' }}</h5>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
     <app-add-edit-job-part
       [jobId]="jobDetails()?.jobId"
+      [jobPartId]="editingJobPartId() ?? 0"
       (finish)="onJobPartCancel()"
       (saved)="onJobPartSaved()"></app-add-edit-job-part>
   </div>

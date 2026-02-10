@@ -63,10 +63,14 @@ import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.
 })
 export class EditJobComponent extends ApiBase implements OnInit {
   @ViewChild('venueInstance', { static: true }) venueInstance: NgbTypeahead;
+  @ViewChild('addJobPartModal') addJobPartModalRef: TemplateRef<NgbModal>;
 
   jobDetails = input<JobDetails>();
   partialPaymentsUpdated = output<AddPaymentResponse>();
   jobPartsUpdated = output<void>();
+
+  /** When set, modal opens in edit mode and form loads this job part. */
+  editingJobPartId: WritableSignal<number | null> = signal<number | null>(null);
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -711,9 +715,9 @@ export class EditJobComponent extends ApiBase implements OnInit {
     }));
   }
 
-  editJobPart(part: JobPart) {
-    // TODO: Implement edit functionality
-    console.log('Edit job part:', part);
+  editJobPart(part: JobPart): void {
+    this.editingJobPartId.set(part.jobPartId);
+    this.openAddJobPartModal(this.addJobPartModalRef);
   }
 
   copyJobPart(part: JobPart) {
@@ -750,17 +754,19 @@ export class EditJobComponent extends ApiBase implements OnInit {
     }));
   }
 
-  openAddJobPartModal(template: TemplateRef<NgbModal>) {
+  openAddJobPartModal(template: TemplateRef<NgbModal>): void {
     this.modalRef = this._modal.open(template, { centered: true, size: 'xl' });
   }
 
   onJobPartSaved(): void {
     this.modalRef?.close();
+    this.editingJobPartId.set(null);
     this.jobPartsUpdated.emit();
   }
 
   onJobPartCancel(): void {
     this.modalRef?.close();
+    this.editingJobPartId.set(null);
   }
 
   openAddPaymentModal(template: TemplateRef<NgbModal>) {
