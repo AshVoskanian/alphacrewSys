@@ -2,7 +2,6 @@ import { Component, DestroyRef, inject, input, OnInit, output, signal, WritableS
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { GeneralService } from "../../../../shared/services/general.service";
@@ -33,15 +32,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   jobPartTypesLoading = signal(false);
 
-  constructor() {
-    super(inject(HttpClient));
-  }
-
-  ngOnInit(): void {
-    this.loadJobPartTypes();
-  }
-
-  private loadJobPartTypes(): void {
+  loadJobPartTypes(): void {
     this.jobPartTypesLoading.set(true);
     this.get<JobPartTypeItem[]>('Jobs/GetJobPartType')
       .pipe(
@@ -173,6 +164,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     skillHealhAndSafety: [ false ],
     skillWorkingAtHeight: [ false ],
   });
+
+  ngOnInit(): void {
+    this.loadJobPartTypes();
+  }
 
   submit() {
     if (this.form.invalid) {
