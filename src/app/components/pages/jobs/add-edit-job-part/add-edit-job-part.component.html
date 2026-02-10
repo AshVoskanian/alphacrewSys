@@ -231,8 +231,8 @@
 
   <!-- Action Buttons -->
   <div class="d-flex justify-content-end gap-3">
-    <button type="button" class="btn btn-secondary px-4" (click)="finish.emit()">CANCEL</button>
-    <button type="submit" class="btn btn-primary px-4" [disabled]="submitLoading()">
+    <button type="button" class="btn btn-secondary px-4 w-200" (click)="finish.emit()">CANCEL</button>
+    <button type="submit" class="btn btn-primary px-4 w-200" [disabled]="submitLoading()">
       @if (submitLoading()) {
         <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
       }
