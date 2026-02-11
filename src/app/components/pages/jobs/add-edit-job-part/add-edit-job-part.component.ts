@@ -40,6 +40,11 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   jobPartTypesLoading = signal(false);
   partDetailsLoading = signal(false);
 
+  /** Rate for ccSupplement calculation (from job part rateCard or default). */
+  crewChiefSupplementRate = signal(5);
+  /** Rate for fuelCost calculation: fuelCost = returnMileage * mileageRate (from rateCard.milage). */
+  mileageRate = signal(0.65);
+
   constructor(http: HttpClient) {
     super(http);
     effect(() => {
@@ -202,6 +207,48 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   ngOnInit(): void {
     this.loadJobPartTypes();
     this.syncRequiredSkillToForm();
+    this.syncCcSupplementFromCrewAndHours();
+    this.syncFuelCostFromMileage();
+  }
+
+  /** When returnMileage changes: fuelCost = returnMileage * mileageRate, fuelCostCrew = returnMileage * (mileageRate - 0.2). */
+  private syncFuelCostFromMileage(): void {
+    const updateFuelCosts = (): void => {
+      const returnMileage = Number(this.form.get('returnMileage')?.value ?? 0);
+      const rate = this.mileageRate();
+      const crewRate = Math.max(0, rate - 0.2);
+      this.form.patchValue({
+        fuelCost: returnMileage * rate,
+        fuelCostCrew: returnMileage * crewRate,
+      }, { emitEvent: false });
+    };
+    this.form.get('returnMileage')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateFuelCosts());
+    updateFuelCosts();
+  }
+
+  /** When crewNumber or jobPartHours changes, recalculate ccSupplement. */
+  private syncCcSupplementFromCrewAndHours(): void {
+    const updateCcSupplement = (): void => {
+      const crewNumber = Number(this.form.get('crewNumber')?.value ?? 0);
+      const jobPartHours = Number(this.form.get('jobPartHours')?.value ?? 0);
+      const rate = this.crewChiefSupplementRate();
+      let ccSupplement = 0;
+      if (crewNumber > 12) {
+        ccSupplement = jobPartHours * 2 * rate;
+      } else if (crewNumber > 3 && crewNumber <= 12) {
+        ccSupplement = jobPartHours * rate;
+      }
+      this.form.patchValue({ ccSupplement }, { emitEvent: false });
+    };
+    this.form.get('crewNumber')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateCcSupplement());
+    this.form.get('jobPartHours')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateCcSupplement());
+    updateCcSupplement();
   }
 
   /** GET Jobs/GetJobPart and patch form (edit mode). */
@@ -219,7 +266,12 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
             return;
           }
           const part = res.data;
-          if (part) this.patchFormWithPart(part);
+          if (part) {
+            const rc = part.rateCard;
+            if (rc?.crewChiefSupplement != null) this.crewChiefSupplementRate.set(rc.crewChiefSupplement);
+            if (rc?.milage != null) this.mileageRate.set(rc.milage);
+            this.patchFormWithPart(part);
+          }
         },
       });
   }
