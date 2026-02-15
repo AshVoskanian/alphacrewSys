@@ -3,241 +3,247 @@
     <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
   </div>
 } @else {
-<form [formGroup]="form" (ngSubmit)="submit()">
-  <!-- Job Part Type Dropdown -->
-  <div class="row g-3 m-b-15">
-    <div class="col-12 col-md-4">
-      <label class="form-label">Type</label>
-      @if (jobPartTypesLoading()) {
-        <div class="form-control bg-light animate-pulse" style="height: 38px;"></div>
-      } @else {
-        <select2 [data]="jobPartTypes()" formControlName="jobPartTypeId"></select2>
-      }
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <!-- Job Part Type Dropdown -->
+    <div class="row g-3 m-b-15">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Type</label>
+        @if (jobPartTypesLoading()) {
+          <div class="form-control bg-light animate-pulse" style="height: 38px;"></div>
+        } @else {
+          <select2 [data]="jobPartTypes()" formControlName="jobPartTypeId"></select2>
+        }
+      </div>
     </div>
-  </div>
 
-  <hr class="m-t-5 m-b-15">
+    <hr class="m-t-5 m-b-15">
 
-  <!-- Main Fields Row -->
-  <div class="row g-3 m-b-20">
-    <div class="col-12 col-sm-6 col-md">
-      <label class="form-label">Start Date and Time:</label>
-      <input type="datetime-local" class="form-control" formControlName="startDate">
+    <!-- Main Fields Row -->
+    <div class="row g-3 m-b-20">
+      <div class="col-12 col-sm-6 col-md">
+        <label class="form-label">Start Date and Time:</label>
+        <input type="datetime-local" class="form-control" formControlName="startDate">
+      </div>
+      <div class="col-12 col-sm-6 col-md">
+        <label class="form-label">Hours</label>
+        <select2 [data]="hoursOptions()" [displaySearchStatus]="'hidden'" formControlName="jobPartHours"></select2>
+      </div>
+      <div class="col-12 col-sm-6 col-md">
+        <label class="form-label">Crew</label>
+        <select2 [data]="crewOptions()" [displaySearchStatus]="'hidden'" formControlName="crewNumber"></select2>
+      </div>
+      <div class="col-12 col-sm-6 col-md">
+        <label class="form-label">CC Suppl</label>
+        <input type="number" step="0.01" class="form-control" formControlName="ccSupplement">
+      </div>
     </div>
-    <div class="col-12 col-sm-6 col-md">
-      <label class="form-label">Hours</label>
-      <select2 [data]="hoursOptions()" [displaySearchStatus]="'hidden'" formControlName="jobPartHours"></select2>
-    </div>
-    <div class="col-12 col-sm-6 col-md">
-      <label class="form-label">Crew</label>
-      <select2 [data]="crewOptions()" [displaySearchStatus]="'hidden'" formControlName="crewNumber"></select2>
-    </div>
-    <div class="col-12 col-sm-6 col-md">
-      <label class="form-label">CC Suppl</label>
-      <input type="number" step="0.01" class="form-control" formControlName="ccSupplement">
-    </div>
-  </div>
 
-  <!-- Accordion Section -->
-  <div class="accordion m-b-20" ngbAccordion>
-    <div class="accordion-item" ngbAccordionItem [collapsed]="true">
-      <h2 class="accordion-header" ngbAccordionHeader>
-        <button class="accordion-button" type="button" ngbAccordionButton>
-          <span class="accordion-title text-primary">OOT - Out of town / travel costs</span>
-          <span class="cost-badge ms-auto me-2">£0.00</span>
-        </button>
-      </h2>
-      <div ngbAccordionCollapse>
-        <div ngbAccordionBody>
-          <ng-template>
-            <div class="row g-3 p-t-10">
-              <div class="col">
-                <label class="form-label">Travel Hours:</label>
-                <select class="form-select form-select-sm" formControlName="travelHours">
-                  @for (h of travelHoursOptions(); track h.value) {
-                    <option [value]="h.value">{{ h.label }}</option>
-                  }
-                </select>
+    <!-- Accordion Section -->
+    <div class="accordion m-b-20" ngbAccordion>
+      <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+        <h2 class="accordion-header" ngbAccordionHeader>
+          <button class="accordion-button" type="button" ngbAccordionButton>
+            <span class="accordion-title text-primary">OOT - Out of town / travel costs</span>
+            <span class="cost-badge ms-auto me-2">{{ ootTotal | currency:'GBP':'symbol':'1.2-2' }}</span>
+          </button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="row g-3 p-t-10">
+                <div class="col">
+                  <label class="form-label">Travel Hours:</label>
+                  <select class="form-select form-select-sm" formControlName="travelHours">
+                    @for (h of travelHoursOptions(); track h.value) {
+                      <option [value]="h.value">{{ h.label }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="form-label">Cost:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm"
+                         formControlName="travelHoursCost">
+                </div>
+                <div class="col">
+                  <label class="form-label">Milage:</label>
+                  <input type="number" class="form-control form-control-sm" formControlName="returnMileage">
+                </div>
+                <div class="col">
+                  <label class="form-label">OOT Travel:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="ootCost">
+                </div>
+                <div class="col">
+                  <label class="form-label">Late Shift:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="lateShiftCost">
+                </div>
+                <div class="col">
+                  <label class="form-label">Cost(75p):</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="fuelCost">
+                </div>
+                <div class="col">
+                  <label class="form-label">To Crew:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="fuelCostCrew">
+                </div>
               </div>
-              <div class="col">
-                <label class="form-label">Cost:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="travelHoursCost">
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Miscellaneous costs and skills -->
+      <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+        <h2 class="accordion-header" ngbAccordionHeader>
+          <button class="accordion-button" type="button" ngbAccordionButton>
+            <span class="accordion-title text-primary">Miscellaneous costs and skills</span>
+            <span class="cost-badge ms-auto me-2">{{ skillsTotal | currency:'GBP':'symbol':'1.2-2' }}</span>
+          </button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="row g-3 p-t-10">
+                <div class="col">
+                  <label class="form-label">Miscellaneous</label>
+                  <input type="text" class="form-control form-control-sm" formControlName="misc" placeholder="e.g. LMB">
+                </div>
+                <div class="col">
+                  <label class="form-label">Misc cost:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="miscCost">
+                </div>
+                <div class="col">
+                  <label class="form-label">Required skills:</label>
+                  <select class="form-select form-select-sm" formControlName="requiredSkills">
+                    <option [ngValue]="null">Choose skills</option>
+                    @for (s of skillsOptions(); track s.value) {
+                      <option [ngValue]="s.value">{{ s.label }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="form-label">Skills cost:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm"
+                         formControlName="skillSupplement">
+                </div>
               </div>
-              <div class="col">
-                <label class="form-label">Milage:</label>
-                <input type="number" class="form-control form-control-sm" formControlName="returnMileage">
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extra Hours -->
+      <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+        <h2 class="accordion-header" ngbAccordionHeader>
+          <button class="accordion-button" type="button" ngbAccordionButton>
+            <span class="accordion-title text-primary">Extra Hours</span>
+            <span class="cost-badge ms-auto me-2">{{ extraTotal | currency:'GBP':'symbol':'1.2-2' }}</span>
+          </button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="row g-3 p-t-10">
+                <div class="col">
+                  <label class="form-label">Number of Extra Crew:</label>
+                  <select class="form-select form-select-sm" formControlName="extraCrew">
+                    @for (ec of extraCrewOptions(); track ec.value) {
+                      <option [value]="ec.value">{{ ec.label }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="form-label">Total Extra man-hours:</label>
+                  <input type="number" step="0.0001" class="form-control form-control-sm" formControlName="extraHours">
+                </div>
+                <div class="col">
+                  <label class="form-label">Extra Hours Cost:</label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="extraCost">
+                </div>
               </div>
-              <div class="col">
-                <label class="form-label">OOT Travel:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="ootCost">
-              </div>
-              <div class="col">
-                <label class="form-label">Late Shift:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="lateShiftCost">
-              </div>
-              <div class="col">
-                <label class="form-label">Cost(75p):</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="fuelCost">
-              </div>
-              <div class="col">
-                <label class="form-label">To Crew:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="fuelCostCrew">
-              </div>
-            </div>
-          </ng-template>
+            </ng-template>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Miscellaneous costs and skills -->
-    <div class="accordion-item" ngbAccordionItem [collapsed]="true">
-      <h2 class="accordion-header" ngbAccordionHeader>
-        <button class="accordion-button" type="button" ngbAccordionButton>
-          <span class="accordion-title text-primary">Miscellaneous costs and skills</span>
-          <span class="cost-badge ms-auto me-2">£0.00</span>
-        </button>
-      </h2>
-      <div ngbAccordionCollapse>
-        <div ngbAccordionBody>
-          <ng-template>
-            <div class="row g-3 p-t-10">
-              <div class="col">
-                <label class="form-label">Miscellaneous</label>
-                <input type="text" class="form-control form-control-sm" formControlName="misc" placeholder="e.g. LMB">
-              </div>
-              <div class="col">
-                <label class="form-label">Misc cost:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="miscCost">
-              </div>
-              <div class="col">
-                <label class="form-label">Required skills:</label>
-                <select class="form-select form-select-sm" formControlName="requiredSkills">
-                  <option [ngValue]="null">Choose skills</option>
-                  @for (s of skillsOptions(); track s.value) {
-                    <option [ngValue]="s.value">{{ s.label }}</option>
-                  }
-                </select>
-              </div>
-              <div class="col">
-                <label class="form-label">Skills cost:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="skillSupplement">
-              </div>
-            </div>
-          </ng-template>
+    <!-- Bottom Fields Row -->
+    <div class="row g-3 m-b-20">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Alternative venue:</label>
+        <input type="text" class="form-control" formControlName="jobPartVenueName">
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label">Postcode:</label>
+        <input type="text" class="form-control" formControlName="jobPartVenuePostcode">
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Onsite contact:</label>
+        <input type="text" class="form-control" formControlName="onsiteContact">
+      </div>
+      <div class="col-6 col-md-1">
+        <label class="form-label">AlpDr:</label>
+        <input type="number" class="form-control" formControlName="alphaDrivers">
+      </div>
+      <div class="col-6 col-md-3 d-flex align-items-end justify-content-end">
+        <div class="total-amount-box">
+          <span class="total-cost text-center">{{ total | currency:'GBP':'symbol':'1.2-2' }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Extra Hours -->
-    <div class="accordion-item" ngbAccordionItem [collapsed]="true">
-      <h2 class="accordion-header" ngbAccordionHeader>
-        <button class="accordion-button" type="button" ngbAccordionButton>
-          <span class="accordion-title text-primary">Extra Hours</span>
-          <span class="cost-badge ms-auto me-2">£0.00</span>
-        </button>
-      </h2>
-      <div ngbAccordionCollapse>
-        <div ngbAccordionBody>
-          <ng-template>
-            <div class="row g-3 p-t-10">
-              <div class="col">
-                <label class="form-label">Number of Extra Crew:</label>
-                <select class="form-select form-select-sm" formControlName="extraCrew">
-                  @for (ec of extraCrewOptions(); track ec.value) {
-                    <option [value]="ec.value">{{ ec.label }}</option>
-                  }
-                </select>
-              </div>
-              <div class="col">
-                <label class="form-label">Total Extra man-hours:</label>
-                <input type="number" step="0.0001" class="form-control form-control-sm" formControlName="extraHours">
-              </div>
-              <div class="col">
-                <label class="form-label">Extra Hours Cost:</label>
-                <input type="number" step="0.01" class="form-control form-control-sm" formControlName="extraCost">
-              </div>
-            </div>
-          </ng-template>
+    <!-- Notes Section -->
+    <div class="notes-section m-b-20">
+      <div class="notes-header bg-info d-flex align-items-stretch">
+        <div class="form-check flex items-center gap-8 p-x-20">
+          <input class="form-check-input m-0" type="checkbox" id="importantNotesCheckbox"
+                 formControlName="importantNotes">
+          <label class="form-check-label m-0" for="importantNotesCheckbox">Important</label>
         </div>
+        <ul class="nav notes-tabs flex-grow-1 m-0">
+          <li class="nav-item">
+            <button type="button" class="nav-link" [class.active]="activeNotesTab() === 1"
+                    (click)="activeNotesTab.set(1)">OFFICE NOTES
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" [class.active]="activeNotesTab() === 2"
+                    (click)="activeNotesTab.set(2)">CREW (APP) NOTES
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" [class.active]="activeNotesTab() === 3"
+                    (click)="activeNotesTab.set(3)">PAPERWORK NOTES
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div class="notes-content">
+        @if (activeNotesTab() === 1) {
+          <textarea class="form-control border-0" rows="4"
+                    formControlName="notes"
+                    placeholder="Office notes..."></textarea>
+        }
+        @if (activeNotesTab() === 2) {
+          <textarea class="form-control border-0" rows="4"
+                    formControlName="crewNotes"
+                    placeholder="Crew notes..."></textarea>
+        }
+        @if (activeNotesTab() === 3) {
+          <textarea class="form-control border-0" rows="4"
+                    formControlName="paperworkNotes"
+                    placeholder="Paperwork notes..."></textarea>
+        }
       </div>
     </div>
-  </div>
 
-  <!-- Bottom Fields Row -->
-  <div class="row g-3 m-b-20">
-    <div class="col-12 col-md-3">
-      <label class="form-label">Alternative venue:</label>
-      <input type="text" class="form-control" formControlName="jobPartVenueName">
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-end gap-3">
+      <button type="button" class="btn btn-secondary px-4 w-200" (click)="finish.emit()">CANCEL</button>
+      <button type="submit" class="btn btn-primary px-4 w-200" [disabled]="submitLoading()">
+        @if (submitLoading()) {
+          <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
+        }
+        SAVE
+      </button>
     </div>
-    <div class="col-12 col-md-2">
-      <label class="form-label">Postcode:</label>
-      <input type="text" class="form-control" formControlName="jobPartVenuePostcode">
-    </div>
-    <div class="col-12 col-md-3">
-      <label class="form-label">Onsite contact:</label>
-      <input type="text" class="form-control" formControlName="onsiteContact">
-    </div>
-    <div class="col-6 col-md-1">
-      <label class="form-label">AlpDr:</label>
-      <input type="number" class="form-control" formControlName="alphaDrivers">
-    </div>
-    <div class="col-6 col-md-3 d-flex align-items-end justify-content-end">
-      <div class="total-amount-box">
-        <span class="total-cost text-center">£0.00</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notes Section -->
-  <div class="notes-section m-b-20">
-    <div class="notes-header bg-info d-flex align-items-stretch">
-      <div class="form-check flex items-center gap-8 p-x-20">
-        <input class="form-check-input m-0" type="checkbox" id="importantNotesCheckbox" formControlName="importantNotes">
-        <label class="form-check-label m-0" for="importantNotesCheckbox">Important</label>
-      </div>
-      <ul class="nav notes-tabs flex-grow-1 m-0">
-        <li class="nav-item">
-          <button type="button" class="nav-link" [class.active]="activeNotesTab() === 1"
-                  (click)="activeNotesTab.set(1)">OFFICE NOTES</button>
-        </li>
-        <li class="nav-item">
-          <button type="button" class="nav-link" [class.active]="activeNotesTab() === 2"
-                  (click)="activeNotesTab.set(2)">CREW (APP) NOTES</button>
-        </li>
-        <li class="nav-item">
-          <button type="button" class="nav-link" [class.active]="activeNotesTab() === 3"
-                  (click)="activeNotesTab.set(3)">PAPERWORK NOTES</button>
-        </li>
-      </ul>
-    </div>
-    <div class="notes-content">
-      @if (activeNotesTab() === 1) {
-        <textarea class="form-control border-0" rows="4"
-                  formControlName="notes"
-                  placeholder="Office notes..."></textarea>
-      }
-      @if (activeNotesTab() === 2) {
-        <textarea class="form-control border-0" rows="4"
-                  formControlName="crewNotes"
-                  placeholder="Crew notes..."></textarea>
-      }
-      @if (activeNotesTab() === 3) {
-        <textarea class="form-control border-0" rows="4"
-                  formControlName="paperworkNotes"
-                  placeholder="Paperwork notes..."></textarea>
-      }
-    </div>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="d-flex justify-content-end gap-3">
-    <button type="button" class="btn btn-secondary px-4 w-200" (click)="finish.emit()">CANCEL</button>
-    <button type="submit" class="btn btn-primary px-4 w-200" [disabled]="submitLoading()">
-      @if (submitLoading()) {
-        <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
-      }
-      SAVE
-    </button>
-  </div>
-</form>
+  </form>
 }

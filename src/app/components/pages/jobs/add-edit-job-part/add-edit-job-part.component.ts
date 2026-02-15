@@ -8,13 +8,15 @@ import { finalize } from 'rxjs';
 import { GeneralService } from '../../../../shared/services/general.service';
 import { ApiBase } from '../../../../shared/bases/api-base';
 import { AddOrUpdateJobPartRequest, JobPartDetailsResponse, JobPartTypeItem } from '../../../../shared/interface/jobs';
+import { CurrencyPipe } from "@angular/common";
 
 @Component({
   selector: 'app-add-edit-job-part',
   imports: [
     ReactiveFormsModule,
     Select2Module,
-    NgbAccordionModule
+    NgbAccordionModule,
+    CurrencyPipe
   ],
   templateUrl: './add-edit-job-part.component.html',
   styleUrl: './add-edit-job-part.component.scss'
@@ -44,6 +46,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   crewChiefSupplementRate = signal(5);
   /** Rate for fuelCost calculation: fuelCost = returnMileage * mileageRate (from rateCard.milage). */
   mileageRate = signal(0.65);
+  skillSupplement = signal(0);
+  crewRate = signal(0);
+  extraHour = signal(0);
 
   constructor(http: HttpClient) {
     super(http);
@@ -206,9 +211,111 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   ngOnInit(): void {
     this.loadJobPartTypes();
+    this.syncSkillToSkillCoast();
+    this.syncTravelHoursToCoast();
     this.syncRequiredSkillToForm();
-    this.syncCcSupplementFromCrewAndHours();
     this.syncFuelCostFromMileage();
+    this.syncExtraHoursToExtraCoast();
+    this.syncCcSupplementFromCrewAndHours();
+  }
+
+  private _getNumber(path: string, fallback = 0): number {
+    return Number(this.form.get(path)?.value ?? fallback);
+  }
+
+  get total(): number {
+    const jobPartHours = this._getNumber('jobPartHours', 1);
+    const crewNumber = this._getNumber('crewNumber', 1);
+    const ccSupplement = this._getNumber('ccSupplement');
+
+    const base =
+      this.crewChiefSupplementRate() *
+      jobPartHours *
+      crewNumber;
+
+    return (
+      base +
+      ccSupplement +
+      this.ootTotal +
+      this.skillsTotal +
+      this.extraTotal
+    );
+  }
+
+  get ootTotal(): number {
+    return [
+      'travelHoursCost',
+      'ootCost',
+      'lateShiftCost',
+      'fuelCost'
+    ].reduce((sum, key) => sum + this._getNumber(key), 0);
+  }
+
+  get skillsTotal(): number {
+    return [
+      'miscCost',
+      'skillSupplement'
+    ].reduce((sum, key) => sum + this._getNumber(key), 0);
+  }
+
+  get extraTotal(): number {
+    return this._getNumber('extraCost');
+  }
+
+  /** When travel or crew number changes */
+  private syncTravelHoursToCoast(): void {
+    const updateTravelCosts = (): void => {
+      const crewRate = this.crewRate();
+      const crewNumber = Number(this.form.get('crewNumber')?.value ?? 0);
+      this.form.patchValue({
+        travelHoursCost: crewRate * crewNumber
+      }, { emitEvent: false });
+    };
+
+    this.form.get('travelHours')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateTravelCosts());
+    updateTravelCosts();
+
+    this.form.get('crewNumber')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateTravelCosts());
+  }
+
+  /** When skills or hours changes */
+  private syncSkillToSkillCoast(): void {
+    const updateSkillCosts = (): void => {
+      const skillSupplement = this.skillSupplement();
+      const jobPartHours = Number(this.form.get('jobPartHours')?.value ?? 0);
+      this.form.patchValue({
+        skillSupplement: skillSupplement * jobPartHours // * სკილების რაოდენობაზე?
+      }, { emitEvent: false });
+    };
+
+    this.form.get('requiredSkills')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateSkillCosts());
+    updateSkillCosts();
+
+    this.form.get('jobPartHours')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateSkillCosts());
+  }
+
+  /** When skills changes */
+  private syncExtraHoursToExtraCoast(): void {
+    const updateExtraCosts = (): void => {
+      const extraHours = this.extraHour();
+      const extraHoursField = Number(this.form.get('extraHours')?.value ?? 0);
+      this.form.patchValue({
+        extraCost: extraHours * extraHoursField
+      }, { emitEvent: false });
+    };
+
+    this.form.get('extraHours')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateExtraCosts());
+    updateExtraCosts();
   }
 
   /** When returnMileage changes: fuelCost = returnMileage * mileageRate, fuelCostCrew = returnMileage * (mileageRate - 0.2). */
@@ -216,12 +323,12 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const updateFuelCosts = (): void => {
       const returnMileage = Number(this.form.get('returnMileage')?.value ?? 0);
       const rate = this.mileageRate();
-      const crewRate = Math.max(0, rate - 0.2);
       this.form.patchValue({
         fuelCost: returnMileage * rate,
-        fuelCostCrew: returnMileage * crewRate,
+        fuelCostCrew: returnMileage * rate * 0.8,
       }, { emitEvent: false });
     };
+
     this.form.get('returnMileage')?.valueChanges
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe(() => updateFuelCosts());
@@ -242,12 +349,15 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       }
       this.form.patchValue({ ccSupplement }, { emitEvent: false });
     };
+
     this.form.get('crewNumber')?.valueChanges
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe(() => updateCcSupplement());
+
     this.form.get('jobPartHours')?.valueChanges
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe(() => updateCcSupplement());
+
     updateCcSupplement();
   }
 
@@ -270,6 +380,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
             const rc = part.rateCard;
             if (rc?.crewChiefSupplement != null) this.crewChiefSupplementRate.set(rc.crewChiefSupplement);
             if (rc?.milage != null) this.mileageRate.set(rc.milage);
+            if (rc?.skillSupplement != null) this.skillSupplement.set(rc.skillSupplement);
+            if (rc?.crewRate != null) this.crewRate.set(rc.crewRate);
+            if (rc?.extraHour != null) this.extraHour.set(rc.extraHour);
             this.patchFormWithPart(part);
           }
         },
@@ -348,7 +461,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   private setRequiredSkillsFromPart(part: JobPartDetailsResponse): void {
     const entry = Object.entries(AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL)
-      .find(([, ctrl]) => (part as unknown as Record<string, unknown>)[ctrl] === true);
+      .find(([ , ctrl ]) => (part as unknown as Record<string, unknown>)[ctrl] === true);
     if (entry) this.form.patchValue({ requiredSkills: entry[0] }, { emitEvent: false });
   }
 
@@ -384,9 +497,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       ? (raw.length === 16 ? `${ raw }:00` : raw.slice(0, 19))
       : this.getDefaultStartLocalIso();
 
-    const [datePart, timePart] = startDate.split('T');
-    const [y, m, d] = (datePart ?? '').split('-').map(Number);
-    const [h, min] = (timePart ?? '00:00:00').split(':').map(Number);
+    const [ datePart, timePart ] = startDate.split('T');
+    const [ y, m, d ] = (datePart ?? '').split('-').map(Number);
+    const [ h, min ] = (timePart ?? '00:00:00').split(':').map(Number);
     const startLocal = new Date(y, m - 1, d, h ?? 0, min ?? 0, 0, 0);
     const endLocal = new Date(startLocal.getTime() + hours * 60 * 60 * 1000);
     const pad = (n: number) => String(n).padStart(2, '0');
