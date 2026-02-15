@@ -8,7 +8,7 @@ import { LayoutService } from "../../../../shared/services/layout.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
-import { AddPaymentResponse, JobDetails, PartialPayment } from "../../../../shared/interface/jobs";
+import { AddPaymentResponse, JobDetails, JobScheduleWarning } from "../../../../shared/interface/jobs";
 
 @Component({
   selector: 'app-jobs-details',
@@ -28,6 +28,7 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
   public layoutService = inject(LayoutService);
 
   jobDetails: WritableSignal<JobDetails> = signal<JobDetails>(null);
+  jobWarnings: WritableSignal<JobScheduleWarning[]> = signal<JobScheduleWarning[]>(null);
 
   ngOnInit() {
     this.getDetails();
@@ -52,6 +53,28 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
                 }
 
                 this.jobDetails.set(res.data);
+                this.getJobPartWarnings();
+              }
+            })
+        }
+      })
+  }
+
+  getJobPartWarnings() {
+    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: params => {
+          this.get<JobScheduleWarning[]>(`Jobs/GetJobPartWarning?jobId=${ +params.get('id') }`)
+            .pipe(
+              takeUntilDestroyed(this._dr)
+            )
+            .subscribe({
+              next: res => {
+                if (res.errors && res.errors.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                  return;
+                }
+                this.jobWarnings.set(res.data);
               }
             })
         }

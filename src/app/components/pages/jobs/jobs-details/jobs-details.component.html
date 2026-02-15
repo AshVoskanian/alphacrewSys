@@ -22,6 +22,7 @@
       <app-edit-job
         #editJobRef
         [jobDetails]="jobDetails()"
+        [jobWarnings]="jobWarnings()"
         (partialPaymentsUpdated)="onPartialPaymentsUpdated($event)"
         (jobPartsUpdated)="getDetails()">
       </app-edit-job>

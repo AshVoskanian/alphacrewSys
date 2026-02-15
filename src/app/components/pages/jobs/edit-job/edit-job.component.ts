@@ -19,6 +19,8 @@ import {
   JobDetails,
   JobDocument,
   JobPart,
+  JobPartResponse,
+  JobScheduleWarning,
   JobVenue,
   PartialPayment
 } from "../../../../shared/interface/jobs";
@@ -66,6 +68,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   @ViewChild('addJobPartModal') addJobPartModalRef: TemplateRef<NgbModal>;
 
   jobDetails = input<JobDetails>();
+  jobWarnings = input<JobScheduleWarning[]>();
   partialPaymentsUpdated = output<AddPaymentResponse>();
   jobPartsUpdated = output<void>();
 
@@ -112,7 +115,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   jobPartsTableConfig: WritableSignal<TableConfigs> = signal<TableConfigs>({
     columns: [
-      { title: '', field_value: 'infoIcon' },
+      { title: '', field_value: 'warningIcon' },
       { title: '', field_value: 'typeIcon' },
       { title: 'Starts', field_value: 'starts' },
       { title: 'Time', field_value: 'time' },
@@ -160,6 +163,14 @@ export class EditJobComponent extends ApiBase implements OnInit {
         this.documents.set(details.documents || []);
       }
     });
+
+    // Watch for warning changes and update parts
+    effect(() => {
+      const warnings = this.jobWarnings();
+      if (warnings) {
+        this.setPartWarnings(warnings);
+      }
+    });
   }
 
   ngOnInit() {
@@ -170,6 +181,24 @@ export class EditJobComponent extends ApiBase implements OnInit {
     if (this.jobDetails()) {
       this.setFormData();
     }
+  }
+
+  setPartWarnings(warnings: JobScheduleWarning[]): void {
+    if (!warnings?.length) return;
+
+    const parts = this.jobDetails()?.jobParts;
+    if (!parts?.length) return;
+
+    const warningMap = new Map(warnings.map(w => [ w.jobPartId, w ]));
+
+    parts.forEach((part: JobPart) => {
+      const match = warningMap.get(part.jobPartId);
+      if (match) {
+        part.warnings = match;
+      }
+    });
+
+    this.updateJobPartsTable(this.jobDetails()?.jobParts)
   }
 
   initForm() {
@@ -258,7 +287,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
             return;
           }
           this.currencies.set(
-            (res.data ?? []).map(c => ({ label: `${c.sign} ${c.code}`, value: c.id }))
+            (res.data ?? []).map(c => ({ label: `${ c.sign } ${ c.code }`, value: c.id }))
           );
         }
       });
@@ -350,9 +379,9 @@ export class EditJobComponent extends ApiBase implements OnInit {
     const regionNamesList = this.regionNames();
     const jobRegionAccessValue = Array.isArray(details.jobRegionAccess)
       ? details.jobRegionAccess.map((id: number) => {
-          const found = regionNamesList.find(r => r.value === id);
-          return found ? { value: found.value, display: found.display } : { value: id, display: String(id) };
-        })
+        const found = regionNamesList.find(r => r.value === id);
+        return found ? { value: found.value, display: found.display } : { value: id, display: String(id) };
+      })
       : [];
 
     this.form.patchValue({
@@ -578,7 +607,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       ...part,
       id: part.jobPartId,
       typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
-      infoIcon: this.getJobPartInfoIcon(part.jobPartTypeId, part.typeText),
+      warningIcon: this.getJobPartWarningIcon(part),
       skills: this.getSkillsString(part),
       travelFormatted: this.getTravelFormatted(part.ootCost, part.currencySign),
       netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
@@ -619,20 +648,25 @@ export class EditJobComponent extends ApiBase implements OnInit {
     }
   }
 
-  getJobPartInfoIcon(typeId: number, typeText: string): string {
-    const tooltip = typeText ? `title="${ typeText }"` : '';
+  getJobPartWarningIcon(part: JobPart) {
+    if (!part) return;
+    if (!part?.warnings) return;
 
-    switch (typeId) {
-      case 12:
-        return `<i class="fas fa-triangle-exclamation txt-danger f-18" ${ tooltip }></i>`;
-      case 22:
-      case 52:
-        return `<i class="fas fa-triangle-exclamation f-18" ${ tooltip }></i>`;
-      case 42:
-      case 62:
-        return `<i class="fas fa-triangle-exclamation f-18" ${ tooltip }></i>`;
+    const { warnings } = part;
+
+    const tooltipText = `Number of Crew booked at this time: ${ warnings?.crew }. Threshold: ${ warnings?.warning }. Limit: ${ warnings?.limit }`;
+    const tooltip = `title="${ tooltipText }"`;
+
+    switch (part.warnings?.status) {
+      case 0:
+        return ``;
+      case 1:
+        return `<i class="fa-solid fa-warning text-warning f-18" ${ tooltip }></i>`;
+      case 2:
+        return `<i class="fa-solid fa-warning txt-danger f-18" ${ tooltip }></i>`;
+      case 3:
+        return `<i class="fa-solid fa-coins text-warning f-18" ${ tooltip }></i>`;
       default:
-        // return `<i class="fas fa-triangle-exclamation txt-warning f-18" ${ tooltip }></i>`;
         return '';
     }
   }
@@ -695,6 +729,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
           this.removeJobPartFromTable(part.jobPartId);
           GeneralService.showSuccessMessage('Job part deleted successfully');
+          this.jobPartsUpdated.emit();
         }
       });
   }
@@ -727,7 +762,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
     // Set loading state on the row
     this.setPartCopyLoading(part.jobPartId, true);
 
-    this.post<JobPart[]>('Jobs/CopyJobPart', { jobId, jobPartId: part.jobPartId })
+    this.post<JobPartResponse>('Jobs/CopyJobPart', { jobId, jobPartId: part.jobPartId })
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.setPartCopyLoading(part.jobPartId, false))
@@ -739,8 +774,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
             return;
           }
 
-          this.updateJobPartsTable(res.data);
           GeneralService.showSuccessMessage('Job part copied successfully');
+          this.jobPartsUpdated.emit();
         }
       });
   }

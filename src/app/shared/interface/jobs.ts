@@ -123,6 +123,11 @@ export interface AddPaymentResponse {
   partialPayments: PartialPayment[];
 }
 
+export interface JobPartResponse {
+  jobCost?: JobCost;
+  jobJobPartResponses: JobPart[];
+}
+
 export interface JobPart {
   jobPartId: number;
   jobId: number;
@@ -160,6 +165,7 @@ export interface JobPart {
   skillFollowspot: boolean;
   quoteCost: number;
   quoteCostVat: number;
+  warnings: JobScheduleWarning;
 }
 
 export interface JobPartTypeItem {
@@ -313,4 +319,16 @@ export interface JobPartDetailsResponse {
   updateHistory?: string;
   revision?: number;
   rateCard?: JobPartRateCard;
+}
+
+
+export interface JobScheduleWarning {
+  crew: number;
+  hour: number;
+  jobPartId: number;
+  limit: number;
+  status: number;
+  times: string;
+  warning: number;
+  weekDay: number;
 }
