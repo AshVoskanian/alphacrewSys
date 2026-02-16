@@ -8,7 +8,7 @@ import { LayoutService } from "../../../../shared/services/layout.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
-import { AddPaymentResponse, JobDetails, JobScheduleWarning } from "../../../../shared/interface/jobs";
+import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
 
 @Component({
   selector: 'app-jobs-details',
@@ -27,11 +27,13 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
 
   public layoutService = inject(LayoutService);
 
+  jobRateCard: WritableSignal<JobPartRateCard> = signal(null);
   jobDetails: WritableSignal<JobDetails> = signal<JobDetails>(null);
   jobWarnings: WritableSignal<JobScheduleWarning[]> = signal<JobScheduleWarning[]>(null);
 
   ngOnInit() {
     this.getDetails();
+    this.getRateCards();
   }
 
   getDetails() {
@@ -75,6 +77,28 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
                   return;
                 }
                 this.jobWarnings.set(res.data);
+              }
+            })
+        }
+      })
+  }
+
+  getRateCards() {
+    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: params => {
+          this.get<JobPartRateCard>(`Jobs/GetRateCard?jobId=${ +params.get('id') }`)
+            .pipe(
+              takeUntilDestroyed(this._dr)
+            )
+            .subscribe({
+              next: res => {
+                if (res.errors && res.errors.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                  return;
+                }
+
+                this.jobRateCard.set(res.data);
               }
             })
         }

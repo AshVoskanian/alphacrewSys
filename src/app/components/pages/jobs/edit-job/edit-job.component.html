@@ -418,6 +418,7 @@
     <app-add-edit-job-part
       [jobId]="jobDetails()?.jobId"
       [jobPartId]="editingJobPartId() ?? 0"
+      [jobRateCard]="jobRateCard()"
       (finish)="onJobPartCancel()"
       (saved)="onJobPartSaved()"></app-add-edit-job-part>
   </div>

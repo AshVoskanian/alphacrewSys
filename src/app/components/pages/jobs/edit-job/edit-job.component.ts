@@ -19,6 +19,7 @@ import {
   JobDetails,
   JobDocument,
   JobPart,
+  JobPartRateCard,
   JobPartResponse,
   JobScheduleWarning,
   JobVenue,
@@ -69,10 +70,12 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   jobDetails = input<JobDetails>();
   jobWarnings = input<JobScheduleWarning[]>();
+  jobRateCard = input<JobPartRateCard>();
+
   partialPaymentsUpdated = output<AddPaymentResponse>();
   jobPartsUpdated = output<void>();
 
-  /** When set, modal opens in edit mode and form loads this job part. */
+
   editingJobPartId: WritableSignal<number | null> = signal<number | null>(null);
 
   private readonly _dr = inject(DestroyRef);

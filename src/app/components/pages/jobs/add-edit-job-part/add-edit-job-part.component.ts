@@ -7,7 +7,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { GeneralService } from '../../../../shared/services/general.service';
 import { ApiBase } from '../../../../shared/bases/api-base';
-import { AddOrUpdateJobPartRequest, JobPartDetailsResponse, JobPartTypeItem } from '../../../../shared/interface/jobs';
+import {
+  AddOrUpdateJobPartRequest,
+  JobPartDetailsResponse,
+  JobPartRateCard,
+  JobPartTypeItem
+} from '../../../../shared/interface/jobs';
 import { CurrencyPipe } from "@angular/common";
 
 @Component({
@@ -27,6 +32,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   jobId = input<number>();
   jobPartId = input<number>(0);
+  jobRateCard = input<JobPartRateCard>();
 
   /** Emitted when user cancels or when modal should close without refetch */
   finish = output<void>();
@@ -58,6 +64,17 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
         this.loadJobPartDetails(id);
       }
     });
+
+    effect(() => {
+      const rc = this.jobRateCard();
+      if (rc) {
+        this.crewChiefSupplementRate.set(rc.crewChiefSupplement);
+        this.mileageRate.set(rc.milage);
+        this.skillSupplement.set(rc.skillSupplement);
+        this.crewRate.set(rc.crewRate);
+        this.extraHour.set(rc.extraHour);
+      }
+    })
   }
 
   loadJobPartTypes(): void {
