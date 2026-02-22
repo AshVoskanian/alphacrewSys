@@ -281,10 +281,12 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   /** When skills or hours changes */
   private syncSkillToSkillCoast(): void {
     const updateSkillCosts = (): void => {
-      const skillSupplement = this.skillSupplement();
+      const skillSupplementRate = this.skillSupplement();
       const jobPartHours = Number(this.form.get('jobPartHours')?.value ?? 0);
+      const items = (this.form.get('jobPartSkillsAddRequests')?.value as ChipCountItem[]) ?? [];
+      const totalSkillCount = items.reduce((sum, item) => sum + item.count, 0);
       this.form.patchValue({
-        skillSupplement: skillSupplement * jobPartHours
+        skillSupplement: skillSupplementRate * jobPartHours * totalSkillCount
       }, { emitEvent: false });
     };
 
