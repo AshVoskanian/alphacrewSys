@@ -412,7 +412,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       misc: part.misc ?? '',
       miscCost: part.miscCost,
       fuel: part.fuel ?? 0,
-      skillSupplement: part.skillSupplement,
+      skillSupplement: (part.jobPartSkills?.length ? part.skillSupplement : 0) ?? 0,
       jobPartVenueName: part.jobPartVenueName ?? '',
       jobPartVenuePostcode: part.jobPartVenuePostcode ?? '',
       onsiteContact: part.onsiteContact ?? '',
