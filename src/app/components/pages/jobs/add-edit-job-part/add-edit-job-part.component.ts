@@ -14,6 +14,7 @@ import {
   JobPartTypeItem
 } from '../../../../shared/interface/jobs';
 import { CurrencyPipe } from "@angular/common";
+import { ChipCountSelectComponent } from "../../../../shared/components/ui/chip-count-select";
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -21,7 +22,8 @@ import { CurrencyPipe } from "@angular/common";
     ReactiveFormsModule,
     Select2Module,
     NgbAccordionModule,
-    CurrencyPipe
+    CurrencyPipe,
+    ChipCountSelectComponent
   ],
   templateUrl: './add-edit-job-part.component.html',
   styleUrl: './add-edit-job-part.component.scss'

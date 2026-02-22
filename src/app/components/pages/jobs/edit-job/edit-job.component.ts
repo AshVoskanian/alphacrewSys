@@ -44,7 +44,6 @@ import { TableClickedAction, TableConfigs } from "../../../../shared/interface/c
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
 import { TagInputModule } from "ngx-chips";
 import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.component";
-import { MultiChipComponent } from "../../../../shared/components/ui/multi-chip/multi-chip.component";
 
 @Component({
   selector: 'app-edit-job',
@@ -59,8 +58,7 @@ import { MultiChipComponent } from "../../../../shared/components/ui/multi-chip/
     AddPaymentComponent,
     CardComponent,
     TagInputModule,
-    AddEditJobPartComponent,
-    MultiChipComponent
+    AddEditJobPartComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
