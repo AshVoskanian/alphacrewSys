@@ -1,20 +1,14 @@
 <div class="chip-count-select" [class.disabled]="isDisabled()" [class.position-top]="position() === 'top'">
   @if (position() === 'top') {
     <!-- Select above, chips below -->
-    @if (availableOptions().length) {
-      <div class="chip-add">
-        <select
-          class="form-select chip-select"
-          [value]="selectedOptionId() ?? ''"
-          (change)="onSelectChange($event)"
+    @if (availableOptionsForSelect2().length) {
+      <div class="chip-add" [formGroup]="select2Form">
+        <select2
+          formControlName="addOptionId"
+          [data]="availableOptionsForSelect2()"
+          [placeholder]="placeholder()"
           [disabled]="isDisabled()"
-          [attr.aria-label]="placeholder()"
-        >
-          <option value="" disabled>{{ placeholder() }}</option>
-          @for (opt of availableOptions(); track opt.id) {
-            <option [value]="opt.id">{{ opt.label }}</option>
-          }
-        </select>
+        />
       </div>
     }
     @if (chipsWithLabel().length) {
@@ -85,20 +79,14 @@
         }
       </div>
     }
-    @if (availableOptions().length) {
-      <div class="chip-add">
-        <select
-          class="form-select chip-select"
-          [value]="selectedOptionId() ?? ''"
-          (change)="onSelectChange($event)"
+    @if (availableOptionsForSelect2().length) {
+      <div class="chip-add" [formGroup]="select2Form">
+        <select2
+          formControlName="addOptionId"
+          [data]="availableOptionsForSelect2()"
+          [placeholder]="placeholder()"
           [disabled]="isDisabled()"
-          [attr.aria-label]="placeholder()"
-        >
-          <option value="" disabled>{{ placeholder() }}</option>
-          @for (opt of availableOptions(); track opt.id) {
-            <option [value]="opt.id">{{ opt.label }}</option>
-          }
-        </select>
+        />
       </div>
     }
   }

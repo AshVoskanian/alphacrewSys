@@ -1,19 +1,23 @@
 import {
   Component,
   computed,
+  DestroyRef,
+  effect,
   inject,
   input,
   signal,
   WritableSignal
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Select2Module, Select2Option } from 'ng-select2-component';
 import { ChipCountItem, ChipCountOption } from './chip-count-select.model';
 
 @Component({
   selector: 'app-chip-count-select',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule, Select2Module],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -25,6 +29,9 @@ import { ChipCountItem, ChipCountOption } from './chip-count-select.model';
   styleUrl: './chip-count-select.component.scss'
 })
 export class ChipCountSelectComponent implements ControlValueAccessor {
+  private readonly _fb = inject(FormBuilder);
+  private readonly _dr = inject(DestroyRef);
+
   /** Full list of options (id + label) to choose from. */
   options = input.required<ChipCountOption[]>();
 
@@ -33,6 +40,9 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
 
   /** Minimum count per chip (default 1). When decremented below, item is removed. */
   minCount = input<number>(1);
+
+  /** Position: 'bottom' = chips above, select below (default); 'top' = select above, chips below. */
+  position = input<'top' | 'bottom'>('top');
 
   /** Whether the control is disabled (from template). */
   disabled = input<boolean>(false);
@@ -46,8 +56,8 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
   /** Current value: array of { id, count }. */
   value: WritableSignal<ChipCountItem[]> = signal<ChipCountItem[]>([]);
 
-  /** Selected option id for the dropdown (used for adding). */
-  selectedOptionId = signal<number | null>(null);
+  /** Internal form for the Select2 "add" dropdown (not part of parent form). */
+  select2Form = this._fb.group({ addOptionId: [null as number | null] });
 
   /** Options that are not yet in value (available in dropdown). */
   availableOptions = computed(() => {
@@ -55,6 +65,11 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
     const selectedIds = new Set(this.value().map((v) => v.id));
     return opts.filter((o) => !selectedIds.has(o.id));
   });
+
+  /** Select2 data: available options as { value, label }. */
+  availableOptionsForSelect2 = computed<Select2Option[]>(() =>
+    this.availableOptions().map((o) => ({ value: o.id, label: o.label }))
+  );
 
   /** Chips to display: value enriched with label from options. */
   chipsWithLabel = computed(() => {
@@ -68,6 +83,25 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
 
   private onTouched: () => void = () => {};
   private onChange: (value: ChipCountItem[]) => void = () => {};
+
+  constructor() {
+    this.select2Form
+      .get('addOptionId')
+      ?.valueChanges.pipe(takeUntilDestroyed(this._dr))
+      .subscribe((v) => {
+        if (v != null && typeof v === 'number') {
+          this.addById(v);
+          this.select2Form.patchValue({ addOptionId: null }, { emitEvent: false });
+        }
+      });
+
+    effect(() => {
+      const disabled = this.isDisabled();
+      const ctrl = this.select2Form.get('addOptionId');
+      if (disabled) ctrl?.disable({ emitEvent: false });
+      else ctrl?.enable({ emitEvent: false });
+    });
+  }
 
   writeValue(raw: ChipCountItem[] | null | undefined): void {
     const arr = Array.isArray(raw) ? raw : [];
@@ -100,7 +134,6 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
       next = [...current, { id, count: Math.max(1, min) }];
     }
     this.value.set(next);
-    this.selectedOptionId.set(null);
     this.emitAndTouch(next);
   }
 
@@ -137,16 +170,6 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
     const next = this.value().filter((x) => x.id !== id);
     this.value.set(next);
     this.emitAndTouch(next);
-  }
-
-  onSelectChange(event: Event): void {
-    const el = event.target as HTMLSelectElement;
-    const id = el.value ? Number(el.value) : null;
-    if (id != null && !Number.isNaN(id)) {
-      this.addById(id);
-    }
-    this.selectedOptionId.set(null);
-    el.value = '';
   }
 
   private emitAndTouch(next: ChipCountItem[]): void {
