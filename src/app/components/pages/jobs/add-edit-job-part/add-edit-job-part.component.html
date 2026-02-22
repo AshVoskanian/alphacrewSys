@@ -111,15 +111,16 @@
                   <input type="number" step="0.01" class="form-control form-control-sm" formControlName="miscCost">
                 </div>
                 <div class="col">
-
                   <label class="form-label">Required skills:</label>
-                  <app-chip-count-select [options]="skillsOptions()"></app-chip-count-select>
-<!--                  <select class="form-select form-select-sm" formControlName="requiredSkills">-->
-<!--                    <option [ngValue]="null">Choose skills</option>-->
-<!--                    @for (s of skillsOptions(); track s.value) {-->
-<!--                      <option [ngValue]="s.value">{{ s.label }}</option>-->
-<!--                    }-->
-<!--                  </select>-->
+                  @if (skillsLoading()) {
+                    <div class="form-control bg-light animate-pulse" style="min-height: 38px;"></div>
+                  } @else {
+                    <app-chip-count-select
+                      formControlName="jobPartSkillsAddRequests"
+                      [options]="skillListOptions()"
+                      placeholder=""
+                    />
+                  }
                 </div>
                 <div class="col">
                   <label class="form-label">Skills cost:</label>

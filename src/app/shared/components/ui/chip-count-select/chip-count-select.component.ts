@@ -29,7 +29,7 @@ export class ChipCountSelectComponent implements ControlValueAccessor {
   options = input.required<ChipCountOption[]>();
 
   /** Placeholder for the dropdown when no selection. */
-  placeholder = input<string>('აირჩიეთ...');
+  placeholder = input<string>('');
 
   /** Minimum count per chip (default 1). When decremented below, item is removed. */
   minCount = input<number>(1);

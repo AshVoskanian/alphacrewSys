@@ -13,8 +13,10 @@ import {
   JobPartRateCard,
   JobPartTypeItem
 } from '../../../../shared/interface/jobs';
-import { CurrencyPipe } from "@angular/common";
-import { ChipCountSelectComponent } from "../../../../shared/components/ui/chip-count-select";
+import { CrewSkillListItem } from '../../../../shared/interface/crew';
+import { CurrencyPipe } from '@angular/common';
+import { ChipCountSelectComponent } from '../../../../shared/components/ui/chip-count-select';
+import type { ChipCountItem, ChipCountOption } from '../../../../shared/components/ui/chip-count-select';
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -46,8 +48,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   activeNotesTab: WritableSignal<number> = signal(1);
 
   jobPartTypes: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
+  skillListOptions: WritableSignal<ChipCountOption[]> = signal<ChipCountOption[]>([]);
 
   jobPartTypesLoading = signal(false);
+  skillsLoading = signal(false);
   partDetailsLoading = signal(false);
 
   /** Rate for ccSupplement calculation (from job part rateCard or default). */
@@ -129,33 +133,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     Array.from({ length: 11 }, (_, i) => ({ value: i, label: `${ i } Extra Crew` }))
   );
 
-  /** Dropdown value -> form control name for required skill. */
-  private static readonly REQUIRED_SKILL_TO_CONTROL: Record<string, string> = {
-    driver: 'skillDriver',
-    forklift: 'skillForklift',
-    ipaf: 'skillIpaf',
-    safety: 'skillSafety',
-    construction: 'skillConstruction',
-    carpenter: 'skillCarpenter',
-    lightning: 'skillLightning',
-    sound: 'skillSound',
-    video: 'skillVideo',
-    firstaid: 'skillFirstAid',
-  };
-
-  readonly skillsOptions = signal<{ value: string; label: string }[]>([
-    { value: 'driver', label: 'Driver' },
-    { value: 'forklift', label: 'Forklift' },
-    { value: 'ipaf', label: 'IPAF' },
-    { value: 'safety', label: 'Safety' },
-    { value: 'construction', label: 'Construction' },
-    { value: 'carpenter', label: 'Carpenter' },
-    { value: 'lightning', label: 'Lightning' },
-    { value: 'sound', label: 'Sound' },
-    { value: 'video', label: 'Video' },
-    { value: 'firstaid', label: 'First Aid' },
-  ]);
-
   form: FormGroup = this._fb.group({
     jobPartTypeId: [ 1 ],
     startDate: [ null ],
@@ -186,7 +163,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     miscCost: [ 0 ],
     fuel: [ 0 ],
     skillSupplement: [ 0 ],
-    requiredSkills: [ null as string | null ],
+    jobPartSkillsAddRequests: [ [] as ChipCountItem[] ],
 
     // Venue / Contact
     jobPartVenueName: [ null ],
@@ -203,39 +180,39 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
     // Flags
     lateChange: [ false ],
-
-    // Skills
-    skillDriver: [ false ],
-    skillForklift: [ false ],
-    skillIpaf: [ false ],
-    skillIpaf3b: [ false ],
-    skillSafety: [ false ],
-    skillConstruction: [ false ],
-    skillCarpenter: [ false ],
-    skillLightning: [ false ],
-    skillSound: [ false ],
-    skillVideo: [ false ],
-    skillTfm: [ false ],
-    skillTelehandler: [ false ],
-    skillScissorlift: [ false ],
-    skillCherrypicker: [ false ],
-    skillFirstAid: [ false ],
-    skillPasma: [ false ],
-    skillFollowspot: [ false ],
-    skillAudioTech: [ false ],
-    skillRoughTerrainForklift: [ false ],
-    skillHealhAndSafety: [ false ],
-    skillWorkingAtHeight: [ false ],
   });
 
   ngOnInit(): void {
     this.loadJobPartTypes();
+    this.loadSkillList();
     this.syncSkillToSkillCoast();
     this.syncTravelHoursToCoast();
-    this.syncRequiredSkillToForm();
     this.syncFuelCostFromMileage();
     this.syncExtraHoursToExtraCoast();
     this.syncCcSupplementFromCrewAndHours();
+  }
+
+  loadSkillList(): void {
+    this.skillsLoading.set(true);
+    this.get<CrewSkillListItem[]>('Crew/GetSkillList')
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.skillsLoading.set(false))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          const items = res.data ?? [];
+          const options: ChipCountOption[] = items.map((item) => ({
+            id: item.crewSkillId,
+            label: item.crewSkillText || item.crewSkillAbbr || String(item.crewSkillId)
+          }));
+          this.skillListOptions.set(options);
+        }
+      });
   }
 
   private _getNumber(path: string, fallback = 0): number {
@@ -307,18 +284,17 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       const skillSupplement = this.skillSupplement();
       const jobPartHours = Number(this.form.get('jobPartHours')?.value ?? 0);
       this.form.patchValue({
-        skillSupplement: skillSupplement * jobPartHours // * სკილების რაოდენობაზე?
+        skillSupplement: skillSupplement * jobPartHours
       }, { emitEvent: false });
     };
 
-    this.form.get('requiredSkills')?.valueChanges
+    this.form.get('jobPartSkillsAddRequests')?.valueChanges
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe(() => updateSkillCosts());
-    updateSkillCosts();
-
     this.form.get('jobPartHours')?.valueChanges
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe(() => updateSkillCosts());
+    updateSkillCosts();
   }
 
   /** When skills changes */
@@ -411,7 +387,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private patchFormWithPart(part: JobPartDetailsResponse): void {
     const startForInput = this.isoToDatetimeLocal(part.startDate);
     const jobPartHours = part.jobPartHours ?? this.computeHoursFromStartEnd(part.startDate, part.endDate);
-    const bool = (v: boolean | null | undefined) => v === true;
     this.form.patchValue({
       jobPartTypeId: part.jobPartTypeId,
       startDate: startForInput,
@@ -446,29 +421,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       skillsNotes: part.skillsNotes ?? '',
       paperworkNotes: part.paperworkNotes ?? '',
       lateChange: part.lateChange ?? false,
-      skillDriver: bool(part.skillDriver),
-      skillForklift: bool(part.skillForklift),
-      skillIpaf: bool(part.skillIpaf),
-      skillIpaf3b: bool(part.skillIpaf3b),
-      skillSafety: bool(part.skillSafety),
-      skillConstruction: bool(part.skillConstruction),
-      skillCarpenter: bool(part.skillCarpenter),
-      skillLightning: bool(part.skillLightning),
-      skillSound: bool(part.skillSound),
-      skillVideo: bool(part.skillVideo),
-      skillTfm: bool(part.skillTfm),
-      skillTelehandler: bool(part.skillTelehandler),
-      skillScissorlift: bool(part.skillScissorlift),
-      skillCherrypicker: bool(part.skillCherrypicker),
-      skillFirstAid: bool(part.skillFirstAid),
-      skillPasma: bool(part.skillPasma),
-      skillFollowspot: bool(part.skillFollowspot),
-      skillAudioTech: bool(part.skillAudioTech),
-      skillRoughTerrainForklift: bool(part.skillRoughTerrainForklift),
-      skillHealhAndSafety: bool(part.skillHealhAndSafety),
-      skillWorkingAtHeight: bool(part.skillWorkingAtHeight),
+      jobPartSkillsAddRequests: (part.jobPartSkills ?? []).map((s) => ({ id: s.skillId, count: s.count })),
     }, { emitEvent: false });
-    this.setRequiredSkillsFromPart(part);
   }
 
   private computeHoursFromStartEnd(startIso: string, endIso: string): number {
@@ -478,12 +432,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     return Math.max(0, Math.round((end.getTime() - start.getTime()) / (60 * 60 * 1000)));
   }
 
-  private setRequiredSkillsFromPart(part: JobPartDetailsResponse): void {
-    const entry = Object.entries(AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL)
-      .find(([ , ctrl ]) => (part as unknown as Record<string, unknown>)[ctrl] === true);
-    if (entry) this.form.patchValue({ requiredSkills: entry[0] }, { emitEvent: false });
-  }
-
   /** ISO string to datetime-local value YYYY-MM-DDTHH:mm. */
   private isoToDatetimeLocal(iso: string): string {
     if (!iso?.trim()) return '';
@@ -491,20 +439,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     if (Number.isNaN(d.getTime())) return '';
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }`;
-  }
-
-  /** When "Required skills" dropdown changes, set the corresponding skill control to true. */
-  private syncRequiredSkillToForm(): void {
-    this.form.get('requiredSkills')?.valueChanges
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe((value: string | null) => {
-        const controlName = value ? AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL[value] : null;
-        const updates: Record<string, boolean> = {};
-        Object.values(AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL).forEach((ctrl) => {
-          updates[ctrl] = ctrl === controlName;
-        });
-        this.form.patchValue(updates, { emitEvent: false });
-      });
   }
 
   /** Builds start/end from "Start date and time" (datetime-local → YYYY-MM-DDTHH:mm). */
@@ -532,21 +466,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const d = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }:00`;
-  }
-
-  private getSkillPayloadFromForm(v: Record<string, unknown>): Record<string, boolean> {
-    const requiredControl = v['requiredSkills'] ? AddEditJobPartComponent.REQUIRED_SKILL_TO_CONTROL[v['requiredSkills'] as string] : null;
-    const skillKeys = [
-      'skillDriver', 'skillForklift', 'skillIpaf', 'skillIpaf3b', 'skillSafety', 'skillConstruction',
-      'skillCarpenter', 'skillLightning', 'skillSound', 'skillVideo', 'skillTfm', 'skillTelehandler',
-      'skillScissorlift', 'skillCherrypicker', 'skillFirstAid', 'skillPasma', 'skillFollowspot',
-      'skillAudioTech', 'skillRoughTerrainForklift', 'skillHealhAndSafety', 'skillWorkingAtHeight',
-    ];
-    const out: Record<string, boolean> = {};
-    skillKeys.forEach((key) => {
-      out[key] = key === requiredControl ? true : Boolean(v[key]);
-    });
-    return out;
   }
 
   private buildPayload(): Partial<AddOrUpdateJobPartRequest> {
@@ -587,7 +506,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       lateChange: Boolean(v.lateChange),
       jobPartNumber: Number(v.jobPartNumber ?? 0),
       jobPartHours: Number(v.jobPartHours ?? 0),
-      ...this.getSkillPayloadFromForm(v),
+      jobPartSkillsAddRequests: ((v.jobPartSkillsAddRequests as ChipCountItem[]) ?? []).map((item) => ({
+        skillId: item.id,
+        count: item.count
+      })),
       skillSupplement: Number(v.skillSupplement ?? 0),
       onsiteContact: v.onsiteContact ?? ''
     };

@@ -190,6 +190,12 @@ export interface JobPartRateCard {
   milage: number;
 }
 
+/** Item in jobPartSkillsAddRequests (add/update skills with count). */
+export interface JobPartSkillAddRequest {
+  skillId: number;
+  count: number;
+}
+
 export interface AddOrUpdateJobPartRequest {
   jobPartId: number;
   jobId: number;
@@ -225,34 +231,24 @@ export interface AddOrUpdateJobPartRequest {
   lateChange: boolean;
   jobPartNumber: number;
   jobPartHours: number;
-  skillDriver: boolean;
-  skillForklift: boolean;
-  skillIpaf: boolean;
-  skillIpaf3b: boolean;
-  skillSafety: boolean;
-  skillConstruction: boolean;
-  skillCarpenter: boolean;
-  skillLightning: boolean;
-  skillSound: boolean;
-  skillVideo: boolean;
-  skillTfm: boolean;
-  skillTelehandler: boolean;
-  skillScissorlift: boolean;
-  skillCherrypicker: boolean;
-  skillFirstAid: boolean;
-  skillPasma: boolean;
-  skillFollowspot: boolean;
-  skillAudioTech: boolean;
-  skillRoughTerrainForklift: boolean;
-  skillHealhAndSafety: boolean;
-  skillWorkingAtHeight: boolean;
+  jobPartSkillsAddRequests: JobPartSkillAddRequest[];
   skillSupplement: number;
   onsiteContact: string;
-  editedBy: string;
-  lastModified: string;
-  updateHistory: string;
-  revision: number;
-  rateCard: JobPartRateCard;
+  editedBy?: string;
+  lastModified?: string;
+  updateHistory?: string;
+  revision?: number;
+  rateCard?: JobPartRateCard;
+}
+
+/** Job part skill returned in GET Jobs/GetJobPart (jobPartSkills). */
+export interface JobPartSkillItem {
+  id: number;
+  jobId: number;
+  jobPartId: number;
+  skillId: number;
+  count: number;
+  createDate: string;
 }
 
 /** Response of GET Jobs/GetJobPart (API may return null for some fields). */
@@ -291,27 +287,7 @@ export interface JobPartDetailsResponse {
   lateChange: boolean | null;
   jobPartNumber: number | null;
   jobPartHours: number | null;
-  skillDriver: boolean;
-  skillForklift: boolean;
-  skillIpaf: boolean;
-  skillIpaf3b: boolean | null;
-  skillSafety: boolean;
-  skillConstruction: boolean;
-  skillCarpenter: boolean;
-  skillLightning: boolean;
-  skillSound: boolean;
-  skillVideo: boolean;
-  skillTfm: boolean;
-  skillTelehandler: boolean;
-  skillScissorlift: boolean;
-  skillCherrypicker: boolean;
-  skillFirstAid: boolean;
-  skillPasma: boolean;
-  skillFollowspot: boolean;
-  skillAudioTech: boolean | null;
-  skillRoughTerrainForklift: boolean | null;
-  skillHealhAndSafety: boolean | null;
-  skillWorkingAtHeight: boolean | null;
+  jobPartSkills?: JobPartSkillItem[];
   skillSupplement: number;
   onsiteContact: string;
   editedBy?: string;
