@@ -10,7 +10,6 @@ import { NgxPaginationModule } from "ngx-pagination";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DomSanitizer } from "@angular/platform-browser";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { Client, ClientDetails } from "../../../shared/interface/clients";
 import { JobsFilterComponent } from "./jobs-filter/jobs-filter.component";
 import { Job, JobDetails, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
 import { AddJobComponent } from "./add-job/add-job.component";
@@ -103,7 +102,6 @@ export class JobsComponent extends ApiBase implements OnInit {
                 page: +params['page'] || 1,
                 statusId: +params['statusId'] || 0,
                 region: +params['region'] || 0,
-                active: (+params['active'] === 0 || +params['active'] === 1) ? +params['active'] : null,
                 pageSize: 20
               }
             )
@@ -121,11 +119,11 @@ export class JobsComponent extends ApiBase implements OnInit {
         page: p
       },
       queryParamsHandling: 'merge',
-    });
+    }).then();
   }
 
   itemSelect(job: JobDetails) {
-    this._router.navigate([ 'jobs', job.jobId ]);
+    this._router.navigate([ 'jobs', job.jobId ]).then();
   }
 
   addNewClient(temp: TemplateRef<NgbModal>) {
@@ -134,6 +132,6 @@ export class JobsComponent extends ApiBase implements OnInit {
 
   goToCreatedClientDetails(job: JobDetails) {
     this.modalRef.close();
-    this._router.navigate([ 'jobs', job?.jobId ]);
+    this._router.navigate([ 'jobs', job?.jobId ]).then();
   }
 }

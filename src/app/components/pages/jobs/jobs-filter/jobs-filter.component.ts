@@ -41,7 +41,6 @@ export class JobsFilterComponent extends ApiBase implements OnInit {
   initForm() {
     this.form = this._fb.group({
       searchKey: [ '' ],
-      active: [ 1 ],
       statusId: [ 0 ],
       region: [ 0 ]
     });
@@ -71,8 +70,7 @@ export class JobsFilterComponent extends ApiBase implements OnInit {
             ...params,
             page: +params['page'] || 1,
             statusId: +params['statusId'] || 0,
-            region: +params['region'] || 0,
-            active: (+params['active'] === 0 || +params['active'] === 1) ? +params['active'] : null,
+            region: +params['region'] || 0
           }
           if (Object.keys(transformedParams).length) {
             this.form.patchValue(transformedParams, { emitEvent: false });
