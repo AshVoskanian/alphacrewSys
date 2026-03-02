@@ -75,6 +75,15 @@ export class EditJobComponent extends ApiBase implements OnInit {
   partialPaymentsUpdated = output<AddPaymentResponse>();
   jobPartsUpdated = output<void>();
 
+  /** Start date (ISO) of the job part that starts last; used as base for new part default (last + 24h). */
+  lastJobPartStartDate = computed(() => {
+    const parts = this.jobDetails()?.jobParts ?? [];
+    if (!parts.length) return null;
+    const latest = parts.reduce((best, p) =>
+      new Date(p.startDate).getTime() > new Date(best.startDate).getTime() ? p : best
+    );
+    return latest.startDate;
+  });
 
   editingJobPartId: WritableSignal<number | null> = signal<number | null>(null);
 

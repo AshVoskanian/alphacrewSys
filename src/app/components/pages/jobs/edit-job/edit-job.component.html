@@ -55,7 +55,8 @@
       <div class="row g-3">
         <div class="col-12">
           <label class="form-label">Additional Regions</label>
-          <tag-input formControlName="jobRegionAccess" placeholder="+Add Region" secondaryPlaceholder="+Add Region" [onlyFromAutocomplete]="true">
+          <tag-input formControlName="jobRegionAccess" placeholder="+Add Region" secondaryPlaceholder="+Add Region"
+                     [onlyFromAutocomplete]="true">
             <tag-input-dropdown [autocompleteItems]="regionNames()"
                                 [showDropdownIfEmpty]="true">
             </tag-input-dropdown>
@@ -344,23 +345,11 @@
     </div>
   </div>
 
-  <div class="main-divider m-y-12">
-    <div class="divider-body divider-body-1 divider-secondary">
-      <div class="divider-p-secondary p-0"></div>
-    </div>
-  </div>
+  <div class="main-divider m-y-12"></div>
 
   <!-- Job Parts Table Section -->
   <div class="row g-3">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center m-b-15">
-        <h5 class="m-0">Job Parts</h5>
-        <button type="button" class="btn btn-primary btn-sm"
-          (click)="editingJobPartId.set(null); openAddJobPartModal(addJobPartModal)">
-          <i class="fa-solid fa-plus m-r-5"></i>
-          Add new Part
-        </button>
-      </div>
       @if (jobPartsTableConfig().data?.length) {
         <div class="table-responsive custom-scrollbar">
           <app-table
@@ -372,11 +361,16 @@
             (action)="handleJobPartAction($event)">
           </app-table>
         </div>
-      } @else {
-        <div class="text-center p-20 txt-secondary">
-          No job parts found
-        </div>
       }
+
+      <div class="w-100 flex justify-content-center m-t-15">
+        <button type="button" class="btn btn-primary btn-sm"
+                (click)="editingJobPartId.set(null);
+                       openAddJobPartModal(addJobPartModal)">
+          <i class="fa-solid fa-plus m-r-5"></i>
+          Add new Part
+        </button>
+      </div>
     </div>
   </div>
 </form>
@@ -418,6 +412,7 @@
       [jobId]="jobDetails()?.jobId"
       [jobPartId]="editingJobPartId() ?? 0"
       [jobRateCard]="jobRateCard()"
+      [lastJobPartStartDate]="lastJobPartStartDate()"
       (finish)="onJobPartCancel()"
       (saved)="onJobPartSaved()"></app-add-edit-job-part>
   </div>

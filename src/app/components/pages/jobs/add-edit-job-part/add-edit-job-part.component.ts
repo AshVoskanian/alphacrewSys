@@ -37,6 +37,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   jobId = input<number>();
   jobPartId = input<number>(0);
   jobRateCard = input<JobPartRateCard>();
+  /** When adding (jobPartId 0), use this as base for default startDate (startDate = this + 24h). */
+  lastJobPartStartDate = input<string | null>(null);
 
   /** Emitted when user cancels or when modal should close without refetch */
   finish = output<void>();
@@ -80,7 +82,16 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
         this.crewRate.set(rc.crewRate);
         this.extraHour.set(rc.extraHour);
       }
-    })
+    });
+
+    effect(() => {
+      const id = this.jobPartId();
+      const lastStart = this.lastJobPartStartDate();
+      if (id === 0 && lastStart) {
+        const defaultStart = this.getDefaultStartFromLastPart(lastStart);
+        this.form.patchValue({ startDate: defaultStart }, { emitEvent: false });
+      }
+    });
   }
 
   loadJobPartTypes(): void {
@@ -225,7 +236,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const ccSupplement = this._getNumber('ccSupplement');
 
     const base =
-      this.crewChiefSupplementRate() *
+      this.crewRate() *
       jobPartHours *
       crewNumber;
 
@@ -469,6 +480,15 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const d = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }:00`;
+  }
+
+  /** Returns datetime-local value for (lastPartStartIso + 24 hours). */
+  private getDefaultStartFromLastPart(lastPartStartIso: string): string {
+    const d = new Date(lastPartStartIso);
+    if (Number.isNaN(d.getTime())) return this.getDefaultStartLocalIso();
+    const plus24 = new Date(d.getTime() + 24 * 60 * 60 * 1000);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${ plus24.getFullYear() }-${ pad(plus24.getMonth() + 1) }-${ pad(plus24.getDate()) }T${ pad(plus24.getHours()) }:${ pad(plus24.getMinutes()) }:00`;
   }
 
   private buildPayload(): Partial<AddOrUpdateJobPartRequest> {

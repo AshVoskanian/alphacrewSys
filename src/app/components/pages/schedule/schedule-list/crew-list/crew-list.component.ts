@@ -526,7 +526,6 @@ export class CrewListComponent extends ApiBase implements OnInit {
   }
 
   getBadgeClass(crew: Crew): string {
-    console.log(crew)
     if (crew.conflict > 0) {
       return 'badge-danger'
     }
