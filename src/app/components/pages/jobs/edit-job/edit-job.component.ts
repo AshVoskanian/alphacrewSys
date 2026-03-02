@@ -602,6 +602,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
           }
 
           GeneralService.showSuccessMessage('Job updated successfully');
+          this.jobPartsUpdated.emit();
         }
       });
   }
