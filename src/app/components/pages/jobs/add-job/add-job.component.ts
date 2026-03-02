@@ -3,7 +3,7 @@ import { JobClient, JobDetails, JobVenue } from "../../../../shared/interface/jo
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
-import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
+import { JOB_STATUSES, JOB_STATUSES_FOR_JPART } from "../jobs-filter/jobs-utils";
 import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
@@ -35,7 +35,7 @@ export class AddJobComponent extends ApiBase implements OnInit {
   jobVenues: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   jobClients: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
   regions = toSignal(this._regionsService.regions);
-  statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
+  statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES_FOR_JPART);
 
   form: FormGroup;
 
