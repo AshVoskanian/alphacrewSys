@@ -2195,7 +2195,7 @@ tbody {
   }
 }
 
-.form-check-input {
+input[type='checkbox'].form-check-input {
   border: 1px solid var(--dark-light-color) !important;
 }
 
