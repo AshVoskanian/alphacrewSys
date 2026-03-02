@@ -262,9 +262,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private syncTravelHoursToCoast(): void {
     const updateTravelCosts = (): void => {
       const crewRate = this.crewRate();
+      const travelHours = Number(this.form.get('travelHours')?.value ?? 0);
       const crewNumber = Number(this.form.get('crewNumber')?.value ?? 0);
       this.form.patchValue({
-        travelHoursCost: crewRate * crewNumber
+        travelHoursCost: crewRate * crewNumber * travelHours
       }, { emitEvent: false });
     };
 
@@ -299,7 +300,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     updateSkillCosts();
   }
 
-  /** When skills changes */
+  /** When extraHours changes */
   private syncExtraHoursToExtraCoast(): void {
     const updateExtraCosts = (): void => {
       const extraHours = this.extraHour();

@@ -219,7 +219,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       paidDate: [ null ],
       notes: [ null ],
       publish: [ false ],
-      purchaseOrder: [ null, [ Validators.required ] ],
+      purchaseOrder: [ null ],
       jobRateCardId: [ null ],
       currencyId: [ null ],
       vat: [ true ],

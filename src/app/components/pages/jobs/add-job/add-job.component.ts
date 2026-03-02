@@ -49,8 +49,8 @@ export class AddJobComponent extends ApiBase implements OnInit {
 
   initForm() {
     this.form = this._fb.group({
-      statusId: [ 0, [ Validators.required ] ],
-      jobRegionId: [ 0, [ Validators.required ] ],
+      statusId: [ 1, [ Validators.required ] ],
+      jobRegionId: [ 1, [ Validators.required ] ],
       clientId: [ null, [ Validators.required ] ],
       venueId: [ null ],
       venue: [ null, [ Validators.required ] ],
