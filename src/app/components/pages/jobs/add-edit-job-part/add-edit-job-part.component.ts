@@ -112,14 +112,14 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   }
 
   readonly hoursOptions = signal<Select2Option[]>(
-    Array.from({ length: 25 }, (_, i) => {
-      const hours = i + 1;
+    Array.from({ length: 14 }, (_, i) => {
+      const hours = i + 2;
       return { value: hours, label: `${ hours } Hour${ hours !== 1 ? 's' : '' }` };
     })
   );
 
   readonly crewOptions = signal<Select2Option[]>(
-    Array.from({ length: 21 }, (_, i) => {
+    Array.from({ length: 24 }, (_, i) => {
       const crew = i + 1;
       return { value: crew, label: `${ crew } Crew` };
     })
@@ -136,7 +136,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   form: FormGroup = this._fb.group({
     jobPartTypeId: [ 1 ],
     startDate: [ null ],
-    jobPartHours: [ 1 ],
+    jobPartHours: [ 4 ],
     jobPartNumber: [ 0 ],
     crewNumber: [ 1 ],
     crewChiefNumber: [ 0 ],

@@ -55,7 +55,7 @@
       <div class="row g-3">
         <div class="col-12">
           <label class="form-label">Additional Regions</label>
-          <tag-input formControlName="jobRegionAccess" placeholder="+Add Region" [onlyFromAutocomplete]="true">
+          <tag-input formControlName="jobRegionAccess" placeholder="+Add Region" secondaryPlaceholder="+Add Region" [onlyFromAutocomplete]="true">
             <tag-input-dropdown [autocompleteItems]="regionNames()"
                                 [showDropdownIfEmpty]="true">
             </tag-input-dropdown>
