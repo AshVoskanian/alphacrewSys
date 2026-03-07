@@ -87,10 +87,11 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     effect(() => {
       const id = this.jobPartId();
       const lastStart = this.lastJobPartStartDate();
-      if (id === 0 && lastStart) {
-        const defaultStart = this.getDefaultStartFromLastPart(lastStart);
-        this.form.patchValue({ startDate: defaultStart }, { emitEvent: false });
-      }
+      if (id !== 0) return;
+      const defaultStart = lastStart
+        ? this.getDefaultStartFromLastPart(lastStart)
+        : this.getDefaultStartForFirstJobPart();
+      this.form.patchValue({ startDate: defaultStart }, { emitEvent: false });
     });
   }
 
@@ -475,7 +476,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const raw = startVal?.trim() ?? '';
     const startDate = raw.length >= 16
       ? (raw.length === 16 ? `${ raw }:00` : raw.slice(0, 19))
-      : this.getDefaultStartLocalIso();
+      : (this.lastJobPartStartDate() ? this.getDefaultStartLocalIso() : this.getDefaultStartForFirstJobPart());
 
     const [ datePart, timePart ] = startDate.split('T');
     const [ y, m, d ] = (datePart ?? '').split('-').map(Number);
@@ -493,6 +494,21 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const d = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }:00`;
+  }
+
+  /** Default for first job part: now + 24 hours, rounded up to the next hour (e.g. 14:30 → 15:00). */
+  private getDefaultStartForFirstJobPart(): string {
+    const now = new Date();
+    const plus24 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const min = plus24.getMinutes();
+    const sec = plus24.getSeconds();
+    const ms = plus24.getMilliseconds();
+    plus24.setMinutes(0, 0, 0);
+    if (min > 0 || sec > 0 || ms > 0) {
+      plus24.setTime(plus24.getTime() + 60 * 60 * 1000);
+    }
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${ plus24.getFullYear() }-${ pad(plus24.getMonth() + 1) }-${ pad(plus24.getDate()) }T${ pad(plus24.getHours()) }:${ pad(plus24.getMinutes()) }:00`;
   }
 
   /** Returns datetime-local value for (lastPartStartIso + 24 hours). */
