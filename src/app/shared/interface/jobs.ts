@@ -179,6 +179,7 @@ export interface ClientLimit {
   creditLimit: number;
   creditRating: number;
   recommendedCreditLimit: number;
+  clientUtilisation: number;
 }
 
 /** Request body for POST Jobs/AddOrUpdateJobPart */

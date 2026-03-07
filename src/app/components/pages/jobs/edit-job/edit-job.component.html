@@ -139,8 +139,10 @@
     </div>
 
     <div class="col-auto">
-      <div class="txt-danger f-14 fw-bold">
-        Credit Utilisation: {{ 898.80 | currency:'GBP':'symbol':'1.2-2' }}
+      <div class="text-success f-14 fw-bold"
+           [class.txt-danger]="overUtilisation"
+      >
+        Credit Utilisation: {{ jobDetails()?.clientLimit?.clientUtilisation | currency:'GBP':'symbol':'1.2-2' }}
       </div>
     </div>
 
