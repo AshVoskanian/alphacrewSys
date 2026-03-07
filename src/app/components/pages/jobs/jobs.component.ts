@@ -13,17 +13,20 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { JobsFilterComponent } from "./jobs-filter/jobs-filter.component";
 import { Job, JobDetails, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
 import { AddJobComponent } from "./add-job/add-job.component";
+import { CurrencyPipe } from "@angular/common";
 
 @Component({
   selector: 'app-jobs',
   imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent ],
   templateUrl: './jobs.component.html',
-  styleUrl: './jobs.component.scss'
+  styleUrl: './jobs.component.scss',
+  providers: [ CurrencyPipe ]
 })
 export class JobsComponent extends ApiBase implements OnInit {
   private _router: Router = inject(Router);
+  private _dr = inject(DestroyRef);
   private _modal = inject(NgbModal);
-  private readonly _dr = inject(DestroyRef);
+  private _currency = inject(CurrencyPipe);
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _sanitizer: DomSanitizer = inject(DomSanitizer);
 
@@ -42,7 +45,7 @@ export class JobsComponent extends ApiBase implements OnInit {
       { title: 'Start', field_value: 'starts', type: 'date' },
       { title: 'End', field_value: 'ends', type: 'date' },
       { title: 'Hours', field_value: 'totalHours' },
-      { title: 'Cost', field_value: 'cost', type: 'price' },
+      { title: 'Cost', field_value: 'cost', class: 'text-end p-r-10' },
     ],
     data: [] as Job[]
   };
@@ -77,7 +80,8 @@ export class JobsComponent extends ApiBase implements OnInit {
             statusText: this._sanitizer.bypassSecurityTrustHtml(
               `<p class="m-0 text-center p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
                      <p class="m-0 text-nowrap text-center" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`
-            )
+            ),
+            cost: this._currency.transform(job.cost, 'GBP', 'symbol', '1.2-2')
           }));
 
           this.totalCount.set(res.data.rowCount);

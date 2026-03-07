@@ -116,6 +116,12 @@
   font-weight: 600;
   font-size: 0.9rem;
   white-space: nowrap;
+
+
+  @media screen and (max-width: 768px) {
+    bottom: auto !important;
+    top: -10px !important;
+  }
 }
 
 // Total amount - visually separated box
@@ -143,4 +149,8 @@
     font-weight: 700;
     color: #333;
   }
+}
+
+hr {
+  width: 85%;
 }

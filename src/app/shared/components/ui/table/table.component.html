@@ -27,7 +27,7 @@
                 <span class="cb-accending-decending"></span>
               </th>
             } @else {
-              <th>{{ column.title }}</th>
+              <th [ngClass]="column.class ? column.class : ''">{{ column.title }}</th>
             }
           }
         }
@@ -107,7 +107,7 @@
                       </td>
                     }
                     @default {
-                      <td [innerHTML]="details[column.field_value]">
+                      <td [innerHTML]="details[column.field_value]" [ngClass]="column.class ? column.class : ''">
                         @if (column.text) {
                           {{ column.text }}
                         }

@@ -269,6 +269,19 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     return this._getNumber('extraCost');
   }
 
+  get baseTotal(): number {
+    const jobPartHours = this._getNumber('jobPartHours', 1);
+    const crewNumber = this._getNumber('crewNumber', 1);
+    const ccSupplement = this._getNumber('ccSupplement');
+
+    const base =
+      this.crewRate() *
+      jobPartHours *
+      crewNumber;
+
+    return base + ccSupplement;
+  }
+
   /** When travel or crew number changes */
   private syncTravelHoursToCoast(): void {
     const updateTravelCosts = (): void => {

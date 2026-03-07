@@ -283,7 +283,8 @@ export class CrewListComponent extends ApiBase implements OnInit {
       next: (res) => {
         this.loading = false;
         if (res.errors?.errorCode) {
-
+          GeneralService.showErrorMessage(res.errors.message);
+          return;
         } else {
           res.data[0].isJobScoped = this.isJobScoped;
           this._scheduleService.crewUpdate$.next(res.data);
