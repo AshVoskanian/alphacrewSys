@@ -99,8 +99,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
   /** Initial values when form was loaded from jobDetails (for tooltip old vs new). */
   private _initialCurrencyId: number | null = null;
   private _initialJobRateCardId: number | null = null;
-  private _initialPrePayment: number = 0;
-  private _initialDiscount: number = 0;
   private _initialCurrencyLabel: string = '—';
   private _initialRateCardLabel: string = '—';
 
@@ -442,9 +440,9 @@ export class EditJobComponent extends ApiBase implements OnInit {
           const venues = res.data.map(venue => ({ label: venue.venueName, value: venue.venueId }));
           const details = this.jobDetails();
 
-          // If we need to set venue after loading (from setFormData)
+          // If we need to set a venue after loading (from setFormData)
           if (setVenueAfterLoad && details?.venue) {
-            // Check if venue exists in the list, if not add it
+            // Check if a venue exists in the list, if not add it
             const venueExists = venues.find(v =>
               v.label.trim().toLowerCase() === details.venue.trim().toLowerCase()
             );
@@ -478,8 +476,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
     this._initialCurrencyId = details.currencyId ?? null;
     this._initialJobRateCardId = details.jobRateCardId ?? null;
-    this._initialPrePayment = Number(details.prePayment) ?? 0;
-    this._initialDiscount = Number(details.discount) ?? 0;
     this._initialCurrencyLabel = this.currencies()?.find(c => c.value === this._initialCurrencyId)?.label ?? '—';
     this._initialRateCardLabel = this.rateCards()?.find(r => r.value === this._initialJobRateCardId)?.label ?? '—';
 
