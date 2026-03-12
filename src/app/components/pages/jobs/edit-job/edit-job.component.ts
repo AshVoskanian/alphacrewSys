@@ -38,7 +38,7 @@ import { RateCard } from "../../../../shared/interface/clients";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
-import { NgbAccordionModule, NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
 import { TagInputModule } from "ngx-chips";
@@ -49,7 +49,6 @@ import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.
   imports: [
     ReactiveFormsModule,
     Select2Module,
-    NgbAccordionModule,
     NgbTooltip,
     NgbTypeahead,
     DatePipe,
@@ -85,6 +84,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
   });
 
   editingJobPartId: WritableSignal<number | null> = signal<number | null>(null);
+
+  financeSectionExpanded: WritableSignal<boolean> = signal(false);
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -198,30 +199,30 @@ export class EditJobComponent extends ApiBase implements OnInit {
     return (this.jobDetails()?.jobCost.outstanding + this.jobDetails()?.clientLimit.clientUtilisation) > this.jobDetails()?.clientLimit.clientUtilisation;
   }
 
-  get currencyBadgeLabel(): string {
-    const id = this.form?.get('currencyId')?.value;
-    if (id == null) return '—';
-    const c = this.currencies()?.find(x => x.value === id);
-    return c?.label ?? '—';
-  }
-
-  get prePaymentBadgeValue(): string | number {
+  get prePaymentBadgeValue(): number {
     const v = this.form?.get('prePayment')?.value;
-    if (v == null || v === '') return '—';
     return Number(v);
   }
 
-  get discountBadgeValue(): string | number {
+  get discountBadgeValue(): number {
     const v = this.form?.get('discount')?.value;
-    if (v == null || v === '') return '—';
     return Number(v);
   }
 
-  get rateCardBadgeLabel(): string {
-    const id = this.form?.get('jobRateCardId')?.value;
-    if (id == null) return '—';
-    const r = this.rateCards()?.find(x => x.value === id);
-    return r?.label ?? '—';
+  get rateCardChanged(): boolean {
+    const oldRateCardId = this.form?.get('jobRateCardId')?.value;
+    const newRateCardId = this.jobDetails()?.clientRateCardId;
+    return oldRateCardId !== newRateCardId;
+  }
+
+  get currencyChanged(): boolean {
+    const oldCurrencyId = this.form?.get('currencyId')?.value;
+    const newCurrencyId = this.jobDetails()?.regionCurrencyId;
+    return oldCurrencyId !== newCurrencyId;
+  }
+
+  toggleFinanceAccordion(): void {
+    this.financeSectionExpanded.update(v => !v);
   }
 
   setPartWarnings(warnings: JobScheduleWarning[]): void {

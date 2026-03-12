@@ -63,6 +63,7 @@ export interface JobDetails {
   venueId: number;
   jobRegionId: number;
   jobRateCardId: number | null;
+  clientRateCardId: number | null;
   statusId: number;
   dateCreated: string;
   dateEdited: string;
@@ -83,6 +84,7 @@ export interface JobDetails {
   numberOfJobParts: number | null;
   importantDate: string;
   currencyId: number | null;
+  regionCurrencyId: number | null;
   publish: boolean;
   notes: string;
   updateHistory: unknown | null;

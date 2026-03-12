@@ -7,7 +7,32 @@
         <h3 class="m-0">Job Details</h3>
       </div>
 
-<!--      აქ-->
+      <div class="border rounded-3"
+           [class.border-dark]="!editJobRef?.rateCardChanged"
+           [class.border-danger]="editJobRef?.rateCardChanged"
+      >
+        <button
+          type="button"
+          class="btn d-flex flex-wrap align-items-center gap-2 p-x-6 p-y-4"
+          (click)="editJobRef?.toggleFinanceAccordion()">
+          <span class="badge t-0 "
+                [class.bg-primary]="!editJobRef.currencyChanged"
+                [class.bg-danger]="editJobRef.currencyChanged"
+                title="Currency">Curr
+          </span>
+          <span class="badge t-0 bg-primary"
+                [class.bg-primary]="editJobRef.prePaymentBadgeValue <= 0"
+                [class.bg-danger]="editJobRef.prePaymentBadgeValue > 0"
+                title="Pre payment">Pre
+          </span>
+          <span class="badge t-0"
+                [class.bg-primary]="editJobRef.discountBadgeValue <= 0"
+                [class.bg-danger]="editJobRef.discountBadgeValue > 0"
+                title="Discount">Disc
+          </span>
+          <span class="badge t-0 bg-primary" title="Rate card">Rate</span>
+        </button>
+      </div>
 
       <button
         class="w-130 btn btn-primary position-relative"
