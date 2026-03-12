@@ -15,22 +15,25 @@
           type="button"
           class="btn d-flex flex-wrap align-items-center gap-2 p-x-6 p-y-4"
           (click)="editJobRef?.toggleFinanceAccordion()">
-          <span class="badge t-0 "
-                [class.bg-primary]="!editJobRef.currencyChanged"
-                [class.bg-danger]="editJobRef.currencyChanged"
-                title="Currency">Curr
+          <span class="badge t-0 position-static"
+                [class.bg-primary]="!editJobRef?.currencyChanged"
+                [class.bg-danger]="editJobRef?.currencyChanged"
+                [ngbTooltip]="editJobRef?.currencyBadgeTooltip">Curr
           </span>
-          <span class="badge t-0 bg-primary"
-                [class.bg-primary]="editJobRef.prePaymentBadgeValue <= 0"
-                [class.bg-danger]="editJobRef.prePaymentBadgeValue > 0"
-                title="Pre payment">Pre
+          <span class="badge t-0 position-static"
+                [class.bg-primary]="editJobRef?.prePaymentBadgeValue <= 0"
+                [class.bg-danger]="editJobRef?.prePaymentBadgeValue > 0"
+                [ngbTooltip]="editJobRef?.prePaymentBadgeTooltip">Pre
           </span>
-          <span class="badge t-0"
-                [class.bg-primary]="editJobRef.discountBadgeValue <= 0"
-                [class.bg-danger]="editJobRef.discountBadgeValue > 0"
-                title="Discount">Disc
+          <span class="badge t-0 position-static"
+                [class.bg-primary]="editJobRef?.discountBadgeValue <= 0"
+                [class.bg-danger]="editJobRef?.discountBadgeValue > 0"
+                [ngbTooltip]="editJobRef?.discountBadgeTooltip">Disc
           </span>
-          <span class="badge t-0 bg-primary" title="Rate card">Rate</span>
+          <span class="badge t-0 position-static"
+                [class.bg-primary]="!editJobRef?.rateCardChanged"
+                [class.bg-danger]="editJobRef?.rateCardChanged"
+                [ngbTooltip]="editJobRef?.rateCardBadgeTooltip">Rate</span>
         </button>
       </div>
 

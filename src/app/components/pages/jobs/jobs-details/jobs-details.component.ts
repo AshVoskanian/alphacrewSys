@@ -9,6 +9,7 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
 import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
+import { NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-jobs-details',
@@ -16,6 +17,7 @@ import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } f
     CardComponent,
     RouterModule,
     EditJobComponent,
+    NgbTooltip,
   ],
   templateUrl: './jobs-details.component.html',
   styleUrl: './jobs-details.component.scss'

@@ -96,6 +96,14 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   private modalRef: NgbModalRef;
 
+  /** Initial values when form was loaded from jobDetails (for tooltip old vs new). */
+  private _initialCurrencyId: number | null = null;
+  private _initialJobRateCardId: number | null = null;
+  private _initialPrePayment: number = 0;
+  private _initialDiscount: number = 0;
+  private _initialCurrencyLabel: string = '—';
+  private _initialRateCardLabel: string = '—';
+
   statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
   regions = toSignal(this._regionsService.regions);
   regionNames = computed(() => {
@@ -210,15 +218,57 @@ export class EditJobComponent extends ApiBase implements OnInit {
   }
 
   get rateCardChanged(): boolean {
-    const oldRateCardId = this.form?.get('jobRateCardId')?.value;
-    const newRateCardId = this.jobDetails()?.clientRateCardId;
-    return oldRateCardId !== newRateCardId;
+    const current = this.form?.get('jobRateCardId')?.value;
+    return this._initialJobRateCardId !== current;
   }
 
   get currencyChanged(): boolean {
-    const oldCurrencyId = this.form?.get('currencyId')?.value;
-    const newCurrencyId = this.jobDetails()?.regionCurrencyId;
-    return oldCurrencyId !== newCurrencyId;
+    const current = this.form?.get('currencyId')?.value;
+    return this._initialCurrencyId !== current;
+  }
+
+  get currencyBadgeLabel(): string {
+    const id = this.form?.get('currencyId')?.value;
+    if (id == null) return '—';
+    const c = this.currencies()?.find(x => x.value === id);
+    return c?.label ?? '—';
+  }
+
+  get rateCardBadgeLabel(): string {
+    const id = this.form?.get('jobRateCardId')?.value;
+    if (id == null) return '—';
+    const r = this.rateCards()?.find(x => x.value === id);
+    return r?.label ?? '—';
+  }
+
+  get currencyBadgeTooltip(): string {
+    const initialLabel = this.currencies()?.find(c => c.value === this._initialCurrencyId)?.label ?? this._initialCurrencyLabel ?? '—';
+    if (this.currencyChanged) {
+      return `Old: ${ initialLabel } → New: ${ this.currencyBadgeLabel }`;
+    }
+    return `Currency: ${ this.currencyBadgeLabel }`;
+  }
+
+  get prePaymentBadgeTooltip(): string {
+    if (this.prePaymentBadgeValue > 0) {
+      return 'Pre payment > 0';
+    }
+    return 'Pre payment: 0';
+  }
+
+  get discountBadgeTooltip(): string {
+    if (this.discountBadgeValue > 0) {
+      return 'Discount > 0';
+    }
+    return 'Discount: 0';
+  }
+
+  get rateCardBadgeTooltip(): string {
+    const initialLabel = this.rateCards()?.find(r => r.value === this._initialJobRateCardId)?.label ?? this._initialRateCardLabel ?? '—';
+    if (this.rateCardChanged) {
+      return `Old: ${ initialLabel } → New: ${ this.rateCardBadgeLabel }`;
+    }
+    return `Rate card: ${ this.rateCardBadgeLabel }`;
   }
 
   toggleFinanceAccordion(): void {
@@ -425,6 +475,13 @@ export class EditJobComponent extends ApiBase implements OnInit {
         return found ? { value: found.value, display: found.display } : { value: id, display: String(id) };
       })
       : [];
+
+    this._initialCurrencyId = details.currencyId ?? null;
+    this._initialJobRateCardId = details.jobRateCardId ?? null;
+    this._initialPrePayment = Number(details.prePayment) ?? 0;
+    this._initialDiscount = Number(details.discount) ?? 0;
+    this._initialCurrencyLabel = this.currencies()?.find(c => c.value === this._initialCurrencyId)?.label ?? '—';
+    this._initialRateCardLabel = this.rateCards()?.find(r => r.value === this._initialJobRateCardId)?.label ?? '—';
 
     this.form.patchValue({
       statusId: details.statusId,
