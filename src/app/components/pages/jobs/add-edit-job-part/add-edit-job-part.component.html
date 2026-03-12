@@ -9,7 +9,7 @@
       <div class="col-12 col-md-4">
         <label class="form-label">Type</label>
         @if (jobPartTypesLoading()) {
-          <div class="form-control bg-light animate-pulse" style="height: 38px;"></div>
+          <div class="form-control bg-light animate-pulse h-38"></div>
         } @else {
           <select2 [data]="jobPartTypes()" formControlName="jobPartTypeId"></select2>
         }
