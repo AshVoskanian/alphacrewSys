@@ -746,7 +746,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, res.data.crewNumber),
+                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length)),
                 transformedSkills
               };
             }
@@ -757,7 +757,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, res.data.crewNumber),
+                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length)),
                 transformedSkills
               };
             }
