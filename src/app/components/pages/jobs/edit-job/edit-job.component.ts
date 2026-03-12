@@ -198,6 +198,32 @@ export class EditJobComponent extends ApiBase implements OnInit {
     return (this.jobDetails()?.jobCost.outstanding + this.jobDetails()?.clientLimit.clientUtilisation) > this.jobDetails()?.clientLimit.clientUtilisation;
   }
 
+  get currencyBadgeLabel(): string {
+    const id = this.form?.get('currencyId')?.value;
+    if (id == null) return '—';
+    const c = this.currencies()?.find(x => x.value === id);
+    return c?.label ?? '—';
+  }
+
+  get prePaymentBadgeValue(): string | number {
+    const v = this.form?.get('prePayment')?.value;
+    if (v == null || v === '') return '—';
+    return Number(v);
+  }
+
+  get discountBadgeValue(): string | number {
+    const v = this.form?.get('discount')?.value;
+    if (v == null || v === '') return '—';
+    return Number(v);
+  }
+
+  get rateCardBadgeLabel(): string {
+    const id = this.form?.get('jobRateCardId')?.value;
+    if (id == null) return '—';
+    const r = this.rateCards()?.find(x => x.value === id);
+    return r?.label ?? '—';
+  }
+
   setPartWarnings(warnings: JobScheduleWarning[]): void {
     if (!warnings?.length) return;
 

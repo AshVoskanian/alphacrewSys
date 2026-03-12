@@ -4,7 +4,12 @@
     <div class="accordion-item" ngbAccordionItem [collapsed]="false">
       <h2 class="accordion-header" ngbAccordionHeader>
         <button class="accordion-button" type="button" ngbAccordionButton>
-          <span class="accordion-title text-primary">Currency, Pre payment, Discount, Inc. VAT, Rate card</span>
+          <div class="d-flex flex-wrap align-items-center gap-2 w-100">
+            <span class="badge bg-dark-subtle text-dark">Currency: <span class="text-primary">{{ currencyBadgeLabel }}</span></span>
+            <span class="badge bg-dark-subtle text-dark">Pre payment: <span class="text-primary">{{ prePaymentBadgeValue }}</span></span>
+            <span class="badge bg-dark-subtle text-dark">Discount: <span class="text-primary">{{ discountBadgeValue }}</span></span>
+            <span class="badge bg-dark-subtle text-dark">Rate card: <span class="text-primary">{{ rateCardBadgeLabel }}</span></span>
+          </div>
         </button>
       </h2>
       <div ngbAccordionCollapse>
