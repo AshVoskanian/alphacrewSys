@@ -17,6 +17,7 @@ import { filter, finalize, map } from "rxjs";
 import { RegionsService } from "../../services/regions.service";
 import { HeaderMenuComponent } from "./widgets/header-menu/header-menu.component";
 import { LegacySystemService } from "../../services/legacy-system.service";
+import { BreadcrumbService } from '../../services/breadcrumb.service';
 
 @Component({
   selector: 'app-header',
@@ -39,6 +40,7 @@ export class HeaderComponent extends ApiBase implements OnInit {
 
   public navService: NavService = inject(NavService);
   readonly legacySystemService = inject(LegacySystemService);
+  private _breadcrumbService = inject(BreadcrumbService);
 
   regionLoading = false;
   isScheduleRoute = false;
@@ -68,7 +70,7 @@ export class HeaderComponent extends ApiBase implements OnInit {
     return '#111827';
   });
 
-  /** Breadcrumb: Dashboard → Schedule → [Category] → [Detail id/name] */
+  /** Breadcrumb: Dashboard → Schedule → [Category] → [ID only for Jobs, else Name] */
   breadcrumbSegments = computed(() => {
     const url = this.urlSig()?.split('?')[0] ?? '';
     const parts = url.replace(/^\/+/, '').split('/').filter(Boolean);
@@ -86,9 +88,16 @@ export class HeaderComponent extends ApiBase implements OnInit {
     const category = parts[0];
     if (category && categoryMap[category]) {
       segments.push({ label: categoryMap[category], link: `/${category}` });
-      const idOrName = parts[1];
-      if (idOrName) {
-        segments.push({ label: idOrName, link: null });
+      const routeId = parts[1];
+      if (routeId) {
+        if (category === 'jobs') {
+          segments.push({ label: routeId, link: null });
+        } else {
+          const name = this._breadcrumbService.detailLabel();
+          if (name) {
+            segments.push({ label: name, link: null });
+          }
+        }
       }
     }
     return segments;
