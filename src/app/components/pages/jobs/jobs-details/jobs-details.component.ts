@@ -111,6 +111,28 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
     this._location.back();
   }
 
+  readonly downloadReportOptions: { label: string; value: string }[] = [
+    { label: 'Quote', value: 'Quote' },
+    { label: 'Confirmation', value: 'Confirmation' },
+    { label: 'Invoice', value: 'Invoice' },
+    { label: 'Pro-forma', value: 'Proforma' },
+  ];
+
+  private readonly pdfDownloadBaseUrl = 'https://alphacrew.eu/jobs/PdfDownload';
+
+  onDownloadReport(selectEl: HTMLSelectElement, report: string): void {
+    const jobId = this.jobDetails()?.jobId;
+    if (!jobId || !report) return;
+    const url = `${this.pdfDownloadBaseUrl}?id=${jobId}&report=${encodeURIComponent(report)}`;
+    window.open(url, '_blank');
+    selectEl.value = '';
+  }
+
+  getMapsUrl(venue: string | { label?: string } | null | undefined): string {
+    const s = typeof venue === 'string' ? venue : venue?.label ?? this.jobDetails()?.venue ?? '';
+    return `https://www.google.co.uk/maps/search/${encodeURIComponent(s)}/`;
+  }
+
   onPartialPaymentsUpdated(data: AddPaymentResponse) {
     this.jobDetails.update(details => {
       if (!details) return details;
