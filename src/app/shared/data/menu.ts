@@ -40,7 +40,7 @@ export const menuItems: Menu[] = [
   // },
   {
     title: 'Dashboard',
-    icon: 'home',
+    icon: 'fa-dashboard',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Dashboard/',
     path: '/dashboard',
@@ -49,7 +49,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Schedule',
-    icon: 'reports',
+    icon: 'fa-clipboard',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Schedule/',
     path: '/schedule',
@@ -58,7 +58,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Jobs',
-    icon: 'reports',
+    icon: 'fa-bars',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Jobs',
     path: '/jobs',
@@ -67,7 +67,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Clients',
-    icon: 'reports',
+    icon: 'fa-building',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Clients',
     path: '/clients',
@@ -76,7 +76,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Venues',
-    icon: 'reports',
+    icon: 'fa-map-marker',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Venues',
     path: '/venue',
@@ -85,7 +85,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Crew',
-    icon: 'reports',
+    icon: 'fa-users',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Crew',
     path: '/crew',

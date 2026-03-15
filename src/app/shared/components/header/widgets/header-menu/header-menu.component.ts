@@ -8,11 +8,10 @@ import { filter } from 'rxjs';
 import { menuItems as menuItemsData } from '../../../../data/menu';
 import { Menu } from '../../../../interface/menu';
 import { LegacySystemService } from '../../../../services/legacy-system.service';
-import { SvgIconComponent } from '../../../ui/svg-icon/svg-icon.component';
 
 @Component({
   selector: 'app-header-menu',
-  imports: [CommonModule, TranslateModule, SvgIconComponent, RouterModule],
+  imports: [CommonModule, TranslateModule, RouterModule],
   templateUrl: './header-menu.component.html',
   styleUrl: './header-menu.component.scss'
 })
