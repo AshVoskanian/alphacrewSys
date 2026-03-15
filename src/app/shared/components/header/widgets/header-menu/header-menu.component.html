@@ -16,7 +16,7 @@
     @for (menuItem of menuItems(); track menuItem.path + $index) {
       @if (isLegacySystem()) {
         <a [href]="getLegacyHref(menuItem)" target="_blank" class="lang selected sidebar-link sidebar-title link-nav" (click)="selectMenuItem(menuItem)">
-          <div class="m-r-10">
+          <div class="m-r-10 w-30">
             @if (menuItem.icon) {
               <i class="fa-solid f-16" [ngClass]="menuItem.icon"></i>
             }
@@ -25,7 +25,7 @@
         </a>
       } @else {
         <a [routerLink]="menuItem.path" class="lang selected sidebar-link sidebar-title link-nav" (click)="selectMenuItem(menuItem)">
-          <div class="m-r-10">
+          <div class="m-r-10 w-30 flex justify-content-center">
             @if (menuItem.icon) {
               <i class="fa-solid f-16" [ngClass]="menuItem.icon"></i>
             }

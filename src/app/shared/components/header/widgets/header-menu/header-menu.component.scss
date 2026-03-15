@@ -66,8 +66,8 @@
   color: inherit;
 
   &:hover {
-    background: var(--theme-default, #7366ff);
-    color: #fff;
+    background: var(--theme-secondary);
+    color: #fff !important;
 
     span {
       color: #fff;
@@ -75,6 +75,9 @@
 
     a {
       color: #fff;
+    }
+    i {
+      color: #fff !important;
     }
   }
 }
