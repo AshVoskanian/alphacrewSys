@@ -55,16 +55,7 @@ export const menuItems: Menu[] = [
     path: '/crew',
     bookmark: true,
     level: 1,
-  },
-  {
-    title: 'Profile',
-    icon: 'fa-user txt-primary',
-    type: 'extTabLink',
-    legacyPath: 'https://alphacrew.eu/profile',
-    path: '/profile',
-    bookmark: true,
-    level: 1,
-  },
+  }
 ]
 
 // Array

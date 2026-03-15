@@ -202,7 +202,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   }
 
   get overUtilisation() {
-    return (this.jobDetails()?.jobCost.outstanding + this.jobDetails()?.clientLimit.clientUtilisation) > this.jobDetails()?.clientLimit.clientUtilisation;
+    return (this.jobDetails()?.jobCost.outstanding + this.jobDetails()?.clientLimit.clientUtilisation) > this.jobDetails()?.clientLimit.creditLimit;
   }
 
   get prePaymentBadgeValue(): number {
