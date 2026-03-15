@@ -1,12 +1,10 @@
-import { Component, inject, OnInit, DestroyRef, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, ElementRef, HostListener, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { menuItems as menuItemsData } from '../../../../data/menu';
 import { Menu } from '../../../../interface/menu';
-import { NavService } from '../../../../services/nav.service';
 import { SvgIconComponent } from '../../../ui/svg-icon/svg-icon.component';
 
 @Component({
@@ -18,42 +16,47 @@ import { SvgIconComponent } from '../../../ui/svg-icon/svg-icon.component';
 export class HeaderMenuComponent implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly elementRef = inject(ElementRef);
 
-  readonly menuItems: Menu[] = menuItemsData.filter(item => item.title);
-
-  activeMenuItem: Menu | undefined;
-
-  active = signal(false);
+  readonly menuItems: WritableSignal<Menu[]> = signal(
+    menuItemsData.filter(item => item.title)
+  );
+  readonly activeMenuItem: WritableSignal<Menu | undefined> = signal<Menu | undefined>(undefined);
+  readonly isDropdownOpen = signal(false);
 
   ngOnInit(): void {
-    this.updateActiveMenuItemFromRoute();
-
-    this.router.events
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.updateActiveMenuItemFromRoute());
+    this.setActiveMenuItemFromRoute();
   }
 
-  updateActiveMenuItemFromRoute(): void {
-    const pathWithoutQuery = this.router.url?.split('?')[0];
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isDropdownOpen()) return;
+    const target = event.target as Node;
+    if (this.elementRef.nativeElement.contains(target)) return;
+    this.isDropdownOpen.set(false);
+  }
 
-    this.activeMenuItem = menuItemsData.find(
+  private setActiveMenuItemFromRoute(): void {
+    const pathWithoutQuery = this.router.url?.split('?')[0];
+    let found = menuItemsData.find(
       item => item.type === 'link' && pathWithoutQuery?.includes(item.path ?? '')
     );
-
-    if (!this.activeMenuItem) {
+    if (!found) {
       const fullUrl = window.location.href;
-      this.activeMenuItem = menuItemsData.find(
+      found = menuItemsData.find(
         item => item.type === 'extTabLink' && fullUrl.includes(item.path ?? '')
       );
     }
+    this.activeMenuItem.set(found ?? menuItemsData.filter(item => item.title)[0]);
   }
 
   selectMenuItem(menuItem: Menu): void {
-    this.activeMenuItem = menuItem;
+    this.activeMenuItem.set(menuItem);
+    this.isDropdownOpen.set(false);
   }
 
-  toggleLanguage() {
-    this.active.update(prev => !prev);
+  toggleDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isDropdownOpen.update(prev => !prev);
   }
 }
