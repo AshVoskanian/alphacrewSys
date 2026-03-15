@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
-import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
@@ -15,14 +14,14 @@ import { ApiBase } from "../../bases/api-base";
 import { GeneralService } from "../../services/general.service";
 import { Region } from "../../interface/header";
 import { filter, finalize, map } from "rxjs";
-import { LayoutService } from "../../services/layout.service";
 import { RegionsService } from "../../services/regions.service";
+import { HeaderMenuComponent } from "./widgets/header-menu/header-menu.component";
 
 @Component({
   selector: 'app-header',
   imports: [
     RouterModule,
-    HeaderLogoComponent, HeaderLanguageComponent, Select2Module, ReactiveFormsModule,
+    HeaderLogoComponent, HeaderMenuComponent, Select2Module, ReactiveFormsModule,
     ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent
   ],
   templateUrl: './header.component.html',
