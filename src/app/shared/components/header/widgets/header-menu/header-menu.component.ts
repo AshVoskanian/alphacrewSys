@@ -1,7 +1,9 @@
-import { Component, ElementRef, HostListener, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, HostListener, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { filter } from 'rxjs';
 
 import { menuItems as menuItemsData } from '../../../../data/menu';
 import { Menu } from '../../../../interface/menu';
@@ -18,6 +20,7 @@ export class HeaderMenuComponent implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly legacySystemService = inject(LegacySystemService);
   readonly isLegacySystem = this.legacySystemService.isLegacySystem;
@@ -30,6 +33,11 @@ export class HeaderMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.setActiveMenuItemFromRoute();
+
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.setActiveMenuItemFromRoute());
   }
 
   @HostListener('document:click', ['$event'])
