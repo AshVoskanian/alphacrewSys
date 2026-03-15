@@ -67,6 +67,10 @@ export class HeaderMenuComponent implements OnInit {
     this.isDropdownOpen.set(false);
   }
 
+  getLegacyHref(menuItem: Menu): string {
+    return menuItem.legacyPath ?? menuItem.path ?? '#';
+  }
+
   toggleDropdown(event: Event): void {
     event.stopPropagation();
     this.isDropdownOpen.update(prev => !prev);
