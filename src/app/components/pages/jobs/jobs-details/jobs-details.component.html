@@ -7,14 +7,15 @@
         <h3 class="m-0">Job Details</h3>
       </div>
 
-      <div class="border rounded-3"
-           [class.border-dark]="!editJobRef?.rateCardChanged"
-           [class.border-danger]="editJobRef?.rateCardChanged"
-      >
-        <button
-          type="button"
-          class="btn d-flex flex-wrap align-items-center gap-2 p-x-6 p-y-4"
-          (click)="editJobRef?.toggleFinanceAccordion()">
+      <div class="flex items-center gap-20 justify-content-between">
+        <div class="border rounded-3"
+             [class.border-dark]="!editJobRef?.rateCardChanged"
+             [class.border-danger]="editJobRef?.rateCardChanged"
+        >
+          <button
+            type="button"
+            class="btn d-flex flex-wrap align-items-center gap-2 p-x-6 p-y-4"
+            (click)="editJobRef?.toggleFinanceAccordion()">
           <span class="badge t-0 position-static"
                 [class.bg-primary]="!editJobRef?.currencyChanged"
                 [class.bg-danger]="editJobRef?.currencyChanged"
@@ -23,64 +24,65 @@
                 [openDelay]="200"
                 placement="bottom">Curr
           </span>
-          <span class="badge t-0 position-static"
-                [class.bg-primary]="editJobRef?.prePaymentBadgeValue <= 0"
-                [class.bg-danger]="editJobRef?.prePaymentBadgeValue > 0"
-                [ngbTooltip]="editJobRef?.prePaymentBadgeTooltip"
-                container="body"
-                [openDelay]="200"
-                placement="bottom">Pre
+            <span class="badge t-0 position-static"
+                  [class.bg-primary]="editJobRef?.prePaymentBadgeValue <= 0"
+                  [class.bg-danger]="editJobRef?.prePaymentBadgeValue > 0"
+                  [ngbTooltip]="editJobRef?.prePaymentBadgeTooltip"
+                  container="body"
+                  [openDelay]="200"
+                  placement="bottom">Pre
           </span>
-          <span class="badge t-0 position-static"
-                [class.bg-primary]="editJobRef?.discountBadgeValue <= 0"
-                [class.bg-danger]="editJobRef?.discountBadgeValue > 0"
-                [ngbTooltip]="editJobRef?.discountBadgeTooltip"
-                container="body"
-                [openDelay]="200"
-                placement="bottom">Disc
+            <span class="badge t-0 position-static"
+                  [class.bg-primary]="editJobRef?.discountBadgeValue <= 0"
+                  [class.bg-danger]="editJobRef?.discountBadgeValue > 0"
+                  [ngbTooltip]="editJobRef?.discountBadgeTooltip"
+                  container="body"
+                  [openDelay]="200"
+                  placement="bottom">Disc
           </span>
-          <span class="badge t-0 position-static"
-                [class.bg-primary]="!editJobRef?.rateCardChanged"
-                [class.bg-danger]="editJobRef?.rateCardChanged"
-                [ngbTooltip]="editJobRef?.rateCardBadgeTooltip"
-                container="body"
-                [openDelay]="200"
-                placement="bottom">Rate</span>
+            <span class="badge t-0 position-static"
+                  [class.bg-primary]="!editJobRef?.rateCardChanged"
+                  [class.bg-danger]="editJobRef?.rateCardChanged"
+                  [ngbTooltip]="editJobRef?.rateCardBadgeTooltip"
+                  container="body"
+                  [openDelay]="200"
+                  placement="bottom">Rate</span>
+          </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <select
+            class="form-select form-select-sm w-auto"
+            #downloadSelect
+            (change)="onDownloadReport(downloadSelect, $any($event.target).value)">
+            <option value="" disabled selected>Download</option>
+            @for (opt of downloadReportOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+          <a
+            [href]="getMapsUrl(editJobRef?.form?.get('venue')?.value ?? jobDetails()?.venue)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center p-2 w-28 h-28"
+            [ngbTooltip]="'Open in maps'"
+            container="body"
+            [openDelay]="200">
+            <i class="fa-solid fa-map-location-dot f-16"></i>
+          </a>
+        </div>
+
+        <button
+          class="w-130 btn btn-primary position-relative"
+          type="button"
+          (click)="editJobRef.submit()"
+          [disabled]="!editJobRef?.form?.valid || editJobRef?.loading?.()">
+          Save
+          @if (editJobRef?.loading?.()) {
+            <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+          }
         </button>
       </div>
-
-      <div class="d-flex align-items-center gap-2">
-        <select
-          class="form-select form-select-sm w-auto"
-          #downloadSelect
-          (change)="onDownloadReport(downloadSelect, $any($event.target).value)">
-          <option value="" disabled selected>Download</option>
-          @for (opt of downloadReportOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
-          }
-        </select>
-        <a
-          [href]="getMapsUrl(editJobRef?.form?.get('venue')?.value ?? jobDetails()?.venue)"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-2 w-30 h-30"
-          [ngbTooltip]="'Open in maps'"
-          container="body"
-          [openDelay]="200">
-          <i class="fa-solid fa-map-location-dot f-16"></i>
-        </a>
-      </div>
-
-      <button
-        class="w-130 btn btn-primary position-relative"
-        type="button"
-        (click)="editJobRef.submit()"
-        [disabled]="!editJobRef?.form?.valid || editJobRef?.loading?.()">
-        Save
-        @if (editJobRef?.loading?.()) {
-          <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
-        }
-      </button>
     </div>
 
     <div class="m-t-20">
