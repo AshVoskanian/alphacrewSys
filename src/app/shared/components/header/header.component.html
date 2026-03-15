@@ -88,7 +88,21 @@
   <div class="nav-right col-auto pull-right right-header p-0 ms-auto">
     <ul class="nav-menus">
       <li class="language-nav">
-        <app-header-menu></app-header-menu>
+        <div class="d-flex align-items-center gap-12">
+          <div class="d-flex align-items-center gap-2">
+            <span class="f-12 text-nowrap m-r-3">Legacy Mode</span>
+            <button
+              type="button"
+              class="legacy-switch"
+              [class.legacy-switch-on]="legacySystemService.isLegacySystem()"
+              [attr.aria-checked]="legacySystemService.isLegacySystem()"
+              role="switch"
+              (click)="legacySystemService.toggle()">
+              <span class="legacy-switch-thumb"></span>
+            </button>
+          </div>
+          <app-header-menu></app-header-menu>
+        </div>
       </li>
 
       @if (isScheduleRoute) {

@@ -18,8 +18,8 @@
             <app-svg-icon [icon]="menuItem.icon" [change]="true"></app-svg-icon>
           }
         </div>
-        @if (menuItem.type === 'extTabLink') {
-          <a [href]="menuItem.path" target="_blank" class="sidebar-link sidebar-title link-nav">{{ menuItem.title }}</a>
+        @if (isLegacySystem()) {
+          <a [href]="menuItem.legacyPath ?? menuItem.path" target="_blank" class="sidebar-link sidebar-title link-nav">{{ menuItem.title }}</a>
         } @else {
           <a [routerLink]="menuItem.path" class="sidebar-link sidebar-title link-nav">{{ menuItem.title }}</a>
         }

@@ -5,6 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { menuItems as menuItemsData } from '../../../../data/menu';
 import { Menu } from '../../../../interface/menu';
+import { LegacySystemService } from '../../../../services/legacy-system.service';
 import { SvgIconComponent } from '../../../ui/svg-icon/svg-icon.component';
 
 @Component({
@@ -17,6 +18,9 @@ export class HeaderMenuComponent implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
+
+  readonly legacySystemService = inject(LegacySystemService);
+  readonly isLegacySystem = this.legacySystemService.isLegacySystem;
 
   readonly menuItems: WritableSignal<Menu[]> = signal(
     menuItemsData.filter(item => item.title)
