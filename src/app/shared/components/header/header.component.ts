@@ -68,6 +68,32 @@ export class HeaderComponent extends ApiBase implements OnInit {
     return '#111827';
   });
 
+  /** Breadcrumb: Dashboard → Schedule → [Category] → [Detail id/name] */
+  breadcrumbSegments = computed(() => {
+    const url = this.urlSig()?.split('?')[0] ?? '';
+    const parts = url.replace(/^\/+/, '').split('/').filter(Boolean);
+    const segments: { label: string; link: string | null }[] = [
+      { label: 'Dashboard', link: '/dashboard' },
+      { label: 'Schedule', link: '/schedule' },
+    ];
+    const categoryMap: Record<string, string> = {
+      jobs: 'Jobs',
+      clients: 'Clients',
+      crew: 'Crew',
+      venue: 'Venue',
+      profile: 'My Account',
+    };
+    const category = parts[0];
+    if (category && categoryMap[category]) {
+      segments.push({ label: categoryMap[category], link: `/${category}` });
+      const idOrName = parts[1];
+      if (idOrName) {
+        segments.push({ label: idOrName, link: null });
+      }
+    }
+    return segments;
+  });
+
   ngOnInit() {
     this.initForm();
     this._router.events.subscribe(() => {

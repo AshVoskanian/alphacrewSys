@@ -6,14 +6,18 @@
     </div>
 
     @if (!isScheduleRoute) {
-      <div class="breadcrumb-custom flex items-center justify-content-between text-primary">
-        <a class="m-r-5" routerLink="/dashboard"><span class="f-16 pointer">Dashboard</span></a>
-        <a class="m-r-5" routerLink="/schedule"> / <span class="f-16 pointer">Schedule</span></a>
-        <a class="m-r-5" routerLink="/crew"> / <span class="f-16 pointer"> Crew</span></a>
-        <a class="m-r-5" routerLink="/venue"> / <span class="f-16 pointer"> Venue</span></a>
-        <a class="m-r-5" routerLink="/clients"> / <span class="f-16 pointer"> Clients</span></a>
-        <a class="m-r-5" routerLink="/jobs"> / <span class="f-16 pointer"> Jobs</span></a>
-      </div>
+      <nav class="breadcrumb-custom flex items-center flex-wrap gap-1 text-primary f-16">
+        @for (seg of breadcrumbSegments(); track seg.label + (seg.link ?? ''); let last = $last) {
+          @if (seg.link) {
+            <a [routerLink]="seg.link" class="text-primary text-decoration-none pointer">{{ seg.label }}</a>
+          } @else {
+            <span class="text-primary">{{ seg.label }}</span>
+          }
+          @if (!last) {
+            <span class="m-x-2 text-primary">/</span>
+          }
+        }
+      </nav>
     }
 
     @if (isScheduleRoute) {
