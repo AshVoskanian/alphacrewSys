@@ -2,45 +2,9 @@ import { BehaviorSubject } from "rxjs";
 import { Menu } from "../interface/menu";
 
 export const menuItems: Menu[] = [
-  // {
-  //   title: 'Dashboard',
-  //   icon: 'home',
-  //   type: 'link',
-  //   bookmark: true,
-  //   path: '/dashboard',
-  //   level: 1,
-  // },
-  // {
-  //   title: 'Schedule',
-  //   icon: 'reports',
-  //   type: 'link',
-  //   bookmark: true,
-  //   path: '/schedule',
-  //   level: 1,
-  // },
-  // {
-  //   title: 'Crew',
-  //   icon: 'reports',
-  //   type: 'link',
-  //   bookmark: true,
-  //   path: '/crew',
-  //   level: 1,
-  // },
-  // {
-  //   title: 'Profile',
-  //   icon: 'reports',
-  //   type: 'link',
-  //   bookmark: true,
-  //   path: '/profile',
-  //   active: false,
-  //   level: 1,
-  // },
-  // {
-  //   main_title: 'Legacy System'
-  // },
   {
     title: 'Dashboard',
-    icon: 'fa-dashboard',
+    icon: 'fa-dashboard txt-primary',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Dashboard/',
     path: '/dashboard',
@@ -49,7 +13,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Schedule',
-    icon: 'fa-clipboard',
+    icon: 'fa-clipboard txt-primary',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Schedule/',
     path: '/schedule',
@@ -58,7 +22,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Jobs',
-    icon: 'fa-bars',
+    icon: 'fa-bars txt-primary',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Jobs',
     path: '/jobs',
@@ -67,7 +31,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Clients',
-    icon: 'fa-building',
+    icon: 'fa-building txt-primary',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Clients',
     path: '/clients',
@@ -76,7 +40,7 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Venues',
-    icon: 'fa-map-marker',
+    icon: 'fa-map-marker txt-primary',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Venues',
     path: '/venue',
@@ -85,10 +49,19 @@ export const menuItems: Menu[] = [
   },
   {
     title: 'Crew',
-    icon: 'fa-users',
+    icon: 'fa-users txt-primary',
     type: 'extTabLink',
     legacyPath: 'https://alphacrew.eu/Crew',
     path: '/crew',
+    bookmark: true,
+    level: 1,
+  },
+  {
+    title: 'Profile',
+    icon: 'fa-user txt-primary',
+    type: 'extTabLink',
+    legacyPath: 'https://alphacrew.eu/profile',
+    path: '/profile',
     bookmark: true,
     level: 1,
   },
