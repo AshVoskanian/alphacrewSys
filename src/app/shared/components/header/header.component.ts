@@ -121,10 +121,6 @@ export class HeaderComponent extends ApiBase implements OnInit {
       })
   }
 
-  toggleLanguage() {
-    this.navService.isLanguage = !this.navService.isLanguage;
-  }
-
   submit() {
     if (this.form.valid) {
       this.navService.filterParams.next({

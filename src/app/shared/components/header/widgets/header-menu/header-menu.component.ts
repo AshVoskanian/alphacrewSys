@@ -1,13 +1,13 @@
-import { Component, inject } from '@angular/core';
-import { language } from '../../../../data/header';
-import { Language } from '../../../../interface/header';
-import { NavService } from '../../../../services/nav.service';
+import { Component, inject, OnInit, DestroyRef, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { menuItems } from "../../../../data/menu";
-import { Menu } from "../../../../interface/menu";
-import { SvgIconComponent } from "../../../ui/svg-icon/svg-icon.component";
-import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+
+import { menuItems as menuItemsData } from '../../../../data/menu';
+import { Menu } from '../../../../interface/menu';
+import { NavService } from '../../../../services/nav.service';
+import { SvgIconComponent } from '../../../ui/svg-icon/svg-icon.component';
 
 @Component({
   selector: 'app-header-menu',
@@ -15,44 +15,45 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
   templateUrl: './header-menu.component.html',
   styleUrl: './header-menu.component.scss'
 })
+export class HeaderMenuComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-export class HeaderMenuComponent {
-  private _activatedRouter = inject(ActivatedRoute);
+  readonly menuItems: Menu[] = menuItemsData.filter(item => item.title);
 
-  public languages = language;
-  public selectedMenuItem: Menu;
-  public selectedLanguage: Language;
-  public menuItems = menuItems.filter(it => it.title);
+  activeMenuItem: Menu | undefined;
 
-  constructor(public navService: NavService, private translate: TranslateService, private router: Router) {
-    this.languages.filter((details) => {
-      if (details.active) {
-        this.selectedLanguage = details
-      }
-    })
-    this.setCurrentMenuItem();
+  active = signal(false);
+
+  ngOnInit(): void {
+    this.updateActiveMenuItemFromRoute();
+
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateActiveMenuItemFromRoute());
   }
 
-  get textColor() {
-    return'';
-  }
+  updateActiveMenuItemFromRoute(): void {
+    const pathWithoutQuery = this.router.url?.split('?')[0];
 
-  setCurrentMenuItem() {
-    const currentPath = this.router.url?.split('?')[0];
-
-    this.selectedMenuItem = menuItems.find(item =>
-      item.type === 'link' && currentPath?.includes(item.path)
+    this.activeMenuItem = menuItemsData.find(
+      item => item.type === 'link' && pathWithoutQuery?.includes(item.path ?? '')
     );
 
-    if (!this.selectedMenuItem) {
+    if (!this.activeMenuItem) {
       const fullUrl = window.location.href;
-      this.selectedMenuItem = menuItems.find(item =>
-        item.type === 'extTabLink' && fullUrl.includes(item.path)
+      this.activeMenuItem = menuItemsData.find(
+        item => item.type === 'extTabLink' && fullUrl.includes(item.path ?? '')
       );
     }
   }
 
-  selectedMenu(menuItem: Menu) {
-    this.selectedMenuItem = menuItem;
+  selectMenuItem(menuItem: Menu): void {
+    this.activeMenuItem = menuItem;
+  }
+
+  toggleLanguage() {
+    this.active.update(prev => !prev);
   }
 }

@@ -1,18 +1,18 @@
-<div class="translate_wrapper" [ngClass]="navService.isLanguage ? 'active' : ''">
-  @if (selectedLanguage) {
-    <div class="common-flex flex-nowrap align-items-center h-20 m-0 pointer">
+<div class="translate_wrapper" [ngClass]="active() ? 'active' : ''">
+  @if (activeMenuItem) {
+    <div class="common-flex flex-nowrap align-items-center h-20 m-0 pointer" (click)="toggleLanguage()">
       <div>
-        <app-svg-icon [icon]="selectedMenuItem?.icon" [class]="'h-15'" [change]="true"></app-svg-icon>
+        <app-svg-icon [icon]="activeMenuItem?.icon" [class]="'h-15'" [change]="true"></app-svg-icon>
       </div>
-      <p class="m-0 p-t-3 {{textColor}}">
-        {{ selectedMenuItem?.title | titlecase }}
+      <p class="m-0 p-t-3">
+        {{ activeMenuItem?.title | titlecase }}
       </p>
     </div>
   }
 
-  <div class="more_lang" [ngClass]="navService.isLanguage ? 'active' : ''">
+  <div class="more_lang" [ngClass]="active() ? 'active' : ''">
     @for (menuItem of menuItems; track menuItem.path + $index) {
-      <div class="lang selected" (click)="selectedMenu(menuItem)">
+      <div class="lang selected" (click)="selectMenuItem(menuItem)">
         <div class="m-r-10">
           @if (menuItem.icon) {
             <app-svg-icon [icon]="menuItem.icon" [change]="true"></app-svg-icon>
