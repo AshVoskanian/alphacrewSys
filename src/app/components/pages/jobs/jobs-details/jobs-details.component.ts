@@ -124,7 +124,7 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
     const jobId = this.jobDetails()?.jobId;
     if (!jobId || !report) return;
     const url = `${this.pdfDownloadBaseUrl}?id=${jobId}&report=${encodeURIComponent(report)}`;
-    window.open(url, '_blank');
+    window.open(url);
     selectEl.value = '';
   }
 
