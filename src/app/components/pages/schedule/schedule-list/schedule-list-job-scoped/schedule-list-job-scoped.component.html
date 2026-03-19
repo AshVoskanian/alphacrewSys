@@ -178,13 +178,17 @@
                     }
                   </div>
 
-                  <div class="skills col-4">
-                    @for (skill of schedule.transformedSkills | filter:[
-                      { field: 'active', condition: 'equals', value: true }
-                    ]; track skill.url + $index) {
-                      <i class="pointer border border-dark p-3 rounded text-danger f-20"
-                         [class]="skill.url"
-                         [ngbTooltip]="skill.name | titlecase"></i>
+                  <div class="skills col-4 relative">
+                    @for (skill of schedule.jobPartSkillsWithCount; track skill.id + $index) {
+                      <div class="position-relative">
+                        <i class="pointer border border-dark p-3 rounded text-danger f-20"
+                           [class]="'fa-solid fa-hammer'"
+                           [ngbTooltip]="skill.createDate | titlecase"></i>
+                        <span
+                          class="position-absolute z-3 f-10 top-0 left-0 translate-middle badge rounded-pill bg-primary">
+                          {{ skill.count }}
+                        </span>
+                      </div>
                     }
                   </div>
                 </div>

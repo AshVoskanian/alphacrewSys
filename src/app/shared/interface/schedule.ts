@@ -45,7 +45,7 @@ export interface Schedule {
   venueName: string;
   notifications: Array<Notification>;
   jobPartSkills: ScheduleSkills;
-  transformedSkills: TransformedSkill[];
+  jobPartSkillsWithCount: IYourEntity[];
   editedBy: string;
   lastModified: string;
   messageStatus: number;
@@ -57,6 +57,17 @@ export interface Schedule {
   other?: string;
   region?: string;
   total?: string;
+}
+
+export interface IYourEntity {
+  count: number;
+  createDate: string;
+  icon: string;
+  id: number;
+  jobId: number;
+  jobPartId: number;
+  jobPartStartDate: string;
+  skillId: number;
 }
 
 export interface TransformedSkill {
