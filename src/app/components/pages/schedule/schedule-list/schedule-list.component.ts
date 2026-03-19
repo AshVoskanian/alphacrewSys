@@ -749,14 +749,11 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             return;
           }
 
-          const jobPartSkillsWithCount = schedule.jobPartSkillsWithCount;
-
           this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length)),
-                jobPartSkillsWithCount
+                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length))
               };
             }
             return item;
@@ -766,8 +763,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length)),
-                jobPartSkillsWithCount
+                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length))
               };
             }
             return item;
