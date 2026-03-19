@@ -5,9 +5,36 @@
         <i (click)="goBack()"
            class="pointer fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
         <h3 class="m-0">Job Details</h3>
+        <i class="fa-solid fa-circle-info txt-primary f-20 pointer"
+           [ngbTooltip]="jobDetailsInfoTemplate"
+           tooltipClass="wide-tooltip"></i>
+        <ng-template #jobDetailsInfoTemplate>
+          <div class="p-2 text-start">
+            <p class="m-0 text-black">
+              <span class="text-primary">Edited By:</span> {{ jobDetails()?.editedBy ?? '—' }}
+            </p>
+            <p class="m-0 text-black">
+              <span class="text-primary">Created:</span> {{ jobDetails()?.dateCreated | date }}
+            </p>
+            <p class="m-0 text-black">
+              <span class="text-primary">Edited:</span> {{ jobDetails()?.dateEdited | date }}
+            </p>
+          </div>
+        </ng-template>
       </div>
 
       <div class="flex items-center gap-20 justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <div class="txt-secondary f-12">
+            Credit Limit: {{ jobDetails()?.clientLimit?.creditLimit | currency:'GBP':'symbol':'1.2-2' }}
+          </div>
+          <div class="f-12 fw-bold"
+               [class.text-success]="!overUtilisation"
+               [class.txt-danger]="overUtilisation">
+            Credit Utilisation: {{ jobDetails()?.clientLimit?.clientUtilisation | currency:'GBP':'symbol':'1.2-2' }}
+          </div>
+        </div>
+
         <div class="border rounded-3"
              [class.border-dark]="!editJobRef?.rateCardChanged"
              [class.border-danger]="editJobRef?.rateCardChanged"
@@ -22,7 +49,7 @@
                 [ngbTooltip]="editJobRef?.currencyBadgeTooltip"
                 container="body"
                 [openDelay]="200"
-                placement="bottom">Curr
+                placement="bottom">{{ editJobRef?.currencyBadgeLabel ?? '—' }}
           </span>
             <span class="badge t-0 position-static"
                   [class.bg-primary]="editJobRef?.prePaymentBadgeValue <= 0"
@@ -46,7 +73,7 @@
                   [ngbTooltip]="editJobRef?.rateCardBadgeTooltip"
                   container="body"
                   [openDelay]="200"
-                  placement="bottom">Rate</span>
+                  placement="bottom">VAT</span>
           </button>
         </div>
 

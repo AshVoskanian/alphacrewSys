@@ -10,6 +10,7 @@ import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
 import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
 import { NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
+import { CurrencyPipe, DatePipe } from "@angular/common";
 
 @Component({
   selector: 'app-jobs-details',
@@ -18,6 +19,8 @@ import { NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
     RouterModule,
     EditJobComponent,
     NgbTooltip,
+    CurrencyPipe,
+    DatePipe,
   ],
   templateUrl: './jobs-details.component.html',
   styleUrl: './jobs-details.component.scss'
@@ -131,6 +134,15 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
   getMapsUrl(venue: string | { label?: string } | null | undefined): string {
     const s = typeof venue === 'string' ? venue : venue?.label ?? this.jobDetails()?.venue ?? '';
     return `https://www.google.co.uk/maps/search/${encodeURIComponent(s)}/`;
+  }
+
+  get overUtilisation(): boolean {
+    const details = this.jobDetails();
+    const limit = details?.clientLimit;
+    const outstanding = details?.jobCost?.outstanding ?? 0;
+    const utilisation = limit?.clientUtilisation ?? 0;
+    const creditLimit = limit?.creditLimit ?? 0;
+    return (outstanding + utilisation) > creditLimit;
   }
 
   onPartialPaymentsUpdated(data: AddPaymentResponse) {

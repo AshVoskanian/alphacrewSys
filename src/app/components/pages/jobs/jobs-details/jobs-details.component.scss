@@ -1,0 +1,6 @@
+:host ::ng-deep .wide-tooltip {
+  .tooltip-inner {
+    max-width: 300px !important;
+    white-space: normal;
+  }
+}

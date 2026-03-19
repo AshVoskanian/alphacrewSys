@@ -51,7 +51,6 @@ import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.
     Select2Module,
     NgbTooltip,
     NgbTypeahead,
-    DatePipe,
     CurrencyPipe,
     TableComponent,
     AddPaymentComponent,
@@ -199,10 +198,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
     if (this.jobDetails()) {
       this.setFormData();
     }
-  }
-
-  get overUtilisation() {
-    return (this.jobDetails()?.jobCost.outstanding + this.jobDetails()?.clientLimit.clientUtilisation) > this.jobDetails()?.clientLimit.creditLimit;
   }
 
   get prePaymentBadgeValue(): number {
