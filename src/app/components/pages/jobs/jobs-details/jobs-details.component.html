@@ -24,7 +24,14 @@
       </div>
 
       <div class="flex items-center gap-20 justify-content-between">
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-10">
+          <label class="form-label m-b-0">Publish to App</label>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="publish" formControlName="publish">
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-10">
           <div class="txt-secondary f-12">
             Credit Limit: {{ jobDetails()?.clientLimit?.creditLimit | currency:'GBP':'symbol':'1.2-2' }}
           </div>

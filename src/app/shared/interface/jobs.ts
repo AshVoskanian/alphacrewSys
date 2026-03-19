@@ -70,6 +70,7 @@ export interface JobDetails {
   invoiceDate: string;
   paidDate: string;
   paymentDueDate: string;
+  gid: string;
   purchaseOrder: string | null;
   invoiceNumber: string | null;
   editedBy: string;

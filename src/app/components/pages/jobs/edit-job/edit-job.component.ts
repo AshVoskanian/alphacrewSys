@@ -304,6 +304,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       purchaseOrder: [ null ],
       jobRateCardId: [ null ],
       currencyId: [ null ],
+      gid: [ null ],
       vat: [ true ],
       prePayment: [ 0 ],
       discount: [ 0 ],
@@ -485,6 +486,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       discount: details.discount ?? 0,
       jobRegionAccess: jobRegionAccessValue,
       orderedBy: details.orderedBy,
+      gid: details.gid ?? null,
       jobContact: details.jobContact,
       importantDate: formatDate(details.importantDate),
       invoiceDate: formatDate(details.invoiceDate),
@@ -663,6 +665,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       paymentDueDate: toISOString(formValue.paymentDueDate),
       paidDate: toISOString(formValue.paidDate),
       notes: formValue.notes,
+      gid: formValue.gid,
       publish: formValue.publish,
       purchaseOrder: formValue.purchaseOrder
     };

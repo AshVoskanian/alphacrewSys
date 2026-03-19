@@ -11,6 +11,7 @@ import { EditJobComponent } from "../edit-job/edit-job.component";
 import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
 import { NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
 import { CurrencyPipe, DatePipe } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: 'app-jobs-details',
@@ -21,6 +22,8 @@ import { CurrencyPipe, DatePipe } from "@angular/common";
     NgbTooltip,
     CurrencyPipe,
     DatePipe,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './jobs-details.component.html',
   styleUrl: './jobs-details.component.scss'
