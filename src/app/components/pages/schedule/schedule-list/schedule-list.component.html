@@ -182,7 +182,7 @@
                   <div class="skills col-4">
                     @for (skill of schedule.jobPartSkillsWithCount; track skill.id + $index) {
                       <div class="position-relative">
-                        <i class="pointer border border-dark p-3 rounded text-danger f-20"
+                        <i class="pointer border border-dark fa-question p-3 rounded text-danger f-20"
                            [class]="skill.faIcon"
                            [ngbTooltip]="skill.description | titlecase"></i>
                         <span
