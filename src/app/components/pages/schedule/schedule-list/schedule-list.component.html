@@ -183,8 +183,8 @@
                     @for (skill of schedule.jobPartSkillsWithCount; track skill.id + $index) {
                       <div class="position-relative">
                         <i class="pointer border border-dark p-3 rounded text-danger f-20"
-                           [class]="'fa-solid fa-hammer'"
-                           [ngbTooltip]="skill.createDate | titlecase"></i>
+                           [class]="skill.faIcon"
+                           [ngbTooltip]="skill.description | titlecase"></i>
                         <span
                           class="position-absolute z-3 f-10 top-0 left-0 translate-middle badge rounded-pill bg-primary">
                           {{ skill.count }}

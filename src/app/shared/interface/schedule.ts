@@ -62,11 +62,12 @@ export interface Schedule {
 export interface IYourEntity {
   count: number;
   createDate: string;
-  icon: string;
+  faIcon: string;
   id: number;
   jobId: number;
   jobPartId: number;
   jobPartStartDate: string;
+  description: string;
   skillId: number;
 }
 

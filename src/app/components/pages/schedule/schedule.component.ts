@@ -8,7 +8,6 @@ import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
 import { NavService } from "../../../shared/services/nav.service";
 import { ScheduleService } from "./schedule.service";
-import { SKILLS } from "../../../shared/data/skills";
 import { ScheduleGridComponent } from "./schedule-grid/schedule-grid.component";
 import { AsyncPipe } from "@angular/common";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
