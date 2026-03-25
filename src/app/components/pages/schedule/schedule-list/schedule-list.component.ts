@@ -63,14 +63,15 @@ import { SendSmsToCrewComponent } from "./send-sms-to-crew/send-sms-to-crew.comp
 import { UkPostcodeLinkPipe } from "../../../../shared/pipes/uk-post-code-link.pipe";
 import { ActivityComponent } from "./activity/activity.component";
 import { JobPartLog } from "../../../../shared/interface/activity";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
+import { LegacySystemService } from "../../../../shared/services/legacy-system.service";
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
@@ -83,6 +84,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   private _offCanvasService = inject(NgbOffcanvas);
   private _activatedRouter = inject(ActivatedRoute);
   private _scheduleService = inject(ScheduleService);
+  readonly legacySystemService = inject(LegacySystemService);
 
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
@@ -208,6 +210,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   isJobScoped = computed(() => {
     return this.queryParams() && this.queryParams().get('jobId')
   })
+
+  readonly isLegacySystem = this.legacySystemService.isLegacySystem;
 
   hideVehicles: boolean = false;
 
