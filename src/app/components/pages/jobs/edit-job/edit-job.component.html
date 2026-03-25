@@ -175,7 +175,8 @@
               </label>
             </div>
             @if (documents().length) {
-              <div class="documents-list w-100 flex flex-wrap m-t-10 max-h-100 overflow-y-auto custom-scrollbar header-files-col">
+              <div
+                class="documents-list w-100 flex flex-wrap m-t-10 max-h-100 overflow-y-auto custom-scrollbar header-files-col">
                 @for (doc of documents(); track doc.fileName) {
                   <div
                     class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
@@ -354,7 +355,16 @@
 <!-- Add / Edit Job Part Modal -->
 <ng-template #addJobPartModal let-modal>
   <div class="modal-header">
-    <h5 class="modal-title">{{ editingJobPartId() ? 'Edit Job Part' : 'Add New Job Part' }}</h5>
+    <div class="flex items-center gap-10">
+      <h5 class="modal-title">{{ editingJobPartId() ? 'Edit Job Part' : 'Add New Job Part' }}</h5>
+      <i class="fa-solid fa-{{activityLoading() ? 'spinner' : 'circle-info'}} txt-primary f-20 pointer"
+         (click)="getActivities( popoverRef)"
+         #popoverRef="ngbPopover"
+         triggers="manual"
+         [autoClose]="'outside'"
+         [popoverClass]="'wide-popover border max-w-1000'"
+         [ngbPopover]="activities"></i>
+    </div>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
@@ -366,4 +376,9 @@
       (finish)="onJobPartCancel()"
       (saved)="onJobPartSaved()"></app-add-edit-job-part>
   </div>
+</ng-template>
+
+<!--Recent Activities-->
+<ng-template #activities>
+  <app-activity [activityList]="activityList()"></app-activity>
 </ng-template>

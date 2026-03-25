@@ -7,8 +7,12 @@
           @for (activitie of activityList(); track activitie.id) {
             <li class="d-flex align-items-center p-r-5 m-b-2">
               <div class="flex-grow-1">
-                <h6 class="m-b-0"
-                    [ngbTooltip]="activitie.content?.length > 78 ? activitie.content : ''">{{ activitie.content }}</h6>
+                <h6 class="m-b-0" [ngbTooltip]="content">
+                  {{ activitie.content }}
+                </h6>
+                <ng-template #content>
+                  <p class="min-w-300" [innerHtml]="activitie.content?.length > 78 ? activitie.content : ''"></p>
+                </ng-template>
                 <span>By <span class="text-primary">{{ activitie.name }}</span></span>
               </div>
               <div class="flex-shrink-0">

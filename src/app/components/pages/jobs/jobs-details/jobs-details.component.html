@@ -5,22 +5,13 @@
         <i (click)="goBack()"
            class="pointer fa-solid fa-circle-chevron-left f-36 txt-primary"></i>
         <h3 class="m-0">Job Details</h3>
-        <i class="fa-solid fa-circle-info txt-primary f-20 pointer"
-           [ngbTooltip]="jobDetailsInfoTemplate"
-           tooltipClass="wide-tooltip"></i>
-        <ng-template #jobDetailsInfoTemplate>
-          <div class="p-2 text-start">
-            <p class="m-0 text-black">
-              <span class="text-primary">Edited By:</span> {{ jobDetails()?.editedBy ?? '—' }}
-            </p>
-            <p class="m-0 text-black">
-              <span class="text-primary">Created:</span> {{ jobDetails()?.dateCreated | date }}
-            </p>
-            <p class="m-0 text-black">
-              <span class="text-primary">Edited:</span> {{ jobDetails()?.dateEdited | date }}
-            </p>
-          </div>
-        </ng-template>
+        <i class="fa-solid fa-{{jobDetails()?.loader ? 'spinner' : 'circle-info'}} txt-primary f-20 pointer"
+           (click)="getActivities(jobDetails(), popoverRef)"
+           #popoverRef="ngbPopover"
+           triggers="manual"
+           [autoClose]="'outside'"
+           [popoverClass]="'wide-popover border max-w-1000'"
+           [ngbPopover]="activities"></i>
       </div>
 
       <div class="flex items-center gap-20 justify-content-between">
@@ -135,3 +126,8 @@
     </div>
   </app-card>
 </div>
+
+<!--Recent Activities-->
+<ng-template #activities>
+  <app-activity [activityList]="activityList()"></app-activity>
+</ng-template>

@@ -9,9 +9,12 @@ import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
 import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
-import { NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
+import { NgbPopover, NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
+import { Schedule } from "../../../../shared/interface/schedule";
+import { JobPartLog } from "../../../../shared/interface/activity";
 
 @Component({
   selector: 'app-jobs-details',
@@ -24,6 +27,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
     DatePipe,
     FormsModule,
     ReactiveFormsModule,
+    ActivityComponent,
+    NgbPopover,
   ],
   templateUrl: './jobs-details.component.html',
   styleUrl: './jobs-details.component.scss'
@@ -35,6 +40,7 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
 
   public layoutService = inject(LayoutService);
 
+  activityList: WritableSignal<JobPartLog[]> = signal([]);
   jobRateCard: WritableSignal<JobPartRateCard> = signal(null);
   jobDetails: WritableSignal<JobDetails> = signal<JobDetails>(null);
   jobWarnings: WritableSignal<JobScheduleWarning[]> = signal<JobScheduleWarning[]>(null);
@@ -157,5 +163,29 @@ export class JobsDetailsComponent extends ApiBase implements OnInit {
         ...(data.jobCost != null && { jobCost: data.jobCost })
       };
     });
+  }
+
+  getActivities(job: JobDetails, popover: NgbPopover) {
+    job.loader = true;
+
+    const body = {
+      jobId: job.jobId
+    }
+
+    this.post<JobPartLog[]>('ActionHistory/GetActionHistoryLogByJobIdOrJobPartId', { ...body })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => job.loader = false)
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.activityList.set(res.data);
+          popover.open();
+        }
+      })
   }
 }

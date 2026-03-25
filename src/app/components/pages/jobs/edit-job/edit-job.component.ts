@@ -38,11 +38,13 @@ import { RateCard } from "../../../../shared/interface/clients";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
-import { NgbModal, NgbModalRef, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef, NgbPopover, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
 import { TagInputModule } from "ngx-chips";
 import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.component";
+import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
+import { JobPartLog } from "../../../../shared/interface/activity";
 
 @Component({
   selector: 'app-edit-job',
@@ -55,7 +57,9 @@ import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.
     TableComponent,
     AddPaymentComponent,
     TagInputModule,
-    AddEditJobPartComponent
+    AddEditJobPartComponent,
+    ActivityComponent,
+    NgbPopover
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
@@ -85,6 +89,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   editingJobPartId: WritableSignal<number | null> = signal<number | null>(null);
 
   financeSectionExpanded: WritableSignal<boolean> = signal(false);
+  activityList: WritableSignal<JobPartLog[]> = signal([]);
 
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -119,6 +124,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   currencies: WritableSignal<Select2Option[]> = signal<Select2Option[]>([]);
 
   loading = signal<boolean>(false);
+  activityLoading = signal<boolean>(false);
   clientLoading = signal<boolean>(false);
   venueLoading = signal<boolean>(false);
   rateCardLoading = signal<boolean>(false);
@@ -958,5 +964,32 @@ export class EditJobComponent extends ApiBase implements OnInit {
   formatPaymentDate(dateStr: string): string {
     if (!dateStr) return '';
     return this._datePipe.transform(dateStr, 'dd MMM yyyy') ?? dateStr;
+  }
+
+  getActivities(popover: NgbPopover) {
+    if (this.activityLoading() || this.loading()) return;
+
+    this.activityLoading.set(true);
+
+    const body = {
+      jobId: this.jobDetails()?.jobId,
+      jobPartId: this.editingJobPartId()
+    }
+
+    this.post<JobPartLog[]>('ActionHistory/GetActionHistoryLogByJobIdOrJobPartId', { ...body })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.activityLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.activityList.set(res.data);
+          popover.open();
+        }
+      })
   }
 }

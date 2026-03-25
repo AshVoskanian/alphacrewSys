@@ -78,6 +78,7 @@ export interface JobDetails {
   jobContact: string;
   vatRateId: number;
   vat: boolean;
+  loader?: boolean;
   prePayment: number;
   discount: number;
   discountPercent: number | null;
