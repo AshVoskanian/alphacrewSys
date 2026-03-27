@@ -135,7 +135,7 @@
                         <h6>
                           {{ schedule.startDate | date: 'HH:mm' }} -  {{ schedule.endDate | date: 'HH:mm' }}
                           (Cr: {{ schedule.crewNumber }},
-                          Hrs: {{ hoursDifference(schedule.startDate, schedule.endDate) }}
+                          Hrs: {{ schedule.hours }}
                           @if (schedule?.travelHours > 0) {
                             +{{ schedule?.travelHours }}TrHr
                           }
