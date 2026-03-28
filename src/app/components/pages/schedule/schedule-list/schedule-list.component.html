@@ -451,7 +451,8 @@
               #popoverRef="ngbPopover"
               triggers="manual"
               [autoClose]="'outside'"
-              [popoverClass]="'wide-popover border max-w-800'"
+              [popoverClass]="'wide-popover border max-w-800 bg-dark p-0'"
+              [popoverTitle]="'Recent Activity'"
               [ngbPopover]="activities"
               class="btn btn-info action-button left w-30 h-30 p-0">
         <i class="fa-solid fa-{{schedule.activityLoader ? 'spinner' : 'info'}} text-light"></i>
