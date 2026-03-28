@@ -362,7 +362,8 @@
          #popoverRef="ngbPopover"
          triggers="manual"
          [autoClose]="'outside'"
-         [popoverClass]="'wide-popover border max-w-1000'"
+         [popoverClass]="'wide-popover border min-w-370 max-w-800 bg-dark'"
+         [popoverTitle]="'Recent Activity'"
          [ngbPopover]="activities"></i>
     </div>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>

@@ -3,7 +3,7 @@ import { JobClient, JobDetails, JobVenue } from "../../../../shared/interface/jo
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
-import { JOB_STATUSES, JOB_STATUSES_FOR_JPART } from "../jobs-filter/jobs-utils";
+import { JOB_STATUSES_FOR_JPART } from "../jobs-filter/jobs-utils";
 import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
@@ -122,10 +122,10 @@ export class AddJobComponent extends ApiBase implements OnInit {
   };
 
 
-  getJobVenues(clientId?: number, all = 1) {
+  getJobVenues(clientId?: number, all = 1, jobId =  0) {
     this.venueLoading.set(true);
 
-    this.post<JobVenue[]>('jobs/GetJobVenue', { id: clientId, all })
+    this.post<JobVenue[]>('jobs/GetJobVenue', { id: clientId, all, jobId })
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.venueLoading.set(false))

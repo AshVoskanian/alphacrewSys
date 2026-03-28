@@ -38,7 +38,14 @@ import { RateCard } from "../../../../shared/interface/clients";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
-import { NgbModal, NgbModalRef, NgbPopover, NgbTooltip, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
+import {
+  NgbModal,
+  NgbModalRef,
+  NgbPopover,
+  NgbPopoverModule,
+  NgbTooltip,
+  NgbTypeahead
+} from "@ng-bootstrap/ng-bootstrap";
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
 import { TagInputModule } from "ngx-chips";
@@ -59,7 +66,7 @@ import { JobPartLog } from "../../../../shared/interface/activity";
     TagInputModule,
     AddEditJobPartComponent,
     ActivityComponent,
-    NgbPopover
+    NgbPopoverModule
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
@@ -329,7 +336,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
           if (clientId && clientId !== 0) {
             this.form.get('venueId')?.setValue(null);
             this.form.get('venue')?.setValue(null);
-            this.getJobVenues(clientId);
+            this.getJobVenues(clientId, this.jobDetails()?.jobId ?? 0);
           } else {
             this.jobVenues.set([]);
           }
@@ -424,10 +431,10 @@ export class EditJobComponent extends ApiBase implements OnInit {
       });
   }
 
-  getJobVenues(clientId?: number, setVenueAfterLoad = false) {
+  getJobVenues(clientId: number, jobId: number, setVenueAfterLoad = false) {
     this.venueLoading.set(true);
 
-    this.post<JobVenue[]>('jobs/GetJobVenue', { id: clientId, all: 0 })
+    this.post<JobVenue[]>('jobs/GetJobVenue', { id: clientId, all: 0, jobId })
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.venueLoading.set(false))
@@ -506,7 +513,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
     // Load venues only if clientId exists and is valid
     // Set venue after venues are loaded
     if (details.clientId && details.clientId !== 0) {
-      this.getJobVenues(details.clientId, true);
+      this.getJobVenues(details.clientId, this.jobDetails()?.jobId ?? 0, true);
     }
 
     // Set venue value for typeahead
