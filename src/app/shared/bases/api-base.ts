@@ -16,6 +16,11 @@ export class ApiBase {
     return environment.apiUrl;
   }
 
+  /** Collapses repeated `/` in the path; keeps `https://` intact. */
+  private normalizeRequestUrl(url: string): string {
+    return url.replace(/([^:]\/)\/+/g, '$1');
+  }
+
   get<T>(endpoint: string, queryParams?: Record<string, string | number | boolean>, headers?: HttpHeaders): Observable<ApiResponse<T>> {
     let params = new HttpParams();
     if (queryParams) {
@@ -23,23 +28,23 @@ export class ApiBase {
         params = params.append(key, queryParams[key].toString());
       });
     }
-    return this.http.get<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }`, { params, headers })
+    return this.http.get<ApiResponse<T>>(this.normalizeRequestUrl(`${ this.apiUrl }/${ endpoint }`), { params, headers })
   }
 
   getFile(endpoint: string, responseType: 'json' | 'blob' = 'json'): Observable<Blob> {
-    return this.http.get<Blob>(`${ this.apiUrl }/${ endpoint }`, { responseType: responseType as any })
+    return this.http.get<Blob>(this.normalizeRequestUrl(`${ this.apiUrl }/${ endpoint }`), { responseType: responseType as any })
   }
 
   post<T, U = any>(endpoint: string, data: U, headers?: HttpHeaders): Observable<ApiResponse<T>> {
-    return this.http.post<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }`, data, { headers }).pipe(catchError(this.handleError));
+    return this.http.post<ApiResponse<T>>(this.normalizeRequestUrl(`${ this.apiUrl }/${ endpoint }`), data, { headers }).pipe(catchError(this.handleError));
   }
 
   put<T, U = any>(endpoint: string, id: number | string, data: U, headers?: HttpHeaders): Observable<ApiResponse<T>> {
-    return this.http.put<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }/${ id }`, data, { headers }).pipe(catchError(this.handleError));
+    return this.http.put<ApiResponse<T>>(this.normalizeRequestUrl(`${ this.apiUrl }/${ endpoint }/${ id }`), data, { headers }).pipe(catchError(this.handleError));
   }
 
   delete<T, U>(endpoint: string, id?: number | string, body?: U): Observable<ApiResponse<T>> {
-    return this.http.delete<ApiResponse<T>>(`${ this.apiUrl }/${ endpoint }/${ id }`, { body }).pipe(catchError(this.handleError));
+    return this.http.delete<ApiResponse<T>>(this.normalizeRequestUrl(`${ this.apiUrl }/${ endpoint }/${ id }`), { body }).pipe(catchError(this.handleError));
   }
 
   protected handleError(error: HttpErrorResponse) {
