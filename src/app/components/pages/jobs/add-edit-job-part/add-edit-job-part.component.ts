@@ -173,6 +173,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     // Miscellaneous costs and skills
     misc: [ null ],
     miscCost: [ 0 ],
+    perDiem: [ 0 ],
+    lastMinuteBookingCost: [ 0 ],
     fuel: [ 0 ],
     skillSupplement: [ 0 ],
     jobPartSkillsAddRequests: [ [] as ChipCountItem[] ],
@@ -262,7 +264,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   get skillsTotal(): number {
     return [
       'miscCost',
-      'skillSupplement'
+      'skillSupplement',
+      'perDiem',
+      'lastMinuteBookingCost'
     ].reduce((sum, key) => sum + this._getNumber(key), 0);
   }
 
@@ -437,6 +441,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       extraCost: part.extraCost,
       misc: part.misc ?? '',
       miscCost: part.miscCost,
+      perDiem: part.perDiem ?? 0,
+      lastMinuteBookingCost: part.lastMinuteBookingCost ?? 0,
       fuel: part.fuel ?? 0,
       skillSupplement: (part.jobPartSkills?.length ? part.skillSupplement : 0) ?? 0,
       jobPartVenueName: part.jobPartVenueName ?? '',
@@ -547,6 +553,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       returnMileage: Number(v.returnMileage ?? 0),
       misc: v.misc ?? '',
       miscCost: Number(v.miscCost ?? 0),
+      perDiem: Number(v.perDiem ?? 0),
+      lastMinuteBookingCost: Number(v.lastMinuteBookingCost ?? 0),
       fuel: Number(v.fuel ?? 0),
       fuelCost: Number(v.fuelCost ?? 0),
       fuelCostCrew: Number(v.fuelCostCrew ?? 0),

@@ -225,6 +225,8 @@ export interface AddOrUpdateJobPartRequest {
   returnMileage: number;
   misc: string;
   miscCost: number;
+  perDiem: number;
+  lastMinuteBookingCost: number;
   fuel: number;
   fuelCost: number;
   fuelCostCrew: number;
