@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <div class="border rounded-3"
+        <div class="border border-2 rounded-3"
              [class.border-dark]="!editJobRef?.rateCardChanged"
              [class.border-danger]="editJobRef?.rateCardChanged"
         >
@@ -71,12 +71,10 @@
                   placement="bottom">Disc
           </span>
             <span class="badge t-0 position-static"
-                  [class.bg-primary]="!editJobRef?.rateCardChanged"
-                  [class.bg-danger]="editJobRef?.rateCardChanged"
-                  [ngbTooltip]="editJobRef?.rateCardBadgeTooltip"
-                  container="body"
-                  [openDelay]="200"
-                  placement="bottom">VAT</span>
+                  [class.bg-primary]="!editJobRef?.vatChanged"
+                  [class.bg-danger]="editJobRef?.vatChanged">
+              VAT
+            </span>
           </button>
         </div>
 

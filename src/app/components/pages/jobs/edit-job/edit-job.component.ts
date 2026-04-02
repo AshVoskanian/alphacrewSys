@@ -236,6 +236,10 @@ export class EditJobComponent extends ApiBase implements OnInit {
     return this._initialJobRateCardId !== current;
   }
 
+  get vatChanged(): boolean {
+    return this.form?.get('vat').value === false || this.jobDetails()?.vatRateId !== 1;
+  }
+
   get currencyChanged(): boolean {
     const current = this.form?.get('currencyId')?.value;
     return this._initialCurrencyId !== current;
@@ -491,7 +495,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       })
       : [];
 
-    this._initialCurrencyId = details.currencyId ?? null;
+    this._initialCurrencyId = details.regionCurrencyId ?? null;
     this._initialJobRateCardId = details.jobRateCardId ?? null;
     this._initialCurrencyLabel = this.currencies()?.find(c => c.value === this._initialCurrencyId)?.label ?? '—';
     this._initialRateCardLabel = this.rateCards()?.find(r => r.value === this._initialJobRateCardId)?.label ?? '—';
