@@ -14,6 +14,16 @@
           background: var(--light-background);
         }
 
+        .table-action-hover-only {
+          opacity: 0;
+          transition: opacity 0.15s ease;
+        }
+
+        &:hover .table-action-hover-only,
+        &:focus-within .table-action-hover-only {
+          opacity: 1;
+        }
+
         td {
           &.pointer {
             &:hover {

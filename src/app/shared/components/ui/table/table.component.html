@@ -1,4 +1,55 @@
 @if (tableConfig) {
+  <ng-template #rowActionsTpl let-actions="actions" let-details="details">
+    <div class="product-action common-align gap-10 justify-content-start">
+      @for (rows of actions; track rows) {
+        @if (rows.type == 'button') {
+          <button [class]="rows.class">{{ rows.label }}</button>
+        }
+        @if (rows.label == 'Create') {
+          <button class="plus-btn">+</button>
+        } @else if (rows.label == 'Edit' || rows.label == 'Delete' || rows.label == 'Copy') {
+          <a [class]="rows.class ?? 'square-white'" href="javascript:void(0)"
+             [class.table-action-hover-only]="rows.showOnHover === true"
+             (click)="handleAction(rows, details)">
+            @if (rows.label === 'Copy' && details.copyLoading) {
+              <i class="fa-solid fa-spinner fa-spin txt-primary"></i>
+            } @else if (rows.label === 'Delete' && details.deleteLoading) {
+              <i class="fa-solid fa-spinner fa-spin txt-danger"></i>
+            } @else if (rows.icon?.startsWith('fa-')) {
+              <i [class]="rows.icon"></i>
+            } @else {
+              <app-svg-icon [icon]="rows.icon"></app-svg-icon>
+            }
+          </a>
+        } @else if (rows.label == 'View') {
+          <a class="square-white" href="javascript:void(0)" (click)="handleAction(rows, details)"
+             [class.table-action-hover-only]="rows.showOnHover === true"
+             [routerLink]="rows.path">
+            <i class="fa-solid fa-eye"></i>
+          </a>
+        } @else if (rows.label == 'Refresh') {
+          <a class="square-white" href="javascript:void(0)" placement="top"
+             [class.table-action-hover-only]="rows.showOnHover === true"
+             [ngbTooltip]="'Change Status'">
+            <i class="fa-solid fa-{{ rows.icon }}"></i>
+          </a>
+        } @else if (rows.label == 'Message') {
+          <Button class="btn btn-primary" placement="top" [ngbTooltip]="'Message'"
+                  [class.table-action-hover-only]="rows.showOnHover === true"><i
+            class="fa-solid fa-envelope"></i></Button>
+        } @else if (rows.label == 'Approve') {
+          <Button class="btn btn-success" placement="top" [ngbTooltip]="'Approve'"
+                  [class.table-action-hover-only]="rows.showOnHover === true"><i
+            class="fa-solid fa-thumbs-up"></i></Button>
+        } @else if (rows.label == 'Reject') {
+          <Button class="btn btn-danger" placement="top" [ngbTooltip]="'Reject'"
+                  [class.table-action-hover-only]="rows.showOnHover === true"><i
+            class="fa-solid fa-circle-xmark"></i></Button>
+        }
+      }
+    </div>
+  </ng-template>
+
   <div class="overflow-auto custom-scrollbar max-h-{{maxHeight}}">
     <table class="table" [ngClass]="tableClass">
       <thead>
@@ -14,6 +65,10 @@
 
         @if (rowDetails) {
           <th></th>
+        }
+
+        @if (tableConfig.row_action_before) {
+          <th class="text-start" aria-label="Row actions"></th>
         }
 
         @for (column of tableConfig.columns; track column) {
@@ -62,6 +117,13 @@
                       'background': 'url(assets/images/' + (selectedOpenRows.includes(details.id) ? 'details_close' : 'details_open') + '.png) no-repeat center center',
                       'cursor': 'pointer'
                     }" (click)="openRowDetails(details.id)">
+                </td>
+              }
+
+              @if (tableConfig.row_action_before) {
+                <td class="flex items-center justify-content-start">
+                  <ng-container
+                    *ngTemplateOutlet="rowActionsTpl; context: { actions: tableConfig.row_action_before, details: details }"/>
                 </td>
               }
 
@@ -119,55 +181,15 @@
 
               @if (tableConfig.row_action) {
                 <td class="flex items-center justify-content-end">
-                  <div class="product-action common-align gap-10 justify-content-start">
-                    @for (rows of tableConfig.row_action; track rows) {
-                      @if (rows.type == 'button') {
-                        <button [class]="rows.class">{{ rows.label }}</button>
-                      }
-                      @if (rows.label == 'Create') {
-                        <button class="plus-btn">+</button>
-                      } @else if (rows.label == 'Edit' || rows.label == 'Delete' || rows.label == 'Copy') {
-                        <a [class]="rows.class ?? 'square-white'" href="javascript:void(0)"
-                           (click)="handleAction(rows, details)">
-                          @if (rows.label === 'Copy' && details.copyLoading) {
-                            <i class="fa-solid fa-spinner fa-spin txt-primary"></i>
-                          } @else if (rows.label === 'Delete' && details.deleteLoading) {
-                            <i class="fa-solid fa-spinner fa-spin txt-danger"></i>
-                          } @else if (rows.icon?.startsWith('fa-')) {
-                            <i [class]="rows.icon"></i>
-                          } @else {
-                            <app-svg-icon [icon]="rows.icon"></app-svg-icon>
-                          }
-                        </a>
-                      } @else if (rows.label == 'View') {
-                        <a class="square-white" href="javascript:void(0)" (click)="handleAction(rows, details)"
-                           [routerLink]="rows.path">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      } @else if (rows.label == 'Refresh') {
-                        <a class="square-white" href="javascript:void(0)" placement="top"
-                           [ngbTooltip]="'Change Status'">
-                          <i class="fa-solid fa-{{ rows.icon }}"></i>
-                        </a>
-                      } @else if (rows.label == 'Message') {
-                        <Button class="btn btn-primary" placement="top" [ngbTooltip]="'Message'"><i
-                          class="fa-solid fa-envelope"></i></Button>
-                      } @else if (rows.label == 'Approve') {
-                        <Button class="btn btn-success" placement="top" [ngbTooltip]="'Approve'"><i
-                          class="fa-solid fa-thumbs-up"></i></Button>
-                      } @else if (rows.label == 'Reject') {
-                        <Button class="btn btn-danger" placement="top" [ngbTooltip]="'Reject'"><i
-                          class="fa-solid fa-circle-xmark"></i></Button>
-                      }
-                    }
-                  </div>
+                  <ng-container
+                    *ngTemplateOutlet="rowActionsTpl; context: { actions: tableConfig.row_action, details: details }"/>
                 </td>
               }
             </tr>
 
             @if (rowDetails && selectedOpenRows.includes(details.id)) {
-              <tr data-dt-row="8">
-                <td colspan="8">
+              <tr [attr.data-dt-row]="getColSpan()">
+                <td [attr.colspan]="getColSpan()">
                   <table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
                     <tbody>
                       @for (column of tableConfig.columns; track column) {

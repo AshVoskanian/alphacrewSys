@@ -157,6 +157,15 @@ export class EditJobComponent extends ApiBase implements OnInit {
       { title: 'Net', field_value: 'netFormatted' },
       { title: 'Gross', field_value: 'grossFormatted' }
     ],
+    row_action_before: [
+      {
+        label: 'Edit',
+        icon: 'fa-solid fa-pen-to-square txt-primary',
+        class: 'square-white',
+        action_to_perform: 'edit',
+        showOnHover: true
+      }
+    ],
     row_action: [
       {
         label: 'Copy',
@@ -171,13 +180,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
         action_to_perform: 'delete',
         modal: true,
         model_text: 'Are you sure you want to delete this job part?'
-      },
-      // {
-      //   label: 'Edit',
-      //   icon: 'fa-solid fa-pen-to-square txt-primary',
-      //   class: 'square-white',
-      //   action_to_perform: 'edit'
-      // }
+      }
     ],
     data: []
   });

@@ -191,10 +191,11 @@ export class TableComponent implements OnInit, OnChanges {
 
   getColSpan() {
     const columnLength = this.tableConfig.columns.length;
+    const beforeActionLength = this.tableConfig.row_action_before ? 1 : 0;
     const actionLength = this.tableConfig.row_action ? 1 : 0;
     const isCheckbox = this.hasCheckbox ? 1 : 0;
     const isRowDetails = this.rowDetails ? 1 : 0;
 
-    return columnLength + actionLength + isCheckbox + isRowDetails;
+    return columnLength + actionLength + beforeActionLength + isCheckbox + isRowDetails;
   }
 }
