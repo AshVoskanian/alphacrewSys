@@ -159,6 +159,12 @@ export class EditJobComponent extends ApiBase implements OnInit {
     ],
     row_action: [
       {
+        label: 'Copy',
+        icon: 'fa-solid fa-copy txt-secondary',
+        class: 'square-white',
+        action_to_perform: 'copy'
+      },
+      {
         label: 'Delete',
         icon: 'fa-solid fa-trash txt-danger',
         class: 'square-white',
@@ -166,13 +172,12 @@ export class EditJobComponent extends ApiBase implements OnInit {
         modal: true,
         model_text: 'Are you sure you want to delete this job part?'
       },
-      {
-        label: 'Edit',
-        icon: 'fa-solid fa-pen-to-square txt-primary',
-        class: 'square-white',
-        action_to_perform: 'edit'
-      },
-      { label: 'Copy', icon: 'fa-solid fa-copy txt-secondary', class: 'square-white', action_to_perform: 'copy' }
+      // {
+      //   label: 'Edit',
+      //   icon: 'fa-solid fa-pen-to-square txt-primary',
+      //   class: 'square-white',
+      //   action_to_perform: 'edit'
+      // }
     ],
     data: []
   });
@@ -601,6 +606,22 @@ export class EditJobComponent extends ApiBase implements OnInit {
     };
 
     reader.readAsDataURL(file);
+  }
+
+  confirmDeleteDocument(fileName: string): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to delete "${ fileName }"?`,
+      imageUrl: './assets/images/gif/trash.gif',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel',
+      cancelButtonColor: '#FC4438'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.deleteDocument(fileName);
+      }
+    });
   }
 
   deleteDocument(fileName: string) {
