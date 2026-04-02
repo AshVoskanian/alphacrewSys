@@ -59,15 +59,18 @@ export class CrewPaymentsComponent extends ApiBase implements OnChanges {
             GeneralService.showErrorMessage(res.errors.message)
             return;
           }
+          const byPayDateDesc = [...res.data].sort(
+            (a, b) => new Date(b.payDate).getTime() - new Date(a.payDate).getTime(),
+          );
           this.payments.set(
-            res.data.map(it => ({
+            byPayDateDesc.map(it => ({
               title: this._currency.transform(it.payAmount, 'GBP', 'symbol', '1.2-2'),
               desc: it.comments,
               date: it.payDate,
               data: it,
               hasAction: true
-            }))
-          )
+            })),
+          );
         }
       })
   }

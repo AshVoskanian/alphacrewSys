@@ -281,6 +281,8 @@ export interface JobPartDetailsResponse {
   returnMileage: number;
   misc: string;
   miscCost: number;
+  perDiem: number | null;
+  lastMinuteBookingCost: number | null;
   fuel: number | null;
   fuelCost: number;
   fuelCostCrew: number;
