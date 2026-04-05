@@ -48,6 +48,7 @@
                 </a>
               } @else {
                 <a routerLink="/jobs/{{ schedule.jobId }}"
+                   target="_blank"
                    class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
                   {{ schedule.statusText + ' ' + schedule.jobId }}
                 </a>
