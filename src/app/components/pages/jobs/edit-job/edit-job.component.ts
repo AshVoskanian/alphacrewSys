@@ -496,7 +496,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       : [];
 
     this._initialCurrencyId = details.regionCurrencyId ?? null;
-    this._initialJobRateCardId = details.jobRateCardId ?? null;
+    this._initialJobRateCardId = details.clientRateCardId ?? null;
     this._initialCurrencyLabel = this.currencies()?.find(c => c.value === this._initialCurrencyId)?.label ?? '—';
     this._initialRateCardLabel = this.rateCards()?.find(r => r.value === this._initialJobRateCardId)?.label ?? '—';
 
