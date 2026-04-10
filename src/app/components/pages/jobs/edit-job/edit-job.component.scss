@@ -1,3 +1,28 @@
+// Text selection on purple bar: default highlight is light-on-light with white text → invisible
+.job-financial-summary-bar {
+  ::selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+
+  ::-moz-selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+}
+
+.job-financial-summary-po-input {
+  &::selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+
+  &::-moz-selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+}
+
 // Stack main fields when Job Details sits in a narrow column (split view / drawer).
 // Uses named container from app-jobs-details (:host).
 @container job-details (max-width: 639px) {
