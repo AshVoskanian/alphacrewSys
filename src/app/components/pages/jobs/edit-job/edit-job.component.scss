@@ -1,3 +1,12 @@
+// Stack main fields when Job Details sits in a narrow column (split view / drawer).
+// Uses named container from app-jobs-details (:host).
+@container job-details (max-width: 639px) {
+  :host .job-edit-main-row > [class*='col-'] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
 // Tooltip width styling
 // Note: tooltip is rendered in body, so we use :host ::ng-deep to pierce view encapsulation
 :host ::ng-deep .wide-tooltip {

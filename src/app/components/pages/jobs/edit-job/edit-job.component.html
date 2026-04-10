@@ -75,8 +75,8 @@
   }
 
   <!-- Main Form Fields -->
-  <div class="row g-3">
-    <div class="col col-sm-6 col-md-3">
+  <div class="row g-3 job-edit-main-row">
+    <div class="col-12 col-sm-6 col-md-3">
       <label class="form-label">Ordered By</label>
       <div class="input-group">
         <input class="form-control" type="text" formControlName="orderedBy" placeholder="Ordered By">
@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <div class="col col-sm-6 col-md-3">
+    <div class="col-12 col-sm-6 col-md-3">
       <label class="form-label">Contact</label>
       <div class="input-group">
         <input class="form-control" type="text" formControlName="jobContact" placeholder="Contact">
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <div class="col col-sm-6 col-md-3">
+    <div class="col-12 col-sm-6 col-md-3">
       <label class="form-label" for="statusId">Status</label>
       <select2 [data]="statuses()" [templates]="template" id="statusId" formControlName="statusId">
         <ng-template #template let-item="label">
@@ -105,7 +105,7 @@
       </select2>
     </div>
 
-    <div class="col col-sm-6 col-md-3">
+    <div class="col-12 col-sm-6 col-md-3">
       <label class="form-label" for="jobRegionId">Region</label>
       <select2 [data]="regions() || []" [templates]="template" id="jobRegionId" formControlName="jobRegionId">
         <ng-template #template let-item="label">
