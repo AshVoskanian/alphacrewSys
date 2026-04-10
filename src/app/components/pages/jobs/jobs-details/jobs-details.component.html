@@ -16,6 +16,9 @@
       </div>
 
       <div class="flex items-center gap-20 justify-content-between">
+        <div class="fw-bold">
+          {{ editJobRef?.rateCardLabel }}
+        </div>
         <div class="d-flex align-items-center gap-10">
           <label class="form-label m-b-0" for="publishToAppHeader">Publish to App</label>
           <div class="form-check form-switch">
@@ -44,7 +47,7 @@
         >
           <button
             type="button"
-            class="btn d-flex flex-wrap align-items-center gap-2 p-x-6 p-y-4"
+            class="btn d-flex flex-wrap align-items-center gap-2 p-x-6 p-y-4 min-w-162"
             (click)="editJobRef?.toggleFinanceAccordion()">
           <span class="badge t-0 position-static"
                 [class.bg-primary]="!editJobRef?.currencyChanged"

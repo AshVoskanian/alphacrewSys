@@ -259,6 +259,13 @@ export class EditJobComponent extends ApiBase implements OnInit {
     return r?.label ?? '—';
   }
 
+  get rateCardLabel(): string {
+    const id = this.form?.get('jobRateCardId')?.value;
+    if (id == null) return '';
+    const r = this.rateCards()?.find(x => x.value === id);
+    return r?.label ?? '';
+  }
+
   get currencyBadgeTooltip(): string {
     const initialLabel = this.currencies()?.find(c => c.value === this._initialCurrencyId)?.label ?? this._initialCurrencyLabel ?? '—';
     if (this.currencyChanged) {
