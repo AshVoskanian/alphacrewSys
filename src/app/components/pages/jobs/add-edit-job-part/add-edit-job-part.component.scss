@@ -157,11 +157,11 @@ hr {
 
 // ngx-material-timepicker field — align with Bootstrap form-control
 .start-time-picker-wrap {
-  border: 1px solid #dee2e6;
-  border-radius: 0.375rem;
+  border: 1px solid var(--dark-light-color);
+  border-radius: 0.25rem;
   background-color: #fff;
-  min-height: 38px;
-  padding: 0 0.5rem;
+  height: 36px;
+  //padding: 10px;
   display: flex;
   align-items: center;
 }
@@ -169,5 +169,23 @@ hr {
 :host ::ng-deep .start-time-picker-wrap .ngx-timepicker {
   border-bottom: none;
   width: 100%;
-  min-height: 36px;
+  height: 36px;
+
+  .ngx-timepicker-control__arrows {
+    .ngx-timepicker-control__arrow {
+      height: 13px;
+    }
+
+    //display: none !important;
+  }
+
+  .ngx-material-timepicker-toggle {
+    span {
+      display: flex;
+    }
+
+    &:focus {
+      background: transparent !important;
+    }
+  }
 }

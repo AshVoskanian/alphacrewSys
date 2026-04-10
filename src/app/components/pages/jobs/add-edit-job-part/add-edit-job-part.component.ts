@@ -52,7 +52,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   jobId = input<number>();
   jobPartId = input<number>(0);
   jobRateCard = input<JobPartRateCard>();
-  /** When adding (jobPartId 0), use this as base for default startDate (startDate = this + 24h). */
+  /**
+   * When adding (jobPartId 0): default start = this ISO datetime + 24h, split into startDate + startTime.
+   * Parent should pass the latest job part’s `startDate` (chronologically last start).
+   */
   lastJobPartStartDate = input<string | null>(null);
 
   /** Emitted when user cancels or when modal should close without refetch */
@@ -103,11 +106,25 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       const id = this.jobPartId();
       const lastStart = this.lastJobPartStartDate();
       if (id !== 0) return;
+
       const defaultStart = lastStart
         ? this.getDefaultStartFromLastPart(lastStart)
         : this.getDefaultStartForFirstJobPart();
       const { date, time } = this.splitLocalIsoToDateAndTime(defaultStart);
       this.form.patchValue({ startDate: date, startTime: time }, { emitEvent: false });
+
+      // Same as edit load: ngx-timepicker-field only picks up startTime after a render-bound writeValue.
+      afterNextRender(
+        () => {
+          if (this.jobPartId() !== 0) return;
+          const tc = this.form.get('startTime');
+          if (!tc) return;
+          const v = time || null;
+          tc.setValue(null, { emitEvent: false });
+          tc.setValue(v, { emitEvent: false });
+        },
+        { injector: this._injector }
+      );
     });
   }
 
