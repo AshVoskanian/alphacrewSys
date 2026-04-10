@@ -1,5 +1,17 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, DestroyRef, effect, inject, input, OnInit, output, signal, WritableSignal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  Injector,
+  input,
+  OnInit,
+  output,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
@@ -17,6 +29,7 @@ import { CrewSkillListItem } from '../../../../shared/interface/crew';
 import { CurrencyPipe } from '@angular/common';
 import { ChipCountSelectComponent } from '../../../../shared/components/ui/chip-count-select';
 import type { ChipCountItem, ChipCountOption } from '../../../../shared/components/ui/chip-count-select';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -25,7 +38,8 @@ import type { ChipCountItem, ChipCountOption } from '../../../../shared/componen
     Select2Module,
     NgbAccordionModule,
     CurrencyPipe,
-    ChipCountSelectComponent
+    ChipCountSelectComponent,
+    NgxMaterialTimepickerModule
   ],
   templateUrl: './add-edit-job-part.component.html',
   styleUrl: './add-edit-job-part.component.scss'
@@ -33,6 +47,7 @@ import type { ChipCountItem, ChipCountOption } from '../../../../shared/componen
 export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _fb = inject(FormBuilder);
   private readonly _dr = inject(DestroyRef);
+  private readonly _injector = inject(Injector);
 
   jobId = input<number>();
   jobPartId = input<number>(0);
@@ -91,7 +106,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       const defaultStart = lastStart
         ? this.getDefaultStartFromLastPart(lastStart)
         : this.getDefaultStartForFirstJobPart();
-      this.form.patchValue({ startDate: defaultStart }, { emitEvent: false });
+      const { date, time } = this.splitLocalIsoToDateAndTime(defaultStart);
+      this.form.patchValue({ startDate: date, startTime: time }, { emitEvent: false });
     });
   }
 
@@ -148,6 +164,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   form: FormGroup = this._fb.group({
     jobPartTypeId: [ 1 ],
     startDate: [ null ],
+    startTime: [ null ],
     jobPartHours: [ 4 ],
     jobPartNumber: [ 0 ],
     crewNumber: [ 1 ],
@@ -410,18 +427,38 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
             if (rc?.skillSupplement != null) this.skillSupplement.set(rc.skillSupplement);
             if (rc?.crewRate != null) this.crewRate.set(rc.crewRate);
             if (rc?.extraHour != null) this.extraHour.set(rc.extraHour);
+            // While the spinner is shown the form is not in the DOM; patch now so native controls
+            // have values as soon as the template appears.
             this.patchFormWithPart(part);
+            this.partDetailsLoading.set(false);
+            // ngx-timepicker-field mounts only after loading=false; same-value patch may skip writeValue,
+            // so clear then set startTime after render to force the CVA to display the saved time.
+            afterNextRender(
+              () => {
+                if (this.jobPartId() !== jobPartId) return;
+                const startLocal = this.isoToDatetimeLocal(part.startDate);
+                const { time } = this.splitLocalIsoToDateAndTime(startLocal);
+                const tc = this.form.get('startTime');
+                if (!tc) return;
+                const v = time || null;
+                tc.setValue(null, { emitEvent: false });
+                tc.setValue(v, { emitEvent: false });
+              },
+              { injector: this._injector }
+            );
           }
         },
       });
   }
 
   private patchFormWithPart(part: JobPartDetailsResponse): void {
-    const startForInput = this.isoToDatetimeLocal(part.startDate);
+    const startLocal = this.isoToDatetimeLocal(part.startDate);
+    const { date, time } = this.splitLocalIsoToDateAndTime(startLocal);
     const jobPartHours = part.jobPartHours ?? this.computeHoursFromStartEnd(part.startDate, part.endDate);
     this.form.patchValue({
       jobPartTypeId: part.jobPartTypeId,
-      startDate: startForInput,
+      startDate: date || null,
+      startTime: time || null,
       jobPartHours: jobPartHours ?? 0,
       jobPartNumber: part.jobPartNumber ?? 0,
       crewNumber: part.crewNumber,
@@ -466,7 +503,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     return Math.max(0, Math.round((end.getTime() - start.getTime()) / (60 * 60 * 1000)));
   }
 
-  /** ISO string to datetime-local value YYYY-MM-DDTHH:mm. */
+  /** ISO string to local calendar value YYYY-MM-DDTHH:mm (for splitting into date + time inputs). */
   private isoToDatetimeLocal(iso: string): string {
     if (!iso?.trim()) return '';
     const d = new Date(iso);
@@ -475,13 +512,36 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     return `${ d.getFullYear() }-${ pad(d.getMonth() + 1) }-${ pad(d.getDate()) }T${ pad(d.getHours()) }:${ pad(d.getMinutes()) }`;
   }
 
-  /** Builds start/end from "Start date and time" (datetime-local → YYYY-MM-DDTHH:mm). */
+  /** Splits YYYY-MM-DDTHH:mm(:ss)? into values for type="date" and type="time". */
+  private splitLocalIsoToDateAndTime(localIso: string): { date: string; time: string } {
+    const raw = localIso?.trim() ?? '';
+    if (!raw) return { date: '', time: '' };
+    const [ datePart, timePart = '' ] = raw.split('T');
+    const timeHm = this.normalizeTimeHm(timePart.includes(':') ? timePart : '');
+    return { date: datePart ?? '', time: timeHm };
+  }
+
+  /** Normalizes time from ngx-material-timepicker (may be H:mm) to HH:mm. */
+  private normalizeTimeHm(raw: string): string {
+    const t = raw?.trim() ?? '';
+    if (!t) return '00:00';
+    const segment = t.split(/\s+/)[0] ?? '';
+    const [ hStr, mStr = '0' ] = segment.split(':');
+    const h = Math.min(23, Math.max(0, Number.parseInt(hStr ?? '0', 10) || 0));
+    const m = Math.min(59, Math.max(0, Number.parseInt(mStr, 10) || 0));
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${ pad(h) }:${ pad(m) }`;
+  }
+
+  /** Builds start/end from separate date + time fields (combined → YYYY-MM-DDTHH:mm:ss). */
   private buildStartEndDates(): { startDate: string; endDate: string } {
-    const startVal = this.form.get('startDate')?.value as string | null;
+    const dateVal = (this.form.get('startDate')?.value as string | null)?.trim() ?? '';
+    const timeVal = (this.form.get('startTime')?.value as string | null)?.trim() ?? '';
     const hours = Number(this.form.get('jobPartHours')?.value ?? 0);
-    const raw = startVal?.trim() ?? '';
-    const startDate = raw.length >= 16
-      ? (raw.length === 16 ? `${ raw }:00` : raw.slice(0, 19))
+    const hasValidDate = /^\d{4}-\d{2}-\d{2}$/.test(dateVal);
+    const timeHm = timeVal ? this.normalizeTimeHm(timeVal) : '00:00';
+    const startDate = hasValidDate
+      ? `${ dateVal }T${ timeHm }:00`.slice(0, 19)
       : (this.lastJobPartStartDate() ? this.getDefaultStartLocalIso() : this.getDefaultStartForFirstJobPart());
 
     const [ datePart, timePart ] = startDate.split('T');

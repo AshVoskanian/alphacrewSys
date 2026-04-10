@@ -1,3 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 
 @use "assets/scss/app.scss";
+
+// ngx-material-timepicker defaults to z-index 999; Bootstrap 5 / ng-bootstrap modals use ~1055,
+// so the clock overlay stays hidden behind the modal without this override.
+.timepicker-backdrop-overlay,
+.timepicker-overlay {
+  z-index: 1100 !important;
+}
+
+.timepicker {
+  z-index: 1101 !important;
+}
