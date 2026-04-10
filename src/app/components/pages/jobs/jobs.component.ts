@@ -38,6 +38,7 @@ export class JobsComponent extends ApiBase implements OnInit {
     columns: [
       { title: '', field_value: 'jobId' },
       { title: 'Company/Venue', field_value: 'company_venue', sort: true, type: 'action' },
+      { title: '', field_value: 'link', type: 'link_icon' },
       { title: 'Status', field_value: 'statusText', sort: true },
       { title: '', field_value: 'statusContent' },
       { title: 'Region', field_value: 'regionText', sort: true },
@@ -77,6 +78,7 @@ export class JobsComponent extends ApiBase implements OnInit {
               <p class="m-0 text-black">${ job.companyName }</p>
               <p class="m-0 text-gray">@ ${ job.venueName }</p>
             `,
+            link: `<a target="_blank" href="/jobs/${job.jobId}"><i class="fa-solid fa-external-link"></i></a>`,
             statusText: this._sanitizer.bypassSecurityTrustHtml(
               `<p class="m-0 text-center p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
                      <p class="m-0 text-nowrap text-center" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`

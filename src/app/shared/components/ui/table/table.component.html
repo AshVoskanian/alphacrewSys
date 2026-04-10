@@ -144,6 +144,9 @@
                         }
                       </td>
                     }
+                    @case ('link_icon') {
+                      <td class="pointer" [innerHTML]="details[column.field_value]"></td>
+                    }
                     @case ('date') {
                       <td>
                         {{ details[column.field_value] | date: 'dd MMM yyy HH:mm' }}
