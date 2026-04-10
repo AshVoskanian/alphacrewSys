@@ -38,7 +38,7 @@ export class JobsComponent extends ApiBase implements OnInit {
     columns: [
       { title: '', field_value: 'jobId' },
       { title: 'Company/Venue', field_value: 'company_venue', sort: true, type: 'action' },
-      { title: '', field_value: 'link', type: 'link_icon' },
+      { title: '', field_value: 'link', type: 'link_icon', showOnHover: true },
       { title: 'Status', field_value: 'statusText', sort: true },
       { title: '', field_value: 'statusContent' },
       { title: 'Region', field_value: 'regionText', sort: true },

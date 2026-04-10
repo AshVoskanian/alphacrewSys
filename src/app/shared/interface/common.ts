@@ -23,6 +23,8 @@ export interface TableColumn {
     text?: string;
     icon_field?: string;
     hide_column?: boolean;
+    /** When true (e.g. type `link_icon`), cell content is hidden until the row is hovered or focused within. */
+    showOnHover?: boolean;
 }
 
 export interface TableRows {

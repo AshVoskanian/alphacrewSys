@@ -24,6 +24,16 @@
           opacity: 1;
         }
 
+        // link_icon columns: hover only (no :focus-within — link keeps focus after click so icon would stay visible)
+        .table-link-icon-hover-only {
+          opacity: 0;
+          transition: opacity 0.15s ease;
+        }
+
+        &:hover .table-link-icon-hover-only {
+          opacity: 1;
+        }
+
         td {
           &.pointer {
             &:hover {

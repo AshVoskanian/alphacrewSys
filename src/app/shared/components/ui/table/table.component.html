@@ -145,7 +145,13 @@
                       </td>
                     }
                     @case ('link_icon') {
-                      <td class="pointer" [innerHTML]="details[column.field_value]"></td>
+                      <td class="pointer">
+                        @if (column.showOnHover) {
+                          <span class="table-link-icon-hover-only" [innerHTML]="details[column.field_value]"></span>
+                        } @else {
+                          <span [innerHTML]="details[column.field_value]"></span>
+                        }
+                      </td>
                     }
                     @case ('date') {
                       <td>
