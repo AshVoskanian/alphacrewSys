@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
-import { HeaderLanguageComponent } from "./widgets/header-language/header-language.component";
 import { NavService } from '../../services/nav.service';
 import { ProfileComponent } from "./widgets/profile/profile.component";
 import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
@@ -15,14 +14,16 @@ import { ApiBase } from "../../bases/api-base";
 import { GeneralService } from "../../services/general.service";
 import { Region } from "../../interface/header";
 import { filter, finalize, map } from "rxjs";
-import { LayoutService } from "../../services/layout.service";
 import { RegionsService } from "../../services/regions.service";
+import { HeaderMenuComponent } from "./widgets/header-menu/header-menu.component";
+import { LegacySystemService } from "../../services/legacy-system.service";
+import { BreadcrumbService } from '../../services/breadcrumb.service';
 
 @Component({
   selector: 'app-header',
   imports: [
     RouterModule,
-    HeaderLogoComponent, HeaderLanguageComponent, Select2Module, ReactiveFormsModule,
+    HeaderLogoComponent, HeaderMenuComponent, Select2Module, ReactiveFormsModule,
     ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent
   ],
   templateUrl: './header.component.html',
@@ -38,6 +39,8 @@ export class HeaderComponent extends ApiBase implements OnInit {
   private _localStorageService = inject(LocalStorageService);
 
   public navService: NavService = inject(NavService);
+  readonly legacySystemService = inject(LegacySystemService);
+  private _breadcrumbService = inject(BreadcrumbService);
 
   regionLoading = false;
   isScheduleRoute = false;
@@ -65,6 +68,39 @@ export class HeaderComponent extends ApiBase implements OnInit {
     if (url.includes('/venue')) return '#fc564a';
 
     return '#111827';
+  });
+
+  /** Breadcrumb: Dashboard → Schedule → [Category] → [ID only for Jobs, else Name] */
+  breadcrumbSegments = computed(() => {
+    const url = this.urlSig()?.split('?')[0] ?? '';
+    const parts = url.replace(/^\/+/, '').split('/').filter(Boolean);
+    const segments: { label: string; link: string | null }[] = [
+      { label: 'Dashboard', link: '/dashboard' },
+      { label: 'Schedule', link: '/schedule' },
+    ];
+    const categoryMap: Record<string, string> = {
+      jobs: 'Jobs',
+      clients: 'Clients',
+      crew: 'Crew',
+      venue: 'Venue',
+      profile: 'My Account',
+    };
+    const category = parts[0];
+    if (category && categoryMap[category]) {
+      segments.push({ label: categoryMap[category], link: `/${category}` });
+      const routeId = parts[1];
+      if (routeId) {
+        if (category === 'jobs') {
+          segments.push({ label: routeId, link: null });
+        } else {
+          const name = this._breadcrumbService.detailLabel();
+          if (name) {
+            segments.push({ label: name, link: null });
+          }
+        }
+      }
+    }
+    return segments;
   });
 
   ngOnInit() {
@@ -120,10 +156,6 @@ export class HeaderComponent extends ApiBase implements OnInit {
           this._regionsService.regionsData = this.regions;
         }
       })
-  }
-
-  toggleLanguage() {
-    this.navService.isLanguage = !this.navService.isLanguage;
   }
 
   submit() {

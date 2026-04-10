@@ -1,0 +1,88 @@
+<form class="flex flex-col gap-12" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="row g-3">
+    <div class="col col-sm-6 col-md-3">
+      <label class="form-label" for="statusId">Status</label>
+      <select2 [data]="statuses()" [templates]="template" id="statusId" formControlName="statusId">
+        <ng-template #template let-item="label">
+          {{ item }}
+        </ng-template>
+      </select2>
+    </div>
+
+    <div class="col col-sm-6 col-md-3">
+      <label class="form-label" for="region">Region</label>
+      <select2 [data]="regions()" [templates]="template" id="region" formControlName="jobRegionId">
+        <ng-template #template let-item="label">
+          {{ item }}
+        </ng-template>
+      </select2>
+    </div>
+
+    @if (clientLoading()) {
+      <div class="col col-sm-6 col-md-3">
+        <label class="form-label h-15"></label>
+        <div class="bg-gray-200 animate-pulse rounded-md h-36"></div>
+      </div>
+    } @else {
+      <div class="col col-sm-6 col-md-3">
+        <label class="form-label" for="clientId">Client</label>
+        <select2 [data]="jobClients()" [templates]="template" id="clientId" formControlName="clientId">
+          <ng-template #template let-item="label">
+            {{ item }}
+          </ng-template>
+        </select2>
+      </div>
+    }
+
+    @if (venueLoading()) {
+      <div class="col col-sm-6 col-md-3">
+        <label class="form-label h-15"></label>
+        <div class="bg-gray-200 animate-pulse rounded-md h-36"></div>
+      </div>
+    } @else {
+      <div class="col col-sm-6 col-md-3">
+        <label class="form-label" for="venueId">Venue</label>
+        <input
+          type="text"
+          #instance
+          class="form-control"
+          formControlName="venue"
+          [ngbTypeahead]="search"
+          [inputFormatter]="inputFormatter"
+          [resultFormatter]="resultFormatter"
+          [container]="'custom-scrollbar'"
+          (click)="click$.next($any($event).target.value)"
+          (selectItem)="onVenueSelect($event)"
+        />
+      </div>
+    }
+
+    <div class="col d-flex flex-col justify-content-end align-items-end text-end">
+      <div class="flex h-100 align-items-end">
+        <div class="checkbox checkbox-solid-primary form-check">
+          <input type="checkbox" class="form-check-input" id="showAllVenues" formControlName="showAllVenues">
+          <label class="form-check-label" for="showAllVenues">
+            Show All Venues
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-divider m-y-12">
+    <div class="divider-body divider-body-1 divider-secondary">
+      <div class="divider-p-secondary p-0"></div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col d-flex flex-col justify-content-end align-items-end text-end p-t-15">
+      <button class="w-130 btn btn-primary" [disabled]="form.invalid" type="submit">
+        Add Job
+        @if (loading()) {
+          <i class="t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+        }
+      </button>
+    </div>
+  </div>
+</form>

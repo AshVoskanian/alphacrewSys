@@ -8,7 +8,6 @@ import { GeneralService } from "../../../shared/services/general.service";
 import { ToastrService } from "ngx-toastr";
 import { NavService } from "../../../shared/services/nav.service";
 import { ScheduleService } from "./schedule.service";
-import { SKILLS } from "../../../shared/data/skills";
 import { ScheduleGridComponent } from "./schedule-grid/schedule-grid.component";
 import { AsyncPipe } from "@angular/common";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -111,8 +110,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
             if (jobId && openModal) {
               this.scheduleService.jobScopedShifts = res.data;
               this.scheduleService.jobScopedShifts.forEach(it => {
-                  it.transformedSkills = [];
-                  this.setSkills(it);
                   this.fillArray(it.crews, it.crewNumber);
                 }
               );
@@ -123,27 +120,14 @@ export class ScheduleComponent extends ApiBase implements OnInit {
             } else {
               this.scheduleService.shifts = res.data;
               this.scheduleService.shifts.forEach(it => {
-                it.transformedSkills = [];
-                this.setSkills(it);
                 this.fillArray(it.crews, it.crewNumber);
               });
               this.scheduleService.shiftsLoaded.next(true);
+              console.log(this.scheduleService.shifts);
             }
           }
         }
       })
-  }
-
-  setSkills(schedule: Schedule) {
-    const skills: { [key: string]: any } = schedule.jobPartSkills;
-    for (const [ key, value ] of Object.entries(skills)) {
-      schedule.transformedSkills.push({ name: this.formatSkillName(key), url: SKILLS[key], active: value ?? false });
-    }
-  }
-
-  formatSkillName(key: string): string {
-    const readable = key.replace(/^skill/, '').replace(/([A-Z])/g, ' $1').trim();
-    return `Skill: ${ readable }`;
   }
 
   fillArray(arr: Array<JobPartCrew>, length: number): void {

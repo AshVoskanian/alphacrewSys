@@ -1,4 +1,16 @@
-import { Component, DestroyRef, inject, input, OnChanges, OnInit, output, signal, SimpleChanges } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef, ElementRef,
+  inject,
+  input,
+  OnChanges,
+  OnInit,
+  output,
+  signal,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { VenueDetails } from "../../../../shared/interface/venue";
@@ -17,7 +29,7 @@ import { RegionsService } from "../../../../shared/services/regions.service";
   templateUrl: './venue-form.component.html',
   styleUrl: './venue-form.component.scss'
 })
-export class VenueFormComponent extends ApiBase implements OnInit, OnChanges {
+export class VenueFormComponent extends ApiBase implements OnInit, OnChanges, AfterViewInit {
   private _dr: DestroyRef = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
   private _regionsService = inject(RegionsService);
@@ -31,6 +43,8 @@ export class VenueFormComponent extends ApiBase implements OnInit, OnChanges {
 
   form: FormGroup;
 
+  @ViewChild('addressInput') addressInput!: ElementRef<HTMLInputElement>;
+
   ngOnInit() {
     this.initForm();
     this.subToRegions();
@@ -42,6 +56,19 @@ export class VenueFormComponent extends ApiBase implements OnInit, OnChanges {
     }
   }
 
+  async ngAfterViewInit(): Promise<void> {
+    const autocomplete = new google.maps.places.Autocomplete(
+      this.addressInput.nativeElement,
+      {
+        types: ['address'],
+        // componentRestrictions: { country: 'gb' }
+      }
+    );
+
+    autocomplete.addListener('place_changed', () => {
+      autocomplete.getPlace();
+    });
+  }
 
   subToRegions() {
     this._regionsService.regions.pipe(

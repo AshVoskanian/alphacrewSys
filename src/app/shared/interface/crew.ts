@@ -58,6 +58,16 @@ export interface CrewSkill {
   isActive: boolean;
 }
 
+/** Response item from GET Crew/GetSkillList */
+export interface CrewSkillListItem {
+  crewSkillId: number;
+  crewSkillText: string;
+  crewSkillAbbr: string;
+  isPublic: boolean;
+  description: string;
+  pay: number;
+}
+
 export interface CrewDetail {
   crewId: number;
   name: string;

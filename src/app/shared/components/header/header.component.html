@@ -6,13 +6,18 @@
     </div>
 
     @if (!isScheduleRoute) {
-      <div class="breadcrumb-custom flex items-center justify-content-between text-primary">
-        <a class="m-r-5" routerLink="/dashboard"><span class="f-16 pointer">Dashboard</span></a>
-        <a class="m-r-5" routerLink="/schedule"> / <span class="f-16 pointer">Schedule</span></a>
-        <a class="m-r-5" routerLink="/crew"> / <span class="f-16 pointer"> Crew</span></a>
-        <a class="m-r-5" routerLink="/venue"> / <span class="f-16 pointer"> Venue</span></a>
-        <a class="m-r-5" routerLink="/clients"> / <span class="f-16 pointer"> Clients</span></a>
-      </div>
+      <nav class="breadcrumb-custom flex items-center flex-wrap gap-1 text-primary f-16">
+        @for (seg of breadcrumbSegments(); track seg.label + (seg.link ?? ''); let last = $last) {
+          @if (seg.link) {
+            <a [routerLink]="seg.link" class="text-primary text-decoration-none pointer">{{ seg.label }}</a>
+          } @else {
+            <span class="text-primary">{{ seg.label }}</span>
+          }
+          @if (!last) {
+            <span class="m-x-2 text-primary">/</span>
+          }
+        }
+      </nav>
     }
 
     @if (isScheduleRoute) {
@@ -86,8 +91,22 @@
 
   <div class="nav-right col-auto pull-right right-header p-0 ms-auto">
     <ul class="nav-menus">
-      <li class="language-nav" (click)="toggleLanguage()">
-        <app-header-language></app-header-language>
+      <li class="language-nav">
+        <div class="d-flex align-items-center gap-12">
+          <div class="d-flex align-items-center gap-2">
+            <span class="f-12 text-nowrap m-r-3">Legacy Mode</span>
+            <button
+              type="button"
+              class="legacy-switch"
+              [class.legacy-switch-on]="legacySystemService.isLegacySystem()"
+              [attr.aria-checked]="legacySystemService.isLegacySystem()"
+              role="switch"
+              (click)="legacySystemService.toggle()">
+              <span class="legacy-switch-thumb"></span>
+            </button>
+          </div>
+          <app-header-menu></app-header-menu>
+        </div>
       </li>
 
       @if (isScheduleRoute) {

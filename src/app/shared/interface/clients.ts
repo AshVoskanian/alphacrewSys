@@ -62,6 +62,7 @@ export interface ClientDetails {
 
   accounpetTypeId: number;
   accountType: string;
+  accountTypeId: number;
 
   isActive: boolean;
 }
@@ -72,4 +73,14 @@ export interface ClientSearchParams {
   clientId?: number;
   page: number;
   pageSize: number;
+}
+
+export interface RateCard {
+  rateCardId: number;
+  description: string;
+}
+
+export interface AccountType {
+  accountTypeId: number;
+  accountTypeText: string;
 }

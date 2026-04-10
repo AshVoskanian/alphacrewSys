@@ -84,9 +84,9 @@ export class ClientsFilterComponent extends ApiBase implements OnInit {
           if (Object.keys(transformedParams).length) {
             this.form.patchValue(transformedParams, { emitEvent: false });
           }
+        } else {
+          this.submit();
         }
-
-        this.submit();
       });
   }
 

@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
 import Swal from "sweetalert2";
 import { FormGroup } from "@angular/forms";
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GeneralService {
 
-  constructor() {
+  constructor(private readonly http: HttpClient) {
   }
 
   public static markFormGroupTouched(formGroup: FormGroup) {
@@ -104,5 +107,12 @@ export class GeneralService {
     a.download = filename;
     a.click();
     URL.revokeObjectURL(objectUrl);
+  }
+
+  public downloadFile(endpoint: string, fileName: string): Observable<Blob> {
+    const url = `${environment.apiUrl}/${endpoint}`;
+    return this.http.get(url, { responseType: 'blob' }).pipe(
+      tap(blob => this.downloadBlob(blob, fileName))
+    );
   }
 }

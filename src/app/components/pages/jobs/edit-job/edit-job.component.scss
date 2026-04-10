@@ -1,0 +1,140 @@
+// Text selection on purple bar: default highlight is light-on-light with white text → invisible
+.job-financial-summary-bar {
+  ::selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+
+  ::-moz-selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+}
+
+.job-financial-summary-po-input {
+  &::selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+
+  &::-moz-selection {
+    background: #fff;
+    color: #2b0f5c;
+  }
+}
+
+// Stack main fields when Job Details sits in a narrow column (split view / drawer).
+// Uses named container from app-jobs-details (:host).
+@container job-details (max-width: 639px) {
+  :host .job-edit-main-row > [class*='col-'] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+// Tooltip width styling
+// Note: tooltip is rendered in body, so we use :host ::ng-deep to pierce view encapsulation
+:host ::ng-deep .wide-tooltip {
+  .tooltip-inner {
+    max-width: 300px !important;
+    white-space: normal;
+  }
+}
+
+// Publish to App toggle styling - make it more noticeable
+.publish-toggle {
+  .form-check-input {
+    width: 3.5rem !important;
+    height: 1.75rem !important;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+
+    &:checked {
+      background-color: var(--theme-default) !important;
+      border-color: var(--theme-default) !important;
+      box-shadow: 0 2px 8px rgba(171, 140, 228, 0.4);
+    }
+
+    &:hover {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(171, 140, 228, 0.25);
+    }
+  }
+}
+
+// Header: only the files column scrolls, right side stays at top
+.header-files-col {
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+// Partial payments list - under Paid date, same column width; max 4 visible, then scroll
+.partial-payments-list {
+  max-width: 100%;
+  max-height: calc(4 * (2.5rem)); // ~4 rows (py-2 + line height)
+  overflow-y: auto;
+
+  .partial-payment-row {
+    flex-wrap: wrap;
+    gap: 4px;
+
+    &:last-child {
+      border-bottom: none !important;
+    }
+
+    .fa-trash:hover {
+      opacity: 0.8;
+    }
+
+    // Keep content compact in narrow column
+    span:first-child {
+      flex-shrink: 0;
+    }
+    span.fw-bold {
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Tooltip for payment comment (multi-line, readable)
+:host ::ng-deep .payment-comment-tooltip {
+  .tooltip-inner {
+    max-width: 280px;
+    white-space: normal;
+    text-align: left;
+  }
+}
+
+// Documents list styling
+.documents-list {
+  max-height: 100px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+
+  .document-chip {
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f0f0f0 !important;
+    }
+
+    .max-w-150 {
+      max-width: 150px;
+    }
+
+    i {
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.2);
+      }
+    }
+  }
+}

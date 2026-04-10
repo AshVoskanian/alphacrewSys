@@ -1,4 +1,16 @@
-import { Component, DestroyRef, inject, input, OnChanges, OnInit, output, signal, SimpleChanges } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef, ElementRef,
+  inject,
+  input,
+  OnChanges,
+  OnInit,
+  output,
+  signal,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { Select2Module } from "ng-select2-component";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { CrewDetail, FilterDropdowns } from "../../../../../shared/interface/crew";
@@ -14,7 +26,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
   styleUrl: './crew-profile.component.scss',
   providers: [ DatePipe ]
 })
-export class CrewProfileComponent implements OnInit, OnChanges {
+export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
   private readonly _date = inject(DatePipe);
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -29,6 +41,8 @@ export class CrewProfileComponent implements OnInit, OnChanges {
 
   form: FormGroup;
 
+  @ViewChild('addressInput') addressInput!: ElementRef<HTMLInputElement>;
+
   ngOnInit() {
     this.initForm();
     this.getDropdowns();
@@ -38,6 +52,20 @@ export class CrewProfileComponent implements OnInit, OnChanges {
     if (changes && changes['crewDetail'] && changes['crewDetail'].currentValue) {
       this.getDropdowns(changes['crewDetail'].currentValue);
     }
+  }
+
+  async ngAfterViewInit(): Promise<void> {
+    const autocomplete = new google.maps.places.Autocomplete(
+      this.addressInput.nativeElement,
+      {
+        types: ['address'],
+        // componentRestrictions: { country: 'gb' }
+      }
+    );
+
+    autocomplete.addListener('place_changed', () => {
+      autocomplete.getPlace();
+    });
   }
 
   initForm() {

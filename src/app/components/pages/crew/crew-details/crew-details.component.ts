@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { finalize } from "rxjs";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { LayoutService } from "../../../../shared/services/layout.service";
@@ -21,6 +21,7 @@ import { CrewTimesheetsComponent } from "./crew-timesheets/crew-timesheets.compo
 import { CrewPaymentsComponent } from "./crew-payments/crew-payments.component";
 import { CrewHolidaysComponent } from "./crew-holidays/crew-holidays.component";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { BreadcrumbService } from "../../../../shared/services/breadcrumb.service";
 
 @Component({
   selector: 'app-crew-details',
@@ -43,11 +44,12 @@ import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
   templateUrl: './crew-details.component.html',
   styleUrl: './crew-details.component.scss'
 })
-export class CrewDetailsComponent extends ApiBase implements OnInit {
+export class CrewDetailsComponent extends ApiBase implements OnInit, OnDestroy {
   private _dr: DestroyRef = inject(DestroyRef);
   private _location: Location = inject(Location);
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _domSanitizer: DomSanitizer = inject(DomSanitizer);
+  private _breadcrumbService = inject(BreadcrumbService);
   public layoutService = inject(LayoutService);
 
   avatarUrl: WritableSignal<SafeResourceUrl> = signal<string>('');
@@ -61,6 +63,7 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
   activeTab: string = 'profile';
 
   ngOnInit() {
+    this._breadcrumbService.setDetailLabel(null);
     this.getDetails();
     this.getCrewAvatar();
   }
@@ -79,11 +82,16 @@ export class CrewDetailsComponent extends ApiBase implements OnInit {
             .subscribe({
               next: res => {
                 this.crewDetails.set(res.data);
+                this._breadcrumbService.setDetailLabel(res.data?.name ?? null);
                 this.setSkills(res.data);
               }
             })
         }
       })
+  }
+
+  ngOnDestroy(): void {
+    this._breadcrumbService.setDetailLabel(null);
   }
 
   getCrewAvatar() {

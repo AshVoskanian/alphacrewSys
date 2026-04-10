@@ -20,17 +20,17 @@ export class ContentComponent {
     // this.layoutService.loading = true;
     this.layout = this.layoutService.config.settings.layout;
 
-    this.route.queryParams.subscribe((params) => {
-      this.layout = params['layout'];
-
-      if(this.layout) {
-        this.layoutService.applyLayout(this.layout);
-      }
-
-      setTimeout(() => {
-        this.layoutService.loading = false;
-      }, 2000);
-    });
+    // this.route.queryParams.subscribe((params) => {
+    //   this.layout = params['layout'];
+    //
+    //   if(this.layout) {
+    //     this.layoutService.applyLayout(this.layout);
+    //   }
+    //
+    //   setTimeout(() => {
+    //     this.layoutService.loading = false;
+    //   }, 2000);
+    // });
 
     if(window.innerWidth < 1200){
       this.layoutService.closeSidebar = true;

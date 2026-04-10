@@ -1,0 +1,191 @@
+import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { ActivatedRoute, RouterModule } from "@angular/router";
+import { Location } from "@angular/common";
+import { CardComponent } from "../../../../shared/components/ui/card/card.component";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { finalize } from "rxjs";
+import { LayoutService } from "../../../../shared/services/layout.service";
+import { ApiBase } from "../../../../shared/bases/api-base";
+import { GeneralService } from "../../../../shared/services/general.service";
+import { EditJobComponent } from "../edit-job/edit-job.component";
+import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
+import { NgbPopover, NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
+import { CurrencyPipe, DatePipe } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
+import { Schedule } from "../../../../shared/interface/schedule";
+import { JobPartLog } from "../../../../shared/interface/activity";
+
+@Component({
+  selector: 'app-jobs-details',
+  imports: [
+    CardComponent,
+    RouterModule,
+    EditJobComponent,
+    NgbTooltip,
+    CurrencyPipe,
+    DatePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    ActivityComponent,
+    NgbPopover,
+  ],
+  templateUrl: './jobs-details.component.html',
+  styleUrl: './jobs-details.component.scss'
+})
+export class JobsDetailsComponent extends ApiBase implements OnInit {
+  private _dr: DestroyRef = inject(DestroyRef);
+  private _location: Location = inject(Location);
+  private _route: ActivatedRoute = inject(ActivatedRoute);
+
+  public layoutService = inject(LayoutService);
+
+  activityList: WritableSignal<JobPartLog[]> = signal([]);
+  jobRateCard: WritableSignal<JobPartRateCard> = signal(null);
+  jobDetails: WritableSignal<JobDetails> = signal<JobDetails>(null);
+  jobWarnings: WritableSignal<JobScheduleWarning[]> = signal<JobScheduleWarning[]>(null);
+
+  ngOnInit() {
+    this.getDetails();
+    this.getRateCards();
+  }
+
+  getDetails() {
+    this.layoutService.loading = true;
+
+    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: params => {
+          this.get<JobDetails>(`Jobs/GetJobByJobId?jobId=${ +params.get('id') }`)
+            .pipe(
+              takeUntilDestroyed(this._dr),
+              finalize(() => this.layoutService.loading = false)
+            )
+            .subscribe({
+              next: res => {
+                if (res.errors && res.errors.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                  return;
+                }
+
+                this.jobDetails.set(res.data);
+                this.getJobPartWarnings();
+              }
+            })
+        }
+      })
+  }
+
+  getJobPartWarnings() {
+    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: params => {
+          this.get<JobScheduleWarning[]>(`Jobs/GetJobPartWarning?jobId=${ +params.get('id') }`)
+            .pipe(
+              takeUntilDestroyed(this._dr)
+            )
+            .subscribe({
+              next: res => {
+                if (res.errors && res.errors.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                  return;
+                }
+                this.jobWarnings.set(res.data);
+              }
+            })
+        }
+      })
+  }
+
+  getRateCards() {
+    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: params => {
+          this.get<JobPartRateCard>(`Jobs/GetRateCard?jobId=${ +params.get('id') }`)
+            .pipe(
+              takeUntilDestroyed(this._dr)
+            )
+            .subscribe({
+              next: res => {
+                if (res.errors && res.errors.errorCode) {
+                  GeneralService.showErrorMessage(res.errors.message);
+                  return;
+                }
+
+                this.jobRateCard.set(res.data);
+              }
+            })
+        }
+      })
+  }
+
+  goBack() {
+    this._location.back();
+  }
+
+  readonly downloadReportOptions: { label: string; value: string }[] = [
+    { label: 'Quote', value: 'Quote' },
+    { label: 'Confirmation', value: 'Confirmation' },
+    { label: 'Invoice', value: 'Invoice' },
+    { label: 'Pro-forma', value: 'Proforma' },
+  ];
+
+  private readonly pdfDownloadBaseUrl = 'https://alphacrew.eu/jobs/PdfDownload';
+
+  onDownloadReport(selectEl: HTMLSelectElement, report: string): void {
+    const jobId = this.jobDetails()?.jobId;
+    if (!jobId || !report) return;
+    const url = `${this.pdfDownloadBaseUrl}?id=${jobId}&report=${encodeURIComponent(report)}`;
+    window.open(url);
+    selectEl.value = '';
+  }
+
+  getMapsUrl(venue: string | { label?: string } | null | undefined): string {
+    const s = typeof venue === 'string' ? venue : venue?.label ?? this.jobDetails()?.venue ?? '';
+    return `https://www.google.co.uk/maps/search/${encodeURIComponent(s)}/`;
+  }
+
+  get overUtilisation(): boolean {
+    const details = this.jobDetails();
+    const limit = details?.clientLimit;
+    const outstanding = details?.jobCost?.outstanding ?? 0;
+    const utilisation = limit?.clientUtilisation ?? 0;
+    const creditLimit = limit?.creditLimit ?? 0;
+    return (outstanding + utilisation) > creditLimit;
+  }
+
+  onPartialPaymentsUpdated(data: AddPaymentResponse) {
+    this.jobDetails.update(details => {
+      if (!details) return details;
+      return {
+        ...details,
+        partialPayments: data.partialPayments ?? details.partialPayments,
+        ...(data.jobCost != null && { jobCost: data.jobCost })
+      };
+    });
+  }
+
+  getActivities(job: JobDetails, popover: NgbPopover) {
+    job.loader = true;
+
+    const body = {
+      jobId: job.jobId
+    }
+
+    this.post<JobPartLog[]>('ActionHistory/GetActionHistoryLogByJobIdOrJobPartId', { ...body })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => job.loader = false)
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.activityList.set(res.data);
+          popover.open();
+        }
+      })
+  }
+}

@@ -1,0 +1,191 @@
+// Notes section with teal tab bar
+.notes-section {
+  .notes-header {
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+  }
+
+  .important-check {
+    padding: 0 20px;
+    white-space: nowrap;
+    color: #fff;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      border-color: rgba(255, 255, 255, 0.7);
+      pointer-events: auto;
+      flex-shrink: 0;
+
+      &:checked {
+        background-color: #fff;
+        border-color: #fff;
+      }
+    }
+
+    .form-check-label {
+      cursor: pointer;
+      pointer-events: auto;
+      user-select: none;
+    }
+  }
+
+  .notes-tabs {
+    border: none;
+    margin-bottom: 0;
+    padding: 0;
+
+    .nav-item {
+      .nav-link {
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        border: none !important;
+        border-radius: 0;
+        padding: 10px 20px;
+        background: transparent;
+
+        &.active {
+          background-color: rgba(255, 255, 255, 0.15);
+          color: #fff;
+        }
+
+        &:hover:not(.active) {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .notes-content {
+    border: 1px solid #dee2e6;
+    border-top: 3px solid #fdd835;
+    border-radius: 0 0 4px 4px;
+    padding: 15px;
+    min-height: 140px;
+
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 100px;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+// Accordion custom styling
+:host ::ng-deep .accordion {
+  .accordion-item {
+    border-color: #e0e0e0;
+
+    .accordion-button {
+      padding: 12px 16px;
+      background-color: #fff;
+      box-shadow: none;
+
+      &:not(.collapsed) {
+        background-color: #f8f9fa;
+        box-shadow: none;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+.accordion-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #26c6da;
+}
+
+.cost-badge {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+
+
+  @media screen and (max-width: 768px) {
+    bottom: auto !important;
+    top: -10px !important;
+  }
+}
+
+// Total amount - visually separated box
+.total-amount-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  min-width: 100px;
+
+  .total-amount-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+  }
+
+  .total-cost {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+  }
+}
+
+hr {
+  width: 85%;
+}
+
+// ngx-material-timepicker field — align with Bootstrap form-control
+.start-time-picker-wrap {
+  border: 1px solid var(--dark-light-color);
+  border-radius: 0.25rem;
+  background-color: #fff;
+  height: 36px;
+  //padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+:host ::ng-deep .start-time-picker-wrap .ngx-timepicker {
+  border-bottom: none;
+  width: 100%;
+  height: 36px;
+
+  .ngx-timepicker-control__arrows {
+    .ngx-timepicker-control__arrow {
+      height: 13px;
+    }
+
+    //display: none !important;
+  }
+
+  .ngx-material-timepicker-toggle {
+    span {
+      display: flex;
+    }
+
+    &:focus {
+      background: transparent !important;
+    }
+  }
+}

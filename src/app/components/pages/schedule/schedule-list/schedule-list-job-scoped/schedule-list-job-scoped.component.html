@@ -41,10 +41,18 @@
                   {{ schedule.shiftNumber }} of {{ schedule.shiftCount }}
                 </span>
               }
-              <a [href]="'https://alphacrew.eu/Jobs/Edit/' + schedule.jobId" target="_blank"
-                 class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
-                {{ schedule.statusText + ' ' + schedule.jobId }}
-              </a>
+              @if (isLegacySystem()) {
+                <a [href]="'https://alphacrew.eu/Jobs/Edit/' + schedule.jobId" target="_blank"
+                   class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
+                  {{ schedule.statusText + ' ' + schedule.jobId }}
+                </a>
+              } @else {
+                <a routerLink="/jobs/{{ schedule.jobId }}"
+                   target="_blank"
+                   class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
+                  {{ schedule.statusText + ' ' + schedule.jobId }}
+                </a>
+              }
             </div>
 
             <div class="row g-3 justify-content-between">
@@ -128,7 +136,7 @@
                         <h6>
                           {{ schedule.startDate | date: 'HH:mm' }} -  {{ schedule.endDate | date: 'HH:mm' }}
                           (Cr: {{ schedule.crewNumber }},
-                          Hrs: {{ hoursDifference(schedule.startDate, schedule.endDate) }}
+                          Hrs: {{ schedule.hours }}
                           @if (schedule?.travelHours > 0) {
                             +{{ schedule?.travelHours }}TrHr
                           }
@@ -178,13 +186,17 @@
                     }
                   </div>
 
-                  <div class="skills col-4">
-                    @for (skill of schedule.transformedSkills | filter:[
-                      { field: 'active', condition: 'equals', value: true }
-                    ]; track skill.url + $index) {
-                      <i class="pointer border border-dark p-3 rounded text-danger f-20"
-                         [class]="skill.url"
-                         [ngbTooltip]="skill.name | titlecase"></i>
+                  <div class="skills col-4 relative">
+                    @for (skill of schedule.jobPartSkillsWithCount; track skill.id + $index) {
+                      <div class="position-relative">
+                        <i class="pointer border border-dark fa-question p-3 rounded text-danger f-20"
+                           [class]="skill.faIcon"
+                           [ngbTooltip]="skill.description | titlecase"></i>
+                        <span
+                          class="position-absolute z-3 f-10 top-0 left-0 translate-middle badge rounded-pill bg-primary">
+                          {{ skill.count }}
+                        </span>
+                      </div>
                     }
                   </div>
                 </div>
@@ -264,7 +276,7 @@
                                 }
                               </button>
 
-                              <div class="btn-group" ngbDropdown [placement]="'bottom-right'">
+                              <div class="btn-group" ngbDropdown>
                                 <button class="btn b-ln-height btn-info btn-square w-36" ngbDropdownToggle>
                                   @if (crew.loading) {
                                     <app-feather-icon [class]="'w-14 h-14 text-white spin'"
@@ -277,17 +289,23 @@
                                   @for (menu of menu(); track menu) {
                                     <li class="pointer" (click)="menuAction(menu, crew)">
                                       @if (menu.href) {
-                                        <a class="dropdown-item opacity-100 flex items-center"
-                                           target="_blank"
-                                           [href]="menu.href + crew.crewId"
-                                           ngbDropdownItem>
-                                          <i class="{{menu.icon}} {{menu.color}} me-2"></i>
-                                          {{ menu.text }}
-
-                                          @if (menu.iconAfter) {
-                                            <i class="{{menu.iconAfter}} {{menu.color}} me-2 position-absolute r-0"></i>
-                                          }
-                                        </a>
+                                        @if (isLegacySystem() && menu.id === 2) {
+                                          <a class="dropdown-item opacity-100 flex items-center"
+                                             target="_blank"
+                                             [href]="menu.href + crew.crewId"
+                                             ngbDropdownItem>
+                                            <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                            {{ menu.text }}
+                                          </a>
+                                        } @else {
+                                          <a class="dropdown-item opacity-100 flex items-center"
+                                             [routerLink]="'/crew/' + crew.crewId"
+                                             target="_blank"
+                                             ngbDropdownItem>
+                                            <i class="{{menu.icon}} {{menu.color}} me-2"></i>
+                                            {{ menu.text }}
+                                          </a>
+                                        }
                                       } @else {
                                         <a class="dropdown-item opacity-100 flex items-center" ngbDropdownItem>
                                           <i class="{{menu.icon}} {{menu.color}} me-2"></i>
@@ -430,7 +448,8 @@
               #popoverRef="ngbPopover"
               triggers="manual"
               [autoClose]="'outside'"
-              [popoverClass]="'wide-popover border max-w-800'"
+              [popoverClass]="'wide-popover border max-w-800 bg-dark p-0'"
+              [popoverTitle]="'Recent Activity'"
               [ngbPopover]="activities"
               class="btn btn-info action-button left w-30 h-30 p-0">
         <i class="fa-solid fa-{{schedule.activityLoader ? 'spinner' : 'info'}} text-light"></i>

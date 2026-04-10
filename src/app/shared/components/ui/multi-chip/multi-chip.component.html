@@ -1,0 +1,11 @@
+<div class="">
+  <label class="form-label">Currency</label>
+  <select2
+    [data]="statuses()"
+    [templates]="template"
+    placeholder="Currency">
+    <ng-template #template let-item="label">
+      {{ item }}
+    </ng-template>
+  </select2>
+</div>

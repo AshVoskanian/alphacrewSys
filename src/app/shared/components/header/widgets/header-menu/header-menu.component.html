@@ -1,0 +1,38 @@
+<div class="header-menu-dropdown" [ngClass]="isDropdownOpen() ? 'active' : ''">
+  @if (activeMenuItem()) {
+    <div class="flex gap-3 flex-nowrap align-items-center h-20 m-0 pointer" (click)="toggleDropdown($event)">
+      <div class="m-r-0 h-100">
+        @if (activeMenuItem()?.icon) {
+          <i class="fa-solid" [ngClass]="activeMenuItem()?.icon"></i>
+        }
+      </div>
+      <p class="m-0 p-t-3">
+        {{ activeMenuItem()?.title | titlecase }}
+      </p>
+    </div>
+  }
+
+  <div class="header-menu-panel" [ngClass]="isDropdownOpen() ? 'active' : ''">
+    @for (menuItem of menuItems(); track menuItem.path + $index) {
+      @if (isLegacySystem()) {
+        <a [href]="getLegacyHref(menuItem)" target="_blank" class="lang selected sidebar-link sidebar-title link-nav" (click)="selectMenuItem(menuItem)">
+          <div class="m-r-10 w-30">
+            @if (menuItem.icon) {
+              <i class="fa-solid f-16" [ngClass]="menuItem.icon"></i>
+            }
+          </div>
+          <span>{{ menuItem.title }}</span>
+        </a>
+      } @else {
+        <a [routerLink]="menuItem.path" class="lang selected sidebar-link sidebar-title link-nav" (click)="selectMenuItem(menuItem)">
+          <div class="m-r-10 w-30 flex justify-content-center">
+            @if (menuItem.icon) {
+              <i class="fa-solid f-16" [ngClass]="menuItem.icon"></i>
+            }
+          </div>
+          <span>{{ menuItem.title }}</span>
+        </a>
+      }
+    }
+  </div>
+</div>

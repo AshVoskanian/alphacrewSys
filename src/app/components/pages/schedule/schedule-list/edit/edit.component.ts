@@ -159,7 +159,6 @@ export class EditComponent extends ApiBase implements OnInit {
   }
 
   save() {
-    console.log(this.form.controls)
     if (this.saveLoading || this.form.invalid) return;
 
     this.saveLoading = true;

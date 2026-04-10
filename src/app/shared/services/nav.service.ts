@@ -9,7 +9,6 @@ import { Schedule } from "../interface/schedule";
 
 export class NavService {
 
-  public isLanguage: boolean = false;
   public fullScreen: boolean = false;
   public isSearchOpen: boolean = false;
   public days: number = 2;

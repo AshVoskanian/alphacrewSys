@@ -1,0 +1,385 @@
+<form class="flex flex-col gap-12" [formGroup]="form" (ngSubmit)="submit()">
+  <!-- Currency, Pre payment, Discount, Inc. VAT, Rate card (trigger button is in jobs-details) -->
+  @if (financeSectionExpanded()) {
+    <div class="m-b-20">
+      <div class="flex flex-col gap-12">
+        <div class="row g-3 align-items-end">
+          <div class="col col-sm-6 col-md-2">
+            <label class="form-label">Currency</label>
+            <select2
+              [data]="currencies()"
+              [templates]="template"
+              id="currencyId"
+              formControlName="currencyId"
+              placeholder="Currency">
+              <ng-template #template let-item="label">
+                {{ item }}
+              </ng-template>
+            </select2>
+          </div>
+          <div class="col col-sm-6 col-md-2">
+            <label class="form-label">Pre payment</label>
+            <input class="form-control" type="number" formControlName="prePayment" placeholder="0.0000" step="0.0001"
+                   min="0">
+          </div>
+          <div class="col col-sm-6 col-md-2">
+            <label class="form-label">Discount</label>
+            <input class="form-control" type="number" formControlName="discount" placeholder="0.0000" step="0.0001"
+                   min="0">
+          </div>
+          <div class="col col-sm-6 col-md-2 d-flex align-items-center pb-2">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="vat" formControlName="vat">
+              <label class="form-check-label" for="vat">Inc. VAT</label>
+            </div>
+          </div>
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label">Rate card</label>
+            @if (rateCardLoading()) {
+              <div class="txt-secondary f-14">Loading...</div>
+            } @else {
+              <select2
+                [data]="rateCards()"
+                [templates]="template"
+                id="jobRateCardId"
+                formControlName="jobRateCardId"
+                placeholder="Choose Rate Card">
+                <ng-template #template let-item="label">
+                  {{ item }}
+                </ng-template>
+              </select2>
+            }
+          </div>
+        </div>
+
+        <!-- Additional Regions (Google Places Autocomplete) -->
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Additional Regions</label>
+            <tag-input formControlName="jobRegionAccess" placeholder="+Add Region" secondaryPlaceholder="+Add Region"
+                       [onlyFromAutocomplete]="true">
+              <tag-input-dropdown [autocompleteItems]="regionNames()"
+                                  [showDropdownIfEmpty]="true">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-divider m-y-12">
+      <div class="divider-body divider-body-1 divider-secondary">
+        <div class="divider-p-secondary p-0"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Main Form Fields -->
+  <div class="row g-3 job-edit-main-row">
+    <div class="col-12 col-sm-6 col-md-3">
+      <label class="form-label">Ordered By</label>
+      <div class="input-group">
+        <input class="form-control" type="text" formControlName="orderedBy" placeholder="Ordered By">
+        <span class="input-group-text bg-light-secondary">
+          <i class="fa-solid fa-user txt-secondary"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <label class="form-label">Contact</label>
+      <div class="input-group">
+        <input class="form-control" type="text" formControlName="jobContact" placeholder="Contact">
+        <span class="input-group-text bg-light-secondary">
+          <i class="fa-solid fa-phone txt-secondary"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <label class="form-label" for="statusId">Status</label>
+      <select2 [data]="statuses()" [templates]="template" id="statusId" formControlName="statusId">
+        <ng-template #template let-item="label">
+          {{ item }}
+        </ng-template>
+      </select2>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <label class="form-label" for="jobRegionId">Region</label>
+      <select2 [data]="regions() || []" [templates]="template" id="jobRegionId" formControlName="jobRegionId">
+        <ng-template #template let-item="label">
+          {{ item }}
+        </ng-template>
+      </select2>
+    </div>
+  </div>
+
+  <!-- Client/Venue left; 4 dates right -->
+  <div class="row g-3">
+    <div class="col col-sm-12 col-md-6">
+      <div class="row g-3">
+        <div class="col col-sm-12 col-md-12">
+          @if (clientLoading()) {
+            <div>
+              <label class="form-label h-15"></label>
+              <div class="bg-gray-200 animate-pulse rounded-md h-36"></div>
+            </div>
+          } @else {
+            <div class="mb-3">
+              <label class="form-label" for="clientId">Client/Company</label>
+              <select2 [data]="jobClients()" [templates]="template" id="clientId" formControlName="clientId">
+                <ng-template #template let-item="label">
+                  {{ item }}
+                </ng-template>
+              </select2>
+            </div>
+          }
+          @if (venueLoading()) {
+            <div>
+              <label class="form-label h-15"></label>
+              <div class="bg-gray-200 animate-pulse rounded-md h-36"></div>
+            </div>
+          } @else {
+            <div>
+              <label class="form-label" for="venue">Address/Venue</label>
+              <input
+                type="text"
+                #venueInstance
+                class="form-control"
+                formControlName="venue"
+                [ngbTypeahead]="search"
+                [inputFormatter]="inputFormatter"
+                [resultFormatter]="resultFormatter"
+                [container]="'custom-scrollbar'"
+                (click)="click$.next($any($event).target.value)"
+                (selectItem)="onVenueSelect($event)"
+                id="venue"
+              />
+            </div>
+          }
+        </div>
+
+        <div class="col col-sm-12 col-md-12">
+          <label class="form-label">Files</label>
+          <div class="d-flex flex-column">
+            <div class="d-flex align-items-center">
+              <input type="file" id="fileUpload" class="d-none" (change)="onFileSelected($event)"
+                     [disabled]="uploadLoading()">
+              <label for="fileUpload" class="btn btn-sm btn-outline-primary m-b-0 cursor-pointer"
+                     [class.disabled]="uploadLoading()">
+                @if (uploadLoading()) {
+                  <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
+                }
+                Choose file
+              </label>
+            </div>
+            @if (documents().length) {
+              <div
+                class="documents-list w-100 flex flex-wrap m-t-10 max-h-100 overflow-y-auto custom-scrollbar header-files-col">
+                @for (doc of documents(); track doc.fileName) {
+                  <div
+                    class="document-chip d-inline-flex align-items-center gap-5 bg-light rounded p-x-10 p-y-5 m-r-5 m-b-5">
+                    <span class="f-12 text-dark text-truncate max-w-50" [title]="doc.fileName">{{ doc.fileName }}</span>
+                    @if (downloadingDocument() === doc.fileName) {
+                      <i class="fa-solid fa-spinner fa-spin txt-primary f-12"></i>
+                    } @else {
+                      <i class="fa-solid fa-download txt-primary f-12 cursor-pointer"
+                         (click)="downloadDocument(doc.fileName)"
+                         title="Download"></i>
+                    }
+                    @if (deletingDocument() === doc.fileName) {
+                      <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
+                    } @else {
+                      <i class="fa-solid fa-times txt-danger f-12 cursor-pointer"
+                         (click)="confirmDeleteDocument(doc.fileName)"
+                         title="Delete"></i>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col col-sm-12 col-md-6">
+      <div class="row g-3">
+        <div class="col col-sm-6 col-md-3">
+          <label class="form-label">Important date</label>
+          <input class="form-control digits" type="date" formControlName="importantDate">
+        </div>
+        <div class="col col-sm-6 col-md-3">
+          <label class="form-label">Invoice date</label>
+          <input class="form-control digits" type="date" formControlName="invoiceDate">
+        </div>
+        <div class="col col-sm-6 col-md-3">
+          <label class="form-label">Payment due</label>
+          <input class="form-control digits" type="date" formControlName="paymentDueDate">
+        </div>
+        <div class="col col-sm-6 col-md-3">
+          <label class="form-label">Paid date</label>
+          <input class="form-control digits" type="date" formControlName="paidDate">
+          @if (jobDetails()?.partialPayments?.length) {
+            <ul class="partial-payments-list list-unstyled m-0 m-t-10 custom-scrollbar">
+              @for (payment of jobDetails()?.partialPayments; track payment.partialPaymentId) {
+                <li class="partial-payment-row d-flex align-items-center gap-8 py-2 border-bottom border-light">
+                  <span class="f-12">{{ formatPaymentDate(payment.paidDate) }}</span>
+                  <i class="fa-solid fa-circle-info txt-primary f-14 cursor-default"
+                     [ngbTooltip]="payment.comments || '—'"
+                     tooltipClass="payment-comment-tooltip"
+                     container="body"></i>
+                  <span class="ms-auto">
+                    <span class="f-12 fw-bold m-r-8">{{ payment.amount | currency:'GBP':'symbol':'1.2-2' }}</span>
+                    @if (deletingPartialPayment() === payment.partialPaymentId) {
+                      <i class="fa-solid fa-spinner fa-spin txt-danger f-12"></i>
+                    } @else {
+                      <i class="fa-solid fa-trash txt-danger f-12 cursor-pointer"
+                         (click)="confirmDeletePartialPayment(payment)"
+                         title="Remove payment"></i>
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+        <div class="col col-sm-12 col-md-12">
+          <label class="form-label">Job Notes</label>
+          <div class="input-group">
+            <textarea class="form-control" formControlName="notes" rows="3" placeholder="Job notes..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Summary Section (Read-only display) -->
+  @let jobCost = jobDetails()?.jobCost;
+
+  <div class="row g-3 m-t-1">
+    <div class="col-12">
+      <div class="job-financial-summary-bar bg-primary p-15 rounded text-white">
+        <div class="row align-items-center g-0">
+          <div class="col-auto">
+            <div class="f-12">P.O.</div>
+            <input
+              type="text"
+              class="form-control job-financial-summary-po-input bg-transparent border-0 text-white f-14 fw-bold p-0"
+              formControlName="purchaseOrder"
+              style="color: white !important; border-bottom: 1px solid rgba(255,255,255,0.5) !important; border-radius: 0;">
+          </div>
+          <div class="col text-center">
+            <div class="f-12">NET</div>
+            <div class="f-16 fw-bold">{{ jobCost?.net | currency:'GBP':'symbol':'1.2-2' }}</div>
+          </div>
+          <div class="col text-center">
+            <div class="f-12">VAT</div>
+            <div class="f-16 fw-bold">{{ jobCost?.vat | currency:'GBP':'symbol':'1.2-2' }}</div>
+          </div>
+          <div class="col text-center">
+            <div class="f-12">GROSS</div>
+            <div class="f-16 fw-bold">{{ jobCost?.gross | currency:'GBP':'symbol':'1.2-2' }}</div>
+          </div>
+          <div class="col text-center">
+            <div class="f-12">OUTSTANDING</div>
+            <div class="f-16 fw-bold">{{ jobCost?.outstanding | currency:'GBP':'symbol':'1.2-2' }}</div>
+          </div>
+          <div class="col-auto ms-auto pointer">
+            <i class="fa-solid fa-calendar-plus f-20 text-white cursor-pointer"
+               (click)="openAddPaymentModal(addPaymentModal)"
+               title="Add Payment"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-divider m-y-12"></div>
+
+  <!-- Job Parts Table Section -->
+  <div class="row g-3">
+    <div class="col-12">
+      @if (jobPartsTableConfig().data?.length) {
+        <div class="table-responsive custom-scrollbar">
+          <app-table
+            [tableConfig]="jobPartsTableConfig()"
+            [search]="false"
+            [hover]="true"
+            [pagination]="false"
+            [hasCheckbox]="false"
+            (action)="handleJobPartAction($event)">
+          </app-table>
+        </div>
+      }
+
+      <div class="w-100 flex justify-content-center m-t-15">
+        <button type="button" class="btn btn-primary btn-sm"
+                (click)="editingJobPartId.set(null);
+                       openAddJobPartModal(addJobPartModal)">
+          <i class="fa-solid fa-plus m-r-5"></i>
+          Add new Part
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Add Payment Modal -->
+<ng-template #addPaymentModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Add Payment</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <app-add-payment
+      #addPaymentRef
+      [jobId]="jobDetails()?.jobId"
+      (partialPaymentsAdded)="onPaymentAdded($event)">
+    </app-add-payment>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger"
+            (click)="addPaymentRef.submit()"
+            [disabled]="!addPaymentRef || addPaymentRef.paymentForm?.invalid || addPaymentRef.loading()">
+      @if (addPaymentRef?.loading?.()) {
+        <i class="fa-solid fa-spinner fa-spin m-r-5"></i>
+      }
+      ADD
+    </button>
+  </div>
+</ng-template>
+
+<!-- Add / Edit Job Part Modal -->
+<ng-template #addJobPartModal let-modal>
+  <div class="modal-header">
+    <div class="flex items-center gap-10">
+      <h5 class="modal-title">{{ editingJobPartId() ? 'Edit Job Part' : 'Add New Job Part' }}</h5>
+      <i class="fa-solid fa-{{activityLoading() ? 'spinner' : 'circle-info'}} txt-primary f-20 pointer"
+         (click)="getActivities( popoverRef)"
+         #popoverRef="ngbPopover"
+         triggers="manual"
+         [autoClose]="'outside'"
+         [popoverClass]="'wide-popover border min-w-370 max-w-800 bg-dark'"
+         [popoverTitle]="'Recent Activity'"
+         [ngbPopover]="activities"></i>
+    </div>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <app-add-edit-job-part
+      [jobId]="jobDetails()?.jobId"
+      [jobPartId]="editingJobPartId() ?? 0"
+      [jobRateCard]="jobRateCard()"
+      [lastJobPartStartDate]="lastJobPartStartDate()"
+      (finish)="onJobPartCancel()"
+      (saved)="onJobPartSaved()"></app-add-edit-job-part>
+  </div>
+</ng-template>
+
+<!--Recent Activities-->
+<ng-template #activities>
+  <app-activity [activityList]="activityList()"></app-activity>
+</ng-template>

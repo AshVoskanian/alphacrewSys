@@ -5,6 +5,8 @@ export interface CardToggleOptions {
 
 export interface TableConfigs {
     columns: TableColumn[];
+    /** Action icons rendered before data columns (e.g. Edit). */
+    row_action_before?: TableRows[];
     row_action?: TableRows[];
     data: any[]
 }
@@ -21,6 +23,8 @@ export interface TableColumn {
     text?: string;
     icon_field?: string;
     hide_column?: boolean;
+    /** When true (e.g. type `link_icon`), cell content is hidden until the row is hovered or focused within. */
+    showOnHover?: boolean;
 }
 
 export interface TableRows {
@@ -32,6 +36,8 @@ export interface TableRows {
   model_text?: string;
   type?: string;
   class?: string;
+  /** When true, the control is hidden until the table row is hovered (or focused within). */
+  showOnHover?: boolean;
 }
 
 export interface TableClickedAction {

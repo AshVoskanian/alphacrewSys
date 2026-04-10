@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { Location } from "@angular/common";
 import { CardComponent } from "../../../../shared/components/ui/card/card.component";
@@ -9,6 +9,7 @@ import { finalize } from "rxjs";
 import { LayoutService } from "../../../../shared/services/layout.service";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
+import { BreadcrumbService } from "../../../../shared/services/breadcrumb.service";
 
 @Component({
   selector: 'app-venue-details',
@@ -20,16 +21,18 @@ import { GeneralService } from "../../../../shared/services/general.service";
   templateUrl: './venue-details.component.html',
   styleUrl: './venue-details.component.scss'
 })
-export class VenueDetailsComponent extends ApiBase implements OnInit {
+export class VenueDetailsComponent extends ApiBase implements OnInit, OnDestroy {
   private _dr: DestroyRef = inject(DestroyRef);
   private _location: Location = inject(Location);
   private _route: ActivatedRoute = inject(ActivatedRoute);
+  private _breadcrumbService = inject(BreadcrumbService);
 
   public layoutService = inject(LayoutService);
 
   venueDetails: WritableSignal<VenueDetails> = signal<VenueDetails>(null);
 
   ngOnInit() {
+    this._breadcrumbService.setDetailLabel(null);
     this.getDetails();
   }
 
@@ -52,10 +55,15 @@ export class VenueDetailsComponent extends ApiBase implements OnInit {
                 }
 
                 this.venueDetails.set(res.data);
+                this._breadcrumbService.setDetailLabel(res.data?.venueName ?? null);
               }
             })
         }
       })
+  }
+
+  ngOnDestroy(): void {
+    this._breadcrumbService.setDetailLabel(null);
   }
 
   goBack() {

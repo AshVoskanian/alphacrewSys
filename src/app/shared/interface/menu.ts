@@ -3,6 +3,7 @@ export interface Menu {
     title?: string;
     icon?: string;
     path?: string;
+    legacyPath?: string;
     type?: string;
     active?: boolean;
     badge?: boolean;

@@ -63,14 +63,15 @@ import { SendSmsToCrewComponent } from "../send-sms-to-crew/send-sms-to-crew.com
 import { UkPostcodeLinkPipe } from "../../../../../shared/pipes/uk-post-code-link.pipe";
 import { ActivityComponent } from "../activity/activity.component";
 import { JobPartLog } from "../../../../../shared/interface/activity";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
+import { LegacySystemService } from "../../../../../shared/services/legacy-system.service";
 
 @Component({
   selector: 'app-schedule-list-job-scoped',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list-job-scoped.component.html',
   styleUrl: './schedule-list-job-scoped.component.scss'
@@ -83,6 +84,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   private _offCanvasService = inject(NgbOffcanvas);
   private _activatedRouter = inject(ActivatedRoute);
   private _scheduleService = inject(ScheduleService);
+  readonly legacySystemService = inject(LegacySystemService);
 
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
@@ -203,6 +205,8 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
     }
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
+
+  readonly isLegacySystem = this.legacySystemService.isLegacySystem;
 
   hideVehicles: boolean = false;
 
@@ -740,14 +744,11 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
             return;
           }
 
-          const transformedSkills = schedule.transformedSkills;
-
           this._scheduleService.shifts = this._scheduleService.shifts.map(item => {
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, res.data.crewNumber),
-                transformedSkills
+                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length))
               };
             }
             return item;
@@ -757,8 +758,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
             if (item.jobPartId === schedule.jobPartId) {
               return {
                 ...res.data,
-                crews: this.fillArray(res.data.crews, res.data.crewNumber),
-                transformedSkills
+                crews: this.fillArray(res.data.crews, Math.max(res.data.crewNumber, res.data.crews.length))
               };
             }
             return item;
@@ -884,7 +884,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   statisticByRegion() {
     switch (this._navService.regionId) {
       case 0:
-        return 'London';
+        return 'All';
       case 1:
         return 'London';
       case 2:

@@ -1,0 +1,50 @@
+@if (!loading()) {
+  <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="col-md">
+      <label class="form-label">Status</label>
+      <select2 [data]="statuses()" [templates]="template" formControlName="statusId"
+               placeholder="Select Status" [displaySearchStatus]="'hidden'">
+        <ng-template #template let-category="label">
+          {{ category }}
+        </ng-template>
+      </select2>
+    </div>
+
+    <div class="col-md">
+      <label class="form-label">Region</label>
+      <select2 [data]="regions()" [disabled]="!regions()" [templates]="template"
+               formControlName="region"
+               placeholder="Select Region" [displaySearchStatus]="'hidden'">
+        <ng-template #template let-category="label">
+          {{ category }}
+        </ng-template>
+      </select2>
+    </div>
+
+    <div class="col-md">
+      <label class="form-label"></label>
+      <input class="form-control h-36 m-t-4" type="text" formControlName="searchKey" placeholder="Search...">
+    </div>
+
+    <div class="col d-flex justify-content-start align-items-center m-t-40">
+      <button type="submit" class="btn btn-primary h-36">
+        Search
+      </button>
+    </div>
+  </form>
+} @else {
+  <div class="gap-12 flex flex-col">
+    <div class="flex gap-12">
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-10 w-full rounded-md bg-gray-200 animate-pulse"></div>
+    </div>
+    <div class="flex gap-12">
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+      <div class="col-md h-28 w-full rounded-md bg-gray-200 animate-pulse"></div>
+    </div>
+  </div>
+}

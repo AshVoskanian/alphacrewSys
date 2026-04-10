@@ -1,0 +1,93 @@
+<div class="chip-count-select" [class.disabled]="isDisabled()" [class.position-top]="position() === 'top'">
+  @if (position() === 'top') {
+    <!-- Select above, chips below -->
+    @if (availableOptionsForSelect2().length) {
+      <div class="chip-add" [formGroup]="select2Form">
+        <select2
+          formControlName="addOptionId"
+          [data]="availableOptionsForSelect2()"
+          [placeholder]="placeholder()"
+          [disabled]="isDisabled()"
+        />
+      </div>
+    }
+    @if (chipsWithLabel().length) {
+      <div class="chip-list">
+        @for (chip of chipsWithLabel(); track chip.id) {
+          <div class="chip">
+            <span class="chip-label">{{ chip.label }}</span>
+            <div class="chip-actions">
+              <button
+                type="button"
+                class="chip-btn chip-btn-minus"
+                [attr.aria-label]="'შემცირება ' + chip.label"
+                (click)="decrement(chip.id)"
+                [disabled]="isDisabled()"
+              >−</button>
+              <span class="chip-count">{{ chip.count }}</span>
+              <button
+                type="button"
+                class="chip-btn chip-btn-plus"
+                [attr.aria-label]="'მომატება ' + chip.label"
+                (click)="increment(chip.id)"
+                [disabled]="isDisabled()"
+              >+</button>
+            </div>
+            <button
+              type="button"
+              class="chip-remove"
+              [attr.aria-label]="'წაშლა ' + chip.label"
+              (click)="removeChip(chip.id)"
+              [disabled]="isDisabled()"
+            >×</button>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <!-- Chips above, select below (default) -->
+    @if (chipsWithLabel().length) {
+      <div class="chip-list">
+        @for (chip of chipsWithLabel(); track chip.id) {
+          <div class="chip">
+            <span class="chip-label">{{ chip.label }}</span>
+            <div class="chip-actions">
+              <button
+                type="button"
+                class="chip-btn chip-btn-minus"
+                [attr.aria-label]="'შემცირება ' + chip.label"
+                (click)="decrement(chip.id)"
+                [disabled]="isDisabled()"
+              >−</button>
+              <span class="chip-count">{{ chip.count }}</span>
+              <button
+                type="button"
+                class="chip-btn chip-btn-plus"
+                [attr.aria-label]="'მომატება ' + chip.label"
+                (click)="increment(chip.id)"
+                [disabled]="isDisabled()"
+              >+</button>
+            </div>
+            <button
+              type="button"
+              class="chip-remove"
+              [attr.aria-label]="'წაშლა ' + chip.label"
+              (click)="removeChip(chip.id)"
+              [disabled]="isDisabled()"
+            >×</button>
+          </div>
+        }
+      </div>
+    }
+    @if (availableOptionsForSelect2().length) {
+      <div class="chip-add" [formGroup]="select2Form">
+        <select2
+          formControlName="addOptionId"
+          [data]="availableOptionsForSelect2()"
+          [placeholder]="placeholder()"
+          [disabled]="isDisabled()"
+        />
+      </div>
+    }
+  }
+</div>
