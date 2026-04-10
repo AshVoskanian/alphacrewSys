@@ -84,7 +84,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
   selectedSchedule: Schedule | null;
 
   shiftCrewDetails: WritableSignal<Array<ShiftCrewDetails>> = signal([]);
-  btnDropdownItems: WritableSignal<Array<{ type: 'new' | 'all' | 'current', name: string }>> = signal([
+  btnDropdownItems: WritableSignal<Array<{
+    type: 'new' | 'all' | 'current' | 'checkedShifts',
+    name: string
+  }>> = signal([
     {
       type: 'all',
       name: 'Save All Future Parts'
@@ -92,6 +95,10 @@ export class CrewListComponent extends ApiBase implements OnInit {
     {
       type: 'new',
       name: 'Save New Crew To All Future Parts'
+    },
+    {
+      type: 'checkedShifts',
+      name: 'Save New Crew To Selected Parts'
     }
   ]);
 
@@ -258,21 +265,26 @@ export class CrewListComponent extends ApiBase implements OnInit {
     this.allAreSelectedForSMS = this.areAllCheckedForSMS(filteredCrew);
   }
 
-  saveCrew(type: 'current' | 'all' | 'new') {
+  saveCrew(type: 'current' | 'all' | 'new' | 'checkedShifts') {
     this.showBtnOptions = false;
 
     this.addCrewToShift(type);
   }
 
-  addCrewToShift(type: 'current' | 'all' | 'new') {
+  addCrewToShift(type: 'current' | 'all' | 'new' | 'checkedShifts') {
     if (this.loading) return;
     this.loading = true;
 
+    const checkedClashingCrew = this.jobPartClashing.filter(it => it.checked);
+    const jobPartIds = checkedClashingCrew?.length > 0 ? checkedClashingCrew.map(it => it.jobPartId) : [];
+    const newCrewOnly = type === 'new' || type === 'checkedShifts';
+
     const data = {
       jobId: this.selectedSchedule.jobId,
-      jobPartId: this.selectedSchedule?.jobPartId,
-      crewId: this.getSelectedData(type === 'new' ? 'onlyNewCrew' : 'crew'),
-      newCrewOnly: type === 'new',
+      jobPartId: type === 'checkedShifts' ? 0 : this.selectedSchedule?.jobPartId,
+      jobPartIds: type === 'checkedShifts' ? jobPartIds : [],
+      crewId: this.getSelectedData(newCrewOnly ? 'onlyNewCrew' : 'crew'),
+      newCrewOnly,
     }
 
     if (type === 'current') {
