@@ -3,9 +3,13 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  EventEmitter,
   inject,
   Input,
+  OnChanges,
   OnInit,
+  Output,
+  SimpleChanges,
   QueryList,
   signal,
   ViewChild,
@@ -44,29 +48,30 @@ import { ConfirmModalComponent } from "../../../../../shared/components/ui/confi
 @Component({
   selector: 'app-crew-list',
   imports: [
-    CardComponent, CrewFilterPipe, DatePipe, AsyncPipe, FilterPipe, NgClass,
+    CardComponent, DatePipe, AsyncPipe, FilterPipe, NgClass,
     FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, NgStyle, ConfirmModalComponent
   ],
-  providers: [ CrewFilterPipe ],
+  providers: [CrewFilterPipe],
   templateUrl: './crew-list.component.html',
   styleUrl: './crew-list.component.scss'
 })
-export class CrewListComponent extends ApiBase implements OnInit {
+export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   private _modal = inject(NgbModal);
   private _dr: DestroyRef = inject(DestroyRef);
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
   private _scheduleService = inject(ScheduleService);
-  private _offcanvasService: NgbActiveOffcanvas = inject(NgbActiveOffcanvas);
+  private readonly _activeOffcanvas = inject(NgbActiveOffcanvas, { optional: true });
 
   @Input() title: string;
+  @Input() crewList: Array<Crew> = [];
+  @Input() isJobScoped = false;
+  @Output() panelClose = new EventEmitter<void>();
 
   @ViewChildren(NgbPopover) popovers!: QueryList<NgbPopover>;
   @ViewChild('confirmModal') confirmModal: any;
   @ViewChild('crewManager') crewManager!: ElementRef<HTMLElement>;
 
-  crewList: Array<Crew> = [];
-  isJobScoped: boolean = false;
   private modalRef!: NgbModalRef;
 
   form: FormGroup;
@@ -128,17 +133,78 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.getSelectedSchedule();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['crewList'] || !this.crewList?.length || !this.selectedSchedule) {
+      return;
+    }
     this.getCrewClashing();
+    this.syncCrewlistFlagsFromSelectedSchedule();
+  }
+
+  /** Keeps isAlreadyAssigned / filters in sync when crewList loads after selectedShift (e.g. inline panel always in DOM). */
+  private syncCrewlistFlagsFromSelectedSchedule(): void {
+    const schedule = this.selectedSchedule;
+    if (!schedule) {
+      return;
+    }
+
+    const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
+    const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
+    const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelCrewingWeighting));
+
+    this.crewList.forEach(crew => {
+      crew.isChecked = selectedCrewIds.has(crew.crewId);
+      crew.isAlreadyAssigned = selectedCrewIds.has(crew.crewId);
+    });
+
+    // Uncheck checked crew for SMS
+    this.crewList.forEach(crew => crew.isCheckedForSMS = false);
+    this.allAreSelectedForSMS = false;
+
+    // Check existing crew level filters
+    this.levels.forEach(level => {
+      level.checked = selectedCrewLevelIds.has(level.id);
+    })
+
+    // Check existing crew region filters
+    this.regions.forEach(region => {
+      region.checked = selectedCrewRegionIds.has(region.id);
+    })
+
+    if (!this.levels.some(it => it.checked)) {
+      this.levels[0].checked = true;
+    }
   }
 
   get maxHeight(): string {
     const offsetHeight = (this.crewManager?.nativeElement?.offsetHeight - 50) || 0;
 
     if (this.crewManager?.nativeElement?.offsetHeight < 200 || !this.crewManager?.nativeElement?.offsetHeight) {
-      return `calc(100dvh - ${ 440 }px)`;
+      return `calc(100dvh - ${ 530 }px)`;
     }
 
-    return `calc(100dvh - ${ offsetHeight + 440 }px)`;
+    return `calc(100dvh - ${ offsetHeight + 530 }px)`;
+  }
+
+  /**
+   * Recomputed each change detection. Pure `filter` pipe caches by input reference, so in-place
+   * `isAlreadyAssigned` updates on `crewList` items would not refresh the two @for lists.
+   */
+  get assignedCrewRows(): Crew[] {
+    return this.crewList.filter(m => m.isAlreadyAssigned === true);
+  }
+
+  get selectableCrewRows(): Crew[] {
+    const notAssigned = this.crewList.filter(m => m.isAlreadyAssigned === false);
+    return this._filterPipe.transform(
+      notAssigned,
+      this.getSelectedData('regions'),
+      this.getSelectedData('levels'),
+      this.getSelectedData('jobParts'),
+      this.searchKey
+    );
   }
 
   getAlreadyAssignedCrewCountByLevel(levelId: number) {
@@ -158,45 +224,19 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
         this.selectedSchedule = schedule;
 
-        const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
-        const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
-        const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelCrewingWeighting));
-
-        // Check existing crews
-        this.crewList.forEach(crew => {
-          crew.isChecked = selectedCrewIds.has(crew.crewId);
-          crew.isAlreadyAssigned = selectedCrewIds.has(crew.crewId);
-        });
-
-        // Uncheck checked crew for SMS
-        this.crewList.forEach(crew => crew.isCheckedForSMS = false);
-        this.allAreSelectedForSMS = false;
-
-        // Check existing crew level filters
-        this.levels.forEach(level => {
-          level.checked = selectedCrewLevelIds.has(level.id);
-        })
-
-        // Check existing crew region filters
-        this.regions.forEach(region => {
-          region.checked = selectedCrewRegionIds.has(region.id);
-        })
-
-        if (!this.levels.some(it => it.checked)) {
-          this.levels[0].checked = true;
-        }
-
-        if (!this.regions.some(it => it.checked)) {
-          this.regions[0].checked = true;
-        }
+        this.syncCrewlistFlagsFromSelectedSchedule();
 
         this.getCrewManager();
-        // this.getCrewClashing();
+        this.getCrewClashing();
       });
   }
 
   closeOffcanvas() {
-    this._offcanvasService.close()
+    if (this._activeOffcanvas) {
+      this._activeOffcanvas.close();
+    } else {
+      this.panelClose.emit();
+    }
   }
 
   getSelectedData(type: 'regions' | 'levels' | 'crew' | 'onlyNewCrew' | 'jobParts'): Array<number> {
@@ -338,6 +378,7 @@ export class CrewListComponent extends ApiBase implements OnInit {
 
   getCrewClashing(): void {
     this.crewClashingLoader = true;
+    this.jobPartClashing = [];
 
     this.get<Array<JobPartClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
       .pipe(finalize(() => this.crewClashingLoader = false))

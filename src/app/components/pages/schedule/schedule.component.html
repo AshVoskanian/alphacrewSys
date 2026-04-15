@@ -20,7 +20,7 @@
     <button class="btn-close py-0" type="button" (click)="closeModal(modal)"></button>
   </div>
 
-  <div class="overflow-y-auto overflow-x-hidden">
+  <div class="job-shifts-modal-body d-flex flex-column flex-grow-1 min-h-0 overflow-hidden w-100">
     <app-schedule-list-job-scoped
       [list]="scheduleService.jobScopedShifts"
       [selectedSchedule]="selectedSchedule">

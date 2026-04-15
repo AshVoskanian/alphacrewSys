@@ -358,6 +358,26 @@ fieldset {
     }
 }
 
+.modal-dialog.job-shifts-dialog {
+  max-width: 100%;
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.job-shifts-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
 /**=====================
     2.21 Modal CSS end
 ==========================**/
