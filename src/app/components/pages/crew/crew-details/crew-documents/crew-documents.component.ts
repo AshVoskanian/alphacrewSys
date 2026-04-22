@@ -19,6 +19,7 @@ import { CrewDetail } from "../../../../../shared/interface/crew";
 import { finalize } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { CrewService } from "../../crew.service";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-crew-documents',
@@ -37,6 +38,8 @@ export class CrewDocumentsComponent extends ApiBase implements OnInit, OnChanges
   crewDetail = input<CrewDetail>();
 
   loading = signal<boolean>(false);
+  commentDraft = signal<string>('');
+  commentSaving = signal<boolean>(false);
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [

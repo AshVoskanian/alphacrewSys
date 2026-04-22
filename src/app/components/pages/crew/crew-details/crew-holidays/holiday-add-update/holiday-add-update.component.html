@@ -22,7 +22,24 @@
           </div>
         </div>
 
-        <ngx-editor autofocus [editor]="editor" formControlName="comment" [placeholder]="'Comment...'"></ngx-editor>
+        <div>
+          <label class="form-label" for="holidayComment">Comment</label>
+          <input
+            id="holidayComment"
+            type="text"
+            #instance="ngbTypeahead"
+            class="form-control"
+            formControlName="comment"
+            [ngbTypeahead]="search"
+            [editable]="true"
+            [inputFormatter]="inputFormatter"
+            [resultFormatter]="resultFormatter"
+            [container]="'custom-scrollbar'"
+            (focus)="focus$.next($any($event).target.value)"
+            (click)="click$.next($any($event).target.value)"
+            placeholder="Choose from the list or type your own…"
+          />
+        </div>
       </div>
 
       <div class="flex items-center justify-content-end m-t-12 w-100">
