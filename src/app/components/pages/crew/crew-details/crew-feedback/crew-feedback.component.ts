@@ -54,6 +54,7 @@ export class CrewFeedbackComponent extends ApiBase implements OnChanges {
                 Attitude: ${ it.attitude }
               `,
               date: it.modifiedDate,
+              dateDesc: it.modifiedBy,
               desc: it.ratingtext || '---'
             }))
           )
