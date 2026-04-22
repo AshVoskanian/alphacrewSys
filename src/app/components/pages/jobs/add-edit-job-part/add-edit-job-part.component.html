@@ -130,7 +130,7 @@
                 </div>
               </div>
               <div class="row g-3 p-t-10">
-                <div class="col">
+                <div class="col-12">
                   <label class="form-label">Required skills:</label>
                   @if (skillsLoading()) {
                     <div class="form-control bg-light animate-pulse" style="min-height: 38px;"></div>
@@ -140,6 +140,16 @@
                       [options]="skillListOptions()"
                       placeholder="Add skill"
                     />
+                  }
+                  @if (showSkillsNotesBlock()) {
+                    <label class="form-label m-t-10" for="additionalSkilledServiceText">Skills Notes</label>
+                    <textarea
+                      id="additionalSkilledServiceText"
+                      class="form-control form-control-sm"
+                      rows="2"
+                      formControlName="skillsNotes"
+                      placeholder="Generated from required skills; you can edit before save."
+                    ></textarea>
                   }
                 </div>
 

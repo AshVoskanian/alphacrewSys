@@ -23,20 +23,20 @@
           rows="4"
           [value]="commentDraft()"
           (input)="commentDraft.set($any($event.target).value)"
-          placeholder="ჯერ არაფერს არ აკეთებს ეს კომენტარი"
+          placeholder="Comment"
         ></textarea>
-<!--        <div class="flex justify-content-end">-->
-<!--          <button-->
-<!--            type="button"-->
-<!--            class="btn btn-primary h-36 w-130 position-relative"-->
-<!--            [disabled]="loading() || commentSaving()"-->
-<!--          >-->
-<!--            Save-->
-<!--            @if (commentSaving()) {-->
-<!--              <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>-->
-<!--            }-->
-<!--          </button>-->
-<!--        </div>-->
+        <div class="flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-primary h-36 w-130 position-relative"
+            [disabled]="loading() || commentSaving()"
+          >
+            Save
+            @if (commentSaving()) {
+              <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+            }
+          </button>
+        </div>
       </div>
 
       <input class="hidden" hidden #file (change)="uploadFile($event)" type="file">
