@@ -127,7 +127,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                 this.fillArray(it.crews, it.crewNumber);
               });
               this.scheduleService.shiftsLoaded.next(true);
-              console.log(this.scheduleService.shifts);
             }
           }
         }

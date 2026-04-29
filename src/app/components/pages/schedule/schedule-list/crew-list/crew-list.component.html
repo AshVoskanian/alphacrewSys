@@ -198,11 +198,14 @@
     @if (listLoading$ | async) {
       Loading...
     } @else {
+      @let clashJobPartIds = getSelectedData('jobParts');
       <ul class="list-group justify-content-between overflow-y-auto custom-scrollbar min-h-100"
           [style.max-height]="maxHeight">
         @for (crew of assignedCrewRows; track crew.crewId) {
+          @let noSlotOnSelectedParts = crewUnavailableForJobParts(crew, clashJobPartIds);
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3"
-              [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned">
+              [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned"
+              [ngbTooltip]="noSlotOnSelectedParts ? 'No availability on one or more selected job parts' : null">
             @if (crew.jobNotes) {
               <i class="fa-solid fa-tag position-absolute" style="left:0; top: -3px" [ngbTooltip]="crew.jobNotes"></i>
             }
@@ -220,7 +223,7 @@
                   <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
                 } @else {
                   <p class="badge pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
-                     [ngClass]="getBadgeClass(crew)"
+                     [ngClass]="getBadgeClass(crew, noSlotOnSelectedParts)"
                      style="line-height: 15px;">
                     @if (crew.holiday > 0) {
                       <span [ngbTooltip]="'Holiday'">H</span>
@@ -240,7 +243,7 @@
                   <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
                 } @else {
                   <p class="badge l-h-15 pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
-                     [ngClass]="getBadgeClass(crew)" [ngbTooltip]="ratingInfo">
+                     [ngClass]="getBadgeClass(crew, noSlotOnSelectedParts)" [ngbTooltip]="ratingInfo">
                     <i class="fa-solid fa-info text-light m-0"></i>
                   </p>
 
@@ -330,8 +333,10 @@
           </li>
         }
         @for (crew of selectableCrewRows; track crew.crewId) {
+          @let noSlotOnSelectedParts = crewUnavailableForJobParts(crew, clashJobPartIds);
           <li class="common-flex justify-content-between align-items-center list-group-item border-bottom p-x-10 p-y-3"
-              [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned">
+              [class.bg-dark]="crew.isChecked && !crew.isAlreadyAssigned"
+              [ngbTooltip]="noSlotOnSelectedParts ? 'No availability on one or more selected job parts' : null">
             @if (crew.jobNotes) {
               <i class="fa-solid fa-tag position-absolute" style="left:0; top: -3px" [ngbTooltip]="crew.jobNotes"></i>
             }
@@ -349,7 +354,7 @@
                   <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
                 } @else {
                   <p class="badge pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
-                     [ngClass]="getBadgeClass(crew)"
+                     [ngClass]="getBadgeClass(crew, noSlotOnSelectedParts)"
                      style="line-height: 15px;">
                     @if (crew.holiday > 0) {
                       <span [ngbTooltip]="'Holiday'">H</span>
@@ -369,7 +374,7 @@
                   <i class="fas fa-spin fa-spinner f-15 m-0 m-r-10"></i>
                 } @else {
                   <p class="badge l-h-15 pointer h-15 min-w-15 w-15 text-center rounded-circle p-0 m-0 m-r-10"
-                     [ngClass]="getBadgeClass(crew)" [ngbTooltip]="ratingInfo">
+                     [ngClass]="getBadgeClass(crew, noSlotOnSelectedParts)" [ngbTooltip]="ratingInfo">
                     <i class="fa-solid fa-info text-light m-0"></i>
                   </p>
 

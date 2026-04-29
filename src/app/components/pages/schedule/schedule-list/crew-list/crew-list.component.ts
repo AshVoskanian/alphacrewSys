@@ -34,7 +34,10 @@ import {
   ShiftCrewDetails
 } from "../../../../../shared/interface/schedule";
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
-import { CrewFilterPipe } from "../../../../../shared/pipes/crew-filter.pipe";
+import {
+  CrewFilterPipe,
+  crewIsUnavailableForSelectedJobParts
+} from "../../../../../shared/pipes/crew-filter.pipe";
 import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
@@ -131,6 +134,13 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
   jobPartClashing: Array<JobPartClashing> = [];
 
+  /**
+   * Fixed chrome subtracted from 100dvh for the scrollable crew list: offcanvas header, region/level
+   * rows, both cards (padding + second card toolbar), form margins, panel padding (~12px sides).
+   * Kept separate from #crewManager height so the list can grow on small screens.
+   */
+  private readonly crewListViewportReservePx = 380;
+
   ngOnInit() {
     this.getSelectedSchedule();
   }
@@ -179,13 +189,16 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   get maxHeight(): string {
-    const offsetHeight = (this.crewManager?.nativeElement?.offsetHeight - 50) || 0;
+    const managerEl = this.crewManager?.nativeElement;
+    const reserve = this.crewListViewportReservePx;
 
-    if (this.crewManager?.nativeElement?.offsetHeight < 200 || !this.crewManager?.nativeElement?.offsetHeight) {
-      return `calc(100dvh - ${ 530 }px)`;
+    // No job-part table yet (#crewManager only exists when jobPartClashing has rows)
+    if (!managerEl) {
+      return `max(10rem, calc(100dvh - ${reserve}px))`;
     }
 
-    return `calc(100dvh - ${ offsetHeight + 530 }px)`;
+    const managerHeight = managerEl.offsetHeight;
+    return `max(10rem, calc(100dvh - ${managerHeight + reserve}px))`;
   }
 
   /**
@@ -205,6 +218,11 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       this.getSelectedData('jobParts'),
       this.searchKey
     );
+  }
+
+  /** Used with `@let jpIds = getSelectedData('jobParts')` so availability is computed once per list, not per binding. */
+  crewUnavailableForJobParts(crew: Crew, jobPartIds: number[]): boolean {
+    return crewIsUnavailableForSelectedJobParts(crew, jobPartIds);
   }
 
   getAlreadyAssignedCrewCountByLevel(levelId: number) {
@@ -579,7 +597,11 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     return this.jobPartClashing?.some(p => p.checked) && !this.isAllSelected();
   }
 
-  getBadgeClass(crew: Crew): string {
+  getBadgeClass(crew: Crew, noSlotOnSelectedParts = false): string {
+    if (noSlotOnSelectedParts) {
+      return 'badge-danger';
+    }
+
     if (crew.conflict > 0) {
       return 'badge-danger'
     }
