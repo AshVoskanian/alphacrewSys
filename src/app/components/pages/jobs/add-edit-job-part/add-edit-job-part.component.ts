@@ -169,14 +169,14 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   readonly hoursOptions = signal<Select2Option[]>(
     Array.from({ length: 14 }, (_, i) => {
-      const hours = i + 2;
+      const hours = i;
       return { value: hours, label: `${ hours } Hour${ hours !== 1 ? 's' : '' }` };
     })
   );
 
   readonly crewOptions = signal<Select2Option[]>(
     Array.from({ length: 24 }, (_, i) => {
-      const crew = i + 1;
+      const crew = i;
       return { value: crew, label: `${ crew } Crew` };
     })
   );
