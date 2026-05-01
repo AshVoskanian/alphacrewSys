@@ -15,6 +15,35 @@
     </div>
   } @else {
     <div class="flex flex-col p-t-30 gap-20 justify-content-end">
+      <div class="flex flex-col gap-12 w-100">
+        <label class="form-label m-b-0" for="crewDocumentsComment">
+          Comment <span class="text-danger" aria-hidden="true">*</span>
+        </label>
+        <textarea
+          id="crewDocumentsComment"
+          class="form-control"
+          rows="4"
+          required
+          aria-required="true"
+          [value]="commentDraft()"
+          (input)="commentDraft.set($any($event.target).value)"
+          placeholder="Comment (required)"
+        ></textarea>
+        <div class="flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-primary h-36 w-130 position-relative"
+            [disabled]="loading() || commentSaving() || !commentDraft().trim()"
+            (click)="saveComment()"
+          >
+            Save
+            @if (commentSaving()) {
+              <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+            }
+          </button>
+        </div>
+      </div>
+
       <input class="hidden" hidden #file (change)="uploadFile($event)" type="file">
       <button type="button" class="btn btn-primary w-300 h-36" (click)="file.click()">
         Choose File

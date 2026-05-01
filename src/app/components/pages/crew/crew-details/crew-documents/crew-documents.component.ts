@@ -2,12 +2,10 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  effect,
   inject,
   input,
-  OnChanges,
-  OnInit,
   signal,
-  SimpleChanges,
   WritableSignal
 } from '@angular/core';
 import { TableComponent } from "../../../../../shared/components/ui/table/table.component";
@@ -28,7 +26,7 @@ import { CrewService } from "../../crew.service";
   templateUrl: './crew-documents.component.html',
   styleUrl: './crew-documents.component.scss'
 })
-export class CrewDocumentsComponent extends ApiBase implements OnInit, OnChanges {
+export class CrewDocumentsComponent extends ApiBase {
   private readonly _dr = inject(DestroyRef);
   private readonly _http = inject(HttpClient);
   private readonly _crewService = inject(CrewService);
@@ -37,6 +35,8 @@ export class CrewDocumentsComponent extends ApiBase implements OnInit, OnChanges
   crewDetail = input<CrewDetail>();
 
   loading = signal<boolean>(false);
+  commentDraft = signal<string>('');
+  commentSaving = signal<boolean>(false);
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
@@ -48,13 +48,58 @@ export class CrewDocumentsComponent extends ApiBase implements OnInit, OnChanges
     data: [] as any[]
   });
 
-  ngOnInit() {
+  constructor(http: HttpClient) {
+    super(http);
+    effect(() => {
+      const detail = this.crewDetail();
+      if (!detail) {
+        this.commentDraft.set('');
+        return;
+      }
+      this.commentDraft.set(detail.documents ?? '');
+      if (detail.crewId != null && detail.crewId > 0) {
+        this.getDocuments(detail);
+      }
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes && changes['crewDetail'] && changes['crewDetail'].currentValue) {
-      this.getDocuments(this.crewDetail());
+  saveComment(): void {
+    const detail = this.crewDetail();
+    const crewId = detail?.crewId;
+    if (crewId == null || crewId <= 0) {
+      GeneralService.showErrorMessage('No crew selected.');
+      return;
     }
+
+    if (this.commentSaving()) {
+      return;
+    }
+
+    const documentNote = this.commentDraft().trim();
+    if (!documentNote) {
+      GeneralService.showErrorMessage('Comment is required.');
+      return;
+    }
+
+    this.commentSaving.set(true);
+
+    this.post<unknown>('Crew/AddCrewDocumentsNote', { crewId, documentNote })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.commentSaving.set(false))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          GeneralService.showSuccessMessage('Comment saved');
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Failed to save comment');
+        },
+      });
   }
 
   getDocuments(crewDetail: CrewDetail) {

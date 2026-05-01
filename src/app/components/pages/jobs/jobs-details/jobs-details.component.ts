@@ -10,10 +10,9 @@ import { GeneralService } from "../../../../shared/services/general.service";
 import { EditJobComponent } from "../edit-job/edit-job.component";
 import { AddPaymentResponse, JobDetails, JobPartRateCard, JobScheduleWarning } from "../../../../shared/interface/jobs";
 import { NgbPopover, NgbTooltip } from "@ng-bootstrap/ng-bootstrap";
-import { CurrencyPipe, DatePipe } from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
-import { Schedule } from "../../../../shared/interface/schedule";
 import { JobPartLog } from "../../../../shared/interface/activity";
 
 @Component({
@@ -24,7 +23,6 @@ import { JobPartLog } from "../../../../shared/interface/activity";
     EditJobComponent,
     NgbTooltip,
     CurrencyPipe,
-    DatePipe,
     FormsModule,
     ReactiveFormsModule,
     ActivityComponent,

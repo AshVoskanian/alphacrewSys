@@ -39,8 +39,6 @@ import {
   NgbAlertModule,
   NgbDropdownModule,
   NgbModal,
-  NgbOffcanvas,
-  NgbOffcanvasRef,
   NgbPopover,
   NgbPopoverModule,
   NgbTooltipModule
@@ -71,7 +69,7 @@ import { LegacySystemService } from "../../../../../shared/services/legacy-syste
   selector: 'app-schedule-list-job-scoped',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink, CrewListComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list-job-scoped.component.html',
   styleUrl: './schedule-list-job-scoped.component.scss'
@@ -81,7 +79,6 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   private _modal = inject(NgbModal);
   private _clipboard = inject(Clipboard);
   private _navService = inject(NavService);
-  private _offCanvasService = inject(NgbOffcanvas);
   private _activatedRouter = inject(ActivatedRoute);
   private _scheduleService = inject(ScheduleService);
   readonly legacySystemService = inject(LegacySystemService);
@@ -94,7 +91,8 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   @ViewChildren('itemBlock') itemBlocks!: QueryList<ElementRef>;
   @ViewChild('sendSmsToCrewModal') sendSmsToCrewModal: SendSmsToCrewComponent;
 
-  private offcanvasRef?: NgbOffcanvasRef;
+  /** Inline crew picker panel (job modal); not NgbOffcanvas. */
+  crewPanelOpen = signal(false);
 
   @Input() list: Array<Schedule> = [];
   @Output() openJobsShifts: EventEmitter<Schedule> = new EventEmitter<Schedule>();
@@ -338,26 +336,24 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
     }
     e?.stopPropagation();
 
-    if ((crew && crew.isActive) || this.offcanvasRef) {
-      return
+    if ((crew && crew.isActive) || this.crewPanelOpen()) {
+      return;
     }
 
-    this.offcanvasRef = this._offCanvasService.open(CrewListComponent, {
-      scroll: false,
-      backdrop: true,
-      container: null,
-      panelClass: 'common-offcanvas custom-off-canvas'
-    });
     this.crewList().forEach(it => {
       it.isChecked = false;
       it.jobPartIds = []
     });
-    this.offcanvasRef.componentInstance.crewList = this.crewList();
-    this.offcanvasRef.componentInstance.isJobScoped = true;
+    // CrewList უკვე DOM-შია: selectSchedule ჯერ გაეშვა და sync-მა დააყენა isChecked, შემდეგ forEach გაასუფთავა.
+    // ხელახლა ემიტი — რომ syncCrewlistFlagsFromSelectedSchedule ისევ გაუშვას და assigned ჩეკები დაბრუნდეს.
+    if (schedule) {
+      this.selectSchedule(schedule);
+    }
+    this.crewPanelOpen.set(true);
+  }
 
-    this.offcanvasRef.result.finally(() => {
-      this.offcanvasRef = undefined;
-    });
+  closeCrewPanel(): void {
+    this.crewPanelOpen.set(false);
   }
 
   getCrewList() {
@@ -370,9 +366,6 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
         next: (res) => {
           this._scheduleService.crewListLoading.next(false);
           this.crewList.set(res.data);
-          if (this.offcanvasRef) {
-            this.offcanvasRef.componentInstance.crewList = this.crewList();
-          }
         }
       })
   }
@@ -427,7 +420,9 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
+          crew.loading = false;
           if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
             return;
           }
 

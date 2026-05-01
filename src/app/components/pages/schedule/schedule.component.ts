@@ -114,7 +114,11 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                 }
               );
               this.scheduleService.jobScopedShiftsLoaded.next(true);
-              this._modal.open(this.scheduleModal, { centered: true, fullscreen: true });
+              this._modal.open(this.scheduleModal, {
+                centered: true,
+                fullscreen: true,
+                modalDialogClass: 'job-shifts-dialog'
+              });
               const url = `/schedule?jobId=${ jobId }`;
               window.history.pushState({}, '', url);
             } else {
@@ -123,7 +127,6 @@ export class ScheduleComponent extends ApiBase implements OnInit {
                 this.fillArray(it.crews, it.crewNumber);
               });
               this.scheduleService.shiftsLoaded.next(true);
-              console.log(this.scheduleService.shifts);
             }
           }
         }
