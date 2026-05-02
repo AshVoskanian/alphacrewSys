@@ -155,7 +155,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
       { title: 'Skills', field_value: 'skills' },
       { title: 'Ends', field_value: 'ends' },
       { title: 'Net', field_value: 'netFormatted' },
-      { title: 'Gross', field_value: 'grossFormatted' }
+      { title: 'Gross', field_value: 'grossFormatted' },
+      { title: 'Tags', field_value: 'tag' }
     ],
     row_action_before: [
       {
@@ -748,6 +749,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
     const tableData = jobParts.map(part => ({
       ...part,
       id: part.jobPartId,
+      tag: 'ashot',
       typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
       warningIcon: this.getJobPartWarningIcon(part),
       skills: this.getSkillsString(part),
