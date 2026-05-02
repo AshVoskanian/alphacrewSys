@@ -21,17 +21,19 @@ import {
   JobPart,
   JobPartRateCard,
   JobPartResponse,
+  JobPartTagItem,
+  AddOrUpdateJobPartTagRequest,
   JobScheduleWarning,
   JobVenue,
   PartialPayment
 } from "../../../../shared/interface/jobs";
 import { AddPaymentComponent } from "../add-payment/add-payment.component";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
 import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, OperatorFunction, Subject } from "rxjs";
 import { GeneralService } from "../../../../shared/services/general.service";
 import Swal from 'sweetalert2';
 import { RateCard } from "../../../../shared/interface/clients";
@@ -44,7 +46,8 @@ import {
   NgbPopover,
   NgbPopoverModule,
   NgbTooltip,
-  NgbTypeahead
+  NgbTypeahead,
+  NgbTypeaheadSelectItemEvent
 } from "@ng-bootstrap/ng-bootstrap";
 import { TableComponent } from "../../../../shared/components/ui/table/table.component";
 import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
@@ -57,6 +60,7 @@ import { JobPartLog } from "../../../../shared/interface/activity";
   selector: 'app-edit-job',
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     Select2Module,
     NgbTooltip,
     NgbTypeahead,
@@ -140,6 +144,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
   deletingDocument = signal<string | null>(null);
   downloadingDocument = signal<string | null>(null);
   deletingPartialPayment = signal<number | null>(null);
+  deletingJobPartTagId = signal<number | null>(null);
+  savingJobPartTagId = signal<number | null>(null);
 
   form: FormGroup;
 
@@ -156,7 +162,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       { title: 'Ends', field_value: 'ends' },
       { title: 'Net', field_value: 'netFormatted' },
       { title: 'Gross', field_value: 'grossFormatted' },
-      { title: 'Tags', field_value: 'tag' }
+      { title: 'Tags', field_value: 'jobPartTag', type: 'template' }
     ],
     row_action_before: [
       {
@@ -188,6 +194,37 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   public focus$ = new Subject<string>();
   public click$ = new Subject<string>();
+  /** Re-emits on tag input focus so typeahead shows all suggestions before typing (see venue `search`). */
+  public jobPartTagTypeaheadFocus$ = new Subject<string>();
+
+  /** Distinct tag strings from `jobDetails.jobPartTags` (for typeahead). */
+  jobPartTagSuggestions: WritableSignal<string[]> = signal<string[]>([]);
+
+  tagEditDraft = '';
+  private tagPopoverRow: { jobPartId: number } | null = null;
+  private readonly tagDraftByJobPartId = new Map<number, string>();
+  private readonly tagPopoverInitialByPartId = new Map<number, string>();
+  private activeJobPartTagPopover: NgbPopover | null = null;
+  /** When editing a single persisted tag row, its API id; otherwise `null` (new tag → request `id: 0`). */
+  private tagPopoverBackendTagId: number | null = null;
+  /** True after Done successfully applied (or no-op); popover `hidden` skips reverting the row. */
+  private tagPopoverCommitted = false;
+  /** Part id whose tag popover is open (for Done button disabled state). */
+  tagPopoverOpenPartId = signal<number | null>(null);
+
+  readonly jobPartTagTypeahead: OperatorFunction<string, readonly string[]> = (text$: Observable<string>) => {
+    const debouncedText$ = text$.pipe(debounceTime(200), distinctUntilChanged());
+    return merge(debouncedText$, this.jobPartTagTypeaheadFocus$).pipe(
+      map(term => {
+        const q = (term ?? '').toLowerCase().trim();
+        const pool = this.jobPartTagSuggestions();
+        const filtered = q
+          ? pool.filter(s => s.toLowerCase().includes(q))
+          : pool;
+        return filtered.slice(0, 25);
+      })
+    );
+  };
 
   constructor() {
     const http = inject(HttpClient);
@@ -737,7 +774,10 @@ export class EditJobComponent extends ApiBase implements OnInit {
       });
   }
 
-  updateJobPartsTable(jobParts: JobPart[]) {
+  updateJobPartsTable(jobParts: JobPart[] | undefined) {
+    const catalogTags = this.jobDetails()?.jobPartTags ?? [];
+    this.refreshJobPartTagSuggestions(catalogTags);
+
     if (!jobParts?.length) {
       this.jobPartsTableConfig.update(config => ({
         ...config,
@@ -746,22 +786,243 @@ export class EditJobComponent extends ApiBase implements OnInit {
       return;
     }
 
-    const tableData = jobParts.map(part => ({
-      ...part,
-      id: part.jobPartId,
-      tag: 'ashot',
-      typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
-      warningIcon: this.getJobPartWarningIcon(part),
-      skills: this.getSkillsString(part),
-      travelFormatted: this.getTravelFormatted(part.ootCost, part.currencySign),
-      netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
-      grossFormatted: this.formatCurrency(part.quoteCostVat, part.currencySign)
-    }));
+    const tableData = jobParts.map(part => {
+      const nested = part.jobPartTag;
+      const tagText = (nested?.tag ?? '').trim();
+      const lineItems = tagText && nested ? [ nested ] : [];
+      return {
+        ...part,
+        id: part.jobPartId,
+        tagLineItems: lineItems,
+        tagDisplay: this.resolveJobPartTagDisplay(part),
+        typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
+        warningIcon: this.getJobPartWarningIcon(part),
+        skills: this.getSkillsString(part),
+        travelFormatted: this.getTravelFormatted(part.ootCost, part.currencySign),
+        netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
+        grossFormatted: this.formatCurrency(part.quoteCostVat, part.currencySign)
+      };
+    });
 
     this.jobPartsTableConfig.update(config => ({
       ...config,
       data: tableData
     }));
+  }
+
+  prepareJobPartTagPopover(row: { jobPartId: number; tagDisplay?: string; tagLineItems?: JobPartTagItem[] }): void {
+    this.tagPopoverCommitted = false;
+    this.tagPopoverRow = row;
+    const items = row.tagLineItems ?? [];
+    this.tagPopoverBackendTagId = items.length === 1 ? items[0].id : null;
+    const synced = row.tagDisplay ?? '';
+    this.tagPopoverInitialByPartId.set(row.jobPartId, synced);
+    this.tagDraftByJobPartId.set(row.jobPartId, synced);
+    this.tagEditDraft = synced;
+    this.tagPopoverOpenPartId.set(row.jobPartId);
+  }
+
+  onJobPartTagDraftChange(value: string): void {
+    const id = this.tagPopoverRow?.jobPartId;
+    if (id == null) {
+      return;
+    }
+    this.tagDraftByJobPartId.set(id, value);
+    this.tagEditDraft = value;
+  }
+
+  onJobPartTagTriggerClick(popover: NgbPopover, row: { jobPartId: number; tagDisplay?: string; tagLineItems?: JobPartTagItem[] }, event: Event): void {
+    event.stopPropagation();
+    if (popover.isOpen()) {
+      this.activeJobPartTagPopover = null;
+      popover.close();
+      return;
+    }
+    this.prepareJobPartTagPopover(row);
+    this.activeJobPartTagPopover = popover;
+    popover.open();
+  }
+
+  onJobPartTagPopoverHidden(jobPartId: number): void {
+    const initialRaw = this.tagPopoverInitialByPartId.get(jobPartId) ?? '';
+
+    if (!this.tagPopoverCommitted) {
+      this.revertJobPartTagDisplay(jobPartId, initialRaw);
+    }
+
+    this.tagPopoverCommitted = false;
+    this.tagDraftByJobPartId.delete(jobPartId);
+    this.tagPopoverInitialByPartId.delete(jobPartId);
+    this.activeJobPartTagPopover = null;
+    this.tagPopoverOpenPartId.set(null);
+    this.tagPopoverBackendTagId = null;
+
+    if (this.tagPopoverRow?.jobPartId === jobPartId) {
+      this.tagPopoverRow = null;
+    }
+  }
+
+  commitJobPartTagFromPopover(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const jobPartId = this.tagPopoverRow?.jobPartId;
+    const popover = this.activeJobPartTagPopover;
+    if (jobPartId == null || !popover) {
+      return;
+    }
+
+    const initialRaw = this.tagPopoverInitialByPartId.get(jobPartId) ?? '';
+    const initialTrim = initialRaw.trim();
+    const raw = this.tagDraftByJobPartId.get(jobPartId) ?? this.tagEditDraft ?? '';
+    const value = raw.trim();
+
+    if (value === initialTrim) {
+      this.tagPopoverCommitted = true;
+      popover.close();
+      return;
+    }
+
+    if (!value) {
+      this.tagPopoverCommitted = true;
+      popover.close();
+      return;
+    }
+
+    const jobId = this.jobDetails()?.jobId;
+    const part = this.jobDetails()?.jobParts?.find(p => p.jobPartId === jobPartId);
+    if (!jobId || !part?.startDate) {
+      GeneralService.showErrorMessage('Could not save tag: missing job or part.');
+      return;
+    }
+
+    const payload: AddOrUpdateJobPartTagRequest = {
+      id: this.tagPopoverBackendTagId ?? 0,
+      jobId,
+      jobPartId,
+      tag: value,
+      jobPartStartDate: this.toJobPartTagStartDateIso(part.startDate)
+    };
+
+    this.savingJobPartTagId.set(jobPartId);
+
+    this.post<unknown, AddOrUpdateJobPartTagRequest>('Jobs/AddOrUpdateJobPartTag', payload)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.savingJobPartTagId.set(null))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.jobPartsTableConfig.update(config => ({
+            ...config,
+            data: config.data.map(item =>
+              item.jobPartId === jobPartId
+                ? { ...item, tagDisplay: value, tagLineItems: item.tagLineItems ?? [] }
+                : item
+            )
+          }));
+          this.tagPopoverCommitted = true;
+          GeneralService.showSuccessMessage('Tag saved');
+          this.mergeJobPartTagSuggestion(value);
+          this.jobPartsUpdated.emit();
+          popover.close();
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Could not save tag');
+        }
+      });
+  }
+
+  private toJobPartTagStartDateIso(startDate: string): string {
+    const d = new Date(startDate);
+    return Number.isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+  }
+
+  private revertJobPartTagDisplay(jobPartId: number, tagDisplay: string): void {
+    this.jobPartsTableConfig.update(config => ({
+      ...config,
+      data: config.data.map(item =>
+        item.jobPartId === jobPartId
+          ? { ...item, tagDisplay, tagLineItems: item.tagLineItems ?? [] }
+          : item
+      )
+    }));
+  }
+
+  onJobPartTagTypeaheadSelect(event: NgbTypeaheadSelectItemEvent<string>): void {
+    const id = this.tagPopoverRow?.jobPartId;
+    this.tagEditDraft = event.item;
+    if (id != null) {
+      this.tagDraftByJobPartId.set(id, event.item);
+    }
+  }
+
+  deleteJobPartTagById(event: Event, tagId: number): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.deletingJobPartTagId.set(tagId);
+
+    this.get<unknown>('Jobs/RemoveJobPartTag', { tagId })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.deletingJobPartTagId.set(null))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Tag removed');
+          this.updateJobPartsTable(this.jobDetails()?.jobParts);
+          this.jobPartsUpdated.emit();
+        }
+      });
+  }
+
+  clearLocalJobPartTag(event: Event, jobPartId: number): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.tagDraftByJobPartId.delete(jobPartId);
+    this.jobPartsTableConfig.update(config => ({
+      ...config,
+      data: config.data.map(item =>
+        item.jobPartId === jobPartId ? { ...item, tagDisplay: '', tagLineItems: [] } : item
+      )
+    }));
+  }
+
+  private refreshJobPartTagSuggestions(items: JobPartTagItem[]): void {
+    const uniq = [
+      ...new Set(items.map(i => (i.tag ?? '').trim()).filter(Boolean))
+    ].sort((a, b) => a.localeCompare(b));
+    this.jobPartTagSuggestions.set(uniq);
+  }
+
+  private mergeJobPartTagSuggestion(value: string): void {
+    if (!value) {
+      return;
+    }
+    const cur = this.jobPartTagSuggestions();
+    if (cur.some(x => x.toLowerCase() === value.toLowerCase())) {
+      return;
+    }
+    this.jobPartTagSuggestions.update(arr => [ ...arr, value ].sort((a, b) => a.localeCompare(b)));
+  }
+
+  private resolveJobPartTagDisplay(part: JobPart): string {
+    const nested = (part.jobPartTag?.tag ?? '').trim();
+    if (nested) {
+      return nested;
+    }
+    return (part.tag ?? '').trim();
   }
 
   formatCurrency(value: number, currencySign: string): string {
