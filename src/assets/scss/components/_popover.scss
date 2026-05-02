@@ -3,6 +3,7 @@
 ==========================**/
 // popover
 .popover {
+  z-index: 10050 !important;
   background-color: $white;
   border: none;
   -webkit-box-shadow: 0 0 20px rgba($primary-color, 0.1);

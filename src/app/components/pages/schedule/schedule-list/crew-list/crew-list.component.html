@@ -1,6 +1,6 @@
 <div class="div" (click)="$event.stopPropagation()">
   <div class="offcanvas-header justify-content-between p-y-10 p-x-0 gap-12 align-items-start">
-    <div class="max-w-650">
+    <div class="w-650">
       <p class="f-14 m-0 txt-primary">
         {{ selectedSchedule?.startDate |  date: 'dd MMM yyy':'': 'en' }},
         {{ selectedSchedule?.startDate | date: 'HH:mm' }} -  {{ selectedSchedule?.endDate | date: 'HH:mm' }}
@@ -177,6 +177,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer"
                    [ngbPopover]="popoverContentAll"
+                   container="body"
                    [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>
@@ -215,6 +216,7 @@
                    (click)="getCrewDetails(crew, popoverRef)"
                    #popoverRef="ngbPopover"
                    triggers="manual"
+                   container="body"
                    [popperOptions]=""
                    [popoverClass]="'wide-popover border border-2 bg-dark'"
                    [ngbPopover]="crewDetailsRef"
@@ -317,6 +319,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer m-l-10"
                    [ngbPopover]="popoverContent"
+                   container="body"
                    [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>
@@ -346,6 +349,7 @@
                    (click)="getCrewDetails(crew, popoverRef)"
                    #popoverRef="ngbPopover"
                    triggers="manual"
+                   container="body"
                    [popperOptions]=""
                    [popoverClass]="'wide-popover border border-2 bg-dark'"
                    [ngbPopover]="crewDetailsRef"
@@ -448,6 +452,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer m-l-10"
                    [ngbPopover]="popoverContent"
+                   container="body"
                    [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>

@@ -2021,6 +2021,8 @@ $i: 1;
 }
 
 ::ng-deep .popover {
+  /* Above .common-offcanvas (9999); needed when popover uses container="body" */
+  z-index: 10050 !important;
   width: max-content !important;
   max-width: none !important;
   min-width: unset !important;
