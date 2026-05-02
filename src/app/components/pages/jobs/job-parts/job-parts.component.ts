@@ -380,18 +380,6 @@ export class JobPartsComponent extends ApiBase {
       });
   }
 
-  clearLocalJobPartTag(event: Event, jobPartId: number): void {
-    event.stopPropagation();
-    event.preventDefault();
-    this.tagDraftByJobPartId.delete(jobPartId);
-    this.jobPartsTableConfig.update(config => ({
-      ...config,
-      data: config.data.map(item =>
-        item.jobPartId === jobPartId ? { ...item, tagDisplay: '', tagLineItems: [] } : item
-      )
-    }));
-  }
-
   private refreshJobPartTagSuggestions(items: JobPartTagItem[]): void {
     const uniq = [
       ...new Set(items.map(i => (i.tag ?? '').trim()).filter(Boolean))

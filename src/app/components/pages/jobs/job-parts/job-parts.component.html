@@ -2,7 +2,7 @@
   <div class="col-12">
     @if (jobPartsTableConfig().data?.length) {
       <ng-template #jobPartTagCell let-details>
-        <div class="d-inline-flex align-items-center gap-1 flex-wrap">
+        <div class="d-inline-flex align-items-center gap-5 flex-wrap">
           <button
             type="button"
             class="btn btn-link p-0 m-0 align-middle txt-primary"
@@ -22,7 +22,7 @@
             } @else if (details.tagDisplay) {
               <span class="text-decoration-underline">{{ details.tagDisplay }}</span>
             } @else {
-              <span class="d-inline-flex align-items-center gap-1" title="Add tag">
+              <span class="d-inline-flex align-items-center gap-5" title="Add tag">
                 <i class="fa-solid fa-tag f-14" aria-hidden="true"></i>
                 <span class="f-12 txt-secondary fw-normal">Add tag</span>
               </span>
@@ -44,16 +44,6 @@
                 }
               </button>
             }
-          } @else if (details.tagDisplay?.trim()) {
-            <button
-              type="button"
-              class="btn btn-link p-0 m-0 align-middle txt-danger"
-              [disabled]="savingJobPartTagId() === details.jobPartId"
-              (click)="clearLocalJobPartTag($event, details.jobPartId)"
-              title="Remove tag"
-            >
-              <i class="fa-solid fa-times f-14"></i>
-            </button>
           }
         </div>
       </ng-template>
