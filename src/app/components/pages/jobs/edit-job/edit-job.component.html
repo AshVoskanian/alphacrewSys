@@ -298,126 +298,13 @@
 
   <div class="main-divider m-y-12"></div>
 
-  <!-- Job Parts Table Section -->
-  <div class="row g-3">
-    <div class="col-12">
-      @if (jobPartsTableConfig().data?.length) {
-        <ng-template #jobPartTagCell let-details>
-          <div class="d-inline-flex align-items-center gap-1 flex-wrap">
-            <button
-              type="button"
-              class="btn btn-link p-0 m-0 align-middle txt-primary"
-              #jobPartTagPop="ngbPopover"
-              [ngbPopover]="jobPartTagPopoverTpl"
-              triggers="manual"
-              placement="auto"
-              [autoClose]="false"
-              container="body"
-              popoverClass="job-part-tag-popover shadow"
-              [disabled]="savingJobPartTagId() === details.jobPartId"
-              (click)="onJobPartTagTriggerClick(jobPartTagPop, details, $event)"
-              (hidden)="onJobPartTagPopoverHidden(details.jobPartId)"
-            >
-              @if (savingJobPartTagId() === details.jobPartId) {
-                <i class="fa-solid fa-spinner fa-spin f-14" title="Saving…"></i>
-              } @else if (details.tagDisplay) {
-                <span class="text-decoration-underline">{{ details.tagDisplay }}</span>
-              } @else {
-                <span class="d-inline-flex align-items-center gap-1" title="Add tag">
-                  <i class="fa-solid fa-tag f-14" aria-hidden="true"></i>
-                  <span class="f-12 txt-secondary fw-normal">Add tag</span>
-                </span>
-              }
-            </button>
-            @if (details.tagLineItems?.length) {
-              @for (t of details.tagLineItems; track t.id) {
-                <button
-                  type="button"
-                  class="btn btn-link p-0 m-0 align-middle txt-danger"
-                  [disabled]="deletingJobPartTagId() === t.id || savingJobPartTagId() === details.jobPartId"
-                  (click)="deleteJobPartTagById($event, t.id)"
-                  title="Remove tag"
-                >
-                  @if (deletingJobPartTagId() === t.id) {
-                    <i class="fa-solid fa-spinner fa-spin f-12"></i>
-                  } @else {
-                    <i class="fa-solid fa-times f-14"></i>
-                  }
-                </button>
-              }
-            } @else if (details.tagDisplay?.trim()) {
-              <button
-                type="button"
-                class="btn btn-link p-0 m-0 align-middle txt-danger"
-                [disabled]="savingJobPartTagId() === details.jobPartId"
-                (click)="clearLocalJobPartTag($event, details.jobPartId)"
-                title="Remove tag"
-              >
-                <i class="fa-solid fa-times f-14"></i>
-              </button>
-            }
-          </div>
-        </ng-template>
-
-        <ng-template #jobPartTagPopoverTpl>
-          <div class="d-flex flex-column gap-2 p-1" style="min-width: 12rem;">
-            <div class="d-flex align-items-stretch gap-1">
-              <input
-                type="text"
-                class="form-control form-control-sm flex-grow-1"
-                name="jobPartTagDraft"
-                [ngModel]="tagEditDraft"
-                [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="onJobPartTagDraftChange($event)"
-                [ngbTypeahead]="jobPartTagTypeahead"
-                [container]="'body'"
-                popupClass="job-part-tag-typeahead-popup"
-                (focus)="jobPartTagTypeaheadFocus$.next($any($event).target.value)"
-                (click)="jobPartTagTypeaheadFocus$.next($any($event).target.value)"
-                (selectItem)="onJobPartTagTypeaheadSelect($event)"
-                [disabled]="savingJobPartTagId() === tagPopoverOpenPartId()"
-                placeholder="Type or pick a tag"
-              />
-              <button
-                type="button"
-                class="btn btn-light border btn-sm px-2 py-0 d-flex align-items-center justify-content-center txt-primary flex-shrink-0"
-                [disabled]="savingJobPartTagId() === tagPopoverOpenPartId()"
-                (click)="commitJobPartTagFromPopover($event)"
-                title="Save tag"
-              >
-                @if (savingJobPartTagId() === tagPopoverOpenPartId()) {
-                  <i class="fa-solid fa-spinner fa-spin f-14"></i>
-                } @else {
-                  <i class="fa-solid fa-check f-14"></i>
-                }
-              </button>
-            </div>
-          </div>
-        </ng-template>
-
-        <div class="table-responsive custom-scrollbar">
-          <app-table
-            [tableConfig]="jobPartsTableConfig()"
-            [columnTemplates]="{ jobPartTag: jobPartTagCell }"
-            [search]="false"
-            [hover]="true"
-            [pagination]="false"
-            [hasCheckbox]="false"
-            (action)="handleJobPartAction($event)">
-          </app-table>
-        </div>
-      }
-
-      <div class="w-100 flex justify-content-center m-t-15">
-        <button type="button" class="btn btn-primary btn-sm"
-                (click)="editingJobPartId.set(null);
-                       openAddJobPartModal(addJobPartModal)">
-          <i class="fa-solid fa-plus m-r-5"></i>
-          Add new Part
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-job-parts
+    [jobDetails]="jobDetails()"
+    [jobWarnings]="jobWarnings()"
+    (jobPartsUpdated)="jobPartsUpdated.emit()"
+    (editPart)="onEditJobPart($event)"
+    (addPart)="onAddJobPart()">
+  </app-job-parts>
 </form>
 
 <!-- Add Payment Modal -->
