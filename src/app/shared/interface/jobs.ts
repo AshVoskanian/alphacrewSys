@@ -95,6 +95,8 @@ export interface JobDetails {
   jobCost: JobCost;
   clientLimit: ClientLimit;
   jobParts: JobPart[];
+  /** All tag rows for the job (typeahead / catalog); each part may also expose `jobPartTag`. */
+  jobPartTags?: JobPartTagItem[];
   jobRegionAccess: unknown[];
   documents: JobDocument[];
   partialPayments: PartialPayment[];
@@ -132,9 +134,33 @@ export interface JobPartResponse {
   jobJobPartResponses: JobPart[];
 }
 
+/** Tag row: nested on `JobPart.jobPartTag`, listed on `JobDetails.jobPartTags`, or from tag APIs. */
+export interface JobPartTagItem {
+  id: number;
+  jobId: number;
+  jobPartId: number;
+  tag: string;
+  jobPartStartDate?: string;
+  createDate?: string;
+}
+
+/** Body for POST Jobs/AddOrUpdateJobPartTag */
+export interface AddOrUpdateJobPartTagRequest {
+  /** Existing row id for update; use `0` when adding a new tag. */
+  id: number;
+  jobId: number;
+  jobPartId: number;
+  tag: string;
+  jobPartStartDate: string;
+}
+
 export interface JobPart {
   jobPartId: number;
   jobId: number;
+  /** Optional tag object from GetJobByJobId `jobParts[].jobPartTag`. */
+  jobPartTag?: JobPartTagItem | null;
+  /** Legacy optional label; prefer `jobPartTag.tag`. */
+  tag?: string | null;
   jobPartTypeId: number;
   typeText: string;
   startDate: string; // ISO date

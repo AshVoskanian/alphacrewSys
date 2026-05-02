@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
@@ -45,6 +45,8 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() hover: boolean = false;
   @Input() downloadReports: boolean = false;
   @Input() searchPlaceholder: string = '';
+  /** Maps `TableColumn.field_value` to an `ng-template` when `column.type === 'template'`. */
+  @Input() columnTemplates: Record<string, TemplateRef<unknown>> | null = null;
 
   @Output() action = new EventEmitter<TableClickedAction>();
   @Output() rowClicked = new EventEmitter<any>();

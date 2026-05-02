@@ -12,3 +12,8 @@
 .timepicker {
   z-index: 1101 !important;
 }
+
+// Job part tag popover: typeahead popup is portaled to body — must sit above popover (~1060) and tables
+ngb-typeahead-window.job-part-tag-typeahead-popup {
+  z-index: 20000 !important;
+}
