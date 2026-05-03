@@ -1,3 +1,5 @@
+import { JobPartTagItem } from './jobs';
+
 export interface Schedule {
   address: string | null;
   companyName: string;
@@ -57,6 +59,8 @@ export interface Schedule {
   other?: string;
   region?: string;
   total?: string;
+  /** From `schedule/getschedule` — part-level tag for this shift row. */
+  jobPartTag?: JobPartTagItem | null;
 }
 
 export interface IYourEntity {
