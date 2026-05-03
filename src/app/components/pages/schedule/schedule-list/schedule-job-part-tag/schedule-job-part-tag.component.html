@@ -1,14 +1,14 @@
 <div class="job-part-tag-cell" (click)="$event.stopPropagation()">
   <button
     type="button"
-    class="btn btn-link p-0 m-0 txt-primary job-part-tag-cell__btn"
+    class="btn p-0 m-0 txt-primary job-part-tag-cell__btn"
     #jobPartTagPop="ngbPopover"
     [ngbPopover]="jobPartTagPopoverTpl"
     triggers="manual"
     placement="auto"
     [autoClose]="false"
     container="body"
-    popoverClass="job-part-tag-popover shadow"
+    popoverClass="job-part-tag-popover"
     [disabled]="savingJobPartTagId() === schedule.jobPartId"
     (click)="onJobPartTagTriggerClick(jobPartTagPop, $event)"
     (hidden)="onJobPartTagPopoverHidden()"
@@ -16,7 +16,8 @@
     @if (savingJobPartTagId() === schedule.jobPartId) {
       <i class="fa-solid fa-spinner fa-spin f-14" title="Saving…"></i>
     } @else if (tagDisplay) {
-      <span class="text-decoration-underline">{{ tagDisplay }}</span>
+      <i class="fa-solid fa-tag f-14 m-r-8"></i>
+      <span>{{ tagDisplay }}</span>
     } @else {
       <span class="job-part-tag-cell__add-label" title="Add tag">
         <i class="fa-solid fa-tag f-14" aria-hidden="true"></i>
@@ -28,7 +29,7 @@
     @for (t of tagLineItems; track t.id) {
       <button
         type="button"
-        class="btn btn-link p-0 m-0 txt-danger job-part-tag-cell__btn job-part-tag-cell__btn--icon"
+        class="btn p-0 m-0 txt-danger job-part-tag-cell__btn job-part-tag-cell__btn--icon"
         [disabled]="deletingJobPartTagId() === t.id || savingJobPartTagId() === schedule.jobPartId"
         (click)="deleteJobPartTagById($event, t.id)"
         title="Remove tag"
@@ -43,7 +44,7 @@
   } @else if (tagDisplay) {
     <button
       type="button"
-      class="btn btn-link p-0 m-0 txt-danger job-part-tag-cell__btn job-part-tag-cell__btn--icon"
+      class="btn p-0 m-0 txt-danger job-part-tag-cell__btn job-part-tag-cell__btn--icon"
       [disabled]="savingJobPartTagId() === schedule.jobPartId"
       (click)="clearLocalJobPartTag($event)"
       title="Remove tag"
