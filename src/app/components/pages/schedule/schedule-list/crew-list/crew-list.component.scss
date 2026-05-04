@@ -15,6 +15,33 @@
   }
 }
 
+.crew-list-tag-filter-menu {
+  min-width: 12rem;
+  max-height: 240px;
+  overflow-y: auto;
+  /* Matches global override in styles.scss when menu is portaled to body */
+  z-index: 10050 !important;
+}
+
+.crew-list-tag-filter-row {
+  cursor: pointer;
+
+  .crew-list-tag-filter-check {
+    width: 1.125rem;
+    text-align: center;
+    line-height: 1;
+  }
+}
+
+.crew-list-tag-col {
+  vertical-align: middle;
+  width: 1%;
+}
+
+.crew-list-tag-cell {
+  max-width: 8rem;
+}
+
 ul.custom-scrollbar {
   li:nth-child(odd) {
     background: var(--light-background);

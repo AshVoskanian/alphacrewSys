@@ -11,6 +11,8 @@ import {
   Output,
   SimpleChanges,
   QueryList,
+  Renderer2,
+  RendererStyleFlags2,
   signal,
   ViewChild,
   ViewChildren,
@@ -33,6 +35,7 @@ import {
   Schedule,
   ShiftCrewDetails
 } from "../../../../../shared/interface/schedule";
+import { JobPartTagItem } from '../../../../../shared/interface/jobs';
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import {
   CrewFilterPipe,
@@ -42,7 +45,7 @@ import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
-import { AsyncPipe, DatePipe, NgClass, NgStyle } from "@angular/common";
+import { AsyncPipe, DatePipe, DOCUMENT, NgClass, NgStyle } from '@angular/common';
 import { finalize, Observable } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
@@ -65,6 +68,11 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
   private _scheduleService = inject(ScheduleService);
   private readonly _activeOffcanvas = inject(NgbActiveOffcanvas, { optional: true });
+  private readonly _document = inject(DOCUMENT);
+  private readonly _renderer = inject(Renderer2);
+
+  /** ng-bootstrap hardcodes body dropdown wrapper z-index 1055 — must exceed .common-offcanvas (9999). */
+  private static readonly tagFilterDropdownZ = '10050';
 
   @Input() title: string;
   @Input() crewList: Array<Crew> = [];
@@ -133,6 +141,13 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   ];
 
   jobPartClashing: Array<JobPartClashing> = [];
+
+  /** From `Jobs/GetJobPartTags` for the current job — tag filter + Tag column labels. */
+  jobPartTagsForFilter: JobPartTagItem[] = [];
+  jobPartTagsLoading = false;
+  private jobPartTagsJobIdLoaded: number | null = null;
+  /** `JobPartTagItem.id` values selected in the header tag filter (multi-select). */
+  private readonly selectedTagFilterIds = new Set<number>();
 
   /**
    * Fixed chrome subtracted from 100dvh for the scrollable crew list: offcanvas header, region/level
@@ -397,6 +412,9 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   getCrewClashing(): void {
     this.crewClashingLoader = true;
     this.jobPartClashing = [];
+    this.selectedTagFilterIds.clear();
+    this.jobPartTagsJobIdLoaded = null;
+    this.jobPartTagsForFilter = [];
 
     this.get<Array<JobPartClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
       .pipe(finalize(() => this.crewClashingLoader = false))
@@ -417,8 +435,145 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
           }
 
           this.updateNotClashingCounts(this.jobPartClashing);
+          this.selectedTagFilterIds.clear();
+          this.loadJobPartTagsForJob(this.selectedSchedule.jobId);
         }
       });
+  }
+
+  /** Opens dropdown: reload if needed (e.g. job changed). */
+  onTagFilterDropdownOpen(open: boolean): void {
+    if (open) {
+      this.loadJobPartTagsForJob(this.selectedSchedule?.jobId);
+      this.patchTagFilterDropdownZIndex();
+    }
+  }
+
+  /**
+   * NgbDropdown with `container="body"` sets inline `z-index: 1055` on the wrapper div.
+   * Popper may refresh styles — re-apply after layout so the menu stays above offcanvas.
+   */
+  private patchTagFilterDropdownZIndex(): void {
+    const apply = (): void => {
+      const el = this._document.body.querySelector(
+        '.crew-list-tag-filter-dropdown'
+      ) as HTMLElement | null;
+      if (el) {
+        this._renderer.setStyle(
+          el,
+          'z-index',
+          CrewListComponent.tagFilterDropdownZ,
+          RendererStyleFlags2.Important
+        );
+      }
+    };
+    queueMicrotask(apply);
+    requestAnimationFrame(apply);
+    requestAnimationFrame(() => requestAnimationFrame(apply));
+  }
+
+  private loadJobPartTagsForJob(jobId: number | undefined): void {
+    if (!jobId) {
+      this.jobPartTagsForFilter = [];
+      return;
+    }
+    if (this.jobPartTagsJobIdLoaded === jobId) {
+      return;
+    }
+    this.jobPartTagsLoading = true;
+    this.get<JobPartTagItem[]>('Jobs/GetJobPartTags', { jobId })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => {
+          this.jobPartTagsLoading = false;
+          this._cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: res => {
+          if (jobId !== this.selectedSchedule?.jobId) {
+            return;
+          }
+          if (res.errors?.errorCode) {
+            this.jobPartTagsForFilter = [];
+            this.jobPartTagsJobIdLoaded = null;
+            return;
+          }
+          const rows = Array.isArray(res.data) ? res.data : [];
+          this.jobPartTagsForFilter = [ ...rows ].sort((a, b) => {
+            const ta = (a.tag ?? '').localeCompare(b.tag ?? '', undefined, { sensitivity: 'base' });
+            if (ta !== 0) {
+              return ta;
+            }
+            return a.jobPartId - b.jobPartId;
+          });
+          this.jobPartTagsJobIdLoaded = jobId;
+        },
+        error: () => {
+          if (jobId !== this.selectedSchedule?.jobId) {
+            return;
+          }
+          this.jobPartTagsForFilter = [];
+          this.jobPartTagsJobIdLoaded = null;
+        }
+      });
+  }
+
+  tagFilterMenuLabel(tagItem: JobPartTagItem): string {
+    const base = (tagItem.tag ?? '').trim();
+    const lower = base.toLowerCase();
+    const dup = this.jobPartTagsForFilter.filter(
+      t => (t.tag ?? '').trim().toLowerCase() === lower
+    ).length > 1;
+    return dup ? `${base} (#${tagItem.jobPartId})` : base;
+  }
+
+  isTagFilterSelected(tag: JobPartTagItem): boolean {
+    return this.selectedTagFilterIds.has(tag.id);
+  }
+
+  get selectedTagFilterCount(): number {
+    return this.selectedTagFilterIds.size;
+  }
+
+  toggleTagFilterSelection(tag: JobPartTagItem, checked: boolean): void {
+    if (checked) {
+      this.selectedTagFilterIds.add(tag.id);
+    } else {
+      this.selectedTagFilterIds.delete(tag.id);
+    }
+    this.applySelectedTagsToJobPartChecks();
+  }
+
+  /** Check only clashing rows whose `jobPartId` matches a selected tag row; uncheck all others. */
+  private applySelectedTagsToJobPartChecks(): void {
+    const selectedPartIds = new Set(
+      this.jobPartTagsForFilter
+        .filter(t => this.selectedTagFilterIds.has(t.id))
+        .map(t => t.jobPartId)
+    );
+    this.jobPartClashing.forEach(part => {
+      part.checked = selectedPartIds.has(part.jobPartId);
+    });
+    this.jobPartSelect();
+    this._cdr.markForCheck();
+  }
+
+  tagsLabelForClashingRow(jobPartId: number): string {
+    const labels = [
+      ...new Set(
+        this.jobPartTagsForFilter
+          .filter(t => t.jobPartId === jobPartId)
+          .map(t => (t.tag ?? '').trim())
+          .filter(Boolean)
+      )
+    ];
+    return labels.length ? labels.join(', ') : '';
+  }
+
+  onJobPartRowCheckboxChange(): void {
+    this.selectedTagFilterIds.clear();
+    this.jobPartSelect();
   }
 
   updateNotClashingCounts(data: JobPartClashing[]): void {
@@ -536,6 +691,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   selectAllClashing(): void {
+    this.selectedTagFilterIds.clear();
     if (this.isAllSelected()) {
       this.jobPartClashing?.forEach(part => part.checked = false);
     } else {
