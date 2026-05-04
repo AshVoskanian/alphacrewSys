@@ -34,6 +34,9 @@ import { Schedule } from '../../../../../shared/interface/schedule';
   styleUrl: './schedule-job-part-tag.component.scss'
 })
 export class ScheduleJobPartTagComponent extends ApiBase {
+  /** Cached tag strings per job (shared across row instances). */
+  private static readonly tagCatalogCache = new Map<number, string[]>();
+
   @Input({ required: true }) schedule!: Schedule;
   @Input() schedules: Schedule[] = [];
 
@@ -41,6 +44,9 @@ export class ScheduleJobPartTagComponent extends ApiBase {
 
   deletingJobPartTagId = signal<number | null>(null);
   savingJobPartTagId = signal<number | null>(null);
+
+  /** Last loaded catalog for `schedule.jobId` (from `Jobs/GetJobPartTags`). */
+  tagCatalogFromApi = signal<string[]>([]);
 
   public jobPartTagTypeaheadFocus$ = new Subject<string>();
 
@@ -79,9 +85,33 @@ export class ScheduleJobPartTagComponent extends ApiBase {
   }
 
   private buildTagSuggestionPool(): string[] {
-    const list = this.schedules?.length ? this.schedules : [ this.schedule ];
-    const uniq = [ ...new Set(list.map(s => (s.jobPartTag?.tag ?? '').trim()).filter(Boolean)) ];
-    return uniq.sort((a, b) => a.localeCompare(b));
+    const fromApi = this.tagCatalogFromApi();
+    const fromSchedules = this.collectTagsFromSchedulesSameJob();
+    return [ ...new Set([ ...fromApi, ...fromSchedules ]) ].sort((a, b) => a.localeCompare(b));
+  }
+
+  /** Tags already visible on loaded schedule rows for this job (supplement to API catalog). */
+  private collectTagsFromSchedulesSameJob(): string[] {
+    const jobId = this.schedule.jobId;
+    const list = this.schedules?.length
+      ? this.schedules.filter(s => s.jobId === jobId)
+      : [ this.schedule ];
+    return list.map(s => (s.jobPartTag?.tag ?? '').trim()).filter(Boolean);
+  }
+
+  private static mergeTagIntoJobCatalogCache(jobId: number, tag: string): void {
+    const t = tag.trim();
+    if (!t) {
+      return;
+    }
+    const cur = ScheduleJobPartTagComponent.tagCatalogCache.get(jobId) ?? [];
+    if (cur.some(x => x.toLowerCase() === t.toLowerCase())) {
+      return;
+    }
+    ScheduleJobPartTagComponent.tagCatalogCache.set(
+      jobId,
+      [ ...cur, t ].sort((a, b) => a.localeCompare(b))
+    );
   }
 
   private preparePopover(): void {
@@ -106,8 +136,44 @@ export class ScheduleJobPartTagComponent extends ApiBase {
     }
     this.tagPopoverCommitted = false;
     this.preparePopover();
-    this.activeJobPartTagPopover = popover;
-    popover.open();
+
+    const jobId = this.schedule.jobId;
+    const openPopover = (): void => {
+      this.activeJobPartTagPopover = popover;
+      popover.open();
+      queueMicrotask(() => this.jobPartTagTypeaheadFocus$.next(this.tagEditDraft ?? ''));
+    };
+
+    const cached = ScheduleJobPartTagComponent.tagCatalogCache.get(jobId);
+    if (cached) {
+      this.tagCatalogFromApi.set(cached);
+      openPopover();
+      return;
+    }
+
+    this.get<JobPartTagItem[]>('Jobs/GetJobPartTags', { jobId })
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            this.tagCatalogFromApi.set([]);
+            openPopover();
+            return;
+          }
+          const rows = Array.isArray(res.data) ? res.data : [];
+          const strings = [
+            ...new Set(rows.map(t => (t.tag ?? '').trim()).filter(Boolean))
+          ].sort((a, b) => a.localeCompare(b));
+          ScheduleJobPartTagComponent.tagCatalogCache.set(jobId, strings);
+          this.tagCatalogFromApi.set(strings);
+          openPopover();
+        },
+        error: () => {
+          this.tagCatalogFromApi.set([]);
+          openPopover();
+        }
+      });
   }
 
   onJobPartTagPopoverHidden(): void {
@@ -180,6 +246,10 @@ export class ScheduleJobPartTagComponent extends ApiBase {
 
           const merged = this.mergeSavedTagFromResponse(res.data as JobPartTagItem | number | null | undefined, value);
           this.schedule.jobPartTag = merged;
+          ScheduleJobPartTagComponent.mergeTagIntoJobCatalogCache(this.schedule.jobId, value);
+          this.tagCatalogFromApi.set(
+            ScheduleJobPartTagComponent.tagCatalogCache.get(this.schedule.jobId) ?? this.tagCatalogFromApi()
+          );
           this.tagPopoverCommitted = true;
           GeneralService.showSuccessMessage('Tag saved');
           popover.close();
