@@ -97,16 +97,16 @@
                       } @else if (!jobPartTagsForFilter.length) {
                         <div class="text-muted small px-2 py-1">No tags</div>
                       } @else {
-                        @for (tagItem of jobPartTagsForFilter; track tagItem.id) {
+                        @for (tagLabel of jobPartTagsForFilter; track tagLabel; let tagIdx = $index) {
                           <label
                             class="crew-list-tag-filter-row d-flex align-items-center gap-2 mb-1 px-1 w-100 cursor-pointer">
                             <input
                               class="form-check-input flex-shrink-0 m-0"
                               type="checkbox"
-                              [id]="'crew-list-tag-filter-' + tagItem.id"
-                              [checked]="isTagFilterSelected(tagItem)"
-                              (change)="toggleTagFilterSelection(tagItem, $any($event.target).checked)">
-                            <span class="flex-grow-1 text-truncate small text-start">{{ tagFilterMenuLabel(tagItem) }}</span>
+                              [id]="'crew-list-tag-filter-' + tagIdx"
+                              [checked]="isTagFilterSelected(tagLabel)"
+                              (change)="toggleTagFilterSelection(tagLabel, $any($event.target).checked)">
+                            <span class="flex-grow-1 text-truncate small text-start">{{ tagLabel }}</span>
                           </label>
                         }
                       }

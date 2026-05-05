@@ -142,12 +142,14 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
   jobPartClashing: Array<JobPartClashing> = [];
 
-  /** From `Jobs/GetJobPartTags` for the current job — tag filter + Tag column labels. */
-  jobPartTagsForFilter: JobPartTagItem[] = [];
+  /** Full rows from `Jobs/GetJobPartTags` (map tag → many jobPartIds). */
+  jobPartTagsCatalog: JobPartTagItem[] = [];
+  /** Unique `tag` labels for the dropdown (trimmed; duplicates collapsed case-insensitively). */
+  jobPartTagsForFilter: string[] = [];
   jobPartTagsLoading = false;
   private jobPartTagsJobIdLoaded: number | null = null;
-  /** `JobPartTagItem.id` values selected in the header tag filter (multi-select). */
-  private readonly selectedTagFilterIds = new Set<number>();
+  /** Normalized tag keys (`normalizeTagKey`) selected in the header tag filter (multi-select). */
+  private readonly selectedTagFilterKeys = new Set<string>();
 
   /**
    * Fixed chrome subtracted from 100dvh for the scrollable crew list: offcanvas header, region/level
@@ -412,8 +414,9 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   getCrewClashing(): void {
     this.crewClashingLoader = true;
     this.jobPartClashing = [];
-    this.selectedTagFilterIds.clear();
+    this.selectedTagFilterKeys.clear();
     this.jobPartTagsJobIdLoaded = null;
+    this.jobPartTagsCatalog = [];
     this.jobPartTagsForFilter = [];
 
     this.get<Array<JobPartClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
@@ -435,7 +438,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
           }
 
           this.updateNotClashingCounts(this.jobPartClashing);
-          this.selectedTagFilterIds.clear();
+          this.selectedTagFilterKeys.clear();
           this.loadJobPartTagsForJob(this.selectedSchedule.jobId);
         }
       });
@@ -474,6 +477,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
   private loadJobPartTagsForJob(jobId: number | undefined): void {
     if (!jobId) {
+      this.jobPartTagsCatalog = [];
       this.jobPartTagsForFilter = [];
       return;
     }
@@ -495,63 +499,89 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
             return;
           }
           if (res.errors?.errorCode) {
+            this.jobPartTagsCatalog = [];
             this.jobPartTagsForFilter = [];
             this.jobPartTagsJobIdLoaded = null;
             return;
           }
           const rows = Array.isArray(res.data) ? res.data : [];
-          this.jobPartTagsForFilter = [ ...rows ].sort((a, b) => {
+          this.jobPartTagsCatalog = [ ...rows ].sort((a, b) => {
             const ta = (a.tag ?? '').localeCompare(b.tag ?? '', undefined, { sensitivity: 'base' });
             if (ta !== 0) {
               return ta;
             }
             return a.jobPartId - b.jobPartId;
           });
+          this.jobPartTagsForFilter = this.buildUniqueTagLabels(this.jobPartTagsCatalog);
           this.jobPartTagsJobIdLoaded = jobId;
         },
         error: () => {
           if (jobId !== this.selectedSchedule?.jobId) {
             return;
           }
+          this.jobPartTagsCatalog = [];
           this.jobPartTagsForFilter = [];
           this.jobPartTagsJobIdLoaded = null;
         }
       });
   }
 
-  tagFilterMenuLabel(tagItem: JobPartTagItem): string {
-    const base = (tagItem.tag ?? '').trim();
-    const lower = base.toLowerCase();
-    const dup = this.jobPartTagsForFilter.filter(
-      t => (t.tag ?? '').trim().toLowerCase() === lower
-    ).length > 1;
-    return dup ? `${base} (#${tagItem.jobPartId})` : base;
+  private normalizeTagKey(tag: string | null | undefined): string {
+    return (tag ?? '').trim().toLowerCase();
   }
 
-  isTagFilterSelected(tag: JobPartTagItem): boolean {
-    return this.selectedTagFilterIds.has(tag.id);
+  /** One entry per distinct tag text (case-insensitive); label is first trimmed spelling seen. */
+  private buildUniqueTagLabels(rows: JobPartTagItem[]): string[] {
+    const byKey = new Map<string, string>();
+    for (const row of rows) {
+      const raw = (row.tag ?? '').trim();
+      if (!raw) {
+        continue;
+      }
+      const key = this.normalizeTagKey(raw);
+      if (!byKey.has(key)) {
+        byKey.set(key, raw);
+      }
+    }
+    return [ ...byKey.values() ].sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base' })
+    );
+  }
+
+  isTagFilterSelected(tagLabel: string): boolean {
+    return this.selectedTagFilterKeys.has(this.normalizeTagKey(tagLabel));
   }
 
   get selectedTagFilterCount(): number {
-    return this.selectedTagFilterIds.size;
+    return this.selectedTagFilterKeys.size;
   }
 
-  toggleTagFilterSelection(tag: JobPartTagItem, checked: boolean): void {
+  toggleTagFilterSelection(tagLabel: string, checked: boolean): void {
+    const key = this.normalizeTagKey(tagLabel);
+    if (!key) {
+      return;
+    }
     if (checked) {
-      this.selectedTagFilterIds.add(tag.id);
+      this.selectedTagFilterKeys.add(key);
     } else {
-      this.selectedTagFilterIds.delete(tag.id);
+      this.selectedTagFilterKeys.delete(key);
     }
     this.applySelectedTagsToJobPartChecks();
   }
 
-  /** Check only clashing rows whose `jobPartId` matches a selected tag row; uncheck all others. */
+  /**
+   * Check every clashing row whose `jobPartId` has any of the selected tag strings in the catalog;
+   * uncheck rows that do not match any selected tag.
+   */
   private applySelectedTagsToJobPartChecks(): void {
-    const selectedPartIds = new Set(
-      this.jobPartTagsForFilter
-        .filter(t => this.selectedTagFilterIds.has(t.id))
-        .map(t => t.jobPartId)
-    );
+    const selectedPartIds = new Set<number>();
+    for (const key of this.selectedTagFilterKeys) {
+      for (const row of this.jobPartTagsCatalog) {
+        if (this.normalizeTagKey(row.tag) === key) {
+          selectedPartIds.add(row.jobPartId);
+        }
+      }
+    }
     this.jobPartClashing.forEach(part => {
       part.checked = selectedPartIds.has(part.jobPartId);
     });
@@ -562,7 +592,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   tagsLabelForClashingRow(jobPartId: number): string {
     const labels = [
       ...new Set(
-        this.jobPartTagsForFilter
+        this.jobPartTagsCatalog
           .filter(t => t.jobPartId === jobPartId)
           .map(t => (t.tag ?? '').trim())
           .filter(Boolean)
@@ -572,7 +602,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   onJobPartRowCheckboxChange(): void {
-    this.selectedTagFilterIds.clear();
+    this.selectedTagFilterKeys.clear();
     this.jobPartSelect();
   }
 
@@ -691,7 +721,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   selectAllClashing(): void {
-    this.selectedTagFilterIds.clear();
+    this.selectedTagFilterKeys.clear();
     if (this.isAllSelected()) {
       this.jobPartClashing?.forEach(part => part.checked = false);
     } else {
