@@ -262,6 +262,8 @@ export interface JobPartClashing {
   jobPartId: number;
   startDate: string;
   checked: boolean;
+  /** Present when API returns tag for this part (e.g. `Crew/GetCrewClashing`). */
+  jobPartTag?: JobPartTagItem | null;
 }
 
 export interface CrewClashing {

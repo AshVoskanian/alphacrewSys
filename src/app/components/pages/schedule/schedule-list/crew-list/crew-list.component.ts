@@ -142,12 +142,12 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
   jobPartClashing: Array<JobPartClashing> = [];
 
-  /** Full rows from `Jobs/GetJobPartTags` (map tag → many jobPartIds). */
+  /**
+   * Tag rows derived from `jobPartClashing[].jobPartTag` (same shape as `JobPartTagItem` for filters).
+   */
   jobPartTagsCatalog: JobPartTagItem[] = [];
   /** Unique `tag` labels for the dropdown (trimmed; duplicates collapsed case-insensitively). */
   jobPartTagsForFilter: string[] = [];
-  jobPartTagsLoading = false;
-  private jobPartTagsJobIdLoaded: number | null = null;
   /** Normalized tag keys (`normalizeTagKey`) selected in the header tag filter (multi-select). */
   private readonly selectedTagFilterKeys = new Set<string>();
 
@@ -415,7 +415,6 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     this.crewClashingLoader = true;
     this.jobPartClashing = [];
     this.selectedTagFilterKeys.clear();
-    this.jobPartTagsJobIdLoaded = null;
     this.jobPartTagsCatalog = [];
     this.jobPartTagsForFilter = [];
 
@@ -439,15 +438,14 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
           this.updateNotClashingCounts(this.jobPartClashing);
           this.selectedTagFilterKeys.clear();
-          this.loadJobPartTagsForJob(this.selectedSchedule.jobId);
+          this.rebuildJobPartTagsFromClashing();
         }
       });
   }
 
-  /** Opens dropdown: reload if needed (e.g. job changed). */
+  /** Opens dropdown: z-index only (tags come from `GetCrewClashing`). */
   onTagFilterDropdownOpen(open: boolean): void {
     if (open) {
-      this.loadJobPartTagsForJob(this.selectedSchedule?.jobId);
       this.patchTagFilterDropdownZIndex();
     }
   }
@@ -475,55 +473,30 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     requestAnimationFrame(() => requestAnimationFrame(apply));
   }
 
-  private loadJobPartTagsForJob(jobId: number | undefined): void {
-    if (!jobId) {
-      this.jobPartTagsCatalog = [];
-      this.jobPartTagsForFilter = [];
-      return;
-    }
-    if (this.jobPartTagsJobIdLoaded === jobId) {
-      return;
-    }
-    this.jobPartTagsLoading = true;
-    this.get<JobPartTagItem[]>('Jobs/GetJobPartTags', { jobId })
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        finalize(() => {
-          this.jobPartTagsLoading = false;
-          this._cdr.markForCheck();
-        })
-      )
-      .subscribe({
-        next: res => {
-          if (jobId !== this.selectedSchedule?.jobId) {
-            return;
-          }
-          if (res.errors?.errorCode) {
-            this.jobPartTagsCatalog = [];
-            this.jobPartTagsForFilter = [];
-            this.jobPartTagsJobIdLoaded = null;
-            return;
-          }
-          const rows = Array.isArray(res.data) ? res.data : [];
-          this.jobPartTagsCatalog = [ ...rows ].sort((a, b) => {
-            const ta = (a.tag ?? '').localeCompare(b.tag ?? '', undefined, { sensitivity: 'base' });
-            if (ta !== 0) {
-              return ta;
-            }
-            return a.jobPartId - b.jobPartId;
-          });
-          this.jobPartTagsForFilter = this.buildUniqueTagLabels(this.jobPartTagsCatalog);
-          this.jobPartTagsJobIdLoaded = jobId;
-        },
-        error: () => {
-          if (jobId !== this.selectedSchedule?.jobId) {
-            return;
-          }
-          this.jobPartTagsCatalog = [];
-          this.jobPartTagsForFilter = [];
-          this.jobPartTagsJobIdLoaded = null;
-        }
+  private rebuildJobPartTagsFromClashing(): void {
+    const rows: JobPartTagItem[] = [];
+    for (const part of this.jobPartClashing) {
+      const tagObj = part.jobPartTag;
+      const text = (tagObj?.tag ?? '').trim();
+      if (!tagObj || !text) {
+        continue;
+      }
+      rows.push({
+        ...tagObj,
+        jobId: tagObj.jobId || part.jobId,
+        jobPartId: tagObj.jobPartId || part.jobPartId,
+        tag: text
       });
+    }
+    this.jobPartTagsCatalog = rows.sort((a, b) => {
+      const ta = (a.tag ?? '').localeCompare(b.tag ?? '', undefined, { sensitivity: 'base' });
+      if (ta !== 0) {
+        return ta;
+      }
+      return a.jobPartId - b.jobPartId;
+    });
+    this.jobPartTagsForFilter = this.buildUniqueTagLabels(this.jobPartTagsCatalog);
+    this._cdr.markForCheck();
   }
 
   private normalizeTagKey(tag: string | null | undefined): string {
@@ -590,15 +563,8 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   tagsLabelForClashingRow(jobPartId: number): string {
-    const labels = [
-      ...new Set(
-        this.jobPartTagsCatalog
-          .filter(t => t.jobPartId === jobPartId)
-          .map(t => (t.tag ?? '').trim())
-          .filter(Boolean)
-      )
-    ];
-    return labels.length ? labels.join(', ') : '';
+    const part = this.jobPartClashing.find(p => p.jobPartId === jobPartId);
+    return (part?.jobPartTag?.tag ?? '').trim();
   }
 
   onJobPartRowCheckboxChange(): void {

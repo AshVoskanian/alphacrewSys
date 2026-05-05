@@ -90,11 +90,7 @@
                       <span class="badge bg-primary rounded-pill m-l-2 align-top f-10">{{ selectedTagFilterCount }}</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end p-2 crew-list-tag-filter-menu" ngbDropdownMenu>
-                      @if (jobPartTagsLoading) {
-                        <div class="text-center py-2 text-muted small">
-                          <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                      } @else if (!jobPartTagsForFilter.length) {
+                      @if (!jobPartTagsForFilter.length) {
                         <div class="text-muted small px-2 py-1">No tags</div>
                       } @else {
                         @for (tagLabel of jobPartTagsForFilter; track tagLabel; let tagIdx = $index) {
