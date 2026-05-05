@@ -1,8 +1,10 @@
 import {
+  afterNextRender,
   Component,
   DestroyRef,
   effect,
   inject,
+  Injector,
   input,
   output,
   signal,
@@ -56,6 +58,7 @@ export class JobPartsComponent extends ApiBase {
   addPart = output<void>();
 
   private readonly _dr = inject(DestroyRef);
+  private readonly _injector = inject(Injector);
 
   deletingJobPartTagId = signal<number | null>(null);
   savingJobPartTagId = signal<number | null>(null);
@@ -234,6 +237,12 @@ export class JobPartsComponent extends ApiBase {
     this.prepareJobPartTagPopover(row);
     this.activeJobPartTagPopover = popover;
     popover.open();
+    afterNextRender(
+      () => {
+        queueMicrotask(() => this.jobPartTagTypeaheadFocus$.next(this.tagEditDraft ?? ''));
+      },
+      { injector: this._injector }
+    );
   }
 
   onJobPartTagPopoverHidden(jobPartId: number): void {
@@ -258,7 +267,11 @@ export class JobPartsComponent extends ApiBase {
   commitJobPartTagFromPopover(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    this.persistJobPartTagFromPopover();
+  }
 
+  /** Persists current draft when popover is open (save button and typeahead pick). */
+  private persistJobPartTagFromPopover(): void {
     const jobPartId = this.tagPopoverRow?.jobPartId;
     const popover = this.activeJobPartTagPopover;
     if (jobPartId == null || !popover) {
@@ -311,18 +324,26 @@ export class JobPartsComponent extends ApiBase {
             return;
           }
 
+          const merged = this.mergeSavedJobPartTagFromResponse(
+            res.data as JobPartTagItem | number | null | undefined,
+            value,
+            jobPartId,
+            jobId,
+            part
+          );
+
           this.jobPartsTableConfig.update(config => ({
             ...config,
             data: config.data.map(item =>
               item.jobPartId === jobPartId
-                ? { ...item, tagDisplay: value, tagLineItems: item.tagLineItems ?? [] }
+                ? { ...item, tagDisplay: value, tagLineItems: [ merged ] }
                 : item
             )
           }));
+          this.patchJobDetailsInPlaceAfterTagSave(jobPartId, merged);
           this.tagPopoverCommitted = true;
           GeneralService.showSuccessMessage('Tag saved');
           this.mergeJobPartTagSuggestion(value);
-          this.jobPartsUpdated.emit();
           popover.close();
         },
         error: () => {
@@ -334,6 +355,48 @@ export class JobPartsComponent extends ApiBase {
   private toJobPartTagStartDateIso(startDate: string): string {
     const d = new Date(startDate);
     return Number.isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+  }
+
+  private mergeSavedJobPartTagFromResponse(
+    data: JobPartTagItem | number | null | undefined,
+    tag: string,
+    jobPartId: number,
+    jobId: number,
+    part: JobPart
+  ): JobPartTagItem {
+    if (data && typeof data === 'object' && 'jobPartId' in data) {
+      return data as JobPartTagItem;
+    }
+    const idFromData = typeof data === 'number' && data > 0 ? data : null;
+    const id = idFromData ?? this.tagPopoverBackendTagId ?? part.jobPartTag?.id ?? 0;
+    return {
+      id,
+      jobId,
+      jobPartId,
+      tag,
+      jobPartStartDate: part.startDate
+    };
+  }
+
+  /** Keeps parent `jobDetails` in sync so later actions (e.g. delete) see the new tag without `getDetails()`. */
+  private patchJobDetailsInPlaceAfterTagSave(jobPartId: number, merged: JobPartTagItem): void {
+    const details = this.jobDetails();
+    if (!details) {
+      return;
+    }
+    const linked = details.jobParts?.find(p => p.jobPartId === jobPartId);
+    if (linked) {
+      linked.jobPartTag = merged;
+    }
+    const list = details.jobPartTags ?? [];
+    const isDup = list.some(
+      t =>
+        (merged.id > 0 && t.id === merged.id) ||
+        t.tag.trim().toLowerCase() === merged.tag.trim().toLowerCase()
+    );
+    if (!isDup) {
+      details.jobPartTags = [ ...list, merged ];
+    }
   }
 
   private revertJobPartTagDisplay(jobPartId: number, tagDisplay: string): void {
@@ -353,6 +416,7 @@ export class JobPartsComponent extends ApiBase {
     if (id != null) {
       this.tagDraftByJobPartId.set(id, event.item);
     }
+    this.persistJobPartTagFromPopover();
   }
 
   deleteJobPartTagById(event: Event, tagId: number): void {
@@ -373,11 +437,57 @@ export class JobPartsComponent extends ApiBase {
             return;
           }
 
+          const jobPartId = this.resolveJobPartIdForTagId(tagId);
+          if (jobPartId != null) {
+            this.jobPartsTableConfig.update(config => ({
+              ...config,
+              data: config.data.map(item =>
+                item.jobPartId === jobPartId
+                  ? { ...item, tagDisplay: '', tagLineItems: [] }
+                  : item
+              )
+            }));
+          }
+          this.patchJobDetailsInPlaceAfterTagRemove(tagId, jobPartId);
+          this.refreshJobPartTagSuggestions(this.jobDetails()?.jobPartTags ?? []);
+
           GeneralService.showSuccessMessage('Tag removed');
-          this.updateJobPartsTable(this.jobDetails()?.jobParts);
-          this.jobPartsUpdated.emit();
         }
       });
+  }
+
+  private resolveJobPartIdForTagId(tagId: number): number | null {
+    const fromDetails = this.jobDetails()?.jobParts?.find(p => p.jobPartTag?.id === tagId)?.jobPartId;
+    if (fromDetails != null) {
+      return fromDetails;
+    }
+    const row = this.jobPartsTableConfig().data.find(item =>
+      item.tagLineItems?.some(t => t.id === tagId)
+    );
+    return row?.jobPartId ?? null;
+  }
+
+  private patchJobDetailsInPlaceAfterTagRemove(tagId: number, jobPartId: number | null): void {
+    const details = this.jobDetails();
+    if (!details) {
+      return;
+    }
+    const clearPart = (p: JobPart): void => {
+      if (p.jobPartTag?.id === tagId) {
+        p.jobPartTag = null;
+      }
+    };
+    if (jobPartId != null) {
+      const part = details.jobParts?.find(p => p.jobPartId === jobPartId);
+      if (part) {
+        clearPart(part);
+      }
+    } else {
+      details.jobParts?.forEach(clearPart);
+    }
+    if (details.jobPartTags?.length) {
+      details.jobPartTags = details.jobPartTags.filter(t => t.id !== tagId);
+    }
   }
 
   private refreshJobPartTagSuggestions(items: JobPartTagItem[]): void {

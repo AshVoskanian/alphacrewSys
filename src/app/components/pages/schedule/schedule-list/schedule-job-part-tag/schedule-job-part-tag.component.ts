@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, signal } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, inject, Injector, Input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -41,6 +41,7 @@ export class ScheduleJobPartTagComponent extends ApiBase {
   @Input() schedules: Schedule[] = [];
 
   private readonly _dr = inject(DestroyRef);
+  private readonly _injector = inject(Injector);
 
   deletingJobPartTagId = signal<number | null>(null);
   savingJobPartTagId = signal<number | null>(null);
@@ -141,7 +142,12 @@ export class ScheduleJobPartTagComponent extends ApiBase {
     const openPopover = (): void => {
       this.activeJobPartTagPopover = popover;
       popover.open();
-      queueMicrotask(() => this.jobPartTagTypeaheadFocus$.next(this.tagEditDraft ?? ''));
+      afterNextRender(
+        () => {
+          queueMicrotask(() => this.jobPartTagTypeaheadFocus$.next(this.tagEditDraft ?? ''));
+        },
+        { injector: this._injector }
+      );
     };
 
     const cached = ScheduleJobPartTagComponent.tagCatalogCache.get(jobId);
@@ -192,7 +198,11 @@ export class ScheduleJobPartTagComponent extends ApiBase {
   commitJobPartTagFromPopover(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    this.persistJobPartTagFromPopover();
+  }
 
+  /** Persists current draft when popover is open (used by save button and typeahead pick). */
+  private persistJobPartTagFromPopover(): void {
     const jobPartId = this.schedule.jobPartId;
     const popover = this.activeJobPartTagPopover;
     if (jobPartId == null || !popover) {
@@ -302,6 +312,7 @@ export class ScheduleJobPartTagComponent extends ApiBase {
 
   onJobPartTagTypeaheadSelect(event: NgbTypeaheadSelectItemEvent<string>): void {
     this.tagEditDraft = event.item;
+    this.persistJobPartTagFromPopover();
   }
 
   deleteJobPartTagById(event: Event, tagId: number): void {

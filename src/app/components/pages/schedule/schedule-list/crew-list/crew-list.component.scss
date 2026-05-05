@@ -13,6 +13,14 @@
   th, td {
     padding: 1px !important;
   }
+
+  th:not(:first-child) {
+    line-height: 31px;
+  }
+
+  th:first-child {
+    line-height: 25px;
+  }
 }
 
 .crew-list-tag-filter-menu {
