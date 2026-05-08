@@ -329,6 +329,15 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
     this._modal.open(this.updateNotes, { centered: true, size: 'xl' });
   }
 
+  onOpenCrewToolbarClick(e: Event, schedule: Schedule) {
+    if (schedule.isCrewLocked) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+    this.openCrewsPanel(null, e, schedule);
+  }
+
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
     if (schedule.updateLoading) return;
 

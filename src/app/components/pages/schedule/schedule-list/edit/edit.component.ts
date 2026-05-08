@@ -43,6 +43,9 @@ export class EditComponent extends ApiBase implements OnInit {
 
   ngOnInit() {
     this.initForm();
+    if (this.scheduleInfo?.isCrewLocked) {
+      this.form.get('jobPartCrewStatusId')?.disable({ emitEvent: false });
+    }
     this.setCrewsList();
     this.setCrewSkills();
     this.pay = this.crewInfo.pay;
@@ -163,6 +166,10 @@ export class EditComponent extends ApiBase implements OnInit {
 
     this.saveLoading = true;
 
+    const statusId = this.scheduleInfo?.isCrewLocked
+      ? this.crewInfo.jobPartCrewStatusId
+      : this.form.get('jobPartCrewStatusId').value;
+
     const data = {
       jobPartId: this.scheduleInfo.jobPartId,
       jobPartCrewId: this.crewInfo.jobPartCrewId,
@@ -172,7 +179,7 @@ export class EditComponent extends ApiBase implements OnInit {
       skilledCost: this.form.get('skilledCost').value,
       otherPaymentAdjustmentTxt: this.form.get('otherPaymentAdjustmentTxt').value,
       lastMinuteBonus: this.form.get('lastMinuteBonus').value,
-      jobPartCrewStatusId: this.form.get('jobPartCrewStatusId').value,
+      jobPartCrewStatusId: statusId,
       jobPartCrewRoleId: this.form.get('jobPartCrewRoleId').value,
       buddyDown: this.form.get('buddyDown').value,
       skillId: this.skills.filter(it => it.checked).map(it => it.crewSkillId)

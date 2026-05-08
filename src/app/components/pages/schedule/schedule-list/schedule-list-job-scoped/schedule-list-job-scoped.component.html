@@ -452,7 +452,13 @@
             </div>
           </div>
 
-          <div class="open-crew-panel pointer" (click)="openCrewsPanel(null, $event, schedule)">
+          <div class="open-crew-panel"
+               [class.pointer]="!schedule.isCrewLocked"
+               [class.text-secondary]="schedule.isCrewLocked"
+               [class.opacity-50]="schedule.isCrewLocked"
+               [style.cursor]="schedule.isCrewLocked ? 'not-allowed' : null"
+               [attr.title]="schedule.isCrewLocked ? 'Crew changes are locked for this shift.' : null"
+               (click)="onOpenCrewToolbarClick($event, schedule)">
             <i class="fas fa-list f-14 z-3"></i>
           </div>
 
