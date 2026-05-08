@@ -471,13 +471,15 @@
             <i class="fa-solid fa-rotate-right"></i>
           </button>
 
-          <button type="button"
-                  (click)="toggleLocked(schedule)"
-                  [disabled]="schedule.crewLockLoader"
-                  class="btn btn-primary action-button visibility w-30 h-30 p-0">
-            <i class="fa-solid"
-               [ngClass]="schedule.crewLockLoader ? 'fa-spinner fa-spin' : (schedule.isCrewLocked ? 'fa-lock' : 'fa-lock-open')"></i>
-          </button>
+          @if (allAreConfirmed(schedule)) {
+            <button type="button"
+                    (click)="toggleLocked(schedule)"
+                    [disabled]="schedule.crewLockLoader"
+                    class="btn btn-primary action-button visibility w-30 h-30 p-0">
+              <i class="fa-solid"
+                 [ngClass]="schedule.crewLockLoader ? 'fa-spinner fa-spin' : (schedule.isCrewLocked ? 'fa-lock' : 'fa-lock-open')"></i>
+            </button>
+          }
 
           <button type="button"
                   (click)="getActivities(schedule, popoverRef)"

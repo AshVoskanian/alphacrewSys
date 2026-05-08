@@ -1108,7 +1108,19 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     }
   }
 
+  /** Every active crew row is status Confirmed (id 2); empty crew list is false. */
+  allAreConfirmed(schedule: Schedule): boolean {
+    const crews = schedule.crews;
+    if (!crews?.length) {
+      return false;
+    }
+    return crews.every(c => c.jobPartCrewStatusId === 2);
+  }
+
   toggleLocked(schedule: Schedule) {
+    if (!this.allAreConfirmed(schedule)) {
+      return;
+    }
     if (schedule.crewLockLoader) {
       return;
     }
