@@ -1083,6 +1083,29 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   toggleLocked(schedule: Schedule) {
-
+    if (schedule.crewLockLoader) {
+      return;
+    }
+    const isCrewLocked = !schedule.isCrewLocked;
+    schedule.crewLockLoader = true;
+    this.get<null>('Schedule/UpdateJobPartCrewLocker', { jobPartId: schedule.jobPartId, isCrewLocked })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => {
+          schedule.crewLockLoader = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          schedule.isCrewLocked = isCrewLocked;
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Could not update crew lock.');
+        }
+      });
   }
 }

@@ -20,6 +20,8 @@ export interface Schedule {
   notificationsLoader: boolean;
   vehicleLoader: boolean;
   activityLoader?: boolean;
+  /** True while `Schedule/UpdateJobPartCrewLocker` request is in flight. */
+  crewLockLoader?: boolean;
   noteType?: 'job_note' | 'crew_note';
   updateLoading?: boolean;
   isJobScoped?: boolean;
