@@ -1081,4 +1081,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       target.nativeElement.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }
+
+  toggleLocked(schedule: Schedule) {
+
+  }
 }

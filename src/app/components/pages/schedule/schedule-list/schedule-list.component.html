@@ -450,6 +450,12 @@
       </button>
 
       <button type="button"
+              (click)="toggleLocked(schedule)"
+              class="btn btn-primary action-button visibility w-30 h-30 p-0">
+        <i class="fa-solid fa-lock"></i>
+      </button>
+
+      <button type="button"
               (click)="getActivities(schedule, popoverRef)"
               #popoverRef="ngbPopover"
               triggers="manual"

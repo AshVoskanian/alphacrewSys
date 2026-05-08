@@ -1057,4 +1057,8 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
       target.nativeElement.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }
+
+  toggleLocked(schedule: Schedule) {
+
+  }
 }

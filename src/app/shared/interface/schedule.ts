@@ -12,6 +12,8 @@ export interface Schedule {
   importantNotes: boolean;
   isJobActive: boolean;
   isActive: boolean;
+  /** From `schedule/getschedule` — crew edits locked for this shift row. */
+  isCrewLocked: boolean;
   isNightShift: boolean;
   isNigthShiftPaid: boolean;
   showNotifications: boolean;
