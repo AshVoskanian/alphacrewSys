@@ -358,7 +358,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       jobId: this.selectedSchedule.jobId,
       jobPartId: type === 'checkedShifts' ? 0 : this.selectedSchedule?.jobPartId,
       jobPartIds: type === 'checkedShifts' ? jobPartIds : [],
-      crewId: this.getSelectedData(newCrewOnly ? 'onlyNewCrew' : 'crew'),
+      crewId: this.getSelectedData('crew'),
       newCrewOnly,
     }
 
