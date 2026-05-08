@@ -50,7 +50,7 @@ import { FormsModule } from "@angular/forms";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { CrewListComponent } from "./crew-list/crew-list.component";
 import { ApiBase } from "../../../../shared/bases/api-base";
-import { CrewAction } from "../../../../shared/enums/schedule";
+import { CrewAction, isCrewMenuActionDisabledWhenShiftLocked } from "../../../../shared/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
@@ -469,10 +469,27 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       });
   }
 
-  menuAction(menu: CrewActionItem, crew: JobPartCrew) {
+  isCrewMenuDisabledByLock(menu: CrewActionItem, schedule: Schedule): boolean {
+    return !!schedule?.isCrewLocked && isCrewMenuActionDisabledWhenShiftLocked(menu.action as CrewAction);
+  }
+
+  onCrewMenuItemClick(event: MouseEvent, menu: CrewActionItem, crew: JobPartCrew, schedule: Schedule) {
+    if (this.isCrewMenuDisabledByLock(menu, schedule)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    this.menuAction(menu, crew, schedule);
+  }
+
+  menuAction(menu: CrewActionItem, crew: JobPartCrew, schedule: Schedule) {
     this.selectedCrew = crew;
 
     if (crew.loading) {
+      return;
+    }
+
+    if (schedule?.isCrewLocked && isCrewMenuActionDisabledWhenShiftLocked(menu.action as CrewAction)) {
       return;
     }
 

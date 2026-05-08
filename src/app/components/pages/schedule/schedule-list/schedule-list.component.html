@@ -289,7 +289,14 @@
                                 </button>
                                 <ul class="dropdown-menu" ngbDropdownMenu>
                                   @for (menu of menu(); track menu) {
-                                    <li class="pointer" (click)="menuAction(menu, crew)">
+                                    @let menuLockedByCrew = isCrewMenuDisabledByLock(menu, schedule);
+                                    <li
+                                      [class.pointer]="!menuLockedByCrew"
+                                      [class.text-secondary]="menuLockedByCrew"
+                                      [class.opacity-50]="menuLockedByCrew"
+                                      [style.cursor]="menuLockedByCrew ? 'not-allowed' : null"
+                                      [attr.title]="menuLockedByCrew ? 'Crew changes are locked for this shift.' : null"
+                                      (click)="onCrewMenuItemClick($event, menu, crew, schedule)">
                                       @if (menu.href) {
                                         @if (isLegacySystem() && menu.id === 2) {
                                           <a class="dropdown-item opacity-100 flex items-center"
