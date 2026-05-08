@@ -65,6 +65,7 @@
                   <input
                     class="form-check-input me-1 checkbox-primary"
                     type="checkbox"
+                    [disabled]="crewClashingLoader || !hasSelectableClashingParts()"
                     [checked]="isAllSelected()"
                     [indeterminate]="isIndeterminate()"
                     (change)="selectAllClashing()">
@@ -113,11 +114,18 @@
               </thead>
               <tbody>
                 @for (item of jobPartClashing; track item.jobPartId + item.startDate) {
-                  <tr class="border-bottom-secondary">
+                  <tr class="border-bottom-secondary"
+                      [class.opacity-50]="item.isCrewLocked"
+                      [class.text-secondary]="item.isCrewLocked">
                     <td scope="row">
-                      <input class="form-check-input me-1 checkbox-primary" type="checkbox"
-                             [(ngModel)]="item.checked" [name]="item.jobPartId + ''"
-                             (change)="onJobPartRowCheckboxChange()">
+                      @if (item.isCrewLocked) {
+                        <i class="fa-solid fa-lock text-secondary"
+                           [attr.title]="'Crew changes are locked for this part.'"></i>
+                      } @else {
+                        <input class="form-check-input me-1 checkbox-primary" type="checkbox"
+                               [(ngModel)]="item.checked" [name]="item.jobPartId + ''"
+                               (change)="onJobPartRowCheckboxChange()">
+                      }
                     </td>
                     <td>{{ item.startDate | date: 'dd MMM yyy' }}</td>
                     <td>{{ item.startDate | date: 'HH:mm' }}</td>

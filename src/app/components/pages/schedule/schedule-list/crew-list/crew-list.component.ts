@@ -292,7 +292,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     }
 
     if (type === 'jobParts') {
-      return this.jobPartClashing.filter(it => it.checked).map(it => it.jobPartId);
+      return this.jobPartClashing.filter(it => it.checked && !it.isCrewLocked).map(it => it.jobPartId);
     }
 
     return [];
@@ -350,7 +350,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     if (this.loading) return;
     this.loading = true;
 
-    const checkedClashingCrew = this.jobPartClashing.filter(it => it.checked);
+    const checkedClashingCrew = this.jobPartClashing.filter(it => it.checked && !it.isCrewLocked);
     const jobPartIds = checkedClashingCrew?.length > 0 ? checkedClashingCrew.map(it => it.jobPartId) : [];
     const newCrewOnly = type === 'new' || type === 'checkedShifts';
 
@@ -411,6 +411,22 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       })
   }
 
+  /**
+   * Merges `isCrewLocked` with backend typo `isCrewBlokced` into a single boolean.
+   */
+  private normalizeJobPartClashingLock(part: JobPartClashing): JobPartClashing {
+    const raw = part as JobPartClashing & { isCrewBlokced?: boolean };
+    return {
+      ...part,
+      isCrewLocked: Boolean(part.isCrewLocked ?? raw.isCrewBlokced),
+    };
+  }
+
+  /** Rows in the clashing table that can still be checked for bulk actions. */
+  hasSelectableClashingParts(): boolean {
+    return this.jobPartClashing.some(p => !p.isCrewLocked);
+  }
+
   getCrewClashing(): void {
     this.crewClashingLoader = true;
     this.jobPartClashing = [];
@@ -424,7 +440,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
         next: res => {
           if (res.errors?.errorCode) return;
 
-          this.jobPartClashing = res.data ?? [];
+          this.jobPartClashing = (res.data ?? []).map(part => this.normalizeJobPartClashingLock(part));
 
           const selected = this.jobPartClashing.find(it => it.jobPartId === this.selectedSchedule.jobPartId);
 
@@ -433,7 +449,9 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
             this.jobPartClashing = this.jobPartClashing.filter(it => new Date(it.startDate) >= selectedDate);
 
-            this.jobPartClashing.forEach(it => it.checked = it.jobPartId === this.selectedSchedule.jobPartId);
+            this.jobPartClashing.forEach(it => {
+              it.checked = !it.isCrewLocked && it.jobPartId === this.selectedSchedule.jobPartId;
+            });
           }
 
           this.updateNotClashingCounts(this.jobPartClashing);
@@ -556,6 +574,10 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       }
     }
     this.jobPartClashing.forEach(part => {
+      if (part.isCrewLocked) {
+        part.checked = false;
+        return;
+      }
       part.checked = selectedPartIds.has(part.jobPartId);
     });
     this.jobPartSelect();
@@ -597,7 +619,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       crew.jobPartIds = [];
 
       this.jobPartClashing
-        .filter(jp => jp.checked)
+        .filter(jp => jp.checked && !jp.isCrewLocked)
         .forEach(jp => {
           if (crew.notClashingInfo?.details?.[jp.jobPartId] > 0) {
             crew.jobPartIds.push(jp.jobPartId);
@@ -623,8 +645,8 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       this.notificationsLoader = true;
     }
 
-    const selectedJps = this.jobPartClashing.filter(it => it.checked);
-    const isAnyJpSelected = this.jobPartClashing.some(it => it.checked);
+    const selectedJps = this.jobPartClashing.filter(it => it.checked && !it.isCrewLocked);
+    const isAnyJpSelected = this.jobPartClashing.some(it => it.checked && !it.isCrewLocked);
 
     const data = {
       jobId: this.selectedSchedule.jobId,
@@ -688,10 +710,22 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
   selectAllClashing(): void {
     this.selectedTagFilterKeys.clear();
-    if (this.isAllSelected()) {
-      this.jobPartClashing?.forEach(part => part.checked = false);
+    const selectable = this.jobPartClashing?.filter(p => !p.isCrewLocked) ?? [];
+    if (!selectable.length) {
+      return;
+    }
+    if (selectable.every(p => p.checked)) {
+      this.jobPartClashing?.forEach(part => {
+        if (!part.isCrewLocked) {
+          part.checked = false;
+        }
+      });
     } else {
-      this.jobPartClashing?.forEach(part => part.checked = true);
+      this.jobPartClashing?.forEach(part => {
+        if (!part.isCrewLocked) {
+          part.checked = true;
+        }
+      });
     }
 
     this.updateNotClashingCounts(this.jobPartClashing);
@@ -742,11 +776,13 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   isAllSelected(): boolean {
-    return this.jobPartClashing?.length > 0 && this.jobPartClashing.every(p => p.checked);
+    const selectable = this.jobPartClashing?.filter(p => !p.isCrewLocked) ?? [];
+    return selectable.length > 0 && selectable.every(p => p.checked);
   }
 
   isIndeterminate(): boolean {
-    return this.jobPartClashing?.some(p => p.checked) && !this.isAllSelected();
+    const selectable = this.jobPartClashing?.filter(p => !p.isCrewLocked) ?? [];
+    return selectable.some(p => p.checked) && !this.isAllSelected();
   }
 
   getBadgeClass(crew: Crew, noSlotOnSelectedParts = false): string {

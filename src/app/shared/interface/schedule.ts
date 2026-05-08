@@ -266,6 +266,8 @@ export interface JobPartClashing {
   jobPartId: number;
   startDate: string;
   checked: boolean;
+  /** When true, part row is locked in crew list (no checkbox). Normalized from API `isCrewLocked` or typo `isCrewBlokced`. */
+  isCrewLocked?: boolean;
   /** Present when API returns tag for this part (e.g. `Crew/GetCrewClashing`). */
   jobPartTag?: JobPartTagItem | null;
 }
