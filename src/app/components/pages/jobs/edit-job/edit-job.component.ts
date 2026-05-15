@@ -282,8 +282,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
       .subscribe({
         next: clientId => {
           if (clientId && clientId !== 0) {
-            this.form.get('venueId')?.setValue(null);
-            this.form.get('venue')?.setValue(null);
             this.getJobVenues(clientId, this.jobDetails()?.jobId ?? 0);
           } else {
             this.jobVenues.set([]);
