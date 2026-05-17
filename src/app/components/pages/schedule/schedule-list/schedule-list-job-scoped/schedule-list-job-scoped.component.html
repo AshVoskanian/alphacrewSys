@@ -519,7 +519,7 @@
 <!--Set Vehicle or send SMS-->
 <ng-template #vehicleModal let-vehicleModal>
   <app-vehicles (closeModal)="closeVehiclePopup(vehicleModal, $event)"
-                [scheduleInfo]="selectedSchedule"
+                [scheduleInfo]="vehicleSchedule"
                 [hideVehicles]="hideVehicles"
                 (selectVehicle)="onVehicleSelect($event)"
                 [vehicles]="vehiclesInfo()">
@@ -530,7 +530,7 @@
 <ng-template #sendSmsModal let-sendSmsModal>
   <app-send-sms (closeModal)="sendSmsModal.close()"
                 [smsInfo]="smsInfo()"
-                [scheduleInfo]="selectedSchedule">
+                [scheduleInfo]="vehicleSchedule">
   </app-send-sms>
 </ng-template>
 
