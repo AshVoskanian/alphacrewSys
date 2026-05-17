@@ -65,6 +65,7 @@
                   <input
                     class="form-check-input me-1 checkbox-primary"
                     type="checkbox"
+                    [disabled]="crewClashingLoader || !hasSelectableClashingParts()"
                     [checked]="isAllSelected()"
                     [indeterminate]="isIndeterminate()"
                     (change)="selectAllClashing()">
@@ -73,19 +74,64 @@
                 <th scope="col">Time</th>
                 <th scope="col">Hours</th>
                 <th scope="col">Crew</th>
+                <th scope="col" class="text-center crew-list-tag-col">
+                  <div
+                    class="btn-group m-b-3"
+                    ngbDropdown
+                    container="body"
+                    dropdownClass="crew-list-tag-filter-dropdown"
+                    [autoClose]="'outside'"
+                    (openChange)="onTagFilterDropdownOpen($event)">
+                    <button
+                      type="button"
+                      class="btn m-0 lh-1 border-0 text-decoration-none min-w-auto"
+                      ngbDropdownToggle
+                      aria-haspopup="true"
+                      aria-label="Filter parts by tag">
+                      <span class="badge bg-primary rounded-pill m-l-2 align-top f-10">{{ selectedTagFilterCount }}</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-2 crew-list-tag-filter-menu" ngbDropdownMenu>
+                      @if (!jobPartTagsForFilter.length) {
+                        <div class="text-muted small px-2 py-1">No tags</div>
+                      } @else {
+                        @for (tagLabel of jobPartTagsForFilter; track tagLabel; let tagIdx = $index) {
+                          <label
+                            class="crew-list-tag-filter-row d-flex align-items-center gap-2 mb-1 px-1 w-100 cursor-pointer">
+                            <input
+                              class="form-check-input flex-shrink-0 m-r-3 m-0"
+                              type="checkbox"
+                              [id]="'crew-list-tag-filter-' + tagIdx"
+                              [checked]="isTagFilterSelected(tagLabel)"
+                              (change)="toggleTagFilterSelection(tagLabel, $any($event.target).checked)">
+                            <span class="flex-grow-1 text-truncate small text-start">{{ tagLabel }}</span>
+                          </label>
+                        }
+                      }
+                    </div>
+                  </div>
+                </th>
               </tr>
               </thead>
               <tbody>
                 @for (item of jobPartClashing; track item.jobPartId + item.startDate) {
-                  <tr class="border-bottom-secondary">
-                    <th scope="row">
-                      <input class="form-check-input me-1 checkbox-primary" type="checkbox"
-                             [(ngModel)]="item.checked" [name]="item.jobPartId + ''" (change)="jobPartSelect()">
-                    </th>
+                  <tr class="border-bottom-secondary"
+                      [class.opacity-50]="item.isCrewLocked"
+                      [class.text-secondary]="item.isCrewLocked">
+                    <td scope="row">
+                      @if (item.isCrewLocked) {
+                        <i class="fa-solid fa-lock text-secondary"
+                           [attr.title]="'Crew changes are locked for this part.'"></i>
+                      } @else {
+                        <input class="form-check-input me-1 checkbox-primary" type="checkbox"
+                               [(ngModel)]="item.checked" [name]="item.jobPartId + ''"
+                               (change)="onJobPartRowCheckboxChange()">
+                      }
+                    </td>
                     <td>{{ item.startDate | date: 'dd MMM yyy' }}</td>
                     <td>{{ item.startDate | date: 'HH:mm' }}</td>
                     <td>{{ item.hours }}</td>
                     <td>{{ item.bookedCrew }}</td>
+                    <td class="small text-break crew-list-tag-cell">{{ tagsLabelForClashingRow(item.jobPartId) }}</td>
                   </tr>
                 }
               </tbody>
@@ -177,6 +223,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer"
                    [ngbPopover]="popoverContentAll"
+                   container="body"
                    [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>
@@ -215,6 +262,7 @@
                    (click)="getCrewDetails(crew, popoverRef)"
                    #popoverRef="ngbPopover"
                    triggers="manual"
+                   container="body"
                    [popperOptions]=""
                    [popoverClass]="'wide-popover border border-2 bg-dark'"
                    [ngbPopover]="crewDetailsRef"
@@ -317,6 +365,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer m-l-10"
                    [ngbPopover]="popoverContent"
+                   container="body"
                    [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>
@@ -346,6 +395,7 @@
                    (click)="getCrewDetails(crew, popoverRef)"
                    #popoverRef="ngbPopover"
                    triggers="manual"
+                   container="body"
                    [popperOptions]=""
                    [popoverClass]="'wide-popover border border-2 bg-dark'"
                    [ngbPopover]="crewDetailsRef"
@@ -448,6 +498,7 @@
               } @else {
                 <i class="fa-solid rounded fa-phone-square text-success pointer m-l-10"
                    [ngbPopover]="popoverContent"
+                   container="body"
                    [popoverClass]="'bg-dark'"
                    [popoverTitle]="'Contact'"
                 ></i>

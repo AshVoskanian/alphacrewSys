@@ -177,6 +177,14 @@
                         }
                       </td>
                     }
+                    @case ('template') {
+                      <td [ngClass]="column.class ? column.class : ''">
+                        @if (columnTemplates?.[column.field_value]) {
+                          <ng-container
+                            *ngTemplateOutlet="columnTemplates[column.field_value]; context: { $implicit: details }"/>
+                        }
+                      </td>
+                    }
                     @default {
                       <td [innerHTML]="details[column.field_value]" [ngClass]="column.class ? column.class : ''">
                         @if (column.text) {

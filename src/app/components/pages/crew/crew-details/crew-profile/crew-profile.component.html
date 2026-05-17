@@ -76,6 +76,11 @@
     </div>
 
     <div class="col col-sm-6 col-md-4">
+      <label class="form-label">Date of Birth</label>
+      <input class="form-control digits" type="date" formControlName="doB">
+    </div>
+
+    <div class="col col-sm-6 col-md-4">
       <label class="form-label">Start Date</label>
       <input class="form-control digits" type="date" formControlName="startDate">
     </div>
@@ -91,6 +96,16 @@
       <input class="form-control digits" type="date" formControlName="visaExpiry">
     </div>
 
+    <div class="col col-md-8">
+      <label class="form-label">Address</label>
+      <div class="input-group">
+        <input #addressInput class="form-control" type="text" formControlName="address">
+        <span class="input-group-text bg-light-secondary">
+          <i class="fa-solid fa-map-pin txt-secondary"></i>
+        </span>
+      </div>
+    </div>
+
     <div class="col flex justify-content-end gap-12 m-t-41">
       <div class="h-38">
         <input class="tgl tgl-flip h-100 l-h-38" [id]="1" type="checkbox" formControlName="isFulltime">
@@ -100,16 +115,6 @@
       <div class="h-38">
         <input class="tgl tgl-flip h-100 l-h-38" [id]="12" type="checkbox" formControlName="isActive">
         <label class="tgl-btn m-0 h-100 l-h-38" data-tg-off="Inactive" data-tg-on="Active" [for]="12"></label>
-      </div>
-    </div>
-
-    <div class="col col-md-8">
-      <label class="form-label">Address</label>
-      <div class="input-group">
-        <input #addressInput class="form-control" type="text" formControlName="address">
-        <span class="input-group-text bg-light-secondary">
-          <i class="fa-solid fa-map-pin txt-secondary"></i>
-        </span>
       </div>
     </div>
 

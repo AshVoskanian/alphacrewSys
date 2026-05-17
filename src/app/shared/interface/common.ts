@@ -13,9 +13,11 @@ export interface TableConfigs {
 
 export interface TableColumn {
     title: string;
+    /** When `type` is `'template'`, must match a key in `TableComponent.columnTemplates`. */
     field_value: string;
     sortable_key?: string;
     sort?: boolean;
+    /** Use `'template'` with `columnTemplates` input on `app-table` for custom cells. */
     type?: string;
     template?: string;
     class?: string;

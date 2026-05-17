@@ -12,3 +12,26 @@
 .timepicker {
   z-index: 1101 !important;
 }
+
+// Job part tag popover: keep typeahead dropdown visible (not clipped by popover body)
+.popover.job-part-tag-popover {
+  overflow: visible;
+
+  .popover-body {
+    overflow: visible;
+  }
+}
+
+ngb-typeahead-window.job-part-tag-typeahead-popup {
+  z-index: 200000 !important;
+}
+
+// Crew list offcanvas: ng-bootstrap sets body wrapper inline z-index 1055 — override on that wrapper (.dropdownClass)
+.crew-list-tag-filter-dropdown.dropdown,
+.crew-list-tag-filter-dropdown.dropup {
+  z-index: 10050 !important;
+}
+
+.dropdown-menu.crew-list-tag-filter-menu {
+  z-index: 10050 !important;
+}

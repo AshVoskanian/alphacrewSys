@@ -11,6 +11,8 @@ import {
   Output,
   SimpleChanges,
   QueryList,
+  Renderer2,
+  RendererStyleFlags2,
   signal,
   ViewChild,
   ViewChildren,
@@ -33,6 +35,7 @@ import {
   Schedule,
   ShiftCrewDetails
 } from "../../../../../shared/interface/schedule";
+import { JobPartTagItem } from '../../../../../shared/interface/jobs';
 import { CardComponent } from "../../../../../shared/components/ui/card/card.component";
 import {
   CrewFilterPipe,
@@ -42,7 +45,7 @@ import { FormGroup, FormsModule } from "@angular/forms";
 import { ApiBase } from "../../../../../shared/bases/api-base";
 import { ScheduleService } from "../../schedule.service";
 import { GeneralService } from "../../../../../shared/services/general.service";
-import { AsyncPipe, DatePipe, NgClass, NgStyle } from "@angular/common";
+import { AsyncPipe, DatePipe, DOCUMENT, NgClass, NgStyle } from '@angular/common';
 import { finalize, Observable } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
@@ -65,6 +68,11 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   private _filterPipe: CrewFilterPipe = inject(CrewFilterPipe);
   private _scheduleService = inject(ScheduleService);
   private readonly _activeOffcanvas = inject(NgbActiveOffcanvas, { optional: true });
+  private readonly _document = inject(DOCUMENT);
+  private readonly _renderer = inject(Renderer2);
+
+  /** ng-bootstrap hardcodes body dropdown wrapper z-index 1055 — must exceed .common-offcanvas (9999). */
+  private static readonly tagFilterDropdownZ = '10050';
 
   @Input() title: string;
   @Input() crewList: Array<Crew> = [];
@@ -133,6 +141,15 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   ];
 
   jobPartClashing: Array<JobPartClashing> = [];
+
+  /**
+   * Tag rows derived from `jobPartClashing[].jobPartTag` (same shape as `JobPartTagItem` for filters).
+   */
+  jobPartTagsCatalog: JobPartTagItem[] = [];
+  /** Unique `tag` labels for the dropdown (trimmed; duplicates collapsed case-insensitively). */
+  jobPartTagsForFilter: string[] = [];
+  /** Normalized tag keys (`normalizeTagKey`) selected in the header tag filter (multi-select). */
+  private readonly selectedTagFilterKeys = new Set<string>();
 
   /**
    * Fixed chrome subtracted from 100dvh for the scrollable crew list: offcanvas header, region/level
@@ -275,7 +292,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     }
 
     if (type === 'jobParts') {
-      return this.jobPartClashing.filter(it => it.checked).map(it => it.jobPartId);
+      return this.jobPartClashing.filter(it => it.checked && !it.isCrewLocked).map(it => it.jobPartId);
     }
 
     return [];
@@ -333,7 +350,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     if (this.loading) return;
     this.loading = true;
 
-    const checkedClashingCrew = this.jobPartClashing.filter(it => it.checked);
+    const checkedClashingCrew = this.jobPartClashing.filter(it => it.checked && !it.isCrewLocked);
     const jobPartIds = checkedClashingCrew?.length > 0 ? checkedClashingCrew.map(it => it.jobPartId) : [];
     const newCrewOnly = type === 'new' || type === 'checkedShifts';
 
@@ -341,7 +358,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       jobId: this.selectedSchedule.jobId,
       jobPartId: type === 'checkedShifts' ? 0 : this.selectedSchedule?.jobPartId,
       jobPartIds: type === 'checkedShifts' ? jobPartIds : [],
-      crewId: this.getSelectedData(newCrewOnly ? 'onlyNewCrew' : 'crew'),
+      crewId: this.getSelectedData('crew'),
       newCrewOnly,
     }
 
@@ -394,9 +411,28 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       })
   }
 
+  /**
+   * Merges `isCrewLocked` with backend typo `isCrewBlokced` into a single boolean.
+   */
+  private normalizeJobPartClashingLock(part: JobPartClashing): JobPartClashing {
+    const raw = part as JobPartClashing & { isCrewBlokced?: boolean };
+    return {
+      ...part,
+      isCrewLocked: Boolean(part.isCrewLocked ?? raw.isCrewBlokced),
+    };
+  }
+
+  /** Rows in the clashing table that can still be checked for bulk actions. */
+  hasSelectableClashingParts(): boolean {
+    return this.jobPartClashing.some(p => !p.isCrewLocked);
+  }
+
   getCrewClashing(): void {
     this.crewClashingLoader = true;
     this.jobPartClashing = [];
+    this.selectedTagFilterKeys.clear();
+    this.jobPartTagsCatalog = [];
+    this.jobPartTagsForFilter = [];
 
     this.get<Array<JobPartClashing>>(`Crew/GetCrewClashing/${ this.selectedSchedule.jobPartId }`)
       .pipe(finalize(() => this.crewClashingLoader = false))
@@ -404,7 +440,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
         next: res => {
           if (res.errors?.errorCode) return;
 
-          this.jobPartClashing = res.data ?? [];
+          this.jobPartClashing = (res.data ?? []).map(part => this.normalizeJobPartClashingLock(part));
 
           const selected = this.jobPartClashing.find(it => it.jobPartId === this.selectedSchedule.jobPartId);
 
@@ -413,12 +449,149 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
 
             this.jobPartClashing = this.jobPartClashing.filter(it => new Date(it.startDate) >= selectedDate);
 
-            this.jobPartClashing.forEach(it => it.checked = it.jobPartId === this.selectedSchedule.jobPartId);
+            this.jobPartClashing.forEach(it => {
+              it.checked = !it.isCrewLocked && it.jobPartId === this.selectedSchedule.jobPartId;
+            });
           }
 
           this.updateNotClashingCounts(this.jobPartClashing);
+          this.selectedTagFilterKeys.clear();
+          this.rebuildJobPartTagsFromClashing();
         }
       });
+  }
+
+  /** Opens dropdown: z-index only (tags come from `GetCrewClashing`). */
+  onTagFilterDropdownOpen(open: boolean): void {
+    if (open) {
+      this.patchTagFilterDropdownZIndex();
+    }
+  }
+
+  /**
+   * NgbDropdown with `container="body"` sets inline `z-index: 1055` on the wrapper div.
+   * Popper may refresh styles — re-apply after layout so the menu stays above offcanvas.
+   */
+  private patchTagFilterDropdownZIndex(): void {
+    const apply = (): void => {
+      const el = this._document.body.querySelector(
+        '.crew-list-tag-filter-dropdown'
+      ) as HTMLElement | null;
+      if (el) {
+        this._renderer.setStyle(
+          el,
+          'z-index',
+          CrewListComponent.tagFilterDropdownZ,
+          RendererStyleFlags2.Important
+        );
+      }
+    };
+    queueMicrotask(apply);
+    requestAnimationFrame(apply);
+    requestAnimationFrame(() => requestAnimationFrame(apply));
+  }
+
+  private rebuildJobPartTagsFromClashing(): void {
+    const rows: JobPartTagItem[] = [];
+    for (const part of this.jobPartClashing) {
+      const tagObj = part.jobPartTag;
+      const text = (tagObj?.tag ?? '').trim();
+      if (!tagObj || !text) {
+        continue;
+      }
+      rows.push({
+        ...tagObj,
+        jobId: tagObj.jobId || part.jobId,
+        jobPartId: tagObj.jobPartId || part.jobPartId,
+        tag: text
+      });
+    }
+    this.jobPartTagsCatalog = rows.sort((a, b) => {
+      const ta = (a.tag ?? '').localeCompare(b.tag ?? '', undefined, { sensitivity: 'base' });
+      if (ta !== 0) {
+        return ta;
+      }
+      return a.jobPartId - b.jobPartId;
+    });
+    this.jobPartTagsForFilter = this.buildUniqueTagLabels(this.jobPartTagsCatalog);
+    this._cdr.markForCheck();
+  }
+
+  private normalizeTagKey(tag: string | null | undefined): string {
+    return (tag ?? '').trim().toLowerCase();
+  }
+
+  /** One entry per distinct tag text (case-insensitive); label is first trimmed spelling seen. */
+  private buildUniqueTagLabels(rows: JobPartTagItem[]): string[] {
+    const byKey = new Map<string, string>();
+    for (const row of rows) {
+      const raw = (row.tag ?? '').trim();
+      if (!raw) {
+        continue;
+      }
+      const key = this.normalizeTagKey(raw);
+      if (!byKey.has(key)) {
+        byKey.set(key, raw);
+      }
+    }
+    return [ ...byKey.values() ].sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base' })
+    );
+  }
+
+  isTagFilterSelected(tagLabel: string): boolean {
+    return this.selectedTagFilterKeys.has(this.normalizeTagKey(tagLabel));
+  }
+
+  get selectedTagFilterCount(): number {
+    return this.selectedTagFilterKeys.size;
+  }
+
+  toggleTagFilterSelection(tagLabel: string, checked: boolean): void {
+    const key = this.normalizeTagKey(tagLabel);
+    if (!key) {
+      return;
+    }
+    if (checked) {
+      this.selectedTagFilterKeys.add(key);
+    } else {
+      this.selectedTagFilterKeys.delete(key);
+    }
+    this.applySelectedTagsToJobPartChecks();
+  }
+
+  /**
+   * Check every clashing row whose `jobPartId` has any of the selected tag strings in the catalog;
+   * uncheck rows that do not match any selected tag.
+   */
+  private applySelectedTagsToJobPartChecks(): void {
+    const selectedPartIds = new Set<number>();
+    for (const key of this.selectedTagFilterKeys) {
+      for (const row of this.jobPartTagsCatalog) {
+        if (this.normalizeTagKey(row.tag) === key) {
+          selectedPartIds.add(row.jobPartId);
+        }
+      }
+    }
+    this.jobPartClashing.forEach(part => {
+      if (part.isCrewLocked) {
+        part.checked = false;
+        return;
+      }
+      part.checked = selectedPartIds.has(part.jobPartId);
+    });
+    this.jobPartSelect();
+    this._cdr.markForCheck();
+  }
+
+  tagsLabelForClashingRow(jobPartId: number): string {
+    const part = this.jobPartClashing.find(p => p.jobPartId === jobPartId);
+    return (part?.jobPartTag?.tag ?? '').trim();
+  }
+
+  onJobPartRowCheckboxChange(): void {
+    this.selectedTagFilterKeys.clear();
+    this.jobPartSelect();
   }
 
   updateNotClashingCounts(data: JobPartClashing[]): void {
@@ -446,7 +619,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       crew.jobPartIds = [];
 
       this.jobPartClashing
-        .filter(jp => jp.checked)
+        .filter(jp => jp.checked && !jp.isCrewLocked)
         .forEach(jp => {
           if (crew.notClashingInfo?.details?.[jp.jobPartId] > 0) {
             crew.jobPartIds.push(jp.jobPartId);
@@ -472,8 +645,8 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       this.notificationsLoader = true;
     }
 
-    const selectedJps = this.jobPartClashing.filter(it => it.checked);
-    const isAnyJpSelected = this.jobPartClashing.some(it => it.checked);
+    const selectedJps = this.jobPartClashing.filter(it => it.checked && !it.isCrewLocked);
+    const isAnyJpSelected = this.jobPartClashing.some(it => it.checked && !it.isCrewLocked);
 
     const data = {
       jobId: this.selectedSchedule.jobId,
@@ -536,10 +709,23 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   selectAllClashing(): void {
-    if (this.isAllSelected()) {
-      this.jobPartClashing?.forEach(part => part.checked = false);
+    this.selectedTagFilterKeys.clear();
+    const selectable = this.jobPartClashing?.filter(p => !p.isCrewLocked) ?? [];
+    if (!selectable.length) {
+      return;
+    }
+    if (selectable.every(p => p.checked)) {
+      this.jobPartClashing?.forEach(part => {
+        if (!part.isCrewLocked) {
+          part.checked = false;
+        }
+      });
     } else {
-      this.jobPartClashing?.forEach(part => part.checked = true);
+      this.jobPartClashing?.forEach(part => {
+        if (!part.isCrewLocked) {
+          part.checked = true;
+        }
+      });
     }
 
     this.updateNotClashingCounts(this.jobPartClashing);
@@ -590,11 +776,13 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
   }
 
   isAllSelected(): boolean {
-    return this.jobPartClashing?.length > 0 && this.jobPartClashing.every(p => p.checked);
+    const selectable = this.jobPartClashing?.filter(p => !p.isCrewLocked) ?? [];
+    return selectable.length > 0 && selectable.every(p => p.checked);
   }
 
   isIndeterminate(): boolean {
-    return this.jobPartClashing?.some(p => p.checked) && !this.isAllSelected();
+    const selectable = this.jobPartClashing?.filter(p => !p.isCrewLocked) ?? [];
+    return selectable.some(p => p.checked) && !this.isAllSelected();
   }
 
   getBadgeClass(crew: Crew, noSlotOnSelectedParts = false): string {

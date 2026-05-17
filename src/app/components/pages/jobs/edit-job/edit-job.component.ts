@@ -20,7 +20,6 @@ import {
   JobDocument,
   JobPart,
   JobPartRateCard,
-  JobPartResponse,
   JobScheduleWarning,
   JobVenue,
   PartialPayment
@@ -46,10 +45,9 @@ import {
   NgbTooltip,
   NgbTypeahead
 } from "@ng-bootstrap/ng-bootstrap";
-import { TableComponent } from "../../../../shared/components/ui/table/table.component";
-import { TableClickedAction, TableConfigs } from "../../../../shared/interface/common";
 import { TagInputModule } from "ngx-chips";
 import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.component";
+import { JobPartsComponent } from "../job-parts/job-parts.component";
 import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
 import { JobPartLog } from "../../../../shared/interface/activity";
 
@@ -61,12 +59,12 @@ import { JobPartLog } from "../../../../shared/interface/activity";
     NgbTooltip,
     NgbTypeahead,
     CurrencyPipe,
-    TableComponent,
     AddPaymentComponent,
     TagInputModule,
     AddEditJobPartComponent,
     ActivityComponent,
-    NgbPopoverModule
+    NgbPopoverModule,
+    JobPartsComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
@@ -143,48 +141,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   form: FormGroup;
 
-  jobPartsTableConfig: WritableSignal<TableConfigs> = signal<TableConfigs>({
-    columns: [
-      { title: '', field_value: 'warningIcon' },
-      { title: '', field_value: 'typeIcon' },
-      { title: 'Starts', field_value: 'starts' },
-      { title: 'Time', field_value: 'time' },
-      { title: 'Hours', field_value: 'hours' },
-      { title: 'Crew', field_value: 'crewNumber' },
-      { title: 'Travel', field_value: 'travelFormatted' },
-      { title: 'Skills', field_value: 'skills' },
-      { title: 'Ends', field_value: 'ends' },
-      { title: 'Net', field_value: 'netFormatted' },
-      { title: 'Gross', field_value: 'grossFormatted' }
-    ],
-    row_action_before: [
-      {
-        label: 'Edit',
-        icon: 'fa-solid fa-pen-to-square txt-primary',
-        class: 'square-white',
-        action_to_perform: 'edit',
-        showOnHover: true
-      }
-    ],
-    row_action: [
-      {
-        label: 'Copy',
-        icon: 'fa-solid fa-copy txt-secondary',
-        class: 'square-white',
-        action_to_perform: 'copy'
-      },
-      {
-        label: 'Delete',
-        icon: 'fa-solid fa-trash txt-danger',
-        class: 'square-white',
-        action_to_perform: 'delete',
-        modal: true,
-        model_text: 'Are you sure you want to delete this job part?'
-      }
-    ],
-    data: []
-  });
-
   public focus$ = new Subject<string>();
   public click$ = new Subject<string>();
 
@@ -197,16 +153,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
       const details = this.jobDetails();
       if (details && this.form) {
         this.setFormData();
-        this.updateJobPartsTable(details.jobParts);
         this.documents.set(details.documents || []);
-      }
-    });
-
-    // Watch for warning changes and update parts
-    effect(() => {
-      const warnings = this.jobWarnings();
-      if (warnings) {
-        this.setPartWarnings(warnings);
       }
     });
   }
@@ -300,24 +247,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
     this.financeSectionExpanded.update(v => !v);
   }
 
-  setPartWarnings(warnings: JobScheduleWarning[]): void {
-    if (!warnings?.length) return;
-
-    const parts = this.jobDetails()?.jobParts;
-    if (!parts?.length) return;
-
-    const warningMap = new Map(warnings.map(w => [ w.jobPartId, w ]));
-
-    parts.forEach((part: JobPart) => {
-      const match = warningMap.get(part.jobPartId);
-      if (match) {
-        part.warnings = match;
-      }
-    });
-
-    this.updateJobPartsTable(this.jobDetails()?.jobParts)
-  }
-
   initForm() {
     this.form = this._fb.group({
       statusId: [ 0, [ Validators.required ] ],
@@ -353,8 +282,6 @@ export class EditJobComponent extends ApiBase implements OnInit {
       .subscribe({
         next: clientId => {
           if (clientId && clientId !== 0) {
-            this.form.get('venueId')?.setValue(null);
-            this.form.get('venue')?.setValue(null);
             this.getJobVenues(clientId, this.jobDetails()?.jobId ?? 0);
           } else {
             this.jobVenues.set([]);
@@ -736,199 +663,14 @@ export class EditJobComponent extends ApiBase implements OnInit {
       });
   }
 
-  updateJobPartsTable(jobParts: JobPart[]) {
-    if (!jobParts?.length) {
-      this.jobPartsTableConfig.update(config => ({
-        ...config,
-        data: []
-      }));
-      return;
-    }
-
-    const tableData = jobParts.map(part => ({
-      ...part,
-      id: part.jobPartId,
-      typeIcon: this.getJobPartTypeIcon(part.jobPartTypeId, part.typeText),
-      warningIcon: this.getJobPartWarningIcon(part),
-      skills: this.getSkillsString(part),
-      travelFormatted: this.getTravelFormatted(part.ootCost, part.currencySign),
-      netFormatted: this.formatCurrency(part.quoteCost, part.currencySign),
-      grossFormatted: this.formatCurrency(part.quoteCostVat, part.currencySign)
-    }));
-
-    this.jobPartsTableConfig.update(config => ({
-      ...config,
-      data: tableData
-    }));
-  }
-
-  formatCurrency(value: number, currencySign: string): string {
-    const sign = currencySign || '£';
-    return `${ sign }${ value?.toFixed(2) ?? '0.00' }`;
-  }
-
-  getTravelFormatted(ootCost: number, currencySign: string): string {
-    if (ootCost == null || ootCost <= 0) return '_';
-    const amount = this.formatCurrency(ootCost, currencySign);
-    return `<i class="fa-solid fa-train txt-primary f-16" title="${ amount }"></i>`;
-  }
-
-  getJobPartTypeIcon(typeId: number, typeText: string): string {
-    const tooltip = typeText ? `title="${ typeText }"` : '';
-
-    switch (typeId) {
-      case 1:
-        return `<i class="fa-solid fa-users txt-primary f-18" ${ tooltip }></i>`;
-      case 2:
-      case 5:
-        return `<i class="fa-solid fa-truck txt-danger f-18" ${ tooltip }></i>`;
-      case 4:
-      case 6:
-        return `<i class="icofont icofont-shield-alt txt-danger f-18" ${ tooltip }></i>`;
-      default:
-        return `<i class="fa-solid fa-briefcase txt-secondary f-18" ${ tooltip }></i>`;
-    }
-  }
-
-  getJobPartWarningIcon(part: JobPart) {
-    if (!part) return;
-    if (!part?.warnings) return;
-
-    const { warnings } = part;
-
-    const tooltipText = `Number of Crew booked at this time: ${ warnings?.crew }. Threshold: ${ warnings?.warning }. Limit: ${ warnings?.limit }`;
-    const tooltip = `title="${ tooltipText }"`;
-
-    switch (part.warnings?.status) {
-      case 0:
-        return ``;
-      case 1:
-        return `<i class="fa-solid fa-warning text-warning f-18" ${ tooltip }></i>`;
-      case 2:
-        return `<i class="fa-solid fa-warning txt-danger f-18" ${ tooltip }></i>`;
-      case 3:
-        return `<i class="fa-solid fa-coins text-warning f-18" ${ tooltip }></i>`;
-      default:
-        return '';
-    }
-  }
-
-  getSkillsString(part: JobPart): string {
-    const skillMap: { key: keyof JobPart; label: string }[] = [
-      { key: 'skillDriver', label: 'Driver' },
-      { key: 'skillForklift', label: 'Forklift' },
-      { key: 'skillIpaf', label: 'IPAF' },
-      { key: 'skillSafety', label: 'Safety' },
-      { key: 'skillConstruction', label: 'Construction' },
-      { key: 'skillCarpenter', label: 'Carpenter' },
-      { key: 'skillLightning', label: 'Lightning' },
-      { key: 'skillSound', label: 'Sound' },
-      { key: 'skillVideo', label: 'Video' },
-      { key: 'skillTfm', label: 'TFM' },
-      { key: 'skillTelehandler', label: 'Telehandler' },
-      { key: 'skillScissorlift', label: 'Scissorlift' },
-      { key: 'skillCherrypicker', label: 'Cherrypicker' },
-      { key: 'skillFirstAid', label: 'First Aid' },
-      { key: 'skillPasma', label: 'PASMA' },
-      { key: 'skillFollowspot', label: 'Followspot' }
-    ];
-
-    const activeSkills = skillMap
-      .filter(skill => part[skill.key] === true)
-      .map(skill => skill.label);
-
-    return activeSkills.join(' - ') || '_'
-  }
-
-  handleJobPartAction(event: TableClickedAction) {
-    switch (event.action_to_perform) {
-      case 'delete':
-        this.deleteJobPart(event.data);
-        break;
-      case 'edit':
-        this.editJobPart(event.data);
-        break;
-      case 'copy':
-        this.copyJobPart(event.data);
-        break;
-    }
-  }
-
-  deleteJobPart(part: JobPart) {
-    this.setPartDeleteLoading(part.jobPartId, true);
-
-    this.get<void>(`Jobs/RemoveJobPart?jobPartId=${ part.jobPartId }`)
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        finalize(() => this.setPartDeleteLoading(part.jobPartId, false))
-      )
-      .subscribe({
-        next: res => {
-          if (res.errors?.errorCode) {
-            GeneralService.showErrorMessage(res.errors.message);
-            return;
-          }
-
-          this.removeJobPartFromTable(part.jobPartId);
-          GeneralService.showSuccessMessage('Job part deleted successfully');
-          this.jobPartsUpdated.emit();
-        }
-      });
-  }
-
-  setPartDeleteLoading(partId: number, loading: boolean) {
-    this.jobPartsTableConfig.update(config => ({
-      ...config,
-      data: config.data.map(item =>
-        item.jobPartId === partId ? { ...item, deleteLoading: loading } : item
-      )
-    }));
-  }
-
-  removeJobPartFromTable(partId: number) {
-    this.jobPartsTableConfig.update(config => ({
-      ...config,
-      data: config.data.filter(item => item.jobPartId !== partId)
-    }));
-  }
-
-  editJobPart(part: JobPart): void {
+  onEditJobPart(part: JobPart): void {
     this.editingJobPartId.set(part.jobPartId);
     this.openAddJobPartModal(this.addJobPartModalRef);
   }
 
-  copyJobPart(part: JobPart) {
-    const jobId = this.jobDetails()?.jobId;
-    if (!jobId) return;
-
-    // Set loading state on the row
-    this.setPartCopyLoading(part.jobPartId, true);
-
-    this.post<JobPartResponse>('Jobs/CopyJobPart', { jobId, jobPartId: part.jobPartId })
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        finalize(() => this.setPartCopyLoading(part.jobPartId, false))
-      )
-      .subscribe({
-        next: res => {
-          if (res.errors?.errorCode) {
-            GeneralService.showErrorMessage(res.errors.message);
-            return;
-          }
-
-          GeneralService.showSuccessMessage('Job part copied successfully');
-          this.jobPartsUpdated.emit();
-        }
-      });
-  }
-
-  setPartCopyLoading(partId: number, loading: boolean) {
-    this.jobPartsTableConfig.update(config => ({
-      ...config,
-      data: config.data.map(item =>
-        item.jobPartId === partId ? { ...item, copyLoading: loading } : item
-      )
-    }));
+  onAddJobPart(): void {
+    this.editingJobPartId.set(null);
+    this.openAddJobPartModal(this.addJobPartModalRef);
   }
 
   openAddJobPartModal(template: TemplateRef<NgbModal>): void {

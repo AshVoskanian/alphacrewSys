@@ -12,7 +12,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { Select2Module } from "ng-select2-component";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { CrewDetail, FilterDropdowns } from "../../../../../shared/interface/crew";
 import { CrewService } from "../../crew.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -21,7 +21,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
 
 @Component({
   selector: 'app-crew-profile',
-  imports: [ Select2Module ],
+  imports: [ Select2Module, ReactiveFormsModule ],
   templateUrl: './crew-profile.component.html',
   styleUrl: './crew-profile.component.scss',
   providers: [ DatePipe ]
@@ -78,6 +78,7 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
       deactivationDate: [ '' ],
       loyaltyBonus: [ '' ],
       jobNotes: [ '' ],
+      doB: [ '' ],
       startDate: [ '', [ Validators.required ] ],
       postcode: [ '', [ Validators.required ] ],
       address: [ '', [ Validators.required ] ],
@@ -151,6 +152,7 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
       isFulltime: data.isFulltime,
       isActive: data.isActive,
       deactivationDate: this._date.transform(data.deactivationDate, 'yyyy-MM-dd'),
+      doB: this._date.transform(data.doB, 'yyyy-MM-dd'),
       pliExpiry: this._date.transform(data.pliExpiry, 'yyyy-MM-dd'),
       pliCoverId: data.pliCoverId,
       startDate: this._date.transform(data.startDate, 'yyyy-MM-dd'),

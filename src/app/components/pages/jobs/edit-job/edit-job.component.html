@@ -298,32 +298,13 @@
 
   <div class="main-divider m-y-12"></div>
 
-  <!-- Job Parts Table Section -->
-  <div class="row g-3">
-    <div class="col-12">
-      @if (jobPartsTableConfig().data?.length) {
-        <div class="table-responsive custom-scrollbar">
-          <app-table
-            [tableConfig]="jobPartsTableConfig()"
-            [search]="false"
-            [hover]="true"
-            [pagination]="false"
-            [hasCheckbox]="false"
-            (action)="handleJobPartAction($event)">
-          </app-table>
-        </div>
-      }
-
-      <div class="w-100 flex justify-content-center m-t-15">
-        <button type="button" class="btn btn-primary btn-sm"
-                (click)="editingJobPartId.set(null);
-                       openAddJobPartModal(addJobPartModal)">
-          <i class="fa-solid fa-plus m-r-5"></i>
-          Add new Part
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-job-parts
+    [jobDetails]="jobDetails()"
+    [jobWarnings]="jobWarnings()"
+    (jobPartsUpdated)="jobPartsUpdated.emit()"
+    (editPart)="onEditJobPart($event)"
+    (addPart)="onAddJobPart()">
+  </app-job-parts>
 </form>
 
 <!-- Add Payment Modal -->

@@ -50,7 +50,7 @@ import { FormsModule } from "@angular/forms";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { CrewListComponent } from "./crew-list/crew-list.component";
 import { ApiBase } from "../../../../shared/bases/api-base";
-import { CrewAction } from "../../../../shared/enums/schedule";
+import { CrewAction, isCrewMenuActionDisabledWhenShiftLocked } from "../../../../shared/enums/schedule";
 import { ScheduleService } from "../schedule.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
@@ -66,12 +66,13 @@ import { JobPartLog } from "../../../../shared/interface/activity";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
 import { LegacySystemService } from "../../../../shared/services/legacy-system.service";
+import { ScheduleJobPartTagComponent } from "./schedule-job-part-tag/schedule-job-part-tag.component";
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink, ScheduleJobPartTagComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'
@@ -335,6 +336,15 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     this._modal.open(this.updateNotes, { centered: true, size: 'xl' });
   }
 
+  onOpenCrewToolbarClick(e: Event, schedule: Schedule) {
+    if (schedule.isCrewLocked) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+    this.openCrewsPanel(null, e, schedule);
+  }
+
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
     if (schedule.updateLoading) return;
 
@@ -468,10 +478,27 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
       });
   }
 
-  menuAction(menu: CrewActionItem, crew: JobPartCrew) {
+  isCrewMenuDisabledByLock(menu: CrewActionItem, schedule: Schedule): boolean {
+    return !!schedule?.isCrewLocked && isCrewMenuActionDisabledWhenShiftLocked(menu.action as CrewAction);
+  }
+
+  onCrewMenuItemClick(event: MouseEvent, menu: CrewActionItem, crew: JobPartCrew, schedule: Schedule) {
+    if (this.isCrewMenuDisabledByLock(menu, schedule)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    this.menuAction(menu, crew, schedule);
+  }
+
+  menuAction(menu: CrewActionItem, crew: JobPartCrew, schedule: Schedule) {
     this.selectedCrew = crew;
 
     if (crew.loading) {
+      return;
+    }
+
+    if (schedule?.isCrewLocked && isCrewMenuActionDisabledWhenShiftLocked(menu.action as CrewAction)) {
       return;
     }
 
@@ -1079,5 +1106,44 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     if (target) {
       target.nativeElement.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
+  }
+
+  /** Every active crew row is status Confirmed (id 2); empty crew list is false. */
+  allAreConfirmed(schedule: Schedule): boolean {
+    const crews = schedule.crews;
+    if (!crews?.length) {
+      return false;
+    }
+    return crews.every(c => c.jobPartCrewStatusId === 2);
+  }
+
+  toggleLocked(schedule: Schedule) {
+    if (!this.allAreConfirmed(schedule)) {
+      return;
+    }
+    if (schedule.crewLockLoader) {
+      return;
+    }
+    const isCrewLocked = !schedule.isCrewLocked;
+    schedule.crewLockLoader = true;
+    this.get<null>('Schedule/UpdateJobPartCrewLocker', { jobPartId: schedule.jobPartId, isCrewLocked })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => {
+          schedule.crewLockLoader = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          schedule.isCrewLocked = isCrewLocked;
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Could not update crew lock.');
+        }
+      });
   }
 }

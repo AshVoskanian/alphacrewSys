@@ -48,7 +48,7 @@ import { FormsModule } from "@angular/forms";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { CrewListComponent } from "../crew-list/crew-list.component";
 import { ApiBase } from "../../../../../shared/bases/api-base";
-import { CrewAction } from "../../../../../shared/enums/schedule";
+import { CrewAction, isCrewMenuActionDisabledWhenShiftLocked } from "../../../../../shared/enums/schedule";
 import { ScheduleService } from "../../schedule.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "../vehicles/vehicles.component";
@@ -64,12 +64,13 @@ import { JobPartLog } from "../../../../../shared/interface/activity";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
 import { LegacySystemService } from "../../../../../shared/services/legacy-system.service";
+import { ScheduleJobPartTagComponent } from "../schedule-job-part-tag/schedule-job-part-tag.component";
 
 @Component({
   selector: 'app-schedule-list-job-scoped',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink, CrewListComponent ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink, CrewListComponent, ScheduleJobPartTagComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list-job-scoped.component.html',
   styleUrl: './schedule-list-job-scoped.component.scss'
@@ -203,6 +204,8 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
     }
   ]);
   smsInfo: WritableSignal<Array<ScheduleSmsInfo>> = signal([]);
+  /** Part that opened the vehicles / send-SMS flow (may differ from selectedSchedule). */
+  vehicleSchedule: Schedule;
 
   readonly isLegacySystem = this.legacySystemService.isLegacySystem;
 
@@ -326,6 +329,15 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
     this.selectedSchedule = schedule;
     schedule.noteType = type;
     this._modal.open(this.updateNotes, { centered: true, size: 'xl' });
+  }
+
+  onOpenCrewToolbarClick(e: Event, schedule: Schedule) {
+    if (schedule.isCrewLocked) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+    this.openCrewsPanel(null, e, schedule);
   }
 
   openCrewsPanel(crew: JobPartCrew, e: Event, schedule: Schedule) {
@@ -458,10 +470,27 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
       });
   }
 
-  menuAction(menu: CrewActionItem, crew: JobPartCrew) {
+  isCrewMenuDisabledByLock(menu: CrewActionItem, schedule: Schedule): boolean {
+    return !!schedule?.isCrewLocked && isCrewMenuActionDisabledWhenShiftLocked(menu.action as CrewAction);
+  }
+
+  onCrewMenuItemClick(event: MouseEvent, menu: CrewActionItem, crew: JobPartCrew, schedule: Schedule) {
+    if (this.isCrewMenuDisabledByLock(menu, schedule)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    this.menuAction(menu, crew, schedule);
+  }
+
+  menuAction(menu: CrewActionItem, crew: JobPartCrew, schedule: Schedule) {
     this.selectedCrew = crew;
 
     if (crew.loading) {
+      return;
+    }
+
+    if (schedule?.isCrewLocked && isCrewMenuActionDisabledWhenShiftLocked(menu.action as CrewAction)) {
       return;
     }
 
@@ -620,6 +649,7 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   getVehicleInfo(schedule: Schedule, hideCars: boolean = false) {
+    this.vehicleSchedule = schedule;
     this.hideVehicles = hideCars;
 
     if (schedule.vehicleLoader) return;
@@ -645,10 +675,11 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   updateScheduleVehiclesInfo(vehicles: Array<Vehicle>) {
+    const schedule = this.vehicleSchedule ?? this.selectedSchedule;
     this.vehiclesInfo.set(vehicles.map(vehicle => {
       return {
         ...vehicle,
-        active: this.selectedSchedule.vehicles.map(it => it.vehicleId)?.includes(vehicle.vehicleId),
+        active: schedule.vehicles.map(it => it.vehicleId)?.includes(vehicle.vehicleId),
         fontAwsome: vehicle.vehicleId === 5 || vehicle.vehicleId === 6 ? '<i class="fa-solid fa-car-on"></i>' : vehicle.fontAwsome
       }
     }));
@@ -670,17 +701,23 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   onVehicleSelect(vehicle: Vehicle) {
+    const schedule = this.vehicleSchedule ?? this.selectedSchedule;
+
     this._scheduleService.shifts = this._scheduleService.shifts.map(shift => {
       return {
         ...shift,
-        vehicles: shift.jobPartId === this.selectedSchedule.jobPartId
+        vehicles: shift.jobPartId === schedule.jobPartId
           ? this.toggleVehicle(vehicle, shift.vehicles)
           : shift.vehicles
       };
     });
 
-    this.selectedSchedule.vehicles = this.toggleVehicle(vehicle, this.selectedSchedule.vehicles);
-    this.selectSchedule(this.selectedSchedule);
+    schedule.vehicles = this.toggleVehicle(vehicle, schedule.vehicles);
+    const listItem = this.list.find(it => it.jobPartId === schedule.jobPartId);
+    if (listItem && listItem !== schedule) {
+      listItem.vehicles = schedule.vehicles;
+    }
+    this.selectSchedule(schedule);
     this.updateScheduleVehiclesInfo(this.vehiclesInfo());
   }
 
@@ -1055,5 +1092,44 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
     if (target) {
       target.nativeElement.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
+  }
+
+  /** Every active crew row is status Confirmed (id 2); empty crew list is false. */
+  allAreConfirmed(schedule: Schedule): boolean {
+    const crews = schedule.crews;
+    if (!crews?.length) {
+      return false;
+    }
+    return crews.every(c => c.jobPartCrewStatusId === 2);
+  }
+
+  toggleLocked(schedule: Schedule) {
+    if (!this.allAreConfirmed(schedule)) {
+      return;
+    }
+    if (schedule.crewLockLoader) {
+      return;
+    }
+    const isCrewLocked = !schedule.isCrewLocked;
+    schedule.crewLockLoader = true;
+    this.get<null>('Schedule/UpdateJobPartCrewLocker', { jobPartId: schedule.jobPartId, isCrewLocked })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => {
+          schedule.crewLockLoader = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          schedule.isCrewLocked = isCrewLocked;
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Could not update crew lock.');
+        }
+      });
   }
 }

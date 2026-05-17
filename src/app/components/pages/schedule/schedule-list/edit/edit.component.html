@@ -73,7 +73,9 @@
 
             <div class="row g-3">
               <div class="col w-1-5">
-                <label class="form-label w-100">
+                <label class="form-label w-100"
+                       [class.text-secondary]="scheduleInfo?.isCrewLocked"
+                       [attr.title]="scheduleInfo?.isCrewLocked ? 'Crew changes are locked for this shift.' : null">
                   Status
                   <select2 [data]="statuses" formControlName="jobPartCrewStatusId" [templates]="template"
                            placeholder="Choose..">

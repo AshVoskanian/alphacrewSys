@@ -1,3 +1,5 @@
+import { JobPartTagItem } from './jobs';
+
 export interface Schedule {
   address: string | null;
   companyName: string;
@@ -10,12 +12,16 @@ export interface Schedule {
   importantNotes: boolean;
   isJobActive: boolean;
   isActive: boolean;
+  /** From `schedule/getschedule` — crew edits locked for this shift row. */
+  isCrewLocked: boolean;
   isNightShift: boolean;
   isNigthShiftPaid: boolean;
   showNotifications: boolean;
   notificationsLoader: boolean;
   vehicleLoader: boolean;
   activityLoader?: boolean;
+  /** True while `Schedule/UpdateJobPartCrewLocker` request is in flight. */
+  crewLockLoader?: boolean;
   noteType?: 'job_note' | 'crew_note';
   updateLoading?: boolean;
   isJobScoped?: boolean;
@@ -57,6 +63,8 @@ export interface Schedule {
   other?: string;
   region?: string;
   total?: string;
+  /** From `schedule/getschedule` — part-level tag for this shift row. */
+  jobPartTag?: JobPartTagItem | null;
 }
 
 export interface IYourEntity {
@@ -258,6 +266,10 @@ export interface JobPartClashing {
   jobPartId: number;
   startDate: string;
   checked: boolean;
+  /** When true, part row is locked in crew list (no checkbox). Normalized from API `isCrewLocked` or typo `isCrewBlokced`. */
+  isCrewLocked?: boolean;
+  /** Present when API returns tag for this part (e.g. `Crew/GetCrewClashing`). */
+  jobPartTag?: JobPartTagItem | null;
 }
 
 export interface CrewClashing {
