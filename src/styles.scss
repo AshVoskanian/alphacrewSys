@@ -13,7 +13,15 @@
   z-index: 1101 !important;
 }
 
-// Job part tag popover: typeahead popup is portaled to body — must sit above popover (~1060) and tables
+// Job part tag popover: keep typeahead dropdown visible (not clipped by popover body)
+.popover.job-part-tag-popover {
+  overflow: visible;
+
+  .popover-body {
+    overflow: visible;
+  }
+}
+
 ngb-typeahead-window.job-part-tag-typeahead-popup {
   z-index: 200000 !important;
 }
