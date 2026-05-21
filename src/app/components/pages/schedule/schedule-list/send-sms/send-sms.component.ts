@@ -33,7 +33,6 @@ export class SendSmsComponent extends ApiBase implements OnInit {
   text: string = `Here is the breakdown of your crew. We kindly request you to review the information provided and reach out to our office immediately if any discrepancies are detected.
 
 CLIENT: {{companyName}}
-VENUE: {{venueName}}
 
 {{schedules}}
 
@@ -49,6 +48,7 @@ Alpha Crew
   generateMessage(data: Array<ScheduleSmsInfo>): string {
     const schedulesText = this.smsInfo.map((s: any) => {
       let block = `${ s.startDay } ${ s.startDate } ${ s.startMonth }, ${ s.startYear } ${ s.startTime } - ${ s.endTime }`;
+      if (s.jobPartVenueName?.trim() || s.venueName.trim()) block += `\nVenue: ${ s.jobPartVenueName || s.venueName || 'N/A' }`;
       if (s.vehicles?.trim()) block += `\nVehicles: ${ s.vehicles }`;
       if (s.crewChiefs?.trim()) block += `\nCrew Chief: ${ s.crewChiefs }`;
       if (s.teamLead?.trim()) block += `\nTeam Lead: ${ s.teamLead }`;
