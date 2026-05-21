@@ -67,12 +67,13 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
 import { LegacySystemService } from "../../../../shared/services/legacy-system.service";
 import { ScheduleJobPartTagComponent } from "./schedule-job-part-tag/schedule-job-part-tag.component";
+import { ScheduleJobPartOnsiteContactComponent } from './schedule-job-part-onsite-contact/schedule-job-part-onsite-contact.component';
 
 @Component({
   selector: 'app-schedule-list',
   imports: [ NgxSpinnerModule, NgStyle, FeatherIconComponent, UpdatesNotesComponent, ActivityComponent, ClipboardModule,
     NgbPopoverModule, NgbAlertModule, VehiclesComponent, DatePipe, FilterPipe, TitleCasePipe, NgClass, UkPostcodeLinkPipe,
-    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink, ScheduleJobPartTagComponent ],
+    UkCarNumComponent, NgbTooltipModule, NgbDropdownModule, EditComponent, DatePipe, FormsModule, SendSmsComponent, SendSmsToCrewComponent, LowerCasePipe, RouterLink, ScheduleJobPartTagComponent, ScheduleJobPartOnsiteContactComponent ],
   providers: [ DatePipe ],
   templateUrl: './schedule-list.component.html',
   styleUrl: './schedule-list.component.scss'

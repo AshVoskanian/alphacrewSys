@@ -1,0 +1,16 @@
+.job-part-onsite-contact-cell {
+  display: block;
+}
+
+.job-part-onsite-contact-cell__btn {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.25;
+  font-size: inherit;
+}
+
+.job-part-onsite-contact-cell__missing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}

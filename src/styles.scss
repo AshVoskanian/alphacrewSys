@@ -14,7 +14,8 @@
 }
 
 // Job part tag popover: keep typeahead dropdown visible (not clipped by popover body)
-.popover.job-part-tag-popover {
+.popover.job-part-tag-popover,
+.popover.job-part-onsite-contact-popover {
   overflow: visible;
 
   .popover-body {

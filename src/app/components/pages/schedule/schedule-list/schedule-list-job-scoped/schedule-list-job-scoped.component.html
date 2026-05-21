@@ -164,13 +164,7 @@
                             @if (schedule.address) {
                               <h6>{{ schedule.address }}</h6>
                             }
-                            @if (schedule.onsiteContact) {
-                              <h6 class="fw-bold fst-italic">Onsite: {{ schedule.onsiteContact }}</h6>
-                            } @else {
-                              <h6 class="fw-bold text-danger fst-italic pulse">
-                                <i class="fa-solid fa-warning text-danger"></i> Onsite Contact Missing
-                              </h6>
-                            }
+                            <app-schedule-job-part-onsite-contact [schedule]="schedule" />
                             <app-schedule-job-part-tag [schedule]="schedule" [schedules]="list" />
                           </div>
                         </div>
