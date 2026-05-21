@@ -17,10 +17,22 @@
 .popover.job-part-tag-popover,
 .popover.job-part-onsite-contact-popover {
   overflow: visible;
+  max-width: none;
 
   .popover-body {
     overflow: visible;
+    padding: 0.5rem 0.6rem;
   }
+}
+
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__body {
+  min-width: 20rem;
+  width: min(26rem, calc(100vw - 2rem));
+}
+
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__save-btn {
+  width: 2rem;
+  min-width: 2rem;
 }
 
 ngb-typeahead-window.job-part-tag-typeahead-popup {

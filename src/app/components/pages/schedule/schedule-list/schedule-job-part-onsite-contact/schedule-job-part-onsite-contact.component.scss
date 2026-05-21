@@ -14,3 +14,20 @@
   align-items: center;
   gap: 0.35rem;
 }
+
+.job-part-onsite-contact-popover__body {
+  min-width: 20rem;
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 0.15rem;
+}
+
+.job-part-onsite-contact-popover__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.job-part-onsite-contact-popover__save-btn {
+  width: 2rem;
+  min-width: 2rem;
+  padding: 0.25rem 0;
+}
