@@ -1,14 +1,21 @@
 <div class="modal-content">
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
-      <div class="text-center m-b-20">
-        <h4 class="m-0">{{ job.companyName }}</h4>
-        <p class="m-0 txt-secondary f-14">{{ job.venueName }}</p>
+      <div class="position-relative m-b-20">
+        <span
+          class="badge position-absolute top-0 start-0 p-x-10 p-y-5 rounded text-black"
+          [style.background-color]="job.statusColour">
+          {{ job.statusLabel ?? job.statusText }}
+        </span>
+        <div class="text-center">
+          <h4 class="m-0">{{ job.companyName }}</h4>
+          <p class="m-0 txt-secondary f-14">{{ job.venueName }}</p>
+        </div>
       </div>
 
       <div class="row g-3">
         <div class="col-4">
-          <h6 class="text-center txt-secondary f-14 m-b-15">Email Recipient</h6>
+          <h6 class="text-center txt-dark f-18 m-b-15">Email Recipient</h6>
 
           <div class="flex flex-col gap-12">
             <div>

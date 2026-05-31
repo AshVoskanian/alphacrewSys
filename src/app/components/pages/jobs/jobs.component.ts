@@ -82,6 +82,7 @@ export class JobsComponent extends ApiBase implements OnInit {
           this.tableConfig.data = res.data.jobIndex.map((job: Job) => ({
             ...job,
             id: job.jobId,
+            statusLabel: job.statusText,
             company_venue: `
               <p class="m-0 text-black">${ job.companyName }</p>
               <p class="m-0 text-gray">@ ${ job.venueName }</p>

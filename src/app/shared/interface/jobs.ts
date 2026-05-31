@@ -12,6 +12,7 @@ export interface Job {
   requiresPO: boolean;
   venueName: string;
   statusText: string;
+  statusLabel?: string;
   statusContent: string;
   statusColour: string;
   statusId: number;
