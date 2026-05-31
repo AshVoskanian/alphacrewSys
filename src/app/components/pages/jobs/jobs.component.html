@@ -16,8 +16,48 @@
         } @else {
           <div class="table-responsive custom-scrollbar">
             @if (tableConfig?.data?.length && !loading()) {
+              <ng-template #jobIdCell let-details>
+                <div class="job-id-cell" (click)="$event.stopPropagation()">
+                  <span
+                    class="job-id-overdue-indicator"
+                    [class.job-id-overdue-indicator--active]="details.overdue === '1'">
+                  </span>
+                  <div class="job-id-box" ngbDropdown container="body">
+                    <span class="job-id-number">{{ details.jobId }}</span>
+                    <button
+                      type="button"
+                      class="btn job-id-dropdown-toggle"
+                      ngbDropdownToggle
+                      [disabled]="updatingJobId() === details.jobId"
+                      (click)="$event.stopPropagation()"
+                    >
+                      @if (updatingJobId() === details.jobId) {
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                      } @else {
+                        <i class="fa-solid fa-chevron-down"></i>
+                      }
+                    </button>
+                    <ul class="dropdown-menu" ngbDropdownMenu>
+                      @for (action of jobQuickActions; track action.label) {
+                        <li>
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            ngbDropdownItem
+                            (click)="onJobQuickAction($event, details, action)"
+                          >
+                            {{ action.label }}
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </ng-template>
+
               <div class="flex flex-col gap-20 m-auto">
                 <app-table [tableConfig]="tableConfig"
+                           [columnTemplates]="{ jobId: jobIdCell }"
                            [search]="false"
                            [hover]="true"
                            [pageNo]="filterParams().page"

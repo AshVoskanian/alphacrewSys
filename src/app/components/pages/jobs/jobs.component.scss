@@ -1,0 +1,70 @@
+.job-id-cell {
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 5.5rem;
+}
+
+.job-id-overdue-indicator {
+  width: 3px;
+  min-height: 100%;
+  border-radius: 2px;
+  background-color: #c5c5c5;
+  flex-shrink: 0;
+  margin-right: 4px;
+
+  &--active {
+    background-color: #5d9634;
+  }
+}
+
+.job-id-box {
+  display: inline-flex;
+  align-items: stretch;
+  background-color: #f3f3f3;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e8e8e8;
+}
+
+.job-id-number {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--body-font-color, #2b2b2b);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.job-id-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  min-width: 1.75rem;
+  border: none;
+  border-left: 1px solid #e0e0e0;
+  border-radius: 0;
+  background-color: #ebebeb;
+  color: var(--body-font-color, #2b2b2b);
+  line-height: 1;
+
+  &::after {
+    display: none;
+  }
+
+  &:hover:not(:disabled),
+  &.show {
+    background-color: #e0e0e0;
+    color: var(--theme-default, #7366ff);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+  }
+
+  i {
+    font-size: 0.65rem;
+  }
+}

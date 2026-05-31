@@ -4,6 +4,19 @@ export const JOB_STATUSES_FOR_JPART = [
   { label: 'Confirmed', value: 3 },
 ]
 
+export interface JobQuickAction {
+  label: string;
+  statusId: number;
+}
+
+export const JOB_QUICK_ACTIONS: JobQuickAction[] = [
+  { label: 'Invoice', statusId: 7 },
+  { label: 'Reminder', statusId: 30 },
+  { label: 'Chaseup', statusId: 40 },
+  { label: 'Final Chaseup', statusId: 50 },
+  { label: 'Payment Received', statusId: 8 },
+];
+
 export const JOB_STATUSES = [
   { label: 'All Status', value: 0 },
   { label: 'Draft', value: 1 },

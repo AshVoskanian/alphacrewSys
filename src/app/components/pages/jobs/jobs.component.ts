@@ -9,15 +9,17 @@ import { Select2Module } from "ng-select2-component";
 import { NgxPaginationModule } from "ngx-pagination";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DomSanitizer } from "@angular/platform-browser";
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDropdownModule, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { JobsFilterComponent } from "./jobs-filter/jobs-filter.component";
 import { Job, JobDetails, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
 import { AddJobComponent } from "./add-job/add-job.component";
 import { CurrencyPipe } from "@angular/common";
+import { finalize } from "rxjs";
+import { JOB_QUICK_ACTIONS, JobQuickAction } from "./jobs-filter/jobs-utils";
 
 @Component({
   selector: 'app-jobs',
-  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent ],
+  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
   providers: [ CurrencyPipe ]
@@ -33,10 +35,12 @@ export class JobsComponent extends ApiBase implements OnInit {
   loading: WritableSignal<boolean> = signal(false);
   totalCount: WritableSignal<number> = signal<number>(null);
   filterParams: WritableSignal<JobSearchParams> = signal({ page: 1, pageSize: 20 });
+  readonly jobQuickActions = JOB_QUICK_ACTIONS;
+  updatingJobId: WritableSignal<number | null> = signal(null);
 
   public tableConfig: TableConfigs = {
     columns: [
-      { title: '', field_value: 'jobId' },
+      { title: '', field_value: 'jobId', type: 'template' },
       { title: 'Company/Venue', field_value: 'company_venue', sort: true, type: 'action' },
       { title: '', field_value: 'link', type: 'link_icon', showOnHover: true },
       { title: 'Status', field_value: 'statusText', sort: true },
@@ -139,5 +143,34 @@ export class JobsComponent extends ApiBase implements OnInit {
   goToCreatedClientDetails(job: JobDetails) {
     this.modalRef.close();
     this._router.navigate([ 'jobs', job?.jobId ]).then();
+  }
+
+  onJobQuickAction(event: Event, job: Job, action: JobQuickAction): void {
+    event.stopPropagation();
+
+    if (this.updatingJobId() === job.jobId) return;
+
+    this.updatingJobId.set(job.jobId);
+
+    this.post<unknown>('Jobs/UpdateJobStatusFromJobIndex', {
+      jobId: job.jobId,
+      statusId: action.statusId,
+      action: action.label
+    })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.updatingJobId.set(null))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage(`${ action.label } updated successfully`);
+          this.getJobsList(this.filterParams());
+        }
+      });
   }
 }
