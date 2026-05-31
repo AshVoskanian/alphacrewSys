@@ -147,30 +147,30 @@ export class JobsComponent extends ApiBase implements OnInit {
 
   onJobQuickAction(event: Event, job: Job, action: JobQuickAction): void {
     event.stopPropagation();
-
-    if (this.updatingJobId() === job.jobId) return;
-
-    this.updatingJobId.set(job.jobId);
-
-    this.post<unknown>('Jobs/UpdateJobStatusFromJobIndex', {
-      jobId: job.jobId,
-      statusId: action.statusId,
-      action: action.label
-    })
-      .pipe(
-        takeUntilDestroyed(this._dr),
-        finalize(() => this.updatingJobId.set(null))
-      )
-      .subscribe({
-        next: res => {
-          if (res.errors?.errorCode) {
-            GeneralService.showErrorMessage(res.errors.message);
-            return;
-          }
-
-          GeneralService.showSuccessMessage(`${ action.label } updated successfully`);
-          this.getJobsList(this.filterParams());
-        }
-      });
+    //
+    // if (this.updatingJobId() === job.jobId) return;
+    //
+    // this.updatingJobId.set(job.jobId);
+    //
+    // this.post<unknown>('Jobs/UpdateJobStatusFromJobIndex', {
+    //   jobId: job.jobId,
+    //   statusId: action.statusId,
+    //   action: action.label
+    // })
+    //   .pipe(
+    //     takeUntilDestroyed(this._dr),
+    //     finalize(() => this.updatingJobId.set(null))
+    //   )
+    //   .subscribe({
+    //     next: res => {
+    //       if (res.errors?.errorCode) {
+    //         GeneralService.showErrorMessage(res.errors.message);
+    //         return;
+    //       }
+    //
+    //       GeneralService.showSuccessMessage(`${ action.label } updated successfully`);
+    //       this.getJobsList(this.filterParams());
+    //     }
+    //   });
   }
 }

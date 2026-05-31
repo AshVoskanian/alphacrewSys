@@ -20,7 +20,7 @@
                 <div class="job-id-cell" (click)="$event.stopPropagation()">
                   <span
                     class="job-id-overdue-indicator"
-                    [class.job-id-overdue-indicator--active]="details.overdue === '1'">
+                    [style.background-color]="details.statusColour || '#c5c5c5'">
                   </span>
                   <div class="job-id-box" ngbDropdown container="body">
                     <span class="job-id-number">{{ details.jobId }}</span>

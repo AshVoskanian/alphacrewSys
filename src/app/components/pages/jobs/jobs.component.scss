@@ -5,25 +5,18 @@
 }
 
 .job-id-overdue-indicator {
-  width: 3px;
+  width: 5px;
   min-height: 100%;
-  border-radius: 2px;
-  background-color: #c5c5c5;
+  border-radius: 2px 0 0 2px;
   flex-shrink: 0;
-  margin-right: 4px;
-
-  &--active {
-    background-color: #5d9634;
-  }
 }
 
 .job-id-box {
   display: inline-flex;
   align-items: stretch;
   background-color: #f3f3f3;
-  border-radius: 4px;
+  border-radius:0 4px 4px 0;
   overflow: hidden;
-  border: 1px solid #e8e8e8;
 }
 
 .job-id-number {
@@ -38,11 +31,11 @@
 }
 
 .job-id-dropdown-toggle {
+  width: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 4px 6px;
-  min-width: 1.75rem;
   border: none;
   border-left: 1px solid #e0e0e0;
   border-radius: 0;
