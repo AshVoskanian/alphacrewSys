@@ -94,3 +94,13 @@
     <app-add-job (finish)="goToCreatedClientDetails($event)"></app-add-job>
   </app-card>
 </ng-template>
+
+<ng-template #jobInvoiceEmail let-modal>
+  @if (selectedJob(); as job) {
+    <app-job-invoice-email
+      [job]="job"
+      (closeModal)="closeJobActionModal()"
+      (next)="closeJobActionModal()"
+    ></app-job-invoice-email>
+  }
+</ng-template>

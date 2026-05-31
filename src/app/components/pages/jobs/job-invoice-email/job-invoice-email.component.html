@@ -1,0 +1,70 @@
+<div class="modal-content job-invoice-email">
+  <div class="modal-body">
+    <header class="job-invoice-email__header text-center">
+      <h4 class="job-invoice-email__company m-0">{{ job.companyName }}</h4>
+      <p class="job-invoice-email__address m-0">{{ job.venueName }}</p>
+    </header>
+
+    <div class="row g-0 job-invoice-email__body">
+      <aside class="col-12 col-lg-4 job-invoice-email__sidebar">
+        <h6 class="job-invoice-email__sidebar-title text-center">Email Recipient</h6>
+
+        <div class="job-invoice-email__field">
+          <span class="job-invoice-email__field-icon">
+            <i class="fa-solid fa-user"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control border-0 shadow-none"
+            [(ngModel)]="recipientName"
+            placeholder="Recipient name"
+          />
+        </div>
+
+        <div class="job-invoice-email__field">
+          <span class="job-invoice-email__field-icon">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <input
+            type="email"
+            class="form-control border-0 shadow-none"
+            [(ngModel)]="recipientEmail"
+            placeholder="Email address"
+          />
+        </div>
+
+        <div class="job-invoice-email__field">
+          <span class="job-invoice-email__field-icon">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <input
+            type="email"
+            class="form-control border-0 shadow-none"
+            [(ngModel)]="ccEmail"
+            placeholder="CC..."
+          />
+        </div>
+
+        <div class="job-invoice-email__field job-invoice-email__field--amount">
+          <span class="job-invoice-email__field-icon">
+            <i class="fa-solid fa-sterling-sign"></i>
+          </span>
+          <span class="job-invoice-email__amount">{{ job.cost | currency:'GBP':'symbol':'1.2-2' }}</span>
+        </div>
+      </aside>
+
+      <section class="col-12 col-lg-8 job-invoice-email__editor">
+        <ngx-editor
+          [editor]="editor"
+          [(ngModel)]="emailBody"
+          [placeholder]="'Compose invoice email...'"
+        ></ngx-editor>
+      </section>
+    </div>
+
+    <footer class="job-invoice-email__footer">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="onNext()">Next</button>
+    </footer>
+  </div>
+</div>

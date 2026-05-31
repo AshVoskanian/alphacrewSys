@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
 import { TableConfigs } from "../../../shared/interface/common";
 import { CardComponent } from "../../../shared/components/ui/card/card.component";
 import { TableComponent } from "../../../shared/components/ui/table/table.component";
@@ -14,12 +14,12 @@ import { JobsFilterComponent } from "./jobs-filter/jobs-filter.component";
 import { Job, JobDetails, JobResponse, JobSearchParams } from "../../../shared/interface/jobs";
 import { AddJobComponent } from "./add-job/add-job.component";
 import { CurrencyPipe } from "@angular/common";
-import { finalize } from "rxjs";
 import { JOB_QUICK_ACTIONS, JobQuickAction } from "./jobs-filter/jobs-utils";
+import { JobInvoiceEmailComponent } from "./job-invoice-email/job-invoice-email.component";
 
 @Component({
   selector: 'app-jobs',
-  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule ],
+  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
   providers: [ CurrencyPipe ]
@@ -37,6 +37,9 @@ export class JobsComponent extends ApiBase implements OnInit {
   filterParams: WritableSignal<JobSearchParams> = signal({ page: 1, pageSize: 20 });
   readonly jobQuickActions = JOB_QUICK_ACTIONS;
   updatingJobId: WritableSignal<number | null> = signal(null);
+  selectedJob: WritableSignal<Job | null> = signal(null);
+
+  @ViewChild('jobInvoiceEmail') jobInvoiceEmailTpl!: TemplateRef<NgbModal>;
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -56,6 +59,7 @@ export class JobsComponent extends ApiBase implements OnInit {
   };
 
   private modalRef!: NgbModalRef;
+  private jobActionModalRef!: NgbModalRef;
 
   ngOnInit() {
     this.subToFilterParams();
@@ -147,30 +151,27 @@ export class JobsComponent extends ApiBase implements OnInit {
 
   onJobQuickAction(event: Event, job: Job, action: JobQuickAction): void {
     event.stopPropagation();
-    //
-    // if (this.updatingJobId() === job.jobId) return;
-    //
-    // this.updatingJobId.set(job.jobId);
-    //
-    // this.post<unknown>('Jobs/UpdateJobStatusFromJobIndex', {
-    //   jobId: job.jobId,
-    //   statusId: action.statusId,
-    //   action: action.label
-    // })
-    //   .pipe(
-    //     takeUntilDestroyed(this._dr),
-    //     finalize(() => this.updatingJobId.set(null))
-    //   )
-    //   .subscribe({
-    //     next: res => {
-    //       if (res.errors?.errorCode) {
-    //         GeneralService.showErrorMessage(res.errors.message);
-    //         return;
-    //       }
-    //
-    //       GeneralService.showSuccessMessage(`${ action.label } updated successfully`);
-    //       this.getJobsList(this.filterParams());
-    //     }
-    //   });
+
+    switch (action.label) {
+      case 'Invoice':
+        this.openInvoiceModal(job);
+        break;
+      default:
+        break;
+    }
+  }
+
+  openInvoiceModal(job: Job): void {
+    this.selectedJob.set(job);
+    this.jobActionModalRef = this._modal.open(this.jobInvoiceEmailTpl, {
+      centered: true,
+      size: 'xl',
+      scrollable: true
+    });
+  }
+
+  closeJobActionModal(): void {
+    this.jobActionModalRef?.dismiss();
+    this.selectedJob.set(null);
   }
 }
