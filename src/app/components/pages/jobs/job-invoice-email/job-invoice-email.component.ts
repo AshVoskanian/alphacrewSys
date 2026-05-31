@@ -1,7 +1,7 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Editor, NgxEditorModule } from 'ngx-editor';
+import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
 import { Job } from '../../../../shared/interface/jobs';
 
@@ -20,7 +20,13 @@ export class JobInvoiceEmailComponent implements OnInit, OnDestroy {
   private _date = inject(DatePipe);
   private _currency = inject(CurrencyPipe);
 
-  editor!: Editor;
+  public editor!: Editor;
+  readonly toolbar: Toolbar = [
+    ['bold', 'italic'],
+    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
+    ['link', 'image'],
+    ['text_color', 'background_color'],
+  ];
   recipientName = 'Accounts';
   recipientEmail = '';
   ccEmail = '';

@@ -54,11 +54,19 @@
       </aside>
 
       <section class="col-12 col-lg-8 job-invoice-email__editor">
-        <ngx-editor
-          [editor]="editor"
-          [(ngModel)]="emailBody"
-          [placeholder]="'Compose invoice email...'"
-        ></ngx-editor>
+        <div class="NgxEditor__Wrapper ngx-editor">
+          <ngx-editor-menu
+            [editor]="editor"
+            [toolbar]="toolbar"
+            dropdownPlacement="bottom"
+          ></ngx-editor-menu>
+          <ngx-editor
+            autofocus
+            [editor]="editor"
+            [(ngModel)]="emailBody"
+            [placeholder]="'Type here...'"
+          ></ngx-editor>
+        </div>
       </section>
     </div>
 
