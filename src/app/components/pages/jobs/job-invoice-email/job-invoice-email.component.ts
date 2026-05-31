@@ -9,8 +9,7 @@ import { Job } from '../../../../shared/interface/jobs';
   selector: 'app-job-invoice-email',
   imports: [ FormsModule, NgxEditorModule, CurrencyPipe ],
   providers: [ DatePipe, CurrencyPipe ],
-  templateUrl: './job-invoice-email.component.html',
-  styleUrl: './job-invoice-email.component.scss'
+  templateUrl: './job-invoice-email.component.html'
 })
 export class JobInvoiceEmailComponent implements OnInit, OnDestroy {
   @Input({ required: true }) job!: Job;
