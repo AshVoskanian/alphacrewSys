@@ -7,7 +7,7 @@
       </div>
 
       <div class="row g-3">
-        <div class="col-12 col-lg-4">
+        <div class="col-4">
           <h6 class="text-center txt-secondary f-14 m-b-15">Email Recipient</h6>
 
           <div class="flex flex-col gap-12">
@@ -48,7 +48,7 @@
                   class="form-control"
                   type="text"
                   readonly
-                  [value]="job.cost | currency:'GBP':'symbol':'1.2-2'"
+                  [value]="(job.cost ?? 0) | currency:'GBP':'symbol':'1.2-2'"
                 >
                 <span class="input-group-text bg-light-secondary">
                   <i class="fa-solid fa-sterling-sign txt-secondary"></i>
@@ -58,8 +58,8 @@
           </div>
         </div>
 
-        <div class="col-12 col-lg-8">
-          <div class="NgxEditor__Wrapper ngx-editor">
+        <div class="col-8">
+          <div class="NgxEditor__Wrapper ngx-editor min-h-400">
             <ngx-editor-menu
               [editor]="editor"
               [toolbar]="toolbar"
@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-content-end gap-10 m-t-20">
+      <div class="d-flex justify-content-end gap-2 m-t-20">
         <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="onNext()">Next</button>
       </div>

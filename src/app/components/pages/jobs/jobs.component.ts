@@ -53,7 +53,7 @@ export class JobsComponent extends ApiBase implements OnInit {
       { title: 'Start', field_value: 'starts', type: 'date' },
       { title: 'End', field_value: 'ends', type: 'date' },
       { title: 'Hours', field_value: 'totalHours' },
-      { title: 'Cost', field_value: 'cost', class: 'text-end p-r-10' },
+      { title: 'Cost', field_value: 'costDisplay', class: 'text-end p-r-10' },
     ],
     data: [] as Job[]
   };
@@ -91,7 +91,7 @@ export class JobsComponent extends ApiBase implements OnInit {
               `<p class="m-0 text-center p-x-5 rounded" style="background: ${job.statusColour}; color: #000   ">${job.statusText}</p>
                      <p class="m-0 text-nowrap text-center" style="color: ${job.requiresPO && !job.purchaseOrder ? 'red' : 'black'}">${job.requiresPO && !job.purchaseOrder ? '(PO Required)' : (job.purchaseOrder || '')}</p>`
             ),
-            cost: this._currency.transform(job.cost, 'GBP', 'symbol', '1.2-2')
+            costDisplay: this._currency.transform(job.cost, 'GBP', 'symbol', '1.2-2')
           }));
 
           this.totalCount.set(res.data.rowCount);
