@@ -43,7 +43,7 @@ export class JobsComponent extends ApiBase implements OnInit {
 
   public tableConfig: TableConfigs = {
     columns: [
-      { title: '', field_value: 'jobId', type: 'template' },
+      { title: '', field_value: 'jobId' },
       { title: 'Company/Venue', field_value: 'company_venue', sort: true, type: 'action' },
       { title: '', field_value: 'link', type: 'link_icon', showOnHover: true },
       { title: 'Status', field_value: 'statusText', sort: true },

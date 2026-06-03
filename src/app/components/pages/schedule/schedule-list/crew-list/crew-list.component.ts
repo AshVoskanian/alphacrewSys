@@ -128,6 +128,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     { id: 4, title: 'Par', class: 'primary', checked: false },
     { id: 8, title: 'Bcn', class: 'primary', checked: false },
     { id: 10, title: 'NY', class: 'primary', checked: false },
+    { id: 11, title: 'Berl', class: 'primary', checked: false },
   ];
 
   levels = [
