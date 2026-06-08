@@ -3,7 +3,7 @@ import { Component, DestroyRef, EventEmitter, inject, Input, OnDestroy, OnInit, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
+import { Editor, NgxEditorModule, Toolbar, toHTML } from 'ngx-editor';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { ApiBase } from '../../../../shared/bases/api-base';
@@ -46,6 +46,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   emailBody = '';
 
   private invoiceInfo: JobInvoiceEmailInfo | null = null;
+  private syncingSalutation = false;
 
   constructor() {
     const http = inject(HttpClient);
@@ -62,12 +63,43 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   }
 
   onRecipientNameChange(name: string): void {
-    if (this.isInvoiceSent()) {
+    if (this.isInvoiceSent() || this.syncingSalutation) {
       return;
     }
 
     this.recipientName = name;
-    this.emailBody = this.updateSalutation(this.emailBody, name);
+    const currentBody = this.getCurrentEmailBody();
+    const updatedBody = this.updateSalutation(currentBody, name);
+
+    if (updatedBody === currentBody) {
+      return;
+    }
+
+    this.syncingSalutation = true;
+    this.emailBody = updatedBody;
+    this.editor?.setContent(updatedBody);
+    this.syncingSalutation = false;
+  }
+
+  onEmailBodyChange(body: string): void {
+    if (this.isInvoiceSent()) {
+      this.emailBody = body;
+      return;
+    }
+
+    this.emailBody = body;
+
+    if (this.syncingSalutation) {
+      return;
+    }
+
+    const nameFromBody = this.extractSalutationName(body);
+
+    if (nameFromBody !== null && nameFromBody !== this.recipientName) {
+      this.syncingSalutation = true;
+      this.recipientName = nameFromBody;
+      this.syncingSalutation = false;
+    }
   }
 
   onCancel(): void {
@@ -225,22 +257,47 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     return this._date.transform(latestEnd, 'dd MMM yyyy HH:mm') ?? '';
   }
 
-  private updateSalutation(body: string, name: string): string {
-    const salutation = `<p>Dear ${ name },</p>`;
-    const existingSalutation = /<p[^>]*>\s*Dear\s*[^<]*<\/p>/i;
-    const invoiceBlock = /<p[^>]*>[\s\S]*?<strong>INVOICE<\/strong>[\s\S]*?<\/p>/i;
-
-    if (existingSalutation.test(body)) {
-      return body.replace(existingSalutation, salutation);
+  private getCurrentEmailBody(): string {
+    if (this.editor?.view) {
+      return toHTML(this.editor.view.state.doc.toJSON(), this.editor.schema);
     }
 
-    const match = body.match(invoiceBlock);
+    return typeof this.emailBody === 'string' ? this.emailBody : '';
+  }
+
+  private updateSalutation(body: string, name: string): string {
+    const normalizedBody = typeof body === 'string' ? body : '';
+    const salutation = `<p>Dear ${ name },</p>`;
+    const existingSalutation = /<p[^>]*>(?:(?!<\/p>)[\s\S])*?\bDear\b(?:(?!<\/p>)[\s\S])*?<\/p>/i;
+    const invoiceBlock = /<p[^>]*>(?:(?!<\/p>)[\s\S])*?<strong>INVOICE<\/strong>(?:(?!<\/p>)[\s\S])*?<\/p>/i;
+
+    if (existingSalutation.test(normalizedBody)) {
+      return normalizedBody.replace(existingSalutation, salutation);
+    }
+
+    const match = normalizedBody.match(invoiceBlock);
 
     if (match?.index !== undefined) {
       const insertAt = match.index + match[0].length;
-      return body.slice(0, insertAt) + salutation + body.slice(insertAt);
+      return normalizedBody.slice(0, insertAt) + salutation + normalizedBody.slice(insertAt);
     }
 
-    return salutation + body;
+    return salutation + normalizedBody;
+  }
+
+  private extractSalutationName(body: string): string | null {
+    const normalizedBody = typeof body === 'string' ? body : '';
+    const match = normalizedBody.match(
+      /<p[^>]*>(?:(?!<\/p>)[\s\S])*?\bDear\s+((?:(?!<\/p>)[\s\S])*?)<\/p>/i
+    );
+
+    if (!match?.[1]) {
+      return null;
+    }
+
+    return match[1]
+      .replace(/<[^>]+>/g, '')
+      .replace(/,\s*$/, '')
+      .trim();
   }
 }

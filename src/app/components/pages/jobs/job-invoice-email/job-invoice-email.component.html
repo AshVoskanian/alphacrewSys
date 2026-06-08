@@ -110,7 +110,9 @@
             <ngx-editor
               [autofocus]="!isInvoiceSent()"
               [editor]="editor"
-              [(ngModel)]="emailBody"
+              outputFormat="html"
+              [ngModel]="emailBody"
+              (ngModelChange)="onEmailBodyChange($event)"
               [placeholder]="'Type here...'"
             ></ngx-editor>
           </div>
