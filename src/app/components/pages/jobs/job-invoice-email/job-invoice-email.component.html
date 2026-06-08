@@ -1,15 +1,22 @@
-<div class="modal-content">
-  <div class="modal-body social-profile text-start dark-sign-up">
+<div class="modal-content position-relative">
+  @if (loading()) {
+    <div class="invoice-email-modal-loader">
+      <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
+    </div>
+  }
+  <div class="modal-body social-profile text-start dark-sign-up min-h-400" [class.invoice-email-modal-loading]="loading()">
     <div class="modal-toggle-wrapper">
       <div class="position-relative m-b-20">
-        <span
-          class="badge position-absolute top-0 start-0 p-x-10 p-y-5 rounded text-black"
-          [style.background-color]="job.statusColour">
-          {{ job.statusLabel ?? job.statusText }}
-        </span>
+        @if (invoiceStatusText) {
+          <span
+            class="badge position-absolute top-0 start-0 p-x-10 p-y-5 rounded text-black"
+            [style.background-color]="statusColour || '#f8d7da'">
+            {{ invoiceStatusText }}
+          </span>
+        }
         <div class="text-center">
-          <h4 class="m-0">{{ job.companyName }}</h4>
-          <p class="m-0 txt-secondary f-14">{{ job.venueName }}</p>
+          <h4 class="m-0">{{ companyName }}</h4>
+          <p class="m-0 txt-secondary f-14">{{ venueName }}</p>
         </div>
       </div>
 
@@ -19,9 +26,15 @@
 
           <div class="flex flex-col gap-12">
             <div>
-              <label class="form-label">Recipient</label>
+              <label class="form-label">Recipient <span class="text-danger" aria-hidden="true">*</span></label>
               <div class="input-group">
-                <input class="form-control" type="text" [(ngModel)]="recipientName" placeholder="Accounts">
+                <input
+                  class="form-control"
+                  type="text"
+                  [ngModel]="recipientName"
+                  (ngModelChange)="onRecipientNameChange($event)"
+                  placeholder="Accounts"
+                >
                 <span class="input-group-text bg-light-secondary">
                   <i class="fa-solid fa-user txt-secondary"></i>
                 </span>
@@ -55,7 +68,7 @@
                   class="form-control"
                   type="text"
                   readonly
-                  [value]="(job.cost ?? 0) | currency:'GBP':'symbol':'1.2-2'"
+                  [value]="amount | currency:'GBP':'symbol':'1.2-2'"
                 >
                 <span class="input-group-text bg-light-secondary">
                   <i class="fa-solid fa-sterling-sign txt-secondary"></i>
@@ -66,7 +79,7 @@
         </div>
 
         <div class="col-8">
-          <div class="NgxEditor__Wrapper ngx-editor min-h-400">
+          <div class="NgxEditor__Wrapper ngx-editor invoice-email-editor">
             <ngx-editor-menu
               [editor]="editor"
               [toolbar]="toolbar"
@@ -84,7 +97,7 @@
 
       <div class="d-flex justify-content-end gap-2 m-t-20">
         <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="onNext()">Next</button>
+        <button type="button" class="btn btn-primary" [disabled]="loading() || !recipientName.trim()" (click)="onNext()">Next</button>
       </div>
     </div>
   </div>

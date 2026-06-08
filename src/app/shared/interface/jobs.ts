@@ -344,3 +344,31 @@ export interface JobScheduleWarning {
   warning: number;
   weekDay: number;
 }
+
+export interface JobInvoiceEmailPart {
+  start_Date: string;
+  hour: number;
+  crew: number;
+  cost: number;
+}
+
+export interface JobInvoiceEmailInfo {
+  jobId: number;
+  companyName: string;
+  venueName: string;
+  emailAddress: string;
+  emailAddress_CC: string;
+  contactName: string | null;
+  contactFirstName: string | null;
+  invoiceDate: string;
+  paymentDate: string;
+  amount: number;
+  fullAmount: number;
+  discount: number;
+  vat: number;
+  prePayment: number;
+  emailBody: string;
+  statusText?: string;
+  statusColour?: string;
+  jobParts: JobInvoiceEmailPart[];
+}

@@ -1,0 +1,107 @@
+.invoice-email-modal-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 85%);
+  border-radius: inherit;
+}
+
+.invoice-email-modal-loading {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+:host ::ng-deep .invoice-email-editor {
+  .NgxEditor__Content {
+    > p:first-child {
+      margin-top: 0;
+    }
+
+    > p:nth-child(2) {
+      margin-bottom: 1.5rem;
+    }
+
+    > ul {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+      border: none;
+      font-size: 14px;
+      width: 100%;
+
+      li {
+        display: grid;
+        grid-template-columns: minmax(110px, 1.4fr) minmax(60px, 0.8fr) minmax(50px, 0.6fr) minmax(50px, 0.6fr) minmax(90px, 1fr);
+        column-gap: 16px;
+        align-items: center;
+        margin: 0;
+        padding: 0 4px;
+
+        p {
+          margin: 0;
+          padding: 8px 4px;
+          border: none;
+          text-align: left;
+          min-width: 0;
+        }
+
+        p:last-child {
+          text-align: right;
+        }
+
+        p:only-child {
+          grid-column: 1 / -1;
+          text-align: left !important;
+          padding: 8px;
+        }
+
+        &:first-child {
+          background: #d9d9d9;
+        }
+
+        &:nth-child(2) p:only-child {
+          white-space: nowrap;
+        }
+
+        &:nth-child(n + 3):nth-child(odd) {
+          background: #f2f2f2;
+        }
+
+        &:nth-child(n + 3):nth-child(even) {
+          background: #ffffff;
+        }
+      }
+    }
+
+    > ul + p,
+    > ul + p + p,
+    > ul + p + p + p,
+    > ul + p + p + p + p {
+      text-align: right;
+      margin-bottom: 0;
+      padding-bottom: 4px;
+      border: none;
+    }
+
+    > ul + p {
+      margin-top: 0.5rem;
+      padding-top: 8px;
+    }
+
+    > ul + p + p + p + p {
+      margin-top: 1.5rem;
+      line-height: 1.6;
+    }
+
+    > p:last-child {
+      font-size: 9px;
+      color: #555;
+      text-align: right;
+      margin-top: 2rem;
+      line-height: 1.5;
+    }
+  }
+}
