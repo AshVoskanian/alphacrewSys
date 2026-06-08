@@ -7,17 +7,16 @@
   <div class="modal-body social-profile text-start dark-sign-up min-h-400" [class.invoice-email-modal-loading]="loading()">
     <div class="modal-toggle-wrapper">
       <div class="position-relative m-b-20">
-        @if (invoiceStatusText) {
-          <span
-            class="badge position-absolute top-0 start-0 p-x-10 p-y-5 rounded text-black"
-            [style.background-color]="statusColour || '#f8d7da'">
-            {{ invoiceStatusText }}
-          </span>
+        @if (isInvoiceSent()) {
+          <div class="text-center">
+            <h4 class="m-0">{{ sentInvoiceStatusText }}</h4>
+          </div>
+        } @else {
+          <div class="text-center">
+            <h4 class="m-0">{{ companyName }}</h4>
+            <p class="m-0 txt-secondary f-14">{{ venueName }}</p>
+          </div>
         }
-        <div class="text-center">
-          <h4 class="m-0">{{ companyName }}</h4>
-          <p class="m-0 txt-secondary f-14">{{ venueName }}</p>
-        </div>
       </div>
 
       <div class="row g-3">
@@ -26,11 +25,17 @@
 
           <div class="flex flex-col gap-12">
             <div>
-              <label class="form-label">Recipient <span class="text-danger" aria-hidden="true">*</span></label>
+              <label class="form-label">
+                Recipient
+                @if (!isInvoiceSent()) {
+                  <span class="text-danger" aria-hidden="true">*</span>
+                }
+              </label>
               <div class="input-group">
                 <input
                   class="form-control"
                   type="text"
+                  [readonly]="isInvoiceSent()"
                   [ngModel]="recipientName"
                   (ngModelChange)="onRecipientNameChange($event)"
                   placeholder="Accounts"
@@ -44,7 +49,13 @@
             <div>
               <label class="form-label">Email</label>
               <div class="input-group">
-                <input class="form-control" type="email" [(ngModel)]="recipientEmail" placeholder="Email address">
+                <input
+                  class="form-control"
+                  type="email"
+                  [readonly]="isInvoiceSent()"
+                  [(ngModel)]="recipientEmail"
+                  placeholder="Email address"
+                >
                 <span class="input-group-text bg-light-secondary">
                   <i class="fa-solid fa-envelope txt-secondary"></i>
                 </span>
@@ -54,7 +65,13 @@
             <div>
               <label class="form-label">CC</label>
               <div class="input-group">
-                <input class="form-control" type="email" [(ngModel)]="ccEmail" placeholder="CC...">
+                <input
+                  class="form-control"
+                  type="email"
+                  [readonly]="isInvoiceSent()"
+                  [(ngModel)]="ccEmail"
+                  placeholder="CC..."
+                >
                 <span class="input-group-text bg-light-secondary">
                   <i class="fa-solid fa-envelope txt-secondary"></i>
                 </span>
@@ -79,14 +96,19 @@
         </div>
 
         <div class="col-8">
-          <div class="NgxEditor__Wrapper ngx-editor invoice-email-editor">
-            <ngx-editor-menu
-              [editor]="editor"
-              [toolbar]="toolbar"
-              dropdownPlacement="bottom"
-            ></ngx-editor-menu>
+          <div
+            class="NgxEditor__Wrapper ngx-editor invoice-email-editor"
+            [class.invoice-email-editor--readonly]="isInvoiceSent()"
+          >
+            @if (!isInvoiceSent()) {
+              <ngx-editor-menu
+                [editor]="editor"
+                [toolbar]="toolbar"
+                dropdownPlacement="bottom"
+              ></ngx-editor-menu>
+            }
             <ngx-editor
-              autofocus
+              [autofocus]="!isInvoiceSent()"
               [editor]="editor"
               [(ngModel)]="emailBody"
               [placeholder]="'Type here...'"
@@ -97,7 +119,16 @@
 
       <div class="d-flex justify-content-end gap-2 m-t-20">
         <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-        <button type="button" class="btn btn-primary" [disabled]="loading() || !recipientName.trim()" (click)="onNext()">Next</button>
+        @if (!isInvoiceSent()) {
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="loading() || !recipientName.trim()"
+            (click)="onNext()"
+          >
+            Next
+          </button>
+        }
       </div>
     </div>
   </div>

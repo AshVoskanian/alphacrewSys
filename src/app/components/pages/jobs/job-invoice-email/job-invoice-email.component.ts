@@ -4,10 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
-import { finalize } from 'rxjs';
+import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { ApiBase } from '../../../../shared/bases/api-base';
-import { JobInvoiceEmailInfo, JobInvoiceEmailPart } from '../../../../shared/interface/jobs';
+import { JobInvoiceEmailInfo, JobInvoiceEmailPart, JobInvoiceEmailStatusInfo } from '../../../../shared/interface/jobs';
 import { GeneralService } from '../../../../shared/services/general.service';
 
 @Component({
@@ -35,14 +35,14 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   ];
 
   loading = signal(true);
+  isInvoiceSent = signal(false);
+  sentInvoiceStatusText = '';
   companyName = '';
   venueName = '';
   recipientName = '';
   recipientEmail = '';
   ccEmail = '';
   amount = 0;
-  invoiceStatusText = '';
-  statusColour = '';
   emailBody = '';
 
   private invoiceInfo: JobInvoiceEmailInfo | null = null;
@@ -62,6 +62,10 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   }
 
   onRecipientNameChange(name: string): void {
+    if (this.isInvoiceSent()) {
+      return;
+    }
+
     this.recipientName = name;
     this.emailBody = this.updateSalutation(this.emailBody, name);
   }
@@ -77,8 +81,23 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   private loadInvoiceEmailInfo(): void {
     this.loading.set(true);
 
-    this.get<JobInvoiceEmailInfo>('Jobs/GetJobInfoForInvoiceEmail', { jobId: this.jobId })
+    this.get<JobInvoiceEmailStatusInfo>('Jobs/InfoForInvoceEmail', {
+      jobId: this.jobId,
+      emailTopic: 'Invoice'
+    })
       .pipe(
+        switchMap(statusRes => {
+          if (statusRes.errors?.errorCode) {
+            GeneralService.showErrorMessage(statusRes.errors.message);
+            return EMPTY;
+          }
+
+          const statusText = statusRes.data?.statusText?.trim() ?? '';
+          this.sentInvoiceStatusText = statusText;
+          this.isInvoiceSent.set(!!statusText);
+
+          return this.get<JobInvoiceEmailInfo>('Jobs/GetJobInfoForInvoiceEmail', { jobId: this.jobId });
+        }),
         takeUntilDestroyed(this._dr),
         finalize(() => this.loading.set(false))
       )
@@ -97,11 +116,20 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
           this.recipientEmail = data.emailAddress ?? '';
           this.ccEmail = data.emailAddress_CC ?? '';
           this.amount = data.amount ?? 0;
-          this.invoiceStatusText = data.statusText ?? this.getPlainStatusText(data.emailBody);
-          this.statusColour = data.statusColour ?? '';
+
+          if (this.isInvoiceSent()) {
+            this.emailBody = data.emailBody?.trim() ? data.emailBody : this.buildEmailBody();
+            this.setEditorReadonly(true);
+            return;
+          }
+
           this.emailBody = this.buildEmailBody();
         }
       });
+  }
+
+  private setEditorReadonly(readonly: boolean): void {
+    this.editor?.view?.setProps({ editable: () => !readonly });
   }
 
   private buildEmailBody(): string {
@@ -195,11 +223,6 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     }, new Date(0));
 
     return this._date.transform(latestEnd, 'dd MMM yyyy HH:mm') ?? '';
-  }
-
-  private getPlainStatusText(emailBody: string): string {
-    const trimmed = emailBody?.trim() ?? '';
-    return trimmed.includes('<') ? '' : trimmed;
   }
 
   private updateSalutation(body: string, name: string): string {

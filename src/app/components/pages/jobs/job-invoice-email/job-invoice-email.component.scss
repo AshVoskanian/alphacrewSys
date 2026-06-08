@@ -14,6 +14,13 @@
   opacity: 0.5;
 }
 
+:host ::ng-deep .invoice-email-editor--readonly {
+  .NgxEditor__Content {
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
 :host ::ng-deep .invoice-email-editor {
   .NgxEditor__Content {
     > p:first-child {

@@ -345,6 +345,11 @@ export interface JobScheduleWarning {
   weekDay: number;
 }
 
+export interface JobInvoiceEmailStatusInfo {
+  statusText: string;
+  statusColour?: string;
+}
+
 export interface JobInvoiceEmailPart {
   start_Date: string;
   hour: number;
