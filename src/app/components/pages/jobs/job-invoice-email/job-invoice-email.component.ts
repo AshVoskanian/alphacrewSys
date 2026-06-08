@@ -12,7 +12,7 @@ import { GeneralService } from '../../../../shared/services/general.service';
 
 @Component({
   selector: 'app-job-invoice-email',
-  imports: [ FormsModule, NgxEditorModule, CurrencyPipe ],
+  imports: [ FormsModule, NgxEditorModule, CurrencyPipe, DatePipe ],
   providers: [ DatePipe, CurrencyPipe ],
   templateUrl: './job-invoice-email.component.html',
   styleUrl: './job-invoice-email.component.scss'
@@ -42,6 +42,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   recipientName = '';
   recipientEmail = '';
   ccEmail = '';
+  invoiceDate: string | null = null;
   amount = 0;
   emailBody = '';
 
@@ -147,15 +148,15 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
           this.recipientName = data.contactFirstName ?? data.contactName ?? '';
           this.recipientEmail = data.emailAddress ?? '';
           this.ccEmail = data.emailAddress_CC ?? '';
+          this.invoiceDate = data.invoiceDate ?? null;
           this.amount = data.amount ?? 0;
+          this.emailBody = this.buildEmailBody();
 
           if (this.isInvoiceSent()) {
-            this.emailBody = data.emailBody?.trim() ? data.emailBody : this.buildEmailBody();
             this.setEditorReadonly(true);
-            return;
           }
 
-          this.emailBody = this.buildEmailBody();
+          this.editor?.setContent(this.emailBody);
         }
       });
   }
@@ -172,11 +173,13 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     const jobParts = this.invoiceInfo.jobParts ?? [];
     const assignmentStart = this.getAssignmentStart(jobParts);
     const assignmentEnd = this.getAssignmentEnd(jobParts);
+    const vat = this.invoiceInfo.vat ?? 0;
+    const fullAmount = this.invoiceInfo.fullAmount ?? this.invoiceInfo.amount;
     const netCost = this._currency.transform(this.invoiceInfo.amount, 'GBP', 'symbol', '1.2-2') ?? '';
-    const vatCost = this._currency.transform(this.invoiceInfo.vat, 'GBP', 'symbol', '1.2-2') ?? '';
-    const totalCost = this._currency.transform(this.invoiceInfo.fullAmount, 'GBP', 'symbol', '1.2-2') ?? '';
+    const vatCost = this._currency.transform(vat, 'GBP', 'symbol', '1.2-2') ?? '';
+    const totalCost = this._currency.transform(fullAmount, 'GBP', 'symbol', '1.2-2') ?? '';
     const vatPercent = this.invoiceInfo.amount > 0
-      ? Math.round((this.invoiceInfo.vat / this.invoiceInfo.amount) * 100)
+      ? Math.round((vat / this.invoiceInfo.amount) * 100)
       : 20;
     const currentYear = new Date().getFullYear();
 
