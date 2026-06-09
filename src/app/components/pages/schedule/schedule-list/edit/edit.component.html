@@ -31,13 +31,13 @@
               <div class="col w-1-5 align-self-center">
                 <label class="form-label w-100">
                   Expenses
-                  <input class="form-control" formControlName="expences" type="text">
+                  <input class="form-control" formControlName="expences" numericInput [numericInputDecimals]="2" type="text">
                 </label>
               </div>
               <div class="col w-1-5">
                 <label class="form-label w-100">
                   Extra Hours
-                  <input class="form-control" formControlName="extraHours" type="text">
+                  <input class="form-control" formControlName="extraHours" numericInput type="text">
                 </label>
               </div>
             </div>
@@ -45,7 +45,7 @@
               <div class="col w-1-5">
                 <label class="form-label w-100">
                   Adjustment
-                  <input class="form-control" formControlName="otherPaymentAdjustment" type="text">
+                  <input class="form-control" formControlName="otherPaymentAdjustment" numericInput [numericInputDecimals]="2" type="text">
                   <input class="form-control" formControlName="otherPaymentAdjustmentTxt" type="text"
                          placeholder="Adjustment text">
                 </label>
@@ -53,11 +53,11 @@
               <div class="col w-1-5">
                 <label class="form-label w-100">
                   Last Minute Bonus
-                  <input class="form-control" formControlName="lastMinuteBonus" type="text">
+                  <input class="form-control" formControlName="lastMinuteBonus" numericInput [numericInputDecimals]="2" type="text">
                 </label>
                 <label class="form-label w-100">
                   Skills
-                  <input class="form-control bbl-r-0 bbr-r-0 bb-none" formControlName="skilledCost" type="text">
+                  <input class="form-control bbl-r-0 bbr-r-0 bb-none" formControlName="skilledCost" numericInput [numericInputDecimals]="2" type="text">
                   <div class="border b-r-6 btl-r-0 btr-r-0 border-dark p-b-3 p-x-3">
                                       <p class="text-nowrap text-primary m-0 m-r-4 f-12">Skills due: £{{ skilledCoast | number:'1.2-2' }}</p>
                   <button type="button"

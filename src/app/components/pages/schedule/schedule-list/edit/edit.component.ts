@@ -1,6 +1,7 @@
 import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Select2Data, Select2Module } from "ng-select2-component";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { NumericInputDirective } from "../../../../../shared/directives/numeric-input.directive";
 import { BonusResponse, CrewSkill, JobPartCrewEdit, Schedule } from "../../../../../shared/interface/schedule";
 import { CommonModule } from "@angular/common";
 import { ApiBase } from "../../../../../shared/bases/api-base";
@@ -11,7 +12,7 @@ import { ScheduleService } from "../../schedule.service";
 
 @Component({
   selector: 'app-edit',
-  imports: [ Select2Module, CommonModule ],
+  imports: [ Select2Module, CommonModule, ReactiveFormsModule, NumericInputDirective ],
   templateUrl: './edit.component.html',
   standalone: true,
   styleUrl: './edit.component.scss'
