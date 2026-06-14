@@ -215,4 +215,5 @@ export interface Timesheet {
   adjustmentTxt: string;
   fnPay?: number;
   pay: number;
+  timesheetCurrency?: string;
 }

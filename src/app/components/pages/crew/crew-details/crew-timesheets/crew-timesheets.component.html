@@ -56,10 +56,10 @@
         </span>
       </ng-template>
 
-      <ng-template #extraHoursPayCell let-details>
+      <ng-template #extraHoursCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
-          £{{ details.extraHoursPay | number: '1.2-2' }}
-          @if (showExtraHoursPayInfo(details)) {
+          {{ details.extraHours }}
+          @if (showExtraHoursInfo(details)) {
             <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
                placement="top"
                [ngbTooltip]="getExtraHoursRateTooltip(details)"></i>
@@ -80,11 +80,11 @@
 
       <ng-template #adjustmentCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
-          £{{ details.adjustment | number: '1.2-2' }}
+          {{ getCurrency(details) }}{{ details.adjustment | number: '1.2-2' }}
           @if (showAdjustmentInfo(details)) {
             <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
                placement="top"
-               [ngbTooltip]="details.adjustmentTxt"></i>
+               [ngbTooltip]="getAdjustmentTooltip(details)"></i>
           }
         </span>
       </ng-template>
@@ -94,7 +94,7 @@
                  [disableScrollWrapper]="true"
                  [columnTemplates]="{
                    workHours: bookedHoursCell,
-                   extraHoursPay: extraHoursPayCell,
+                   extraHours: extraHoursCell,
                    travelHours: travelHoursCell,
                    adjustment: adjustmentCell
                  }"

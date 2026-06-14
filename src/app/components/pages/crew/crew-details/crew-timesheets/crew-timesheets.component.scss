@@ -32,6 +32,19 @@
       font-size: 12px;
     }
 
+    thead th.table-column-muted,
+    tbody td.table-column-muted {
+      background-color: #d4d9df;
+    }
+
+    tbody tr:nth-child(even) td.table-column-muted {
+      background-color: #d4d9df;
+    }
+
+    tbody tr.hovered:hover td.table-column-muted {
+      background-color: #c8ced6;
+    }
+
     tbody td {
       vertical-align: middle;
       font-size: 12px;
