@@ -48,10 +48,10 @@
       <ng-template #bookedHoursCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
           {{ details.workHours }}
-          @if (showBookedHoursInfo(details)) {
+          @if (details.bookedHoursInfoTitle) {
             <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
                placement="top"
-               [ngbTooltip]="getBookedHoursRateTooltip(details)"></i>
+               [ngbTooltip]="details.bookedHoursInfoTitle"></i>
           }
         </span>
       </ng-template>
@@ -59,10 +59,10 @@
       <ng-template #extraHoursCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
           {{ details.extraHours }}
-          @if (showExtraHoursInfo(details)) {
+          @if (details.extraHoursInfoTitle) {
             <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
                placement="top"
-               [ngbTooltip]="getExtraHoursRateTooltip(details)"></i>
+               [ngbTooltip]="details.extraHoursInfoTitle"></i>
           }
         </span>
       </ng-template>
@@ -70,21 +70,21 @@
       <ng-template #travelHoursCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
           {{ details.travelHours }}
-          @if (showTravelHoursInfo(details)) {
+          @if (details.travelHoursInfoTitle) {
             <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
                placement="top"
-               [ngbTooltip]="getTravelHourRateTooltip(details)"></i>
+               [ngbTooltip]="details.travelHoursInfoTitle"></i>
           }
         </span>
       </ng-template>
 
       <ng-template #adjustmentCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
-          {{ getCurrency(details) }}{{ details.adjustment | number: '1.2-2' }}
-          @if (showAdjustmentInfo(details)) {
+          {{ details.timesheetCurrency }}{{ details.adjustment | number: '1.2-2' }}
+          @if (details.adjustmentInfoTitle) {
             <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
                placement="top"
-               [ngbTooltip]="getAdjustmentTooltip(details)"></i>
+               [ngbTooltip]="details.adjustmentInfoTitle"></i>
           }
         </span>
       </ng-template>

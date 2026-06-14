@@ -23,6 +23,14 @@ import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 const PAY = 'table-column-muted';
+const DEFAULT_CURRENCY = '£';
+
+interface TimesheetRow extends Timesheet {
+  bookedHoursInfoTitle?: string;
+  extraHoursInfoTitle?: string;
+  travelHoursInfoTitle?: string;
+  adjustmentInfoTitle?: string;
+}
 
 const TIMESHEET_COLUMNS: TableColumn[] = [
   { title: 'Start', field_value: 'startDate', sort: true, type: 'date', min_width: 108 },
@@ -48,6 +56,53 @@ const TIMESHEET_COLUMNS: TableColumn[] = [
 
 const TIMESHEET_TABLE_MIN_WIDTH = TIMESHEET_COLUMNS.reduce((sum, col) => sum + (col.min_width ?? 0), 0);
 
+const withCurrencyTitles = (columns: TableColumn[], currency: string): TableColumn[] =>
+  columns.map(col => ({
+    ...col,
+    title: col.title?.replace('(£)', `(${currency})`) ?? col.title
+  }));
+
+const resolveCurrency = (items: Timesheet[]): string =>
+  items.find(item => item.timesheetCurrency?.trim())?.timesheetCurrency?.trim() || DEFAULT_CURRENCY;
+
+const formatRateTitle = (currency: string, ...values: (number | null | undefined)[]): string | undefined => {
+  if (values.some(value => value === null || value === undefined)) {
+    return undefined;
+  }
+
+  const sum = values.reduce((total, value) => total + Number(value), 0);
+  if (sum <= 0) {
+    return undefined;
+  }
+
+  return `${currency}${sum.toFixed(2)}`;
+};
+
+const formatSingleRateTitle = (currency: string, value: number | null | undefined): string | undefined => {
+  if (value === null || value === undefined || Number(value) <= 0) {
+    return undefined;
+  }
+
+  return `${currency}${Number(value).toFixed(2)}`;
+};
+
+const mapTimesheetRow = (item: Timesheet, currency: string): TimesheetRow => {
+  const isTotal = item.venueName?.toUpperCase() === 'TOTAL';
+  const rowCurrency = item.timesheetCurrency?.trim() || currency;
+
+  return {
+    ...item,
+    id: item.id ?? item.crewId,
+    timesheetCurrency: rowCurrency,
+    startDate: isTotal ? '' : item.startDate,
+    companyName: isTotal ? '' : item.companyName,
+    bookedHoursInfoTitle: isTotal ? undefined : formatRateTitle(rowCurrency, item.crewPayrate, item.loyaltyBonus),
+    extraHoursInfoTitle: isTotal ? undefined : formatRateTitle(rowCurrency, item.extraHourRate, item.loyaltyBonus),
+    travelHoursInfoTitle: isTotal ? undefined : formatSingleRateTitle(rowCurrency, item.travelHourRate),
+    adjustmentInfoTitle: isTotal ? undefined : item.adjustmentTxt?.trim() || undefined,
+  };
+};
+
 @Component({
   selector: 'app-crew-timesheets',
   imports: [ TableComponent, Select2Module, FormsModule, NgbTooltipModule, CommonModule ],
@@ -66,89 +121,16 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
   years = signal<Select2Option[]>(YEARS);
   months = signal<Select2Option[]>(MONTHS);
   timesheetTableMinWidth = TIMESHEET_TABLE_MIN_WIDTH;
-  currency = signal('£');
+  currency = signal(DEFAULT_CURRENCY);
 
   tableConfig: WritableSignal<TableConfigs> = signal(
     {
       columns: TIMESHEET_COLUMNS,
-      data: [] as Timesheet[]
+      data: [] as TimesheetRow[]
     }
   );
 
   form: FormGroup;
-
-  isTotalRow(details: Timesheet): boolean {
-    return details.venueName?.toUpperCase() === 'TOTAL';
-  }
-
-  formatCurrency(value: number | null | undefined, currency?: string): string {
-    const symbol = currency?.trim() || this.currency() || '£';
-    return `${symbol}${Number(value ?? 0).toFixed(2)}`;
-  }
-
-  getCurrency(details?: Timesheet): string {
-    return details?.timesheetCurrency?.trim() || this.currency() || '£';
-  }
-
-  private withCurrencyTitles(columns: TableColumn[], currency: string): TableColumn[] {
-    return columns.map(col => ({
-      ...col,
-      title: col.title?.replace('(£)', `(${currency})`) ?? col.title
-    }));
-  }
-
-  private resolveCurrency(items: Timesheet[]): string {
-    return items.find(item => item.timesheetCurrency?.trim())?.timesheetCurrency?.trim() || '£';
-  }
-
-  getBookedHoursRateTooltip(details: Timesheet): string {
-    return this.formatRateSum(details, details.crewPayrate, details.loyaltyBonus);
-  }
-
-  getExtraHoursRateTooltip(details: Timesheet): string {
-    return this.formatRateSum(details, details.extraHourRate, details.loyaltyBonus);
-  }
-
-  getTravelHourRateTooltip(details: Timesheet): string {
-    return this.formatCurrency(details.travelHourRate, details.timesheetCurrency);
-  }
-
-  getAdjustmentTooltip(details: Timesheet): string {
-    return details.adjustmentTxt?.trim() ?? '';
-  }
-
-  private formatRateSum(details: Timesheet, ...values: number[]): string {
-    const sum = values.reduce((total, value) => total + Number(value), 0);
-    return this.formatCurrency(sum, details.timesheetCurrency);
-  }
-
-  private canShowRateSum(...values: (number | null | undefined)[]): boolean {
-    if (values.some(value => value === null || value === undefined)) {
-      return false;
-    }
-
-    return values.reduce((sum, value) => sum + Number(value), 0) > 0;
-  }
-
-  showBookedHoursInfo(details: Timesheet): boolean {
-    return !this.isTotalRow(details) && this.canShowRateSum(details.crewPayrate, details.loyaltyBonus);
-  }
-
-  showExtraHoursInfo(details: Timesheet): boolean {
-    return !this.isTotalRow(details) && this.canShowRateSum(details.extraHourRate, details.loyaltyBonus);
-  }
-
-  showTravelHoursInfo(details: Timesheet): boolean {
-    if (this.isTotalRow(details) || details.travelHourRate === null || details.travelHourRate === undefined) {
-      return false;
-    }
-
-    return Number(details.travelHourRate) > 0;
-  }
-
-  showAdjustmentInfo(details: Timesheet): boolean {
-    return !this.isTotalRow(details) && !!details.adjustmentTxt?.trim();
-  }
 
   ngOnInit() {
     this.initForm();
@@ -209,18 +191,13 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
             return;
           }
 
-          const currency = this.resolveCurrency(res.data);
+          const currency = resolveCurrency(res.data);
           this.currency.set(currency);
 
           this.tableConfig.update(config => ({
             ...config,
-            columns: this.withCurrencyTitles(TIMESHEET_COLUMNS, currency),
-            data: res.data.map((item: Timesheet) => ({
-              ...item,
-              id: item.id ?? item.crewId,
-              startDate: item.venueName?.toUpperCase() === 'TOTAL' ? '' : item.startDate,
-              companyName: item.venueName?.toUpperCase() === 'TOTAL' ? '' : item.companyName,
-            }))
+            columns: withCurrencyTitles(TIMESHEET_COLUMNS, currency),
+            data: res.data.map(item => mapTimesheetRow(item, currency))
           }));
         }
       })
