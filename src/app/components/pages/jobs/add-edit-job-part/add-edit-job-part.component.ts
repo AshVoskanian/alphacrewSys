@@ -175,7 +175,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   );
 
   readonly crewOptions = signal<Select2Option[]>(
-    Array.from({ length: 24 }, (_, i) => {
+    Array.from({ length: 25 }, (_, i) => {
       const crew = i;
       return { value: crew, label: `${ crew } Crew` };
     })

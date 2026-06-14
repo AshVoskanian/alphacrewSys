@@ -46,7 +46,7 @@
 
       <input class="hidden" hidden #file (change)="uploadFile($event)" type="file">
       <button type="button" class="btn btn-primary w-300 h-36" (click)="file.click()">
-        Choose File
+        Upload New Document
       </button>
       @if (tableConfig() && tableConfig().data.length) {
         <app-table [tableConfig]="tableConfig()"
