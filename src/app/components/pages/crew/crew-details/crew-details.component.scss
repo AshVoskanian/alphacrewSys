@@ -4,6 +4,14 @@
     grid-template-columns: 350px 1fr;
     gap: 30px;
 
+    .content {
+      min-width: 0;
+
+      .card {
+        min-width: 0;
+      }
+    }
+
     .user-info {
       p {
         margin: 0 !important;

@@ -47,6 +47,8 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() searchPlaceholder: string = '';
   /** Maps `TableColumn.field_value` to an `ng-template` when `column.type === 'template'`. */
   @Input() columnTemplates: Record<string, TemplateRef<unknown>> | null = null;
+  /** When true, table renders without the inner scroll wrapper (use an outer `table-responsive` instead). */
+  @Input() disableScrollWrapper: boolean = false;
 
   @Output() action = new EventEmitter<TableClickedAction>();
   @Output() rowClicked = new EventEmitter<any>();

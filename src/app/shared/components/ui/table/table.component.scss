@@ -1,7 +1,20 @@
 .custom-scrollbar {
   table {
-    thead {
+    &.table-fixed-layout {
+      table-layout: fixed;
+      width: 100%;
+    }
 
+    thead th.table-column-muted {
+      background-color: #e2e6ea;
+    }
+
+    tbody td {
+      vertical-align: middle;
+    }
+
+    .table-column-muted {
+      background-color: #e2e6ea;
     }
 
     tbody {
@@ -14,6 +27,10 @@
           background: var(--light-background);
         }
 
+        td.table-column-muted {
+          background-color: #e2e6ea;
+        }
+
         .table-action-hover-only {
           opacity: 0;
           transition: opacity 0.15s ease;
@@ -24,7 +41,6 @@
           opacity: 1;
         }
 
-        // link_icon columns: hover only (no :focus-within — link keeps focus after click so icon would stay visible)
         .table-link-icon-hover-only {
           opacity: 0;
           transition: opacity 0.15s ease;

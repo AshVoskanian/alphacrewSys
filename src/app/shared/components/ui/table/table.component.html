@@ -50,7 +50,7 @@
     </div>
   </ng-template>
 
-  <div class="overflow-auto custom-scrollbar max-h-{{maxHeight}}">
+  <ng-template #tableTpl>
     <table class="table" [ngClass]="tableClass">
       <thead>
       <tr>
@@ -75,14 +75,26 @@
           @if (!column.hide_column) {
             @if (column.sort) {
               <th
-                [ngClass]="sortable_key == (column.sortable_key ? column.sortable_key : column.field_value) && filter['sort'] == 'asc' ? 'asc' :
-                  sortable_key == (column.sortable_key ? column.sortable_key : column.field_value) && filter['sort'] == 'desc' ? 'desc' : ''"
+                [ngClass]="[
+                  sortable_key == (column.sortable_key ? column.sortable_key : column.field_value) && filter['sort'] == 'asc' ? 'asc' :
+                    sortable_key == (column.sortable_key ? column.sortable_key : column.field_value) && filter['sort'] == 'desc' ? 'desc' : '',
+                  column.header_class ?? ''
+                ]"
+                [style.min-width.px]="column.min_width"
+                [style.width.px]="column.min_width"
+                [style.max-width.px]="column.max_width"
                 (click)="onSort(column.sortable_key ? column.sortable_key : column.field_value)">
                 {{ column.title }}
                 <span class="cb-accending-decending"></span>
               </th>
             } @else {
-              <th [ngClass]="column.class ? column.class : ''">{{ column.title }}</th>
+              <th
+                [ngClass]="column.header_class ?? ''"
+                [style.min-width.px]="column.min_width"
+                [style.width.px]="column.min_width"
+                [style.max-width.px]="column.max_width">
+                {{ column.title }}
+              </th>
             }
           }
         }
@@ -154,7 +166,7 @@
                       </td>
                     }
                     @case ('date') {
-                      <td>
+                      <td [ngClass]="column.class ? column.class : ''">
                         {{ details[column.field_value] | date: 'dd MMM yyy HH:mm' }}
                       </td>
                     }
@@ -230,5 +242,13 @@
         </tbody>
       }
     </table>
-  </div>
+  </ng-template>
+
+  @if (disableScrollWrapper) {
+    <ng-container *ngTemplateOutlet="tableTpl"></ng-container>
+  } @else {
+    <div class="overflow-auto custom-scrollbar max-h-{{maxHeight}}">
+      <ng-container *ngTemplateOutlet="tableTpl"></ng-container>
+    </div>
+  }
 }

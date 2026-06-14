@@ -21,6 +21,9 @@ export interface TableColumn {
     type?: string;
     template?: string;
     class?: string;
+    header_class?: string;
+    min_width?: number;
+    max_width?: number;
     decimal_number?: boolean;
     text?: string;
     icon_field?: string;

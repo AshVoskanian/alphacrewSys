@@ -43,15 +43,69 @@
     </div>
   } @else {
     @if (tableConfig().data?.length) {
+      <div class="timesheet-table-wrapper custom-scrollbar max-h-700"
+           [style.--timesheet-min-width.px]="timesheetTableMinWidth">
+      <ng-template #bookedHoursCell let-details>
+        <span class="d-inline-flex align-items-center gap-6">
+          {{ details.workHours }}
+          @if (showBookedHoursInfo(details)) {
+            <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
+               placement="top"
+               [ngbTooltip]="getBookedHoursRateTooltip(details)"></i>
+          }
+        </span>
+      </ng-template>
+
+      <ng-template #extraHoursPayCell let-details>
+        <span class="d-inline-flex align-items-center gap-6">
+          £{{ details.extraHoursPay | number: '1.2-2' }}
+          @if (showExtraHoursPayInfo(details)) {
+            <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
+               placement="top"
+               [ngbTooltip]="getExtraHoursRateTooltip(details)"></i>
+          }
+        </span>
+      </ng-template>
+
+      <ng-template #travelHoursCell let-details>
+        <span class="d-inline-flex align-items-center gap-6">
+          {{ details.travelHours }}
+          @if (showTravelHoursInfo(details)) {
+            <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
+               placement="top"
+               [ngbTooltip]="getTravelHourRateTooltip(details)"></i>
+          }
+        </span>
+      </ng-template>
+
+      <ng-template #adjustmentCell let-details>
+        <span class="d-inline-flex align-items-center gap-6">
+          £{{ details.adjustment | number: '1.2-2' }}
+          @if (showAdjustmentInfo(details)) {
+            <i class="fa-solid fa-circle-info f-12 txt-muted cursor-pointer"
+               placement="top"
+               [ngbTooltip]="details.adjustmentTxt"></i>
+          }
+        </span>
+      </ng-template>
+
       <app-table [tableConfig]="tableConfig()"
+                 [tableClass]="'crew-timesheet-table'"
+                 [disableScrollWrapper]="true"
+                 [columnTemplates]="{
+                   workHours: bookedHoursCell,
+                   extraHoursPay: extraHoursPayCell,
+                   travelHours: travelHoursCell,
+                   adjustment: adjustmentCell
+                 }"
                  [search]="false"
-                 [maxHeight]="700"
                  [hover]="true"
                  [pagination]="false">
       </app-table>
+      </div>
     }
 
-    <button class="btn p-x-14 btn-primary"
+    <button class="btn m-t-20 p-x-14 btn-primary"
             (click)="sendToEmail(crewDetail())"
             type="button">
       Email To: {{crewDetail()?.email}}
@@ -63,21 +117,3 @@
     </button>
   }
 </div>
-
-<!--&lt;!&ndash;Add or Update payment&ndash;&gt;-->
-<!--<ng-template #addUpdatePayment>-->
-<!--  <app-payment-add-update-->
-<!--    [loading]="modalLoading()"-->
-<!--    [selectedPayment]="selectedListItem()"-->
-<!--    (closeModal)="closeAddUpdateModal($event)"-->
-<!--  ></app-payment-add-update>-->
-<!--</ng-template>-->
-
-<!--&lt;!&ndash;Confirm payment removing&ndash;&gt;-->
-<!--<ng-template #confirmModal>-->
-<!--  <app-confirm-modal-->
-<!--    [loading]="modalLoading()"-->
-<!--    [title]="'Delete this payment?'"-->
-<!--    (closeModal)="closeConfirmModal($event)"-->
-<!--  ></app-confirm-modal>-->
-<!--</ng-template>-->
