@@ -30,6 +30,7 @@ export class CrewDocumentsComponent extends ApiBase {
   private readonly _dr = inject(DestroyRef);
   private readonly _http = inject(HttpClient);
   private readonly _crewService = inject(CrewService);
+  private readonly _generalService = inject(GeneralService);
   private readonly _cdr = inject(ChangeDetectorRef);
 
   crewDetail = input<CrewDetail>();
@@ -37,10 +38,11 @@ export class CrewDocumentsComponent extends ApiBase {
   loading = signal<boolean>(false);
   commentDraft = signal<string>('');
   commentSaving = signal<boolean>(false);
+  downloadingDocument = signal<string | null>(null);
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
-      { title: 'File Name', field_value: 'fileName', sort: true },
+      { title: 'File Name', field_value: 'fileName', sort: true, type: 'template' },
     ],
     row_action: [
       { label: "Delete", action_to_perform: "delete", icon: "trash1", modal: true }
@@ -137,10 +139,27 @@ export class CrewDocumentsComponent extends ApiBase {
     }
   }
 
+  downloadDocument(fileName: string) {
+    if (this.downloadingDocument()) {
+      return;
+    }
+
+    this.downloadingDocument.set(fileName);
+
+    this._generalService.downloadFile(`Crew/download/${ encodeURIComponent(fileName) }`, fileName)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.downloadingDocument.set(null))
+      )
+      .subscribe({
+        error: () => GeneralService.showErrorMessage('Download failed')
+      });
+  }
+
   deleteDocument(fileName: string) {
     this.loading.set(true);
 
-    this.post(`Crew/DeleteCrewDocumentAsync?fileName=${ fileName }`, null)
+    this.get(`Crew/DeleteCrewDocumentAsync?fileName=${ fileName }`, null)
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.loading.set(false))
