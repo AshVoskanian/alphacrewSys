@@ -108,9 +108,9 @@
       @if (tableData && tableData.length) {
         <tbody>
           @for (details of tableData | paginate: {
-            itemsPerPage: pageSize,
+            itemsPerPage: pagination ? pageSize : (tableData.length || 1),
             currentPage: pageNo,
-            totalItems: totalCount
+            totalItems: pagination ? totalCount : tableData.length
           }; track details) {
             <tr
               [class.selected]="selected && selected.length && selected.includes(details.id)"
