@@ -16,10 +16,11 @@ import { AddJobComponent } from "./add-job/add-job.component";
 import { CurrencyPipe } from "@angular/common";
 import { JOB_QUICK_ACTIONS, JobQuickAction } from "./jobs-filter/jobs-utils";
 import { JobInvoiceEmailComponent } from "./job-invoice-email/job-invoice-email.component";
+import { JobReminderEmailComponent } from "./job-reminder-email/job-reminder-email.component";
 
 @Component({
   selector: 'app-jobs',
-  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent ],
+  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent, JobReminderEmailComponent ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
   providers: [ CurrencyPipe ]
@@ -40,6 +41,7 @@ export class JobsComponent extends ApiBase implements OnInit {
   selectedJob: WritableSignal<Job | null> = signal(null);
 
   @ViewChild('jobInvoiceEmail') jobInvoiceEmailTpl!: TemplateRef<NgbModal>;
+  @ViewChild('jobReminderEmail') jobReminderEmailTpl!: TemplateRef<NgbModal>;
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -157,6 +159,9 @@ export class JobsComponent extends ApiBase implements OnInit {
       case 'Invoice':
         this.openInvoiceModal(job);
         break;
+      case 'Reminder':
+        this.openReminderModal(job);
+        break;
       default:
         break;
     }
@@ -165,6 +170,15 @@ export class JobsComponent extends ApiBase implements OnInit {
   openInvoiceModal(job: Job): void {
     this.selectedJob.set(job);
     this.jobActionModalRef = this._modal.open(this.jobInvoiceEmailTpl, {
+      centered: true,
+      size: 'xl',
+      scrollable: true
+    });
+  }
+
+  openReminderModal(job: Job): void {
+    this.selectedJob.set(job);
+    this.jobActionModalRef = this._modal.open(this.jobReminderEmailTpl, {
       centered: true,
       size: 'xl',
       scrollable: true

@@ -103,3 +103,12 @@
     ></app-job-invoice-email>
   }
 </ng-template>
+
+<ng-template #jobReminderEmail let-modal>
+  @if (selectedJob(); as job) {
+    <app-job-reminder-email
+      [jobId]="job.jobId"
+      (closeModal)="closeJobActionModal()"
+    ></app-job-reminder-email>
+  }
+</ng-template>
