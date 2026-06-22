@@ -112,3 +112,21 @@
     ></app-job-reminder-email>
   }
 </ng-template>
+
+<ng-template #jobChaseupEmail let-modal>
+  @if (selectedJob(); as job) {
+    <app-job-chaseup-email
+      [jobId]="job.jobId"
+      (closeModal)="closeJobActionModal()"
+    ></app-job-chaseup-email>
+  }
+</ng-template>
+
+<ng-template #jobFinalChaseupEmail let-modal>
+  @if (selectedJob(); as job) {
+    <app-job-final-chaseup-email
+      [jobId]="job.jobId"
+      (closeModal)="closeJobActionModal()"
+    ></app-job-final-chaseup-email>
+  }
+</ng-template>

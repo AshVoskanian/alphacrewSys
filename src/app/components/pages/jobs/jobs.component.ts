@@ -17,10 +17,12 @@ import { CurrencyPipe } from "@angular/common";
 import { JOB_QUICK_ACTIONS, JobQuickAction } from "./jobs-filter/jobs-utils";
 import { JobInvoiceEmailComponent } from "./job-invoice-email/job-invoice-email.component";
 import { JobReminderEmailComponent } from "./job-reminder-email/job-reminder-email.component";
+import { JobChaseupEmailComponent } from "./job-chaseup-email/job-chaseup-email.component";
+import { JobFinalChaseupEmailComponent } from "./job-final-chaseup-email/job-final-chaseup-email.component";
 
 @Component({
   selector: 'app-jobs',
-  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent, JobReminderEmailComponent ],
+  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent, JobReminderEmailComponent, JobChaseupEmailComponent, JobFinalChaseupEmailComponent ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
   providers: [ CurrencyPipe ]
@@ -42,6 +44,8 @@ export class JobsComponent extends ApiBase implements OnInit {
 
   @ViewChild('jobInvoiceEmail') jobInvoiceEmailTpl!: TemplateRef<NgbModal>;
   @ViewChild('jobReminderEmail') jobReminderEmailTpl!: TemplateRef<NgbModal>;
+  @ViewChild('jobChaseupEmail') jobChaseupEmailTpl!: TemplateRef<NgbModal>;
+  @ViewChild('jobFinalChaseupEmail') jobFinalChaseupEmailTpl!: TemplateRef<NgbModal>;
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -162,6 +166,12 @@ export class JobsComponent extends ApiBase implements OnInit {
       case 'Reminder':
         this.openReminderModal(job);
         break;
+      case 'Chaseup':
+        this.openChaseupModal(job);
+        break;
+      case 'Final Chaseup':
+        this.openFinalChaseupModal(job);
+        break;
       default:
         break;
     }
@@ -179,6 +189,24 @@ export class JobsComponent extends ApiBase implements OnInit {
   openReminderModal(job: Job): void {
     this.selectedJob.set(job);
     this.jobActionModalRef = this._modal.open(this.jobReminderEmailTpl, {
+      centered: true,
+      size: 'xl',
+      scrollable: true
+    });
+  }
+
+  openChaseupModal(job: Job): void {
+    this.selectedJob.set(job);
+    this.jobActionModalRef = this._modal.open(this.jobChaseupEmailTpl, {
+      centered: true,
+      size: 'xl',
+      scrollable: true
+    });
+  }
+
+  openFinalChaseupModal(job: Job): void {
+    this.selectedJob.set(job);
+    this.jobActionModalRef = this._modal.open(this.jobFinalChaseupEmailTpl, {
       centered: true,
       size: 'xl',
       scrollable: true

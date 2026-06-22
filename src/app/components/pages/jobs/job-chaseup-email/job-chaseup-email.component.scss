@@ -1,0 +1,57 @@
+.chaseup-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--theme-default, #7366ff);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--theme-default, #7366ff);
+  }
+
+  &--loading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+}
+
+.chaseup-email-modal-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 85%);
+  border-radius: inherit;
+}
+
+.chaseup-email-modal-loading {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+:host ::ng-deep .chaseup-email-editor--readonly {
+  .NgxEditor__Content {
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+:host ::ng-deep .chaseup-email-editor {
+  max-height: 65vh;
+  overflow-y: auto;
+
+  .NgxEditor__Content {
+    > p:first-child {
+      margin-top: 0;
+    }
+
+    > p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
