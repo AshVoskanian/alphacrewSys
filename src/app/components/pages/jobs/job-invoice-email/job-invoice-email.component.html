@@ -154,9 +154,12 @@
           <button
             type="button"
             class="btn btn-primary"
-            [disabled]="loading() || !recipientName.trim()"
+            [disabled]="loading() || sending() || !recipientName.trim() || !recipientEmail.trim()"
             (click)="onNext()"
           >
+            @if (sending()) {
+              <i class="fa-solid fa-spinner fa-spin m-r-5" aria-hidden="true"></i>
+            }
             Next
           </button>
         }

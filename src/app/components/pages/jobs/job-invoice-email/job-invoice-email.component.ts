@@ -7,7 +7,7 @@ import { Editor, NgxEditorModule, Toolbar, toHTML } from 'ngx-editor';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { ApiBase } from '../../../../shared/bases/api-base';
-import { JobInvoiceEmailInfo, JobInvoiceEmailPart, JobInvoiceEmailStatusInfo } from '../../../../shared/interface/jobs';
+import { JobInvoiceEmailInfo, JobInvoiceEmailPart, JobInvoiceEmailStatusInfo, SendInvoiceEmailRequest } from '../../../../shared/interface/jobs';
 import { GeneralService } from '../../../../shared/services/general.service';
 
 @Component({
@@ -20,7 +20,6 @@ import { GeneralService } from '../../../../shared/services/general.service';
 export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestroy {
   @Input({ required: true }) jobId!: number;
   @Output() closeModal = new EventEmitter<void>();
-  @Output() next = new EventEmitter<void>();
 
   private readonly _dr = inject(DestroyRef);
   private readonly _date = inject(DatePipe);
@@ -36,6 +35,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   ];
 
   loading = signal(true);
+  sending = signal(false);
   downloadingPdf = signal(false);
   isInvoiceSent = signal(false);
   sentInvoiceStatusText = '';
@@ -139,7 +139,42 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   }
 
   onNext(): void {
-    this.next.emit();
+    if (this.loading() || this.sending() || !this.recipientName.trim() || !this.recipientEmail.trim()) {
+      return;
+    }
+
+    this.sending.set(true);
+
+    const payload: SendInvoiceEmailRequest = {
+      jobId: this.jobId,
+      recipient: this.recipientName.trim(),
+      emailTo: this.recipientEmail.trim(),
+      emailCC: this.ccEmail.trim(),
+      amount: this.amount,
+      html: this.getCurrentEmailBody(),
+      emailTopic: 'Invoice'
+    };
+
+    this.post<JobInvoiceEmailStatusInfo, SendInvoiceEmailRequest>('Jobs/SendInvoiceEmail', payload)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.sending.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.sentInvoiceStatusText = res.data?.statusText?.trim() || 'Invoice sent successfully';
+          this.isInvoiceSent.set(true);
+          this.invoiceDate = new Date().toISOString();
+          this.setEditorReadonly(true);
+          GeneralService.showSuccessMessage('Invoice sent successfully');
+        },
+        error: () => GeneralService.showErrorMessage('Failed to send invoice email')
+      });
   }
 
   private loadInvoiceEmailInfo(): void {

@@ -350,6 +350,16 @@ export interface JobInvoiceEmailStatusInfo {
   statusColour?: string;
 }
 
+export interface SendInvoiceEmailRequest {
+  jobId: number;
+  recipient: string;
+  emailTo: string;
+  emailCC: string;
+  amount: number;
+  html: string;
+  emailTopic: string;
+}
+
 export interface JobInvoiceEmailPart {
   start_Date: string;
   hour: number;
