@@ -1,0 +1,146 @@
+<div class="modal-content position-relative">
+  @if (loading()) {
+    <div class="payment-received-email-modal-loader">
+      <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
+    </div>
+  }
+  <div class="modal-body social-profile text-start dark-sign-up min-h-400" [class.payment-received-email-modal-loading]="loading()">
+    <div class="modal-toggle-wrapper">
+      <div class="position-relative m-b-20">
+        @if (isThanksSent()) {
+          <div class="text-center">
+            <h4 class="m-0 text-danger">{{ sentThanksStatusText }}</h4>
+          </div>
+        } @else {
+          <div class="text-center">
+            <h4 class="m-0">{{ companyName }}</h4>
+            <p class="m-0 txt-secondary f-14">{{ venueName }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="row g-3">
+        <div class="col-4">
+          <h6 class="text-center txt-dark f-18 m-b-15">Email Recipient</h6>
+
+          <div class="flex flex-col gap-12">
+            <div>
+              <label class="form-label">
+                Recipient
+                @if (!isThanksSent()) {
+                  <span class="text-danger" aria-hidden="true">*</span>
+                }
+              </label>
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  type="text"
+                  [readonly]="isThanksSent()"
+                  [ngModel]="recipientName"
+                  (ngModelChange)="onRecipientNameChange($event)"
+                  placeholder="Accounts"
+                >
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-user txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label">
+                Email
+                @if (!isThanksSent()) {
+                  <span class="text-danger" aria-hidden="true">*</span>
+                }
+              </label>
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  type="email"
+                  [readonly]="isThanksSent()"
+                  [(ngModel)]="recipientEmail"
+                  placeholder="Email address"
+                >
+                <span class="input-group-text bg-light-secondary">
+                  <i class="fa-solid fa-envelope txt-secondary"></i>
+                </span>
+              </div>
+            </div>
+
+            @if (isThanksSent()) {
+              <div>
+                <label class="form-label">Sent date</label>
+                <div class="input-group">
+                  <input
+                    class="form-control"
+                    type="text"
+                    readonly
+                    [value]="sentDate | date:'dd MMM yyyy HH:mm'"
+                  >
+                  <span class="input-group-text bg-light-secondary">
+                    <i class="fa-solid fa-calendar txt-secondary"></i>
+                  </span>
+                </div>
+              </div>
+            } @else if (!isThanksSent()) {
+              <div>
+                <label class="form-label">CC</label>
+                <div class="input-group">
+                  <input
+                    class="form-control"
+                    type="email"
+                    [(ngModel)]="ccEmail"
+                    placeholder="CC..."
+                  >
+                  <span class="input-group-text bg-light-secondary">
+                    <i class="fa-solid fa-envelope txt-secondary"></i>
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="col-8">
+          <div
+            class="NgxEditor__Wrapper ngx-editor payment-received-email-editor custom-scrollbar"
+            [class.payment-received-email-editor--readonly]="isThanksSent()"
+          >
+            @if (!isThanksSent()) {
+              <ngx-editor-menu
+                [editor]="editor"
+                [toolbar]="toolbar"
+                dropdownPlacement="bottom"
+              ></ngx-editor-menu>
+            }
+            <ngx-editor
+              [autofocus]="!isThanksSent()"
+              [editor]="editor"
+              outputFormat="html"
+              [ngModel]="emailBody"
+              (ngModelChange)="onEmailBodyChange($event)"
+              [placeholder]="'Type here...'"
+            ></ngx-editor>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 m-t-20">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">Close</button>
+        @if (!isThanksSent()) {
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="loading() || sending() || !recipientName.trim() || !recipientEmail.trim()"
+            (click)="onNext()"
+          >
+            @if (sending()) {
+              <i class="fa-solid fa-spinner fa-spin m-r-5" aria-hidden="true"></i>
+            }
+            Next
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

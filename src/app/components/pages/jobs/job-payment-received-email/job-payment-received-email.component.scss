@@ -1,0 +1,37 @@
+.payment-received-email-modal-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 85%);
+  border-radius: inherit;
+}
+
+.payment-received-email-modal-loading {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+:host ::ng-deep .payment-received-email-editor--readonly {
+  .NgxEditor__Content {
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+:host ::ng-deep .payment-received-email-editor {
+  max-height: 65vh;
+  overflow-y: auto;
+
+  .NgxEditor__Content {
+    > p:first-child {
+      margin-top: 0;
+    }
+
+    > p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

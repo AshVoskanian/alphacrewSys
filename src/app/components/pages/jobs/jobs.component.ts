@@ -19,10 +19,11 @@ import { JobInvoiceEmailComponent } from "./job-invoice-email/job-invoice-email.
 import { JobReminderEmailComponent } from "./job-reminder-email/job-reminder-email.component";
 import { JobChaseupEmailComponent } from "./job-chaseup-email/job-chaseup-email.component";
 import { JobFinalChaseupEmailComponent } from "./job-final-chaseup-email/job-final-chaseup-email.component";
+import { JobPaymentReceivedEmailComponent } from "./job-payment-received-email/job-payment-received-email.component";
 
 @Component({
   selector: 'app-jobs',
-  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent, JobReminderEmailComponent, JobChaseupEmailComponent, JobFinalChaseupEmailComponent ],
+  imports: [ CardComponent, TableComponent, Select2Module, NgxPaginationModule, JobsFilterComponent, AddJobComponent, NgbDropdownModule, JobInvoiceEmailComponent, JobReminderEmailComponent, JobChaseupEmailComponent, JobFinalChaseupEmailComponent, JobPaymentReceivedEmailComponent ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
   providers: [ CurrencyPipe ]
@@ -46,6 +47,7 @@ export class JobsComponent extends ApiBase implements OnInit {
   @ViewChild('jobReminderEmail') jobReminderEmailTpl!: TemplateRef<NgbModal>;
   @ViewChild('jobChaseupEmail') jobChaseupEmailTpl!: TemplateRef<NgbModal>;
   @ViewChild('jobFinalChaseupEmail') jobFinalChaseupEmailTpl!: TemplateRef<NgbModal>;
+  @ViewChild('jobPaymentReceivedEmail') jobPaymentReceivedEmailTpl!: TemplateRef<NgbModal>;
 
   public tableConfig: TableConfigs = {
     columns: [
@@ -172,6 +174,9 @@ export class JobsComponent extends ApiBase implements OnInit {
       case 'Final Chaseup':
         this.openFinalChaseupModal(job);
         break;
+      case 'Payment Received':
+        this.openPaymentReceivedModal(job);
+        break;
       default:
         break;
     }
@@ -207,6 +212,15 @@ export class JobsComponent extends ApiBase implements OnInit {
   openFinalChaseupModal(job: Job): void {
     this.selectedJob.set(job);
     this.jobActionModalRef = this._modal.open(this.jobFinalChaseupEmailTpl, {
+      centered: true,
+      size: 'xl',
+      scrollable: true
+    });
+  }
+
+  openPaymentReceivedModal(job: Job): void {
+    this.selectedJob.set(job);
+    this.jobActionModalRef = this._modal.open(this.jobPaymentReceivedEmailTpl, {
       centered: true,
       size: 'xl',
       scrollable: true

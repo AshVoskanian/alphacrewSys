@@ -130,3 +130,14 @@
     ></app-job-final-chaseup-email>
   }
 </ng-template>
+
+<ng-template #jobPaymentReceivedEmail let-modal>
+  @if (selectedJob(); as job) {
+    <app-job-payment-received-email
+      [jobId]="job.jobId"
+      [companyName]="job.companyName"
+      [venueName]="job.venueName"
+      (closeModal)="closeJobActionModal()"
+    ></app-job-payment-received-email>
+  }
+</ng-template>
