@@ -107,6 +107,19 @@
                   <i class="fa-solid fa-sterling-sign txt-secondary"></i>
                 </span>
               </div>
+              <a
+                href="#"
+                class="invoice-pdf-link"
+                [class.invoice-pdf-link--loading]="downloadingPdf()"
+                (click)="onDownloadInvoicePdf($event)"
+              >
+                @if (downloadingPdf()) {
+                  <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                } @else {
+                  <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                }
+                Download invoice PDF
+              </a>
             </div>
           </div>
         </div>

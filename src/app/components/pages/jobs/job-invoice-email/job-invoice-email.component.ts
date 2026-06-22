@@ -25,6 +25,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   private readonly _dr = inject(DestroyRef);
   private readonly _date = inject(DatePipe);
   private readonly _currency = inject(CurrencyPipe);
+  private readonly _generalService = inject(GeneralService);
 
   public editor!: Editor;
   readonly toolbar: Toolbar = [
@@ -35,6 +36,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   ];
 
   loading = signal(true);
+  downloadingPdf = signal(false);
   isInvoiceSent = signal(false);
   sentInvoiceStatusText = '';
   companyName = '';
@@ -101,6 +103,35 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
       this.recipientName = nameFromBody;
       this.syncingSalutation = false;
     }
+  }
+
+  onDownloadInvoicePdf(event: Event): void {
+    event.preventDefault();
+
+    if (this.downloadingPdf()) {
+      return;
+    }
+
+    this.downloadingPdf.set(true);
+
+    this.get<string>('Jobs/GetInvoicePdf', { jobId: this.jobId })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.downloadingPdf.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          const bytes = Uint8Array.from(atob(res.data), char => char.charCodeAt(0));
+          const blob = new Blob([bytes], { type: 'application/pdf' });
+          this._generalService.downloadBlob(blob, `invoice-${ this.jobId }.pdf`);
+        },
+        error: () => GeneralService.showErrorMessage('Failed to download invoice PDF')
+      });
   }
 
   onCancel(): void {

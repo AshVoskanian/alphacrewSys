@@ -101,11 +101,12 @@ export class GeneralService {
   }
 
   public downloadBlob(blob: Blob, filename: string): void {
-    const a = document.createElement('a');
     const objectUrl = URL.createObjectURL(blob);
-    a.href = objectUrl;
-    a.download = filename;
-    a.click();
+    const anchor = document.createElement('a');
+
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    anchor.click();
     URL.revokeObjectURL(objectUrl);
   }
 
