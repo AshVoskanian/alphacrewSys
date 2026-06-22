@@ -28,6 +28,11 @@
   color: var(--body-font-color, #2b2b2b);
   line-height: 1;
   white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--theme-default, #7366ff);
+  }
 }
 
 .job-id-dropdown-toggle {

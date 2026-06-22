@@ -17,13 +17,13 @@
           <div class="table-responsive custom-scrollbar">
             @if (tableConfig?.data?.length && !loading()) {
               <ng-template #jobIdCell let-details>
-                <div class="job-id-cell" (click)="$event.stopPropagation()">
+                <div class="job-id-cell">
                   <span
                     class="job-id-overdue-indicator"
                     [style.background-color]="details.statusColour || '#c5c5c5'">
                   </span>
                   <div class="job-id-box" ngbDropdown container="body">
-                    <span class="job-id-number">{{ details.jobId }}</span>
+                    <span class="job-id-number" (click)="itemSelect(details)">{{ details.jobId }}</span>
                     <button
                       type="button"
                       class="btn job-id-dropdown-toggle"
