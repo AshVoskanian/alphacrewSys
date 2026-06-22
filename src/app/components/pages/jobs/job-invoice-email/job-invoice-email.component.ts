@@ -128,7 +128,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
 
           const bytes = Uint8Array.from(atob(res.data), char => char.charCodeAt(0));
           const blob = new Blob([bytes], { type: 'application/pdf' });
-          this._generalService.downloadBlob(blob, `invoice-${ this.jobId }.pdf`);
+          this._generalService.downloadBlob(blob, `Alphacrew_Invoice_${this.jobId}.pdf`);
         },
         error: () => GeneralService.showErrorMessage('Failed to download invoice PDF')
       });
@@ -167,9 +167,9 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
             return;
           }
 
-          this.sentInvoiceStatusText = res.data?.statusText?.trim() || 'Invoice sent successfully';
-          this.isInvoiceSent.set(true);
           this.invoiceDate = new Date().toISOString();
+          this.sentInvoiceStatusText = this.buildInvoiceSentStatusText(this.invoiceDate);
+          this.isInvoiceSent.set(true);
           this.setEditorReadonly(true);
           GeneralService.showSuccessMessage('Invoice sent successfully');
         },
@@ -229,6 +229,11 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
 
   private setEditorReadonly(readonly: boolean): void {
     this.editor?.view?.setProps({ editable: () => !readonly });
+  }
+
+  private buildInvoiceSentStatusText(date: string | Date | null): string {
+    const formattedDate = this._date.transform(date, 'dd/MM/yyyy') ?? '';
+    return `Invoice sent on ${ formattedDate }`;
   }
 
   private buildEmailBody(): string {
