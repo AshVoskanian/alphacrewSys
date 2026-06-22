@@ -151,7 +151,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: this.getCurrentEmailBody(),
+      html: this.getHtmlForSend(),
       emailTopic: 'Invoice'
     };
 
@@ -263,7 +263,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
         Assignment end: ${ assignmentEnd }
       </p>
       <p>Invoice for the above assignment is available. Please find the PDF document attached at the bottom of this email.</p>
-      ${ this.buildJobPartsLists(jobParts) }
+      ${ this.buildJobPartsListForEditor(jobParts) }
       <p align="right"><strong>Net cost: ${ netCost }</strong></p>
       <p align="right"><strong>Vat (${ vatPercent }%): ${ vatCost }</strong></p>
       <p align="right"><strong>Total Cost: ${ totalCost }</strong></p>
@@ -272,7 +272,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     `;
   }
 
-  private buildJobPartsLists(jobParts: JobInvoiceEmailPart[]): string {
+  private buildJobPartsListForEditor(jobParts: JobInvoiceEmailPart[]): string {
     const partRows = jobParts.map(part => {
       const date = this._date.transform(part.start_Date, 'dd MMM yyyy') ?? '';
       const time = this._date.transform(part.start_Date, 'HH:mm') ?? '';
@@ -290,7 +290,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     }).join('');
 
     return `
-      <ul>
+      <ul class="invoice-job-parts">
         <li>
           <p><strong>Date</strong></p>
           <p><strong>Time</strong></p>
@@ -303,6 +303,45 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
         </li>
         ${ partRows }
       </ul>
+    `;
+  }
+
+  private buildJobPartsTableForEmail(jobParts: JobInvoiceEmailPart[]): string {
+    const cellStyle = 'padding: 4px; border: none;';
+    const headerCellStyle = `${ cellStyle } font-weight: bold;`;
+    const headerRowStyle = 'background-color: #d9d9d9;';
+
+    const partRows = jobParts.map((part, index) => {
+      const date = this._date.transform(part.start_Date, 'dd MMM yyyy') ?? '';
+      const time = this._date.transform(part.start_Date, 'HH:mm') ?? '';
+      const cost = this._currency.transform(part.cost, 'GBP', 'symbol', '1.2-2') ?? '';
+      const rowStyle = `background-color: ${ index % 2 === 0 ? '#f2f2f2' : '#ffffff' };`;
+
+      return `
+        <tr style="${ rowStyle }">
+          <td style="${ cellStyle }">${ date }</td>
+          <td style="${ cellStyle }">${ time }</td>
+          <td style="${ cellStyle }">${ part.hour }</td>
+          <td style="${ cellStyle }">${ part.crew }</td>
+          <td style="${ cellStyle } text-align: right;">${ cost }</td>
+        </tr>
+      `;
+    }).join('');
+
+    return `
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 13px; width: 100%;">
+        <tr style="${ headerRowStyle }">
+          <td style="${ headerCellStyle }">Date</td>
+          <td style="${ headerCellStyle }">Time</td>
+          <td style="${ headerCellStyle }">Hours</td>
+          <td style="${ headerCellStyle }">Crew</td>
+          <td style="${ headerCellStyle } text-align: right;">Cost</td>
+        </tr>
+        <tr style="background-color: #f2f2f2;">
+          <td colspan="5" style="${ cellStyle } font-weight: bold;">${ this.venueName }</td>
+        </tr>
+        ${ partRows }
+      </table>
     `;
   }
 
@@ -337,6 +376,29 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     }
 
     return typeof this.emailBody === 'string' ? this.emailBody : '';
+  }
+
+  private getHtmlForSend(): string {
+    const body = this.getCurrentEmailBody();
+    const jobParts = this.invoiceInfo?.jobParts ?? [];
+    const tableHtml = this.buildJobPartsTableForEmail(jobParts);
+    const listPattern = /<ul[^>]*class="invoice-job-parts"[^>]*>[\s\S]*?<\/ul>/i;
+
+    if (listPattern.test(body)) {
+      return body.replace(listPattern, tableHtml);
+    }
+
+    const tablePattern = /<table[\s\S]*?<\/table>/i;
+    if (tablePattern.test(body)) {
+      return body.replace(tablePattern, tableHtml);
+    }
+
+    const ulPattern = /<ul[^>]*>[\s\S]*?<\/ul>/i;
+    if (ulPattern.test(body)) {
+      return body.replace(ulPattern, tableHtml);
+    }
+
+    return body;
   }
 
   private updateSalutation(body: string, name: string): string {
