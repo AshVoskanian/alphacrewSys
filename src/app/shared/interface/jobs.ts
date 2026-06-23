@@ -382,6 +382,7 @@ export interface JobInvoiceEmailInfo {
   discount: number;
   vat: number;
   outstanding: number;
+  paid?: number;
   prePayment: number;
   emailBody: string;
   statusText?: string;

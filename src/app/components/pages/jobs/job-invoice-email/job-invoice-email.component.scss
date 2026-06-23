@@ -108,23 +108,24 @@
       }
     }
 
-    > ul + p,
-    > ul + p + p,
-    > ul + p + p + p,
-    > ul + p + p + p + p {
+    > ul.invoice-job-parts + .invoice-cost-summary,
+    > ul.invoice-job-parts + p.invoice-cost-line,
+    .invoice-cost-summary {
+      margin-top: 36px;
+    }
+
+    p.invoice-cost-line,
+    .invoice-cost-summary p {
+      margin: 0 !important;
+      line-height: 1.35 !important;
       text-align: right;
-      margin-bottom: 0;
-      padding-bottom: 4px;
       border: none;
     }
 
-    > ul + p {
-      margin-top: 0.5rem;
-      padding-top: 8px;
-    }
-
-    > ul + p + p + p + p {
+    .invoice-footer-notice {
+      text-align: right;
       margin-top: 1.5rem;
+      margin-bottom: 0;
       line-height: 1.6;
     }
 

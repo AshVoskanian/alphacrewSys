@@ -3,11 +3,16 @@ import { Component, DestroyRef, EventEmitter, inject, Input, OnDestroy, OnInit, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Editor, NgxEditorModule, Toolbar, toHTML } from 'ngx-editor';
+import { Editor, NgxEditorModule, toHTML, Toolbar } from 'ngx-editor';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { ApiBase } from '../../../../shared/bases/api-base';
-import { JobInvoiceEmailInfo, JobInvoiceEmailPart, JobInvoiceEmailStatusInfo, SendInvoiceEmailRequest } from '../../../../shared/interface/jobs';
+import {
+  JobInvoiceEmailInfo,
+  JobInvoiceEmailPart,
+  JobInvoiceEmailStatusInfo,
+  SendInvoiceEmailRequest
+} from '../../../../shared/interface/jobs';
 import { GeneralService } from '../../../../shared/services/general.service';
 
 @Component({
@@ -28,10 +33,10 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
 
   public editor!: Editor;
   readonly toolbar: Toolbar = [
-    ['bold', 'italic'],
-    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
-    ['link', 'image'],
-    ['text_color', 'background_color'],
+    [ 'bold', 'italic' ],
+    [ { heading: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ] } ],
+    [ 'link', 'image' ],
+    [ 'text_color', 'background_color' ],
   ];
 
   loading = signal(true);
@@ -46,6 +51,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
   ccEmail = '';
   invoiceDate: string | null = null;
   amount = 0;
+  outstanding = 0;
   emailBody = '';
 
   private invoiceInfo: JobInvoiceEmailInfo | null = null;
@@ -127,8 +133,8 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
           }
 
           const bytes = Uint8Array.from(atob(res.data), char => char.charCodeAt(0));
-          const blob = new Blob([bytes], { type: 'application/pdf' });
-          this._generalService.downloadBlob(blob, `Alphacrew_Invoice_${this.jobId}.pdf`);
+          const blob = new Blob([ bytes ], { type: 'application/pdf' });
+          this._generalService.downloadBlob(blob, `Alphacrew_Invoice_${ this.jobId }.pdf`);
         },
         error: () => GeneralService.showErrorMessage('Failed to download invoice PDF')
       });
@@ -216,6 +222,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
           this.ccEmail = data.emailAddress_CC ?? '';
           this.invoiceDate = data.invoiceDate ?? null;
           this.amount = data.amount ?? 0;
+          this.outstanding = data.outstanding ?? 0;
           this.emailBody = this.buildEmailBody();
 
           if (this.isInvoiceSent()) {
@@ -244,14 +251,6 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     const jobParts = this.invoiceInfo.jobParts ?? [];
     const assignmentStart = this.getAssignmentStart(jobParts);
     const assignmentEnd = this.getAssignmentEnd(jobParts);
-    const vat = this.invoiceInfo.vat ?? 0;
-    const fullAmount = this.invoiceInfo.fullAmount ?? this.invoiceInfo.amount;
-    const netCost = this._currency.transform(this.invoiceInfo.amount, 'GBP', 'symbol', '1.2-2') ?? '';
-    const vatCost = this._currency.transform(vat, 'GBP', 'symbol', '1.2-2') ?? '';
-    const totalCost = this._currency.transform(fullAmount, 'GBP', 'symbol', '1.2-2') ?? '';
-    const vatPercent = this.invoiceInfo.amount > 0
-      ? Math.round((vat / this.invoiceInfo.amount) * 100)
-      : 20;
     const currentYear = new Date().getFullYear();
 
     return `
@@ -264,12 +263,52 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
       </p>
       <p>Invoice for the above assignment is available. Please find the PDF document attached at the bottom of this email.</p>
       ${ this.buildJobPartsListForEditor(jobParts) }
-      <p align="right"><strong>Net cost: ${ netCost }</strong></p>
-      <p align="right"><strong>Vat (${ vatPercent }%): ${ vatCost }</strong></p>
-      <p align="right"><strong>Total Cost: ${ totalCost }</strong></p>
-      <p align="right"><strong>Accounts 7 days overdue will be charged 8.5% APR.</strong><br><strong>Accounts 30 days overdue will be charged an additional £40 admin fee.</strong></p>
+      ${ this.buildCostSummaryLines() }
+      <p class="invoice-footer-notice" style="margin-top: 1.5rem; margin-bottom: 0; line-height: 1.6; text-align: right;" align="right"><strong>Accounts 7 days overdue will be charged 8.5% APR.</strong><br><strong>Accounts 30 days overdue will be charged an additional £40 admin fee.</strong></p>
       <p align="right">© Copyright ${ currentYear } Alpha Crew Ltd. All rights reserved.<br>Alpha Crew Ltd is a trading name of Alpha Venue &amp; Event People Ltd, company registered in England and Wales. Company registration number 08236851.<br>VAT number: GB848340905.<br>Registered address: Peerglow Estate, Unit 3 Queensway, Ponders End, Enfield, London, EN3 4SB, UK.</p>
     `;
+  }
+
+  private buildCostSummaryLines(): string {
+    if (!this.invoiceInfo) {
+      return '';
+    }
+
+    const vat = this.invoiceInfo.vat ?? 0;
+    const discount = this.invoiceInfo.discount ?? 0;
+    const paid = this.invoiceInfo.paid ?? 0;
+    const fullAmount = this.invoiceInfo.fullAmount ?? this.invoiceInfo.amount;
+    const outstanding = this.invoiceInfo.outstanding ?? 0;
+
+    const netCost = this._currency.transform(this.invoiceInfo.amount, 'GBP', 'symbol', '1.2-2') ?? '';
+    const vatCost = this._currency.transform(vat, 'GBP', 'symbol', '1.2-2') ?? '';
+    const totalCost = this._currency.transform(fullAmount, 'GBP', 'symbol', '1.2-2') ?? '';
+
+    const lineStyle = 'margin: 0; line-height: 1.35; text-align: right;';
+
+    const lines = [
+      `<strong>Net cost: ${ netCost }</strong>`,
+      `<strong>Vat: ${ vatCost }</strong>`,
+    ];
+
+    if (discount > 0) {
+      const discountCost = this._currency.transform(discount, 'GBP', 'symbol', '1.2-2') ?? '';
+      lines.push(`<strong>Discount: ${ discountCost }</strong>`);
+    }
+
+    if (paid > 0) {
+      const paidCost = this._currency.transform(paid, 'GBP', 'symbol', '1.2-2') ?? '';
+      lines.push(`<strong>Paid: ${ paidCost }</strong>`);
+    }
+
+    lines.push(`<strong>Total Cost: ${ totalCost }</strong>`);
+
+    if (outstanding !== fullAmount && outstanding > 0) {
+      const outstandingCost = this._currency.transform(outstanding, 'GBP', 'symbol', '1.2-2') ?? '';
+      lines.push(`<strong>Outstanding: ${ outstandingCost }</strong>`);
+    }
+
+    return `<div class="invoice-cost-summary" style="margin-top: 36px;">\n        <p class="invoice-cost-line" style="${ lineStyle }" align="right">${ lines.join('<br>') }</p>\n      </div>`;
   }
 
   private buildJobPartsListForEditor(jobParts: JobInvoiceEmailPart[]): string {
@@ -350,7 +389,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
       return '';
     }
 
-    const earliest = [...jobParts].sort(
+    const earliest = [ ...jobParts ].sort(
       (a, b) => new Date(a.start_Date).getTime() - new Date(b.start_Date).getTime()
     )[0];
 
