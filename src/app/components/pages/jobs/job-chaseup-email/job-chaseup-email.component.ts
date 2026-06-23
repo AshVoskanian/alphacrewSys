@@ -46,6 +46,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
   ccEmail = '';
   sentDate: string | null = null;
   amount = 0;
+  outstanding = 0;
   emailBody = '';
 
   private chaseupInfo: JobInvoiceEmailInfo | null = null;
@@ -216,6 +217,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
           this.ccEmail = data.emailAddress_CC ?? '';
           this.sentDate = data.invoiceDate ?? null;
           this.amount = data.amount ?? 0;
+          this.outstanding = data.outstanding ?? 0;
           this.emailBody = this.buildEmailBody();
 
           if (this.isChaseupSent()) {
@@ -241,7 +243,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
       return '';
     }
 
-    const formattedAmount = this._currency.transform(this.amount, 'GBP', 'symbol', '1.2-2') ?? '';
+    const formattedAmount = this._currency.transform(this.outstanding, 'GBP', 'symbol', '1.2-2') ?? '';
     const dueDate = this._date.transform(this.chaseupInfo.paymentDate, 'd MMMM') ?? '';
 
     return `

@@ -46,6 +46,7 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
   ccEmail = '';
   sentDate: string | null = null;
   amount = 0;
+  outstanding = 0;
   emailBody = '';
 
   private reminderInfo: JobInvoiceEmailInfo | null = null;
@@ -216,6 +217,7 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
           this.ccEmail = data.emailAddress_CC ?? '';
           this.sentDate = data.invoiceDate ?? null;
           this.amount = data.amount ?? 0;
+          this.outstanding = data.outstanding ?? 0;
           this.emailBody = this.buildEmailBody();
 
           if (this.isReminderSent()) {
@@ -241,7 +243,7 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
       return '';
     }
 
-    const formattedAmount = this._currency.transform(this.amount, 'GBP', 'symbol', '1.2-2') ?? '';
+    const formattedAmount = this._currency.transform(this.outstanding, 'GBP', 'symbol', '1.2-2') ?? '';
     const dueDate = this._date.transform(this.reminderInfo.paymentDate, 'd MMMM') ?? '';
 
     return `
