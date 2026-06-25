@@ -359,8 +359,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     }
 
     this.offcanvasRef = this._offCanvasService.open(CrewListComponent, {
-      scroll: false,
-      backdrop: true,
+      scroll: true,
+      backdrop: false,
       container: null,
       panelClass: 'common-offcanvas custom-off-canvas'
     });
