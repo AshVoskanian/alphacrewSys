@@ -56,14 +56,14 @@ import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "./vehicles/vehicles.component";
 import { SendSmsComponent } from "./send-sms/send-sms.component";
 import { FilterPipe } from "../../../../shared/pipes/filter.pipe";
-import { finalize, forkJoin, switchMap, take, timer } from "rxjs";
+import { finalize, filter, forkJoin, switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../shared/services/nav.service";
 import { UpdatesNotesComponent } from "./updates-notes/updates-notes.component";
 import { SendSmsToCrewComponent } from "./send-sms-to-crew/send-sms-to-crew.component";
 import { UkPostcodeLinkPipe } from "../../../../shared/pipes/uk-post-code-link.pipe";
 import { ActivityComponent } from "./activity/activity.component";
 import { JobPartLog } from "../../../../shared/interface/activity";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, NavigationStart, Router, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
 import { LegacySystemService } from "../../../../shared/services/legacy-system.service";
 import { ScheduleJobPartTagComponent } from "./schedule-job-part-tag/schedule-job-part-tag.component";
@@ -83,6 +83,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   private _modal = inject(NgbModal);
   private _clipboard = inject(Clipboard);
   private _navService = inject(NavService);
+  private _router = inject(Router);
   private _offCanvasService = inject(NgbOffcanvas);
   private _activatedRouter = inject(ActivatedRoute);
   private _scheduleService = inject(ScheduleService);
@@ -231,6 +232,13 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     this.getStatistics();
     this.getInfoMultiple();
     this.getJobPartCrewAdditionalDetails();
+    this._dr.onDestroy(() => this.closeCrewOffcanvas());
+    this._router.events
+      .pipe(
+        filter((event): event is NavigationStart => event instanceof NavigationStart),
+        takeUntilDestroyed(this._dr)
+      )
+      .subscribe(() => this.closeCrewOffcanvas());
   }
 
   ngAfterViewInit() {
@@ -374,6 +382,12 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
     this.offcanvasRef.result.finally(() => {
       this.offcanvasRef = undefined;
     });
+  }
+
+  private closeCrewOffcanvas(): void {
+    if (this._offCanvasService.hasOpenOffcanvas()) {
+      this._offCanvasService.dismiss();
+    }
   }
 
   getCrewList() {
