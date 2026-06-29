@@ -378,7 +378,7 @@ export interface JobInvoiceEmailInfo {
   invoiceDate: string;
   paymentDate: string;
   amount: number;
-  fullAmount: number;
+  totalCost: number;
   discount: number;
   vat: number;
   outstanding: number;

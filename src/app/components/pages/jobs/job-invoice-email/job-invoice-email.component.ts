@@ -277,7 +277,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     const vat = this.invoiceInfo.vat ?? 0;
     const discount = this.invoiceInfo.discount ?? 0;
     const paid = this.invoiceInfo.paid ?? 0;
-    const fullAmount = this.invoiceInfo.fullAmount ?? this.invoiceInfo.amount;
+    const fullAmount = this.invoiceInfo.totalCost ?? 0;
     const outstanding = this.invoiceInfo.outstanding ?? 0;
 
     const netCost = this._currency.transform(this.invoiceInfo.amount, 'GBP', 'symbol', '1.2-2') ?? '';
