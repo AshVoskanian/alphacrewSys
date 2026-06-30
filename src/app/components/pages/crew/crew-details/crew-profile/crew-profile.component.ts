@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   DestroyRef, ElementRef,
   inject,
@@ -18,6 +17,7 @@ import { CrewService } from "../../crew.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
 import { GeneralService } from "../../../../../shared/services/general.service";
+import { finalize } from "rxjs";
 
 @Component({
   selector: 'app-crew-profile',
@@ -26,7 +26,7 @@ import { GeneralService } from "../../../../../shared/services/general.service";
   styleUrl: './crew-profile.component.scss',
   providers: [ DatePipe ]
 })
-export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
+export class CrewProfileComponent implements OnInit, OnChanges {
   private readonly _date = inject(DatePipe);
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
@@ -38,6 +38,7 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
   loading = input<boolean>(false);
 
   dropdowns = signal<FilterDropdowns>(null);
+  dropdownsLoading = signal<boolean>(true);
 
   form: FormGroup;
 
@@ -54,7 +55,9 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
 
-  async ngAfterViewInit(): Promise<void> {
+  initAddressAutocomplete(): void {
+    if (!this.addressInput?.nativeElement) return;
+
     const autocomplete = new google.maps.places.Autocomplete(
       this.addressInput.nativeElement,
       {
@@ -98,13 +101,21 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   loadDropdownsAndPatchForm() {
+    this.dropdownsLoading.set(true);
+
     this._crewService.getDropdownsData()
-      .pipe(takeUntilDestroyed(this._dr))
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.dropdownsLoading.set(false))
+      )
       .subscribe({
         next: (res) => {
           if (res) {
             this.dropdowns.set(res.data);
-            setTimeout(() => this.patchFormFromCrewDetail(), 10);
+            setTimeout(() => {
+              this.patchFormFromCrewDetail();
+              this.initAddressAutocomplete();
+            }, 10);
           }
         }
       });

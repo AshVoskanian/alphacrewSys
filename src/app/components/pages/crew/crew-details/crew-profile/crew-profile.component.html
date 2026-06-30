@@ -1,3 +1,21 @@
+@if (dropdownsLoading()) {
+  <div class="gap-15 flex-col flex p-t-30">
+    @for (it of [].constructor(6); track $index) {
+      <div class="row g-3">
+        @for (col of [].constructor(3); track $index) {
+          <div class="col col-sm-6 col-md-4">
+            <div class="col-md h-10 w-120 rounded-md bg-gray-200 animate-pulse m-b-8"></div>
+            <div class="col-md h-36 w-full rounded-md bg-gray-200 animate-pulse"></div>
+          </div>
+        }
+      </div>
+    }
+    <div class="flex items-center justify-content-center gap-12 m-t-12">
+      <i class="fa-solid fa-spinner fa-spin txt-primary f-20"></i>
+      <p class="text-primary f-16 m-0">Loading profile...</p>
+    </div>
+  </div>
+} @else {
 <form class="flex flex-col gap-12" [formGroup]="form" (ngSubmit)="submit()">
   <div class="row g-3">
     <div class="col col-sm-6 col-md-4">
@@ -214,3 +232,4 @@
     </div>
   </div>
 </form>
+}
