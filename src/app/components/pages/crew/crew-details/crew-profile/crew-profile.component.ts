@@ -45,12 +45,12 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngOnInit() {
     this.initForm();
-    this.getDropdowns();
+    this.loadDropdownsAndPatchForm();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes && changes['crewDetail'] && changes['crewDetail'].currentValue) {
-      this.getDropdowns(changes['crewDetail'].currentValue);
+    if (changes['crewDetail'] && !changes['crewDetail'].firstChange && changes['crewDetail'].currentValue) {
+      this.patchFormFromCrewDetail(changes['crewDetail'].currentValue);
     }
   }
 
@@ -97,21 +97,28 @@ export class CrewProfileComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  getDropdowns(data?: CrewDetail) {
+  loadDropdownsAndPatchForm() {
     this._crewService.getDropdownsData()
       .pipe(takeUntilDestroyed(this._dr))
       .subscribe({
         next: (res) => {
           if (res) {
             this.dropdowns.set(res.data);
-            if (data) {
-              setTimeout(() => this.setFormData(data), 10);
-            } else {
-              setTimeout(() => this.setFormDefaultValues(), 10)
-            }
+            setTimeout(() => this.patchFormFromCrewDetail(), 10);
           }
         }
       });
+  }
+
+  patchFormFromCrewDetail(data?: CrewDetail) {
+    if (!this.form) return;
+
+    const crewData = data ?? this.crewDetail();
+    if (crewData) {
+      this.setFormData(crewData);
+    } else {
+      this.setFormDefaultValues();
+    }
   }
 
   setFormDefaultValues() {
