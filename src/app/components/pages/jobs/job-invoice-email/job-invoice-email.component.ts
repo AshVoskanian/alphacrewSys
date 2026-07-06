@@ -264,7 +264,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
       <p>Invoice for the above assignment is available. Please find the PDF document attached at the bottom of this email.</p>
       ${ this.buildJobPartsListForEditor(jobParts) }
       ${ this.buildCostSummaryLines() }
-      <p class="invoice-footer-notice" style="margin-top: 1.5rem; margin-bottom: 0; line-height: 1.6; text-align: right;" align="right"><strong>Accounts 7 days overdue will be charged 8.5% APR.</strong><br><strong>Accounts 30 days overdue will be charged an additional £40 admin fee.</strong></p>
+      <p class="invoice-footer-notice" style="margin-top: 1.5rem; margin-bottom: 0; line-height: 14px; text-align: right;" align="right"><strong>Accounts 7 days overdue will be charged 8.5% APR.</strong><br><strong>Accounts 30 days overdue will be charged an additional £40 admin fee.</strong></p>
       <p align="right">© Copyright ${ currentYear } Alpha Crew Ltd. All rights reserved.<br>Alpha Crew Ltd is a trading name of Alpha Venue &amp; Event People Ltd, company registered in England and Wales. Company registration number 08236851.<br>VAT number: GB848340905.<br>Registered address: Peerglow Estate, Unit 3 Queensway, Ponders End, Enfield, London, EN3 4SB, UK.</p>
     `;
   }
@@ -284,7 +284,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     const vatCost = this._currency.transform(vat, 'GBP', 'symbol', '1.2-2') ?? '';
     const totalCost = this._currency.transform(fullAmount, 'GBP', 'symbol', '1.2-2') ?? '';
 
-    const lineStyle = 'margin: 0; line-height: 1.35; text-align: right;';
+    const lineStyle = 'margin: 0; line-height: 14px; text-align: right;';
 
     const lines = [
       `<strong>Net cost: ${ netCost }</strong>`,
@@ -368,7 +368,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
     }).join('');
 
     return `
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 13px; width: 100%;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 12px; line-height: 14px; color: #696969; font-family: Arial, Helvetica, sans-serif; width: 100%;">
         <tr style="${ headerRowStyle }">
           <td style="${ headerCellStyle }">Date</td>
           <td style="${ headerCellStyle }">Time</td>

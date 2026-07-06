@@ -78,6 +78,9 @@ export class GeneralService {
     return doc.body.textContent || '';
   }
 
+  public static readonly EMAIL_TEXT_STYLE =
+    'font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 14px; color: #696969;';
+
   public static wrapEmailHtml(html: string, maxWidth = 600): string {
     const trimmedHtml = typeof html === 'string' ? html.trim() : '';
 
@@ -90,7 +93,7 @@ export class GeneralService {
     <td align="center">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${ maxWidth }" style="border-collapse: collapse; max-width: ${ maxWidth }px; width: 100%;">
         <tr>
-          <td>
+          <td style="${ this.EMAIL_TEXT_STYLE }">
             ${ trimmedHtml }
           </td>
         </tr>
