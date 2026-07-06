@@ -118,7 +118,7 @@ export class JobPaymentReceivedEmailComponent extends ApiBase implements OnInit,
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: this.getCurrentEmailBody(),
+      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody()),
       emailTopic: 'Thanks'
     };
 

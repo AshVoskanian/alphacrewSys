@@ -152,7 +152,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: this.getCurrentEmailBody(),
+      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody()),
       emailTopic: 'FinalChaseup'
     };
 

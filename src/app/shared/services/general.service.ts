@@ -78,6 +78,28 @@ export class GeneralService {
     return doc.body.textContent || '';
   }
 
+  public static wrapEmailHtml(html: string, maxWidth = 600): string {
+    const trimmedHtml = typeof html === 'string' ? html.trim() : '';
+
+    if (!trimmedHtml) {
+      return '';
+    }
+
+    return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; width: 100%;">
+  <tr>
+    <td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${ maxWidth }" style="border-collapse: collapse; max-width: ${ maxWidth }px; width: 100%;">
+        <tr>
+          <td>
+            ${ trimmedHtml }
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+  }
+
   public static clearObject(object: any, zeroCheck: boolean = false): any {
     for (const item in object) {
       if (object.hasOwnProperty(item)) {

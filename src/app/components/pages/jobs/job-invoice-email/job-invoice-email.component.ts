@@ -157,7 +157,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: this.getHtmlForSend(),
+      html: GeneralService.wrapEmailHtml(this.getHtmlForSend()),
       emailTopic: 'Invoice'
     };
 

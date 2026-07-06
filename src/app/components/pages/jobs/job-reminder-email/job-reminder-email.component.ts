@@ -152,7 +152,7 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: this.getCurrentEmailBody(),
+      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody()),
       emailTopic: 'Reminder'
     };
 
