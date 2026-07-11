@@ -52,6 +52,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _injector = inject(Injector);
 
   jobId = input<number>();
+  jobRegionId = input<number>();
   jobPartId = input<number>(0);
   jobRateCard = input<JobPartRateCard>();
   /**
