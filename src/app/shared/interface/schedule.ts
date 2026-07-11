@@ -197,6 +197,7 @@ export interface JobPartCrewEdit {
   otherPaymentAdjustment: number;
   otherPaymentAdjustmentTxt: string;
   pay: number;
+  pd: number;
   postcode: string;
   sundries: number;
   transport: number;

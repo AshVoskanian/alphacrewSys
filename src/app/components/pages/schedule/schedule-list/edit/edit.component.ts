@@ -65,6 +65,7 @@ export class EditComponent extends ApiBase implements OnInit {
       skilledCost: [ this.crewInfo?.skilledCost || 0, [Validators.required] ],
       transport: [ this.crewInfo?.transport || 0, [Validators.required] ],
       sundries: [ this.crewInfo?.sundries || 0, [Validators.required] ],
+      pd: [ this.crewInfo?.pd || 0, [Validators.required] ],
     });
   }
 
