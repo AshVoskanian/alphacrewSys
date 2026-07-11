@@ -26,7 +26,7 @@ import {
   JobPartTypeItem
 } from '../../../../shared/interface/jobs';
 import { CrewSkillListItem } from '../../../../shared/interface/crew';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { ChipCountSelectComponent } from '../../../../shared/components/ui/chip-count-select';
 import type { ChipCountItem, ChipCountOption } from '../../../../shared/components/ui/chip-count-select';
 import { NumericInputDirective } from '../../../../shared/directives/numeric-input.directive';
@@ -39,6 +39,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     Select2Module,
     NgbAccordionModule,
     CurrencyPipe,
+    DecimalPipe,
     ChipCountSelectComponent,
     NgxMaterialTimepickerModule,
     NumericInputDirective
@@ -95,6 +96,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   skillSupplement = signal(0);
   crewRate = signal(0);
   extraHour = signal(0);
+  calculatedOotCost = signal(0);
 
   constructor(http: HttpClient) {
     super(http);
@@ -252,6 +254,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     this.syncFuelCostFromMileage();
     this.syncExtraHoursToExtraCoast();
     this.syncCcSupplementFromCrewAndHours();
+    this.syncOotCostByRegion();
   }
 
   loadSkillList(): void {
@@ -302,9 +305,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   }
 
   get ootTotal(): number {
-    return [
+    return this.calculatedOotCost() + [
       'travelHoursCost',
-      'ootCost',
       'lateShiftCost',
       'fuelCost'
     ].reduce((sum, key) => sum + this._getNumber(key), 0);
@@ -446,6 +448,32 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     updateFuelCosts();
   }
 
+  private syncOotCostByRegion(): void {
+    const updateCalculatedOotCost = (): void => {
+      const raw = Number(this.form.get('ootCost')?.value ?? 0);
+      this.calculatedOotCost.set(this.calculateOotCost(raw));
+    };
+
+    this.form.get('ootCost')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateCalculatedOotCost());
+
+    this.form.get('crewNumber')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe(() => updateCalculatedOotCost());
+
+    updateCalculatedOotCost();
+  }
+
+  private calculateOotCost(raw: number): number {
+    if (this.jobRegionId() === 3) {
+      return raw > 0 ? 15 : 0;
+    }
+
+    const crewNumber = Math.max(1, Number(this.form.get('crewNumber')?.value ?? 1));
+    return this.roundTo2(raw / crewNumber);
+  }
+
   /** When crewNumber or jobPartHours changes, recalculate ccSupplement. */
   private syncCcSupplementFromCrewAndHours(): void {
     const updateCcSupplement = (): void => {
@@ -522,6 +550,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const startLocal = this.isoToDatetimeLocal(part.startDate);
     const { date, time } = this.splitLocalIsoToDateAndTime(startLocal);
     const jobPartHours = part.jobPartHours ?? this.computeHoursFromStartEnd(part.startDate, part.endDate);
+    const crewNumber = part.crewNumber ?? 1;
+    const storedOotCost = part.ootCost ?? 0;
+    this.calculatedOotCost.set(storedOotCost);
     this.form.patchValue({
       jobPartTypeId: part.jobPartTypeId,
       startDate: date || null,
@@ -536,7 +567,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       travelHours: part.travelHours,
       travelHoursCost: part.travelHoursCost,
       returnMileage: part.returnMileage,
-      ootCost: part.ootCost,
+      ootCost: this.jobRegionId() === 3
+        ? storedOotCost
+        : this.roundTo2(storedOotCost * Math.max(1, crewNumber)),
       lateShiftCost: part.lateShiftCost,
       fuelCost: this.roundTo2(part.fuelCost),
       fuelCostCrew: this.roundTo2(part.fuelCostCrew),
@@ -678,7 +711,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       extraCrew: Number(v.extraCrew ?? 0),
       extraHours: Number(v.extraHours ?? 0),
       extraCost: Number(v.extraCost ?? 0),
-      ootCost: Number(v.ootCost ?? 0),
+      ootCost: this.calculatedOotCost(),
       travelHours: Number(v.travelHours ?? 0),
       travelHoursCost: Number(v.travelHoursCost ?? 0),
       lateShiftCost: Number(v.lateShiftCost ?? 0),
