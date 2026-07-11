@@ -90,14 +90,14 @@
                 </div>
                 <div class="col">
                   <label class="form-label">OOT Travel: <span
-                    class="text-info">({{ calculatedOotCost() | number:'1.2-2' }})</span></label>
+                    class="text-primary">({{ calculatedOotCost() | currency:'GBP':'symbol':'1.2-2' }})</span></label>
                   <input type="number" step="0.01" class="form-control form-control-sm" formControlName="ootCost">
                 </div>
                 <div class="col">
                   <label class="form-label">Late Shift: <span
                     [class.text-danger]="isLateShiftCostInvalid()"
-                    [class.text-info]="!isLateShiftCostInvalid()"
-                  >({{ calculatedLateShiftCost() | number:'1.2-2' }})</span></label>
+                    [class.text-primary]="!isLateShiftCostInvalid()"
+                  >({{ calculatedLateShiftCost() | currency:'GBP':'symbol':'1.2-2' }})</span></label>
                   <input
                     type="number"
                     step="0.01"
@@ -131,9 +131,9 @@
                 </div>
 
                 <div class="col">
-                  <label class="form-label">PD:</label>
-                  <input type="number" step="0.01" class="form-control form-control-sm"
-                         formControlName="perDiem">
+                  <label class="form-label">PD: <span
+                    class="text-primary">({{ calculatedPerDiem() | currency:'GBP':'symbol':'1.2-2' }})</span></label>
+                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="perDiem">
                 </div>
 
                 <div class="col">

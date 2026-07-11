@@ -98,6 +98,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   extraHour = signal(0);
   calculatedOotCost = signal(0);
   calculatedLateShiftCost = signal(0);
+  calculatedPerDiem = signal(0);
 
   constructor(http: HttpClient) {
     super(http);
@@ -255,8 +256,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     this.syncFuelCostFromMileage();
     this.syncExtraHoursToExtraCoast();
     this.syncCcSupplementFromCrewAndHours();
-    this.syncOotCostByRegion();
-    this.syncLateShiftCostByRegion();
+    this.syncCalculatedDisplayValues();
   }
 
   loadSkillList(): void {
@@ -307,8 +307,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   }
 
   get ootTotal(): number {
-    return this.calculatedOotCost() + this.calculatedLateShiftCost() + [
+    return [
       'travelHoursCost',
+      'ootCost',
+      'lateShiftCost',
       'fuelCost'
     ].reduce((sum, key) => sum + this._getNumber(key), 0);
   }
@@ -453,21 +455,20 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     updateFuelCosts();
   }
 
-  private syncOotCostByRegion(): void {
-    const updateCalculatedOotCost = (): void => {
-      const raw = Number(this.form.get('ootCost')?.value ?? 0);
-      this.calculatedOotCost.set(this.calculateOotCost(raw));
+  private syncCalculatedDisplayValues(): void {
+    const update = (): void => {
+      this.calculatedOotCost.set(this.calculateOotCost(Number(this.form.get('ootCost')?.value ?? 0)));
+      this.calculatedLateShiftCost.set(this.calculateLateShiftCost(Number(this.form.get('lateShiftCost')?.value ?? 0)));
+      this.calculatedPerDiem.set(this.calculatePerDiem(Number(this.form.get('perDiem')?.value ?? 0)));
     };
 
-    this.form.get('ootCost')?.valueChanges
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe(() => updateCalculatedOotCost());
+    for (const field of [ 'ootCost', 'lateShiftCost', 'perDiem', 'crewNumber' ]) {
+      this.form.get(field)?.valueChanges
+        .pipe(takeUntilDestroyed(this._dr))
+        .subscribe(() => update());
+    }
 
-    this.form.get('crewNumber')?.valueChanges
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe(() => updateCalculatedOotCost());
-
-    updateCalculatedOotCost();
+    update();
   }
 
   private calculateOotCost(raw: number): number {
@@ -477,23 +478,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
     const crewNumber = Math.max(1, Number(this.form.get('crewNumber')?.value ?? 1));
     return this.roundTo2(raw / crewNumber);
-  }
-
-  private syncLateShiftCostByRegion(): void {
-    const updateCalculatedLateShiftCost = (): void => {
-      const raw = Number(this.form.get('lateShiftCost')?.value ?? 0);
-      this.calculatedLateShiftCost.set(this.calculateLateShiftCost(raw));
-    };
-
-    this.form.get('lateShiftCost')?.valueChanges
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe(() => updateCalculatedLateShiftCost());
-
-    this.form.get('crewNumber')?.valueChanges
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe(() => updateCalculatedLateShiftCost());
-
-    updateCalculatedLateShiftCost();
   }
 
   private calculateLateShiftCost(raw: number): number {
@@ -507,14 +491,13 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     return this.roundTo2((raw / crewNumber) * factor);
   }
 
-  private getLateShiftInputFromStored(stored: number, crewNumber: number): number {
-    if (!stored) {
+  private calculatePerDiem(raw: number): number {
+    if (!raw) {
       return 0;
     }
 
-    const factor = this.jobRegionId() === 1 ? 0.6 : 0.8;
-
-    return this.roundTo2((stored * Math.max(1, crewNumber)) / factor);
+    const crewNumber = Math.max(1, Number(this.form.get('crewNumber')?.value ?? 1));
+    return this.roundTo2(raw / crewNumber);
   }
 
   /** When crewNumber or jobPartHours changes, recalculate ccSupplement. */
@@ -593,11 +576,6 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const startLocal = this.isoToDatetimeLocal(part.startDate);
     const { date, time } = this.splitLocalIsoToDateAndTime(startLocal);
     const jobPartHours = part.jobPartHours ?? this.computeHoursFromStartEnd(part.startDate, part.endDate);
-    const crewNumber = part.crewNumber ?? 1;
-    const storedOotCost = part.ootCost ?? 0;
-    const storedLateShiftCost = part.lateShiftCost ?? 0;
-    this.calculatedOotCost.set(storedOotCost);
-    this.calculatedLateShiftCost.set(storedLateShiftCost);
     this.form.patchValue({
       jobPartTypeId: part.jobPartTypeId,
       startDate: date || null,
@@ -612,10 +590,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       travelHours: part.travelHours,
       travelHoursCost: part.travelHoursCost,
       returnMileage: part.returnMileage,
-      ootCost: this.jobRegionId() === 3
-        ? storedOotCost
-        : this.roundTo2(storedOotCost * Math.max(1, crewNumber)),
-      lateShiftCost: this.getLateShiftInputFromStored(storedLateShiftCost, crewNumber),
+      ootCost: part.ootCost,
+      lateShiftCost: part.lateShiftCost,
       fuelCost: this.roundTo2(part.fuelCost),
       fuelCostCrew: this.roundTo2(part.fuelCostCrew),
       extraCrew: part.extraCrew,
@@ -640,6 +616,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       jobPartSkillsAddRequests: (part.jobPartSkills ?? []).map((s) => ({ id: s.skillId, count: s.count })),
     }, { emitEvent: false });
     this.regenerateAdditionalSkilledServiceText();
+    this.calculatedOotCost.set(this.calculateOotCost(part.ootCost ?? 0));
+    this.calculatedLateShiftCost.set(this.calculateLateShiftCost(part.lateShiftCost ?? 0));
+    this.calculatedPerDiem.set(this.calculatePerDiem(part.perDiem ?? 0));
   }
 
   private computeHoursFromStartEnd(startIso: string, endIso: string): number {
@@ -756,10 +735,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       extraCrew: Number(v.extraCrew ?? 0),
       extraHours: Number(v.extraHours ?? 0),
       extraCost: Number(v.extraCost ?? 0),
-      ootCost: this.calculatedOotCost(),
+      ootCost: Number(v.ootCost ?? 0),
       travelHours: Number(v.travelHours ?? 0),
       travelHoursCost: Number(v.travelHoursCost ?? 0),
-      lateShiftCost: this.calculatedLateShiftCost(),
+      lateShiftCost: Number(v.lateShiftCost ?? 0),
       returnMileage: Number(v.returnMileage ?? 0),
       misc: v.misc ?? '',
       miscCost: Number(v.miscCost ?? 0),
