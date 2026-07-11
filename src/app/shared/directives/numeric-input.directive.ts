@@ -43,13 +43,7 @@ export class NumericInputDirective implements ControlValueAccessor, OnChanges {
 
     const numericValue = this.toNumber(value);
     this.lastNumericValue = numericValue;
-
-    if (numericValue === 0) {
-      this.el.nativeElement.value = this.formatZero();
-      return;
-    }
-
-    this.el.nativeElement.value = value == null || value === '' ? this.formatZero() : String(value);
+    this.el.nativeElement.value = this.formatDisplayValue(numericValue, value);
   }
 
   registerOnChange(fn: (value: number) => void): void {
@@ -117,7 +111,7 @@ export class NumericInputDirective implements ControlValueAccessor, OnChanges {
       return;
     }
 
-    this.applyValue(normalized, numericValue);
+    this.applyValue(normalized, numericValue, onBlur);
   }
 
   private isEmpty(value: string): boolean {
@@ -144,6 +138,18 @@ export class NumericInputDirective implements ControlValueAccessor, OnChanges {
     return `${normalizedInteger}.${decimalPart}`;
   }
 
+  private formatDisplayValue(numericValue: number, rawValue: number | string | null | undefined): string {
+    if (this.decimals != null) {
+      return numericValue.toFixed(this.decimals);
+    }
+
+    if (numericValue === 0) {
+      return this.formatZero();
+    }
+
+    return rawValue == null || rawValue === '' ? this.formatZero() : String(rawValue);
+  }
+
   private formatZero(): string {
     if (this.decimals == null) {
       return '0';
@@ -158,9 +164,11 @@ export class NumericInputDirective implements ControlValueAccessor, OnChanges {
     this.onChange(0);
   }
 
-  private applyValue(displayValue: string, numericValue: number): void {
+  private applyValue(displayValue: string, numericValue: number, onBlur = false): void {
     this.lastNumericValue = numericValue;
-    this.el.nativeElement.value = displayValue;
+    this.el.nativeElement.value = onBlur && this.decimals != null
+      ? numericValue.toFixed(this.decimals)
+      : displayValue;
     this.onChange(numericValue);
   }
 

@@ -29,6 +29,7 @@ import { CrewSkillListItem } from '../../../../shared/interface/crew';
 import { CurrencyPipe } from '@angular/common';
 import { ChipCountSelectComponent } from '../../../../shared/components/ui/chip-count-select';
 import type { ChipCountItem, ChipCountOption } from '../../../../shared/components/ui/chip-count-select';
+import { NumericInputDirective } from '../../../../shared/directives/numeric-input.directive';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 
 @Component({
@@ -39,7 +40,8 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     NgbAccordionModule,
     CurrencyPipe,
     ChipCountSelectComponent,
-    NgxMaterialTimepickerModule
+    NgxMaterialTimepickerModule,
+    NumericInputDirective
   ],
   templateUrl: './add-edit-job-part.component.html',
   styleUrl: './add-edit-job-part.component.scss'
@@ -432,8 +434,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       const returnMileage = Number(this.form.get('returnMileage')?.value ?? 0);
       const rate = this.mileageRate();
       this.form.patchValue({
-        fuelCost: returnMileage * rate,
-        fuelCostCrew: returnMileage * rate * 0.8,
+        fuelCost: this.roundTo2(returnMileage * rate),
+        fuelCostCrew: this.roundTo2(returnMileage * rate * 0.8),
       }, { emitEvent: false });
     };
 
@@ -535,8 +537,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       returnMileage: part.returnMileage,
       ootCost: part.ootCost,
       lateShiftCost: part.lateShiftCost,
-      fuelCost: part.fuelCost,
-      fuelCostCrew: part.fuelCostCrew,
+      fuelCost: this.roundTo2(part.fuelCost),
+      fuelCostCrew: this.roundTo2(part.fuelCostCrew),
       extraCrew: part.extraCrew,
       extraHours: part.extraHours,
       extraCost: part.extraCost,
@@ -566,6 +568,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const end = new Date(endIso);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
     return Math.max(0, Math.round((end.getTime() - start.getTime()) / (60 * 60 * 1000)));
+  }
+
+  private roundTo2(value: number): number {
+    return Number((Number(value) || 0).toFixed(2));
   }
 
   /** ISO string to local calendar value YYYY-MM-DDTHH:mm (for splitting into date + time inputs). */
@@ -681,8 +687,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       perDiem: Number(v.perDiem ?? 0),
       lastMinuteBookingCost: Number(v.lastMinuteBookingCost ?? 0),
       fuel: Number(v.fuel ?? 0),
-      fuelCost: Number(v.fuelCost ?? 0),
-      fuelCostCrew: Number(v.fuelCostCrew ?? 0),
+      fuelCost: this.roundTo2(Number(v.fuelCost ?? 0)),
+      fuelCostCrew: this.roundTo2(Number(v.fuelCostCrew ?? 0)),
       notes: v.notes ?? '',
       crewNotes: v.crewNotes ?? '',
       skillsNotes: v.skillsNotes ?? '',

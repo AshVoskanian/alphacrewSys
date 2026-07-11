@@ -80,11 +80,11 @@
                 </div>
                 <div class="col">
                   <label class="form-label">Fuel(75p):</label>
-                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="fuelCost">
+                  <input type="text" class="form-control form-control-sm" formControlName="fuelCost" numericInput [numericInputDecimals]="2">
                 </div>
                 <div class="col">
                   <label class="form-label">Fuel To Crew:</label>
-                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="fuelCostCrew">
+                  <input type="text" class="form-control form-control-sm" formControlName="fuelCostCrew" numericInput [numericInputDecimals]="2">
                 </div>
                 <div class="col">
                   <label class="form-label">OOT Travel:</label>
