@@ -142,6 +142,18 @@ ${ trimmedHtml }
     }
   }
 
+  public openBlobInNewTab(blob: Blob): void {
+    const objectUrl = URL.createObjectURL(blob);
+    const newWindow = window.open(objectUrl, '_blank');
+
+    if (!newWindow) {
+      URL.revokeObjectURL(objectUrl);
+      return;
+    }
+
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  }
+
   public downloadBlob(blob: Blob, filename: string): void {
     const objectUrl = URL.createObjectURL(blob);
     const anchor = document.createElement('a');

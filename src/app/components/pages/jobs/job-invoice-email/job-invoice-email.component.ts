@@ -134,7 +134,7 @@ export class JobInvoiceEmailComponent extends ApiBase implements OnInit, OnDestr
 
           const bytes = Uint8Array.from(atob(res.data), char => char.charCodeAt(0));
           const blob = new Blob([ bytes ], { type: 'application/pdf' });
-          this._generalService.downloadBlob(blob, `Alphacrew_Invoice_${ this.jobId }.pdf`);
+          this._generalService.openBlobInNewTab(blob);
         },
         error: () => GeneralService.showErrorMessage('Failed to download invoice PDF')
       });
