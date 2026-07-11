@@ -50,6 +50,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
   emailBody = '';
 
   private finalChaseupInfo: JobInvoiceEmailInfo | null = null;
+  private invoiceHistoryHtml = '';
   private syncingSalutation = false;
 
   constructor() {
@@ -195,6 +196,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
           const statusText = statusRes.data?.statusText?.trim() ?? '';
           this.sentFinalChaseupStatusText = statusText;
           this.isFinalChaseupSent.set(!!statusText);
+          this.invoiceHistoryHtml = statusRes.data?.html?.trim() ?? '';
 
           return this.get<JobInvoiceEmailInfo>('Jobs/GetJobInfoForInvoiceEmail', { jobId: this.jobId });
         }),
@@ -253,7 +255,17 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
       <p>This invoice was due on ${ dueDate } and is now ${ daysOverdue } days overdue. This invoice must be paid immediately to avoid further action.</p>
       <p>If you've paid, please advise us of the payment details. Please pay within term days agreed upon.<br>All remittance advice slips are to be sent to accounts@alphacrew.co.uk.</p>
       <p><strong>ACCOUNTS 7 DAYS OVERDUE WILL BE CHARGED 8.5% APR.</strong><br><strong>ACCOUNTS 30 DAYS OVERDUE WILL BE CHARGED AN ADDITIONAL £40 ADMIN FEE</strong></p>
-    `;
+    ` + this.buildInvoiceHistoryBlock();
+  }
+
+  private buildInvoiceHistoryBlock(): string {
+    if (!this.invoiceHistoryHtml) {
+      return '';
+    }
+
+    const formattedDate = this._date.transform(this.sentDate, 'd MMMM yyyy HH:mm:ss') ?? '';
+
+    return GeneralService.buildEmailHistoryQuote(this.invoiceHistoryHtml, formattedDate);
   }
 
   private getDaysOverdue(paymentDate: string): number {

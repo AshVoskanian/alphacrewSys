@@ -50,6 +50,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
   emailBody = '';
 
   private chaseupInfo: JobInvoiceEmailInfo | null = null;
+  private invoiceHistoryHtml = '';
   private syncingSalutation = false;
 
   constructor() {
@@ -195,6 +196,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
           const statusText = statusRes.data?.statusText?.trim() ?? '';
           this.sentChaseupStatusText = statusText;
           this.isChaseupSent.set(!!statusText);
+          this.invoiceHistoryHtml = statusRes.data?.html?.trim() ?? '';
 
           return this.get<JobInvoiceEmailInfo>('Jobs/GetJobInfoForInvoiceEmail', { jobId: this.jobId });
         }),
@@ -252,7 +254,17 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
       <p>We have yet to receive payment from yourselves of ${ formattedAmount } in respect to our invoice ${ this.jobId } which was due for payment by ${ dueDate }.</p>
       <p>I would be really grateful if you could let me know when we can expect to receive a payment.</p>
       <p>Kind regards,<br>Alphacrew Accounts</p>
-    `;
+    ` + this.buildInvoiceHistoryBlock();
+  }
+
+  private buildInvoiceHistoryBlock(): string {
+    if (!this.invoiceHistoryHtml) {
+      return '';
+    }
+
+    const formattedDate = this._date.transform(this.sentDate, 'd MMMM yyyy HH:mm:ss') ?? '';
+
+    return GeneralService.buildEmailHistoryQuote(this.invoiceHistoryHtml, formattedDate);
   }
 
   private getCurrentEmailBody(): string {

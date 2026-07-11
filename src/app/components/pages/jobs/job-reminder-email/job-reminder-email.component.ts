@@ -50,6 +50,7 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
   emailBody = '';
 
   private reminderInfo: JobInvoiceEmailInfo | null = null;
+  private invoiceHistoryHtml = '';
   private syncingSalutation = false;
 
   constructor() {
@@ -195,6 +196,7 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
           const statusText = statusRes.data?.statusText?.trim() ?? '';
           this.sentReminderStatusText = statusText;
           this.isReminderSent.set(!!statusText);
+          this.invoiceHistoryHtml = statusRes.data?.html?.trim() ?? '';
 
           return this.get<JobInvoiceEmailInfo>('Jobs/GetJobInfoForInvoiceEmail', { jobId: this.jobId });
         }),
@@ -252,7 +254,17 @@ export class JobReminderEmailComponent extends ApiBase implements OnInit, OnDest
       <p>I just wanted to drop you a quick note to remind you that ${ formattedAmount } in respect of our invoice ${ this.jobId } is due for payment by ${ dueDate }.</p>
       <p>I would be really grateful if you could confirm that everything is on track for payment.</p>
       <p>Kind regards,<br>Alphacrew Accounts</p>
-    `;
+    ` + this.buildInvoiceHistoryBlock();
+  }
+
+  private buildInvoiceHistoryBlock(): string {
+    if (!this.invoiceHistoryHtml) {
+      return '';
+    }
+
+    const formattedDate = this._date.transform(this.sentDate, 'd MMMM yyyy HH:mm:ss') ?? '';
+
+    return GeneralService.buildEmailHistoryQuote(this.invoiceHistoryHtml, formattedDate);
   }
 
   private getCurrentEmailBody(): string {

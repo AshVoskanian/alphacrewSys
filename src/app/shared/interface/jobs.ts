@@ -348,6 +348,7 @@ export interface JobScheduleWarning {
 export interface JobInvoiceEmailStatusInfo {
   statusText: string;
   statusColour?: string;
+  html?: string;
 }
 
 export interface SendInvoiceEmailRequest {

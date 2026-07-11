@@ -81,6 +81,23 @@ export class GeneralService {
   public static readonly EMAIL_TEXT_STYLE =
     'font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 14px; color: #696969;';
 
+  public static buildEmailHistoryQuote(previousHtml: string, formattedSentDate: string): string {
+    const trimmedHtml = typeof previousHtml === 'string' ? previousHtml.trim() : '';
+
+    if (!trimmedHtml) {
+      return '';
+    }
+
+    const datePrefix = formattedSentDate ? `On ${ formattedSentDate }, ` : '';
+
+    return `<br /><br /><br />
+    ${ datePrefix }"Alphacrew Accounts" &lt;accounts@alphacrew.co.uk&gt; wrote
+<br />
+<blockquote>
+${ trimmedHtml }
+</blockquote>`;
+  }
+
   public static wrapEmailHtml(html: string, maxWidth = 600): string {
     const trimmedHtml = typeof html === 'string' ? html.trim() : '';
 
