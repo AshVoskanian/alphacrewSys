@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { GeneralService } from '../../../../shared/services/general.service';
@@ -38,6 +38,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     ReactiveFormsModule,
     Select2Module,
     NgbAccordionModule,
+    NgbTooltip,
     CurrencyPipe,
     DecimalPipe,
     ChipCountSelectComponent,
@@ -99,6 +100,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   calculatedOotCost = signal(0);
   calculatedLateShiftCost = signal(0);
   calculatedPerDiem = signal(0);
+
+  readonly lateShiftCostExpectedTooltip = 'Must be £12.00';
 
   constructor(http: HttpClient) {
     super(http);
