@@ -95,8 +95,16 @@
                 </div>
                 <div class="col">
                   <label class="form-label">Late Shift: <span
-                    class="text-info">({{ calculatedLateShiftCost() | number:'1.2-2' }})</span></label>
-                  <input type="number" step="0.01" class="form-control form-control-sm" formControlName="lateShiftCost">
+                    [class.text-danger]="isLateShiftCostInvalid()"
+                    [class.text-info]="!isLateShiftCostInvalid()"
+                  >({{ calculatedLateShiftCost() | number:'1.2-2' }})</span></label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="form-control form-control-sm"
+                    [class.border-danger]="isLateShiftCostInvalid()"
+                    formControlName="lateShiftCost"
+                  >
                 </div>
               </div>
             </ng-template>

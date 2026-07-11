@@ -326,6 +326,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     return this._getNumber('extraCost');
   }
 
+  isLateShiftCostInvalid(): boolean {
+    return this.calculatedLateShiftCost() !== 12;
+  }
+
   get baseTotal(): number {
     const jobPartHours = this._getNumber('jobPartHours', 1);
     const crewNumber = this._getNumber('crewNumber', 1);
