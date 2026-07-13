@@ -355,6 +355,7 @@
       [jobRegionId]="jobDetails()?.jobRegionId"
       [jobPartId]="editingJobPartId() ?? 0"
       [jobRateCard]="jobRateCard()"
+      [currency]="currencyLabel"
       [lastJobPartStartDate]="lastJobPartStartDate()"
       (finish)="onJobPartCancel()"
       (saved)="onJobPartSaved()"></app-add-edit-job-part>

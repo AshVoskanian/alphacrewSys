@@ -44,7 +44,7 @@
       </div>
 
       <div
-        class="cost-badge position-absolute m-0 b-62 r-32 text-center w-120">{{ baseTotal | currency:'GBP':'symbol':'1.2-2' }}
+        class="cost-badge position-absolute m-0 b-62 r-32 text-center w-120">{{ baseTotal | currency:currency():'symbol':'1.2-2' }}
       </div>
     </div>
 
@@ -54,7 +54,7 @@
         <h2 class="accordion-header" ngbAccordionHeader>
           <button class="accordion-button" type="button" ngbAccordionButton>
             <span class="accordion-title text-primary">OOT - Out of town / travel costs</span>
-            <span class="cost-badge ms-auto me-2">{{ ootTotal | currency:'GBP':'symbol':'1.2-2' }}</span>
+            <span class="cost-badge ms-auto me-2">{{ ootTotal | currency:currency():'symbol':'1.2-2' }}</span>
           </button>
         </h2>
         <div ngbAccordionCollapse>
@@ -89,8 +89,8 @@
                          [numericInputDecimals]="2">
                 </div>
                 <div class="col">
-                  <label class="form-label">OOT Travel: <span
-                    class="text-primary">({{ calculatedOotCost() | currency:'GBP':'symbol':'1.2-2' }})</span></label>
+                  <label class="form-label">OOT: <span
+                    class="text-primary">({{ calculatedOotCost() | currency:currency():'symbol':'1.2-2' }})</span></label>
                   <input type="number" step="0.01" class="form-control form-control-sm" formControlName="ootCost">
                 </div>
                 <div class="col">
@@ -99,7 +99,7 @@
                     <span
                       [class.text-danger]="isLateShiftCostInvalid()"
                       [class.text-primary]="!isLateShiftCostInvalid()"
-                    >({{ calculatedLateShiftCost() | currency:'GBP':'symbol':'1.2-2' }})</span>
+                    >({{ calculatedLateShiftCost() | currency:currency():'symbol':'1.2-2' }})</span>
                     @if (isLateShiftCostInvalid()) {
                       <i
                         class="fa-solid fa-circle-info f-12 text-danger m-l-4 cursor-pointer"
@@ -127,7 +127,7 @@
         <h2 class="accordion-header" ngbAccordionHeader>
           <button class="accordion-button" type="button" ngbAccordionButton>
             <span class="accordion-title text-primary">Miscellaneous costs and skills</span>
-            <span class="cost-badge ms-auto me-2">{{ skillsTotal | currency:'GBP':'symbol':'1.2-2' }}</span>
+            <span class="cost-badge ms-auto me-2">{{ skillsTotal | currency:currency():'symbol':'1.2-2' }}</span>
           </button>
         </h2>
         <div ngbAccordionCollapse>
@@ -142,7 +142,7 @@
 
                 <div class="col">
                   <label class="form-label">PD: <span
-                    class="text-primary">({{ calculatedPerDiem() | currency:'GBP':'symbol':'1.2-2' }})</span></label>
+                    class="text-primary">({{ calculatedPerDiem() | currency:currency():'symbol':'1.2-2' }})</span></label>
                   <input type="number" step="0.01" class="form-control form-control-sm" formControlName="perDiem">
                 </div>
 
@@ -197,7 +197,7 @@
         <h2 class="accordion-header" ngbAccordionHeader>
           <button class="accordion-button" type="button" ngbAccordionButton>
             <span class="accordion-title text-primary">Extra Hours</span>
-            <span class="cost-badge ms-auto me-2">{{ extraTotal | currency:'GBP':'symbol':'1.2-2' }}</span>
+            <span class="cost-badge ms-auto me-2">{{ extraTotal | currency:currency():'symbol':'1.2-2' }}</span>
           </button>
         </h2>
         <div ngbAccordionCollapse>
@@ -247,7 +247,7 @@
       </div>
       <div class="col-6 col-md-3 d-flex align-items-end justify-content-end">
         <div class="total-amount-box">
-          <span class="total-cost text-center">{{ total | currency:'GBP':'symbol':'1.2-2' }}</span>
+          <span class="total-cost text-center">{{ total | currency:currency():'symbol':'1.2-2' }}</span>
         </div>
       </div>
     </div>

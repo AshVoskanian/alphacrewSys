@@ -56,6 +56,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   jobId = input<number>();
   jobRegionId = input<number>();
   jobPartId = input<number>(0);
+  currency = input<string>('GBP');
   jobRateCard = input<JobPartRateCard>();
   /**
    * When adding (jobPartId 0): default start = this ISO datetime + 24h, split into startDate + startTime.
@@ -260,6 +261,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     this.syncExtraHoursToExtraCoast();
     this.syncCcSupplementFromCrewAndHours();
     this.syncCalculatedDisplayValues();
+    console.log(this.currency())
   }
 
   loadSkillList(): void {

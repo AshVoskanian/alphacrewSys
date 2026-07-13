@@ -192,6 +192,13 @@ export class EditJobComponent extends ApiBase implements OnInit {
     return this._initialCurrencyId !== current;
   }
 
+  get currencyLabel(): string {
+    const id = this.form?.get('currencyId')?.value;
+    if (id == null) return '';
+    const c = this.currencies()?.find(x => x.value === id);
+    return c?.data?.code ?? '';
+  }
+
   get currencyBadgeLabel(): string {
     const id = this.form?.get('currencyId')?.value;
     if (id == null) return '—';
@@ -332,7 +339,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
             return;
           }
           this.currencies.set(
-            (res.data ?? []).map(c => ({ label: `${ c.sign } ${ c.code }`, value: c.id }))
+            (res.data ?? []).map(c => ({ label: `${ c.sign } ${ c.code }`, value: c.id, data: c }))
           );
         }
       });
