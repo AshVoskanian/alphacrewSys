@@ -2,6 +2,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { Editor, NgxEditorModule, Toolbar, toHTML } from 'ngx-editor';
 import { EMPTY, finalize, switchMap } from 'rxjs';
@@ -24,6 +25,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
   private readonly _dr = inject(DestroyRef);
   private readonly _date = inject(DatePipe);
   private readonly _currency = inject(CurrencyPipe);
+  private readonly _sanitizer = inject(DomSanitizer);
   private readonly _generalService = inject(GeneralService);
 
   public editor!: Editor;
@@ -48,6 +50,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
   amount = 0;
   outstanding = 0;
   emailBody = '';
+  invoiceHistoryQuoteHtml: SafeHtml | null = null;
 
   private chaseupInfo: JobInvoiceEmailInfo | null = null;
   private invoiceHistoryHtml = '';
@@ -153,7 +156,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody()),
+      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody() + this.buildInvoiceHistoryBlock()),
       emailTopic: 'Chaseup'
     };
 
@@ -221,6 +224,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
           this.amount = data.amount ?? 0;
           this.outstanding = data.outstanding ?? 0;
           this.emailBody = this.buildEmailBody();
+          this.invoiceHistoryQuoteHtml = this.buildInvoiceHistoryPreview();
 
           if (this.isChaseupSent()) {
             this.setEditorReadonly(true);
@@ -254,7 +258,7 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
       <p>We have yet to receive payment from yourselves of ${ formattedAmount } in respect to our invoice ${ this.jobId } which was due for payment by ${ dueDate }.</p>
       <p>I would be really grateful if you could let me know when we can expect to receive a payment.</p>
       <p>Kind regards,<br>Alphacrew Accounts</p>
-    ` + this.buildInvoiceHistoryBlock();
+    `;
   }
 
   private buildInvoiceHistoryBlock(): string {
@@ -265,6 +269,16 @@ export class JobChaseupEmailComponent extends ApiBase implements OnInit, OnDestr
     const formattedDate = this._date.transform(this.sentDate, 'd MMMM yyyy HH:mm:ss') ?? '';
 
     return GeneralService.buildEmailHistoryQuote(this.invoiceHistoryHtml, formattedDate);
+  }
+
+  private buildInvoiceHistoryPreview(): SafeHtml | null {
+    const historyHtml = this.buildInvoiceHistoryBlock();
+
+    if (!historyHtml) {
+      return null;
+    }
+
+    return this._sanitizer.bypassSecurityTrustHtml(historyHtml);
   }
 
   private getCurrentEmailBody(): string {

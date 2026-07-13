@@ -144,6 +144,12 @@
               (ngModelChange)="onEmailBodyChange($event)"
               [placeholder]="'Type here...'"
             ></ngx-editor>
+            @if (invoiceHistoryQuoteHtml) {
+              <div
+                class="email-history-preview"
+                [innerHTML]="invoiceHistoryQuoteHtml"
+              ></div>
+            }
           </div>
         </div>
       </div>

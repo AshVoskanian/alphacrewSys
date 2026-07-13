@@ -58,11 +58,38 @@
     > p:last-child {
       margin-bottom: 0;
     }
+  }
 
-    blockquote {
+  .email-history-preview {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 14px;
+    color: #696969;
+    padding: 0 10px 10px;
+
+    .email-history-quote {
       margin: 0;
       padding-left: 12px;
       border-left: 2px solid #ccc;
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 100%;
+        font-size: 12px;
+        line-height: 14px;
+
+        td,
+        th {
+          padding: 4px;
+          border: none;
+          vertical-align: top;
+        }
+      }
+
+      p {
+        margin: 0 0 0.5rem;
+      }
     }
   }
 }

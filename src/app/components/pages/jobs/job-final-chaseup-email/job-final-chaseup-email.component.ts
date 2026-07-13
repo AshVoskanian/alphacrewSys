@@ -2,6 +2,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { Editor, NgxEditorModule, Toolbar, toHTML } from 'ngx-editor';
 import { EMPTY, finalize, switchMap } from 'rxjs';
@@ -24,6 +25,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
   private readonly _dr = inject(DestroyRef);
   private readonly _date = inject(DatePipe);
   private readonly _currency = inject(CurrencyPipe);
+  private readonly _sanitizer = inject(DomSanitizer);
   private readonly _generalService = inject(GeneralService);
 
   public editor!: Editor;
@@ -48,6 +50,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
   amount = 0;
   outstanding = 0;
   emailBody = '';
+  invoiceHistoryQuoteHtml: SafeHtml | null = null;
 
   private finalChaseupInfo: JobInvoiceEmailInfo | null = null;
   private invoiceHistoryHtml = '';
@@ -153,7 +156,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
       emailTo: this.recipientEmail.trim(),
       emailCC: this.ccEmail.trim(),
       amount: this.amount,
-      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody()),
+      html: GeneralService.wrapEmailHtml(this.getCurrentEmailBody() + this.buildInvoiceHistoryBlock()),
       emailTopic: 'FinalChaseup'
     };
 
@@ -221,6 +224,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
           this.amount = data.amount ?? 0;
           this.outstanding = data.outstanding ?? 0;
           this.emailBody = this.buildEmailBody();
+          this.invoiceHistoryQuoteHtml = this.buildInvoiceHistoryPreview();
 
           if (this.isFinalChaseupSent()) {
             this.setEditorReadonly(true);
@@ -255,7 +259,7 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
       <p>This invoice was due on ${ dueDate } and is now ${ daysOverdue } days overdue. This invoice must be paid immediately to avoid further action.</p>
       <p>If you've paid, please advise us of the payment details. Please pay within term days agreed upon.<br>All remittance advice slips are to be sent to accounts@alphacrew.co.uk.</p>
       <p><strong>ACCOUNTS 7 DAYS OVERDUE WILL BE CHARGED 8.5% APR.</strong><br><strong>ACCOUNTS 30 DAYS OVERDUE WILL BE CHARGED AN ADDITIONAL £40 ADMIN FEE</strong></p>
-    ` + this.buildInvoiceHistoryBlock();
+    `;
   }
 
   private buildInvoiceHistoryBlock(): string {
@@ -266,6 +270,16 @@ export class JobFinalChaseupEmailComponent extends ApiBase implements OnInit, On
     const formattedDate = this._date.transform(this.sentDate, 'd MMMM yyyy HH:mm:ss') ?? '';
 
     return GeneralService.buildEmailHistoryQuote(this.invoiceHistoryHtml, formattedDate);
+  }
+
+  private buildInvoiceHistoryPreview(): SafeHtml | null {
+    const historyHtml = this.buildInvoiceHistoryBlock();
+
+    if (!historyHtml) {
+      return null;
+    }
+
+    return this._sanitizer.bypassSecurityTrustHtml(historyHtml);
   }
 
   private getDaysOverdue(paymentDate: string): number {

@@ -81,6 +81,33 @@ export class GeneralService {
   public static readonly EMAIL_TEXT_STYLE =
     'font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 14px; color: #696969;';
 
+  public static unwrapEmailHtml(html: string): string {
+    const trimmedHtml = typeof html === 'string' ? html.trim() : '';
+
+    if (!trimmedHtml) {
+      return '';
+    }
+
+    const doc = new DOMParser().parseFromString(trimmedHtml, 'text/html');
+    const nestedTd = doc.querySelector('table[role="presentation"] table[role="presentation"] td');
+
+    if (nestedTd?.innerHTML.trim()) {
+      return nestedTd.innerHTML.trim();
+    }
+
+    const presentationTables = doc.querySelectorAll('table[role="presentation"]');
+
+    if (presentationTables.length === 1) {
+      const presentationTd = presentationTables[0].querySelector('td');
+
+      if (presentationTd?.innerHTML.trim()) {
+        return presentationTd.innerHTML.trim();
+      }
+    }
+
+    return trimmedHtml;
+  }
+
   public static buildEmailHistoryQuote(previousHtml: string, formattedSentDate: string): string {
     const trimmedHtml = typeof previousHtml === 'string' ? previousHtml.trim() : '';
 
@@ -88,13 +115,13 @@ export class GeneralService {
       return '';
     }
 
+    const contentHtml = this.unwrapEmailHtml(trimmedHtml);
     const datePrefix = formattedSentDate ? `On ${ formattedSentDate }, ` : '';
 
     return `<br /><br /><br />
-    ${ datePrefix }"Alphacrew Accounts" &lt;accounts@alphacrew.co.uk&gt; wrote
-<br />
-<blockquote>
-${ trimmedHtml }
+    <p>${ datePrefix }"Alphacrew Accounts" &lt;accounts@alphacrew.co.uk&gt; wrote</p>
+<blockquote class="email-history-quote">
+${ contentHtml }
 </blockquote>`;
   }
 
