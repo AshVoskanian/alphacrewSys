@@ -621,6 +621,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   openJobShifts(schedule: Schedule) {
+    this.selectSchedule(schedule);
     this.openJobsShifts.emit(schedule);
   }
 
