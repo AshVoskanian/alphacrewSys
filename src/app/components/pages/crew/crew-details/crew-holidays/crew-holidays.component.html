@@ -22,7 +22,12 @@
         </button>
       </div>
 
-      <app-main-list [list]="holidaysList()" (clickAction)="action($event)"></app-main-list>
+      <div class="crew-holidays-calendar">
+        <full-calendar
+          [options]="calendarOptions"
+          [events]="calendarEvents()"
+        ></full-calendar>
+      </div>
     </div>
   }
 </div>

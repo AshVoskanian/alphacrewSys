@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   inject,
   input,
@@ -8,40 +9,69 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { ApiBase } from "../../../../../shared/bases/api-base";
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { TextEditComponent } from "../text-edit/text-edit.component";
-import { ConfirmModalComponent } from "../../../../../shared/components/ui/confirm-modal/confirm-modal.component";
-import { CrewDetail, CrewHoliday } from "../../../../../shared/interface/crew";
-import { CrewMainListActionData, CrewMainListItem, MainListComponent } from "../main-list/main-list.component";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { finalize } from "rxjs";
-import { GeneralService } from "../../../../../shared/services/general.service";
-import { DatePipe } from "@angular/common";
-import { HolidayAddUpdateComponent } from "./holiday-add-update/holiday-add-update.component";
+import { ApiBase } from '../../../../../shared/bases/api-base';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TextEditComponent } from '../text-edit/text-edit.component';
+import { ConfirmModalComponent } from '../../../../../shared/components/ui/confirm-modal/confirm-modal.component';
+import { CrewDetail, CrewHoliday } from '../../../../../shared/interface/crew';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
+import { GeneralService } from '../../../../../shared/services/general.service';
+import { HolidayAddUpdateComponent } from './holiday-add-update/holiday-add-update.component';
+import { FullCalendarModule } from '@fullcalendar/angular';
+import { CalendarOptions, EventClickArg, EventInput, EventMountArg } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
 
 @Component({
   selector: 'app-crew-holidays',
-  imports: [ MainListComponent, ConfirmModalComponent, HolidayAddUpdateComponent ],
+  imports: [ FullCalendarModule, ConfirmModalComponent, HolidayAddUpdateComponent ],
   templateUrl: './crew-holidays.component.html',
-  styleUrl: './crew-holidays.component.scss',
-  providers: [ DatePipe ]
+  styleUrl: './crew-holidays.component.scss'
 })
-
 export class CrewHolidaysComponent extends ApiBase implements OnChanges {
   private _modal = inject(NgbModal);
   private readonly _dr = inject(DestroyRef);
-  private readonly _date = inject(DatePipe);
 
   @ViewChild('confirmModal') confirmModal: ConfirmModalComponent;
   @ViewChild('addUpdateHoliday') addUpdateHoliday: TextEditComponent;
 
   crewDetail = input<CrewDetail>();
 
-  loading = signal<boolean>(false);
-  modalLoading = signal<boolean>(false);
-  selectedListItem = signal<CrewHoliday>(null);
-  holidaysList = signal<CrewMainListItem<CrewHoliday>[]>([]);
+  loading = signal(false);
+  modalLoading = signal(false);
+  selectedListItem = signal<CrewHoliday | null>(null);
+  holidays = signal<CrewHoliday[]>([]);
+
+  readonly calendarEvents = computed<EventInput[]>(() =>
+    this.holidays().map(holiday => this.toCalendarEvent(holiday))
+  );
+
+  readonly calendarOptions: CalendarOptions = {
+    plugins: [ dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin ],
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+    },
+    buttonText: {
+      today: 'Today',
+      month: 'Month',
+      week: 'Week',
+      day: 'Day',
+      list: 'List'
+    },
+    height: 'auto',
+    editable: false,
+    selectable: false,
+    dayMaxEvents: true,
+    displayEventTime: false,
+    eventClick: this.handleEventClick.bind(this),
+    eventDidMount: this.handleEventDidMount.bind(this)
+  };
 
   private addEditModalRef!: NgbModalRef;
   private confirmModalRef!: NgbModalRef;
@@ -65,30 +95,13 @@ export class CrewHolidaysComponent extends ApiBase implements OnChanges {
       .subscribe({
         next: res => {
           if (res.errors?.errorCode) {
-            GeneralService.showErrorMessage(res.errors.message)
+            GeneralService.showErrorMessage(res.errors.message);
             return;
           }
-          this.holidaysList.set(
-            res.data.map(it => ({
-              title: `${ this._date.transform(it.holidayStart) }  -  ${ this._date.transform(it.holidayEnd) }`,
-              desc: it.comments,
-              hasAction: true,
-              data: it
-            }))
-          )
+
+          this.holidays.set(res.data ?? []);
         }
-      })
-  }
-
-  action(data: CrewMainListActionData) {
-    this.selectedListItem.set(data.listItem.data);
-
-    if (data.action === 'remove') {
-      this.openConfirmModal();
-    }
-    if (data.action === 'edit') {
-      this.openAddUpdateModal();
-    }
+      });
   }
 
   openAddUpdateModal(add?: boolean) {
@@ -99,7 +112,7 @@ export class CrewHolidaysComponent extends ApiBase implements OnChanges {
   }
 
   openConfirmModal() {
-    this.confirmModalRef = this._modal.open(this.confirmModal, { centered: true, size: 'md' })
+    this.confirmModalRef = this._modal.open(this.confirmModal, { centered: true, size: 'md' });
   }
 
   closeConfirmModal(result: 'ok' | 'cancel') {
@@ -116,13 +129,13 @@ export class CrewHolidaysComponent extends ApiBase implements OnChanges {
       return;
     }
 
-    if (data) {
-      this.addEditHoliday(data);
-    }
+    this.addEditHoliday(data);
   }
 
   addEditHoliday(holidayData: { startDate: string, endDate: string, comment: string }) {
-    if (this.modalLoading()) return;
+    if (this.modalLoading()) {
+      return;
+    }
 
     this.modalLoading.set(true);
 
@@ -151,34 +164,18 @@ export class CrewHolidaysComponent extends ApiBase implements OnChanges {
             return;
           }
 
-          const updatedNote = res.data;
+          const updatedHoliday = res.data;
 
-          this.holidaysList.update(list => {
-            const exists = selected && list.some(it => it.data.crewHolidayId === updatedNote.crewHolidayId);
+          this.holidays.update(list => {
+            const exists = selected && list.some(it => it.crewHolidayId === updatedHoliday.crewHolidayId);
 
             if (exists) {
-              // Edit case
               return list.map(item =>
-                item.data.crewHolidayId === updatedNote.crewHolidayId
-                  ? {
-                    title: `${ this._date.transform(updatedNote.holidayStart) }  -  ${ this._date.transform(updatedNote.holidayEnd) }`,
-                    desc: updatedNote.comments,
-                    hasAction: true,
-                    data: updatedNote
-                  }
-                  : item
+                item.crewHolidayId === updatedHoliday.crewHolidayId ? updatedHoliday : item
               );
             }
 
-            // Add case (new holiday)
-            const newItem = {
-              title: `${ this._date.transform(updatedNote.holidayStart) }  -  ${ this._date.transform(updatedNote.holidayEnd) }`,
-              desc: updatedNote.comments,
-              hasAction: true,
-              data: updatedNote
-            };
-
-            return [ newItem, ...list ];
+            return [ updatedHoliday, ...list ];
           });
 
           this.addEditModalRef?.close();
@@ -188,8 +185,10 @@ export class CrewHolidaysComponent extends ApiBase implements OnChanges {
       });
   }
 
-  removeHoliday(listItem: CrewHoliday) {
-    if (!listItem || this.modalLoading()) return;
+  removeHoliday(listItem: CrewHoliday | null) {
+    if (!listItem || this.modalLoading()) {
+      return;
+    }
 
     this.modalLoading.set(true);
     const { crewHolidayId } = listItem;
@@ -206,12 +205,83 @@ export class CrewHolidaysComponent extends ApiBase implements OnChanges {
             return;
           }
 
-          this.holidaysList.update(list =>
-            list.filter(item => item.data.crewHolidayId !== this.selectedListItem().crewHolidayId)
+          this.holidays.update(list =>
+            list.filter(item => item.crewHolidayId !== listItem.crewHolidayId)
           );
           this.confirmModalRef?.close();
           GeneralService.showSuccessMessage('The holiday has been successfully deleted');
         }
-      })
+      });
+  }
+
+  private handleEventClick(clickInfo: EventClickArg): void {
+    const holiday = clickInfo.event.extendedProps?.['holiday'] as CrewHoliday | undefined;
+
+    if (!holiday) {
+      return;
+    }
+
+    this.selectedListItem.set(holiday);
+    this.openAddUpdateModal();
+  }
+
+  private handleEventDidMount(mountInfo: EventMountArg): void {
+    const holiday = mountInfo.event.extendedProps?.['holiday'] as CrewHoliday | undefined;
+
+    if (!holiday) {
+      return;
+    }
+
+    const actions = document.createElement('span');
+    actions.className = 'crew-holiday-event-actions';
+
+    const editBtn = document.createElement('i');
+    editBtn.className = 'fa-solid fa-pen crew-holiday-event-action';
+    editBtn.title = 'Edit';
+    editBtn.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.selectedListItem.set(holiday);
+      this.openAddUpdateModal();
+    });
+
+    const removeBtn = document.createElement('i');
+    removeBtn.className = 'fa-solid fa-xmark crew-holiday-event-action';
+    removeBtn.title = 'Delete';
+    removeBtn.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.selectedListItem.set(holiday);
+      this.openConfirmModal();
+    });
+
+    actions.append(editBtn, removeBtn);
+    mountInfo.el.appendChild(actions);
+  }
+
+  private toCalendarEvent(holiday: CrewHoliday): EventInput {
+    return {
+      id: String(holiday.crewHolidayId ?? `${ holiday.holidayStart }-${ holiday.holidayEnd }`),
+      title: holiday.comments?.trim() || 'Holiday',
+      start: this.toDateOnly(holiday.holidayStart),
+      end: this.toExclusiveEndDate(holiday.holidayEnd),
+      allDay: true,
+      extendedProps: { holiday }
+    };
+  }
+
+  private toDateOnly(value: string): string {
+    return value?.includes('T') ? value.split('T')[0] : value;
+  }
+
+  /** FullCalendar all-day `end` is exclusive; backend holidayEnd is inclusive. */
+  private toExclusiveEndDate(inclusiveEnd: string): string {
+    const dateOnly = this.toDateOnly(inclusiveEnd);
+    const [ year, month, day ] = dateOnly.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    date.setUTCDate(date.getUTCDate() + 1);
+
+    return date.toISOString().slice(0, 10);
   }
 }

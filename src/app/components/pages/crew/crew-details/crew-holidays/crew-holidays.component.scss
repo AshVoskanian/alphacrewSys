@@ -1,0 +1,37 @@
+:host ::ng-deep .crew-holidays-calendar {
+  .fc {
+    font-size: 13px;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.1rem;
+  }
+
+  .fc-event {
+    cursor: pointer;
+    padding-right: 36px;
+    position: relative;
+  }
+
+  .crew-holiday-event-actions {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
+    transform: translateY(-50%);
+  }
+
+  .crew-holiday-event-action {
+    font-size: 11px;
+    color: #fff;
+    opacity: 0.9;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
