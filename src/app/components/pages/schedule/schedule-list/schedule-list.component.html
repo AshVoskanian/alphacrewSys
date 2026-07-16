@@ -25,7 +25,7 @@
         </div>
       </div>
     }
-    <div class="row g-3 position-relative card-wrapper"
+    <div class="row g-3 position-relative card-wrapper" (click)="selectSchedule(schedule)"
          [attr.data-id]="schedule.jobPartId" #itemBlock>
       <div class="col">
         <div class="vertical-ribbon-animate" [class.loading]="schedule.updateLoading">
