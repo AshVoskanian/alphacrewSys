@@ -9,7 +9,7 @@ import { CardComponent } from "../../../../shared/components/ui/card/card.compon
 import { TransformedSkill } from "../../../../shared/interface/schedule";
 import { CREW_SKILLS } from "../../../../shared/data/skills";
 import { DatePipe, Location, TitleCasePipe } from "@angular/common";
-import { NgbNavModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbNavModule, NgbPopover } from "@ng-bootstrap/ng-bootstrap";
 import { CrewProfileComponent } from "./crew-profile/crew-profile.component";
 import { GeneralService } from "../../../../shared/services/general.service";
 import { FormsModule } from "@angular/forms";
@@ -22,6 +22,9 @@ import { CrewPaymentsComponent } from "./crew-payments/crew-payments.component";
 import { CrewHolidaysComponent } from "./crew-holidays/crew-holidays.component";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { BreadcrumbService } from "../../../../shared/services/breadcrumb.service";
+import { JobDetails } from "../../../../shared/interface/jobs";
+import { JobPartLog } from "../../../../shared/interface/activity";
+import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
 
 @Component({
   selector: 'app-crew-details',
@@ -39,7 +42,9 @@ import { BreadcrumbService } from "../../../../shared/services/breadcrumb.servic
     CrewTimesheetsComponent,
     CrewPaymentsComponent,
     CrewHolidaysComponent,
-    RouterModule
+    RouterModule,
+    ActivityComponent,
+    NgbPopover
   ],
   templateUrl: './crew-details.component.html',
   styleUrl: './crew-details.component.scss'
@@ -57,6 +62,7 @@ export class CrewDetailsComponent extends ApiBase implements OnInit, OnDestroy {
   avatarLoading: WritableSignal<boolean> = signal<boolean>(false);
   profileLoading: WritableSignal<boolean> = signal<boolean>(false);
 
+  activityList: WritableSignal<JobPartLog[]> = signal([]);
   crewDetails: WritableSignal<CrewDetail> = signal<CrewDetail>(null);
   skills: WritableSignal<TransformedSkill[]> = signal<TransformedSkill[]>(null);
 
@@ -210,5 +216,29 @@ export class CrewDetailsComponent extends ApiBase implements OnInit, OnDestroy {
     };
 
     reader.readAsDataURL(file);
+  }
+
+  getActivities(crew: CrewDetail, popover: NgbPopover) {
+    crew.loader = true;
+
+    const body = {
+      crewId: this.crewDetails().crewId
+    }
+
+    this.post<JobPartLog[]>('ActionHistory/GetActionHistoryLogByJobIdOrJobPartId', { ...body })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => crew.loader = false)
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+          this.activityList.set(res.data);
+          popover.open();
+        }
+      })
   }
 }

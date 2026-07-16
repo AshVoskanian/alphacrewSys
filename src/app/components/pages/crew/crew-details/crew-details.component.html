@@ -23,6 +23,15 @@
               }
             </div>
 
+            <i class="position-absolute pointer back t-27 r-20 fa-solid f-20 txt-info fa-solid fa-{{crewDetails()?.loader ? 'spinner' : 'circle-info'}}"
+               (click)="getActivities(crewDetails(), popoverRef)"
+               #popoverRef="ngbPopover"
+               triggers="manual"
+               [autoClose]="'outside'"
+               [popoverClass]="'wide-popover border min-w-500 max-w-800 bg-dark'"
+               [popoverTitle]="'Recent Activity'"
+               [ngbPopover]="activities"></i>
+
 
             <div class="text-center">
               <p class="txt-dark f-18">{{ crewDetails()?.name }}</p>
@@ -122,3 +131,8 @@
     </div>
   </div>
 </div>
+
+<!--Recent Activities-->
+<ng-template #activities>
+  <app-activity [activityList]="activityList()"></app-activity>
+</ng-template>

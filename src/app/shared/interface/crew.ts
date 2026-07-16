@@ -109,6 +109,7 @@ export interface CrewDetail {
   isActive: boolean;
   deactivationDate: string | null;
   onFurlough: boolean;
+  loader?: boolean;
   phoneNumbere164: string;
   useWhatsapp: boolean | null;
   useEmail: boolean | null;
