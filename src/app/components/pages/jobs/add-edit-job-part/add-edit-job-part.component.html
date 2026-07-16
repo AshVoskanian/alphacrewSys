@@ -93,7 +93,7 @@
                     @if (isLateShiftCostInvalid()) {
                       <i
                         class="fa-solid fa-circle-info f-12 text-danger m-l-4 cursor-pointer"
-                        [ngbTooltip]="lateShiftCostExpectedTooltip"
+                        [ngbTooltip]="lateShiftCostExpectedTooltip()"
                         aria-label="Late shift cost hint"
                       ></i>
                     }

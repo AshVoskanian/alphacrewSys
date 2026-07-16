@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import {
   afterNextRender,
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -45,6 +46,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     NgxMaterialTimepickerModule,
     NumericInputDirective
   ],
+  providers: [ CurrencyPipe ],
   templateUrl: './add-edit-job-part.component.html',
   styleUrl: './add-edit-job-part.component.scss'
 })
@@ -52,6 +54,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _fb = inject(FormBuilder);
   private readonly _dr = inject(DestroyRef);
   private readonly _injector = inject(Injector);
+  private readonly _currency = inject(CurrencyPipe);
 
   jobId = input<number>();
   jobRegionId = input<number>();
@@ -102,7 +105,10 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   calculatedLateShiftCost = signal(0);
   calculatedPerDiem = signal(0);
 
-  readonly lateShiftCostExpectedTooltip = 'Must be £12.00';
+  readonly lateShiftCostExpectedTooltip = computed(() => {
+    const amount = this._currency.transform(12, this.currency(), 'symbol', '1.2-2') ?? '';
+    return `Must be ${ amount }`;
+  });
 
   constructor(http: HttpClient) {
     super(http);

@@ -58,6 +58,8 @@ export const JOB_EDIT_STATUSES = [
   { label: 'Part-Paid', value: 9 },
   { label: 'In-Dispute', value: 10 },
   { label: 'Cancelled', value: 4 },
+  { label: 'Turned Down', value: 5 },
   { label: 'Write-off', value: 12 },
+  { label: 'Legacy Job', value: 13 },
 ]
 
