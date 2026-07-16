@@ -334,7 +334,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   }
 
   isLateShiftCostInvalid(): boolean {
-    return this.calculatedLateShiftCost() !== 12;
+    return this.calculatedLateShiftCost() !== 12 && this.calculatedLateShiftCost() !== 0;
   }
 
   get baseTotal(): number {

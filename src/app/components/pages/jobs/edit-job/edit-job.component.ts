@@ -27,7 +27,7 @@ import {
 import { AddPaymentComponent } from "../add-payment/add-payment.component";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
-import { JOB_STATUSES } from "../jobs-filter/jobs-utils";
+import { JOB_EDIT_STATUSES, JOB_STATUSES } from "../jobs-filter/jobs-utils";
 import { RegionsService } from "../../../../shared/services/regions.service";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { debounceTime, distinctUntilChanged, filter, finalize, map, merge, Observable, Subject } from "rxjs";
@@ -111,7 +111,7 @@ export class EditJobComponent extends ApiBase implements OnInit {
   private _initialCurrencyLabel: string = '—';
   private _initialRateCardLabel: string = '—';
 
-  statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_STATUSES);
+  statuses: WritableSignal<Select2Option[]> = signal<Select2Option[]>(JOB_EDIT_STATUSES);
   regions = toSignal(this._regionsService.regions);
   regionNames = computed(() => {
     return this.regions()

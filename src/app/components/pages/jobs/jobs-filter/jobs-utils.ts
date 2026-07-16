@@ -47,3 +47,17 @@ export const JOB_STATUSES = [
   { label: 'Writeoff', value: 12 }
 ]
 
+export const JOB_EDIT_STATUSES = [
+  { label: 'Draft', value: 1 },
+  { label: 'Quote', value: 2 },
+  { label: 'Pro-Forma', value: 14 },
+  { label: 'Confirmed', value: 3 },
+  { label: 'Completed', value: 6 },
+  { label: 'Invoiced', value: 7 },
+  { label: 'Paid', value: 8 },
+  { label: 'Part-Paid', value: 9 },
+  { label: 'In-Dispute', value: 10 },
+  { label: 'Cancelled', value: 4 },
+  { label: 'Write-off', value: 12 },
+]
+
