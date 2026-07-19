@@ -48,6 +48,20 @@ export class SalesWeekComponent extends ApiBase implements OnInit {
       },
       dataLabels: { enabled: false },
       series: this.generateSeriesFromRealData(data),
+      tooltip: {
+        followCursor: false,
+        cssClass: 'sales-week-tooltip',
+        custom: ({ seriesIndex, dataPointIndex, w }) => {
+          const point = w.config.series[seriesIndex].data[dataPointIndex];
+          const title = point?.title ?? '';
+
+          return `
+            <div class="apexcharts-tooltip-box">
+              ${title ? `<div>${title}</div>` : ''}
+            </div>
+          `;
+        },
+      },
       xaxis: {
         categories: this.getNextDays(14),
         tickPlacement: "between",
@@ -112,7 +126,7 @@ export class SalesWeekComponent extends ApiBase implements OnInit {
         const itemHour = new Date(item.times).getHours();
         const day = new Date(item.times).getDate(); // ან (d+1) რომ სერიის x იყოს
         if (itemHour === hour) {
-          row.data.push({ x: day.toString(), y: item.crew });
+          row.data.push({ x: day.toString(), y: item.crew, title: item.title });
         }
       });
 

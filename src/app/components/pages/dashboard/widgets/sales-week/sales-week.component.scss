@@ -1,0 +1,8 @@
+:host ::ng-deep {
+  .apexcharts-tooltip.sales-week-tooltip {
+    z-index: 20 !important;
+    white-space: normal !important;
+    word-break: break-word;
+    pointer-events: none;
+  }
+}
