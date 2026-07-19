@@ -144,7 +144,8 @@
                   @switch (column.type) {
                     @case ('link') {
                       <td>
-                        <a target="_blank" [href]="'https://alphacrew.eu/Jobs/Edit/' + details[column.field_value]">
+                        <a target="_blank"
+                           routerLink="/jobs/{{ details[column.field_value] }}">
                           {{ details[column.field_value] }}
                         </a>
                       </td>
