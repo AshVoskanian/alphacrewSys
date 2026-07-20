@@ -1,7 +1,7 @@
 <app-card
-  [headerTitle]="'Dashboard Warnings'"
-  [headerBtnText]="'Add Strike'"
-  [padding]="false">
+  [headerTitle]="'Important Dates'"
+  [padding]="false"
+  [cardBodyClass]="'px-0 pt-0 common-option'">
 
   @if (loading()) {
     <div class="h-300 w-100 flex items-center justify-content-center">
@@ -13,7 +13,6 @@
         <app-table [tableConfig]="tableConfig"
                    [pageSize]="tableConfig?.data?.length"
                    [maxHeight]="400"
-                   [hasCheckbox]="true"
                    [pagination]="false">
         </app-table>
       }

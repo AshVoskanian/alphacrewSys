@@ -5,10 +5,11 @@ import { FinanceOverviewComponent } from "./widgets/finance-overview/finance-ove
 import { SocialAnalyticsComponent } from "./widgets/social-analytics/social-analytics.component";
 import { UpcomingQuotesComponent } from "./widgets/upcoming-quotes/upcoming-quotes.component";
 import { DashboardWarningsComponent } from "./widgets/dashboard-warnings/dashboard-warnings.component";
+import { DashboardImportantDatesComponent } from "./widgets/dashboard-important-dates/dashboard-important-dates.component";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ WebsiteTrafficComponent, SalesWeekComponent, FinanceOverviewComponent, SocialAnalyticsComponent, UpcomingQuotesComponent, DashboardWarningsComponent ],
+  imports: [ WebsiteTrafficComponent, SalesWeekComponent, FinanceOverviewComponent, SocialAnalyticsComponent, UpcomingQuotesComponent, DashboardWarningsComponent, DashboardImportantDatesComponent ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

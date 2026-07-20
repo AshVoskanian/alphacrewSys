@@ -60,4 +60,18 @@ export interface DashboardWarning {
   modifiedDate: string;
 }
 
+export interface DashboardImportantDate {
+  jobId: number;
+  orderedBy: string;
+  editedBy: string;
+  companyName: string;
+  venueName: string;
+  contactName: string;
+  phoneNumber: string;
+  postcode: string;
+  startDate: string;
+  total: number;
+  parts: number;
+}
+
 
