@@ -20,13 +20,13 @@ export class DashboardWarningsComponent extends ApiBase implements OnInit {
 
   public tableConfig: TableConfigs = {
     columns: [
+      { title: 'ID', field_value: 'jobId', sort: true, type: 'link' },
       { title: 'Name', field_value: 'name', sort: true },
       { title: 'Company', field_value: 'companyName', sort: true },
       { title: 'Type', field_value: 'text', sort: true },
       { title: 'Reason', field_value: 'strikeReason', sort: true },
       { title: 'Date', field_value: 'strikeDate', sort: true, type: 'date' },
       { title: 'Venue', field_value: 'venueName', sort: true },
-      { title: 'ID', field_value: 'jobId', sort: true },
       { title: 'Created By', field_value: 'createBy', sort: true },
     ],
     data: [] as DashboardWarning[]
