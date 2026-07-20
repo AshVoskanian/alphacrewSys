@@ -27,7 +27,7 @@ import {
   JobPartTypeItem
 } from '../../../../shared/interface/jobs';
 import { CrewSkillListItem } from '../../../../shared/interface/crew';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ChipCountSelectComponent } from '../../../../shared/components/ui/chip-count-select';
 import type { ChipCountItem, ChipCountOption } from '../../../../shared/components/ui/chip-count-select';
 import { NumericInputDirective } from '../../../../shared/directives/numeric-input.directive';
@@ -41,7 +41,6 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     NgbAccordionModule,
     NgbTooltip,
     CurrencyPipe,
-    DecimalPipe,
     ChipCountSelectComponent,
     NgxMaterialTimepickerModule,
     NumericInputDirective
