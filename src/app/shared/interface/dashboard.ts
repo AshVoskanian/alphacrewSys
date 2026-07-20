@@ -39,4 +39,25 @@ export interface CrewByHour {
   title: string;
 }
 
+export interface DashboardWarning {
+  strikeId: number;
+  isActive: number;
+  warningType: number;
+  text: string;
+  crewId: number;
+  name: string;
+  jobId: number;
+  jobPartId: number;
+  startDate: string;
+  jobPartVenueName: string;
+  companyName: string;
+  venueName: string;
+  strikeReason: string;
+  strikeDate: string;
+  createdBy: string;
+  createDate: string;
+  modifiedBy: string;
+  modifiedDate: string;
+}
+
 
