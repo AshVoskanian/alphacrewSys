@@ -1,0 +1,111 @@
+<form class="modal-content" [formGroup]="form" (ngSubmit)="save()">
+  <div class="modal-body social-profile text-start dark-sign-up">
+    <div class="modal-toggle-wrapper">
+      <div class="common-flex justify-content-between align-items-center m-b-10">
+        <h6 class="text-primary">{{ isEditMode ? 'Edit Warning' : 'Add Warning' }}</h6>
+
+        <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(null)"></button>
+      </div>
+
+      <div class="flex flex-col gap-12">
+        <div>
+          <label class="form-label">Crew</label>
+          @if (crewsLoading()) {
+            <div class="form-control bg-light animate-pulse h-38"></div>
+          } @else {
+            <select2
+              [data]="crews()"
+              [templates]="crewTemplate"
+              formControlName="crewId"
+              placeholder="Select crew...">
+              <ng-template #crewTemplate let-item="label">
+                {{ item }}
+              </ng-template>
+            </select2>
+          }
+        </div>
+
+        <div class="row g-3 align-items-start">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Warning Date:</label>
+            <input class="form-control digits" type="date" formControlName="strikeDate">
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label class="form-label">Severity:</label>
+            <select2
+              [data]="severities"
+              [templates]="severityTemplate"
+              [displaySearchStatus]="'hidden'"
+              formControlName="warningType"
+              placeholder="Select severity...">
+              <ng-template #severityTemplate let-item="label">
+                {{ item }}
+              </ng-template>
+            </select2>
+          </div>
+
+          @if (isEditMode) {
+            <div class="col-12 col-md-4">
+              <div class="f-12 text-secondary text-end">
+                <div>Created: {{ selectedWarning?.createDate | date: 'dd MMM yyy' }}</div>
+                <div>By: {{ selectedWarning?.createBy }}</div>
+                <br>
+                <div>Modified: {{ selectedWarning?.modifiedDate | date: 'dd MMM yyy' }}</div>
+                <div>By: {{ selectedWarning?.modifiedBy }}</div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Job number:</label>
+            <input class="form-control" type="text" formControlName="jobId" placeholder="Enter job ID">
+          </div>
+
+          <div class="col-12 col-md-8">
+            <label class="form-label">Shift:</label>
+            @if (shiftsLoading()) {
+              <div class="form-control bg-light animate-pulse h-38"></div>
+            } @else {
+              <select2
+                [data]="shifts()"
+                [templates]="shiftTemplate"
+                formControlName="jobPartId"
+                placeholder="Select shift...">
+                <ng-template #shiftTemplate let-item="label">
+                  {{ item }}
+                </ng-template>
+              </select2>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" for="strikeReason">Notes</label>
+          <textarea
+            id="strikeReason"
+            class="form-control"
+            rows="5"
+            formControlName="strikeReason"
+            placeholder="Place some text here"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-content-between m-t-16 w-100">
+        <button type="button" class="btn btn-outline-primary" (click)="closeModal.emit(null)">
+          Close
+        </button>
+
+        <button type="submit" class="btn btn-primary text-center"
+                [disabled]="form.invalid || loading || shiftsLoading() || crewsLoading()">
+          Save changes
+          @if (loading) {
+            <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

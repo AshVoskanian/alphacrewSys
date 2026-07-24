@@ -1,7 +1,8 @@
 <app-card
-  [headerTitle]="'Dashboard Warnings'"
-  [headerBtnText]="'Add Strike'"
-  [padding]="false">
+  [headerTitle]="'Warnings'"
+  [headerBtnText]="'Add Warning'"
+  [padding]="false"
+  (headerBtnAction)="openAddModal()">
 
   @if (loading()) {
     <div class="h-300 w-100 flex items-center justify-content-center">
@@ -10,13 +11,23 @@
   } @else {
     <div class="recent-table table-responsive currency-table recent-order-table custom-scrollbar">
       @if (tableConfig?.data?.length) {
-        <app-table [tableConfig]="tableConfig"
-                   [pageSize]="tableConfig?.data?.length"
-                   [maxHeight]="400"
-                   [hasCheckbox]="true"
-                   [pagination]="false">
+        <app-table
+          [tableConfig]="tableConfig"
+          [pageSize]="tableConfig?.data?.length"
+          [maxHeight]="400"
+          [hasCheckbox]="true"
+          [pagination]="false"
+          (action)="handleTableAction($event)">
         </app-table>
       }
     </div>
   }
 </app-card>
+
+<ng-template #addUpdateWarning>
+  <app-warning-add-update
+    [loading]="modalLoading()"
+    [selectedWarning]="selectedWarning()"
+    (closeModal)="closeAddUpdateModal($event)">
+  </app-warning-add-update>
+</ng-template>

@@ -54,10 +54,38 @@ export interface DashboardWarning {
   venueName: string;
   strikeReason: string;
   strikeDate: string;
-  createdBy: string;
+  createBy: string;
   createDate: string;
   modifiedBy: string;
   modifiedDate: string;
+}
+
+export interface DashboardCrewInfo {
+  crewId: number;
+  name: string;
+}
+
+export interface DashboardJobInfo {
+  jobPartId: number;
+  startDate: string;
+  startTime: string;
+  crew: number;
+  hours: number;
+  address: string;
+}
+
+export interface StrikeModel {
+  strikeId: number;
+  warningType: number;
+  crewId: number;
+  jobId: number | null;
+  jobPartId: number | null;
+  strikeReason: string;
+  strikeDate: string;
+  createBy?: string;
+  createDate?: string;
+  modifiedBy?: string;
+  modifiedDate?: string;
 }
 
 export interface DashboardImportantDate {

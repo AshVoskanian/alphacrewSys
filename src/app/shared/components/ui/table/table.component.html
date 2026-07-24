@@ -133,9 +133,11 @@
               }
 
               @if (tableConfig.row_action_before) {
-                <td class="flex items-center justify-content-start">
-                  <ng-container
-                    *ngTemplateOutlet="rowActionsTpl; context: { actions: tableConfig.row_action_before, details: details }"/>
+                <td>
+                  <div class="flex items-center justify-content-end">
+                    <ng-container
+                      *ngTemplateOutlet="rowActionsTpl; context: { actions: tableConfig.row_action_before, details: details }"/>
+                  </div>
                 </td>
               }
 
@@ -210,9 +212,11 @@
               }
 
               @if (tableConfig.row_action) {
-                <td class="flex items-center justify-content-end">
-                  <ng-container
-                    *ngTemplateOutlet="rowActionsTpl; context: { actions: tableConfig.row_action, details: details }"/>
+                <td>
+                  <div class="flex items-center justify-content-end">
+                    <ng-container
+                      *ngTemplateOutlet="rowActionsTpl; context: { actions: tableConfig.row_action, details: details }"/>
+                  </div>
                 </td>
               }
             </tr>
