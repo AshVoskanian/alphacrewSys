@@ -6,10 +6,20 @@ import { SocialAnalyticsComponent } from "./widgets/social-analytics/social-anal
 import { UpcomingQuotesComponent } from "./widgets/upcoming-quotes/upcoming-quotes.component";
 import { DashboardWarningsComponent } from "./widgets/dashboard-warnings/dashboard-warnings.component";
 import { DashboardImportantDatesComponent } from "./widgets/dashboard-important-dates/dashboard-important-dates.component";
+import { DashboardDataIssuesComponent } from "./widgets/dashboard-data-issues/dashboard-data-issues.component";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ WebsiteTrafficComponent, SalesWeekComponent, FinanceOverviewComponent, SocialAnalyticsComponent, UpcomingQuotesComponent, DashboardWarningsComponent, DashboardImportantDatesComponent ],
+  imports: [
+    WebsiteTrafficComponent,
+    SalesWeekComponent,
+    FinanceOverviewComponent,
+    SocialAnalyticsComponent,
+    UpcomingQuotesComponent,
+    DashboardWarningsComponent,
+    DashboardImportantDatesComponent,
+    DashboardDataIssuesComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

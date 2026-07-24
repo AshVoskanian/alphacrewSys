@@ -102,4 +102,12 @@ export interface DashboardImportantDate {
   parts: number;
 }
 
+export interface DashboardDataIssue {
+  area: string;
+  issue: string;
+  recordId: number;
+  recordName: string;
+  postcode: string;
+}
+
 
