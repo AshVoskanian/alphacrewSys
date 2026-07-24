@@ -1,25 +1,43 @@
-<div class="container-fluid p-t-30 default-dashboard">
-  <div class="row">
-    <div class="col-xxl-6 col-md-6 box-col-6">
+<div class="container-fluid dashboard-page default-dashboard">
+  <div class="row dashboard-grid">
+    <div class="col-12 col-xl-6 dashboard-widget">
       <app-social-analytics></app-social-analytics>
-      <app-upcoming-quotes></app-upcoming-quotes>
     </div>
-    <div class="col-xxl-6 col-md-6 box-col-6">
+
+    <div class="col-12 col-xl-6 dashboard-widget">
       <app-sales-week></app-sales-week>
+    </div>
+
+    <div class="col-12 col-xl-6 dashboard-widget">
       <app-website-traffic></app-website-traffic>
     </div>
-    <div class="col-xxl-7 col-md-6 box-col-6">
-      <app-dashboard-warnings></app-dashboard-warnings>
-    </div>
-    <div class="col-xxl-5 col-md-6 box-col-6">
-      <app-dashboard-important-dates></app-dashboard-important-dates>
+
+    <div class="col-12 col-xl-6 dashboard-widget">
       <app-finance-overview></app-finance-overview>
     </div>
-    <div class="col-xxl-6 col-md-6 box-col-6">
+
+    <div class="col-12 dashboard-widget">
+      <app-dashboard-warnings></app-dashboard-warnings>
+    </div>
+
+    <div class="col-12 col-xxl-5 dashboard-widget">
       <app-dashboard-data-issues></app-dashboard-data-issues>
     </div>
-    <div class="col-xxl-6 col-md-6 box-col-6">
-      <app-dashboard-timesheet></app-dashboard-timesheet>
+
+    <div class="col-12 col-xxl-7 dashboard-stack">
+      <div class="dashboard-stack__content">
+        <div class="dashboard-widget dashboard-stack__main">
+          <app-dashboard-important-dates></app-dashboard-important-dates>
+        </div>
+
+        <div class="dashboard-widget dashboard-widget--timesheet">
+          <app-dashboard-timesheet></app-dashboard-timesheet>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 dashboard-widget">
+      <app-upcoming-quotes></app-upcoming-quotes>
     </div>
   </div>
 </div>

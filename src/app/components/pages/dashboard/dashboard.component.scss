@@ -1,0 +1,77 @@
+.dashboard-page {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.dashboard-grid {
+  --bs-gutter-x: 24px;
+  --bs-gutter-y: 24px;
+}
+
+.dashboard-widget {
+  display: flex;
+  min-width: 0;
+
+  > * {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.dashboard-stack {
+  display: flex;
+}
+
+.dashboard-stack__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+@media (min-width: 1400px) {
+  .dashboard-stack__content {
+    height: 100%;
+  }
+
+  .dashboard-stack__main {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .dashboard-widget--timesheet {
+    flex: 0 0 auto;
+  }
+}
+
+:host ::ng-deep {
+  .dashboard-widget app-card {
+    display: block;
+    height: 100%;
+  }
+
+  .dashboard-widget app-card > .card,
+  .dashboard-widget > app-sales-week > .card {
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .dashboard-widget--timesheet .card-body {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-page {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .dashboard-grid {
+    --bs-gutter-x: 16px;
+    --bs-gutter-y: 16px;
+  }
+}
