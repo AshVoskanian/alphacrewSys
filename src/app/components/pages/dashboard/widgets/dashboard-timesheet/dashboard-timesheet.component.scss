@@ -1,0 +1,69 @@
+.timesheet-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.timesheet-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.timesheet-field {
+  flex: 0 1 160px;
+  min-width: 120px;
+
+  .form-label {
+    margin-bottom: 4px;
+  }
+
+  &--regions {
+    flex: 1 1 240px;
+    min-width: 180px;
+  }
+}
+
+.timesheet-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 2px;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host ::ng-deep {
+  .timesheet-field--regions {
+    .select2-container--default .select2-selection--multiple {
+      display: flex !important;
+      align-items: center !important;
+      min-height: 47px;
+      height: auto !important;
+      padding: 6px 10px !important;
+
+      .select2-selection__rendered {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap;
+        gap: 6px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: normal !important;
+      }
+
+      .select2-selection__choice {
+        margin: 0 !important;
+      }
+    }
+  }
+}

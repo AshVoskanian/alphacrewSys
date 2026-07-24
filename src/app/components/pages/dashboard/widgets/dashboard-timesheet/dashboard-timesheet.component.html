@@ -1,0 +1,69 @@
+<app-card
+  [headerTitle]="'Timesheet'"
+  [padding]="false"
+  [cardBodyClass]="'p-15'">
+
+  <form class="timesheet-bar" [formGroup]="form">
+    <div class="timesheet-fields">
+      <div class="timesheet-field timesheet-field--regions">
+        <label class="form-label">Regions</label>
+        <select2
+          [data]="regionOptions()"
+          [multiple]="true"
+          [templates]="regionTemplate"
+          formControlName="regions"
+          placeholder="Select regions...">
+          <ng-template #regionTemplate let-item="label">
+            {{ item }}
+          </ng-template>
+        </select2>
+      </div>
+
+      <div class="timesheet-field">
+        <label class="form-label">Year</label>
+        <select2
+          [data]="years"
+          [templates]="yearTemplate"
+          [displaySearchStatus]="'hidden'"
+          formControlName="year"
+          placeholder="Year">
+          <ng-template #yearTemplate let-item="label">
+            {{ item }}
+          </ng-template>
+        </select2>
+      </div>
+
+      <div class="timesheet-field">
+        <label class="form-label">Month</label>
+        <select2
+          [data]="months"
+          [templates]="monthTemplate"
+          [displaySearchStatus]="'hidden'"
+          formControlName="month"
+          placeholder="Month">
+          <ng-template #monthTemplate let-item="label">
+            {{ item }}
+          </ng-template>
+        </select2>
+      </div>
+    </div>
+
+    <div class="timesheet-icons">
+      <button
+        type="button"
+        class="btn btn-primary action-button w-30 h-30 p-0"
+        title="Send email"
+        (click)="sendEmail()">
+        <i class="fa-solid fa-envelope"></i>
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary action-button w-30 h-30 p-0"
+        title="Lock"
+        (click)="toggleLock()">
+        <i class="fa-solid fa-lock"></i>
+      </button>
+    </div>
+  </form>
+</app-card>

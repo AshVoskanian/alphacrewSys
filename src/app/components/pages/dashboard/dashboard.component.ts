@@ -7,6 +7,7 @@ import { UpcomingQuotesComponent } from "./widgets/upcoming-quotes/upcoming-quot
 import { DashboardWarningsComponent } from "./widgets/dashboard-warnings/dashboard-warnings.component";
 import { DashboardImportantDatesComponent } from "./widgets/dashboard-important-dates/dashboard-important-dates.component";
 import { DashboardDataIssuesComponent } from "./widgets/dashboard-data-issues/dashboard-data-issues.component";
+import { DashboardTimesheetComponent } from "./widgets/dashboard-timesheet/dashboard-timesheet.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -18,7 +19,8 @@ import { DashboardDataIssuesComponent } from "./widgets/dashboard-data-issues/da
     UpcomingQuotesComponent,
     DashboardWarningsComponent,
     DashboardImportantDatesComponent,
-    DashboardDataIssuesComponent
+    DashboardDataIssuesComponent,
+    DashboardTimesheetComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
