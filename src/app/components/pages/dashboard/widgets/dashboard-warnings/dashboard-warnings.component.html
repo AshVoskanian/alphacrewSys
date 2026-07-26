@@ -4,6 +4,14 @@
   [padding]="false"
   (headerBtnAction)="openAddModal()">
 
+  <div class="warnings-header-search" header5>
+    <input
+      class="form-control"
+      type="text"
+      [formControl]="searchControl"
+      placeholder="Search...">
+  </div>
+
   @if (loading()) {
     <div class="h-300 w-100 flex items-center justify-content-center">
       <p class="text-primary f-24">Loading...</p>
@@ -15,10 +23,11 @@
           [tableConfig]="tableConfig"
           [pageSize]="tableConfig?.data?.length"
           [maxHeight]="400"
-          [hasCheckbox]="true"
           [pagination]="false"
-          (action)="handleTableAction($event)">
+          (rowClicked)="openEditModal($event)">
         </app-table>
+      } @else {
+        <p class="text-primary f-20 text-center p-y-40 m-0">No results to display</p>
       }
     </div>
   }

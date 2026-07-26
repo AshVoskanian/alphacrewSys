@@ -1,18 +1,19 @@
 import { Component, DestroyRef, inject, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { finalize } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { ApiBase } from '../../../../../shared/bases/api-base';
 import { CardComponent } from '../../../../../shared/components/ui/card/card.component';
 import { TableComponent } from '../../../../../shared/components/ui/table/table.component';
-import { TableClickedAction, TableConfigs } from '../../../../../shared/interface/common';
+import { TableConfigs } from '../../../../../shared/interface/common';
 import { DashboardWarning, StrikeModel } from '../../../../../shared/interface/dashboard';
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { WarningAddUpdateComponent } from './warning-add-update/warning-add-update.component';
 
 @Component({
   selector: 'app-dashboard-warnings',
-  imports: [CardComponent, TableComponent, WarningAddUpdateComponent],
+  imports: [CardComponent, TableComponent, WarningAddUpdateComponent, ReactiveFormsModule],
   templateUrl: './dashboard-warnings.component.html',
   styleUrl: './dashboard-warnings.component.scss'
 })
@@ -25,34 +26,34 @@ export class DashboardWarningsComponent extends ApiBase implements OnInit {
   loading = signal(false);
   modalLoading = signal(false);
   selectedWarning = signal<DashboardWarning | null>(null);
+  searchControl = new FormControl('', { nonNullable: true });
 
   private addEditModalRef?: NgbModalRef;
 
   public tableConfig: TableConfigs = {
     columns: [
-      { title: 'ID', field_value: 'jobId', sort: true, type: 'link' },
-      { title: 'Name', field_value: 'name', sort: true },
+      { title: 'Name', field_value: 'name', sort: true, type: 'action' },
       { title: 'CrewID', field_value: 'crewId', sort: true },
       { title: 'Warning Date', field_value: 'strikeDate', sort: true, type: 'date' },
       { title: 'Severity', field_value: 'text', sort: true },
       { title: 'Reason', field_value: 'strikeReason', sort: true }
     ],
-    row_action: [
-      {
-        label: 'Edit',
-        icon: 'fa-solid fa-pen txt-primary',
-        class: 'square-white',
-        action_to_perform: 'edit',
-        modal: true,
-        model_text: 'Are you sure you want to delete this job part?'
-      }
-    ],
-
     data: [] as DashboardWarning[]
   };
 
   ngOnInit() {
     this.getWarnings();
+    this.watchSearch();
+  }
+
+  watchSearch() {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this._dr)
+      )
+      .subscribe(() => this.getWarnings());
   }
 
   getWarnings() {
@@ -61,7 +62,7 @@ export class DashboardWarningsComponent extends ApiBase implements OnInit {
     this.post<Array<DashboardWarning>>('Dashboard/GetDashboardWarnings', {
       warningId: 0,
       page: 0,
-      search: ''
+      search: this.searchControl.value.trim()
     })
       .pipe(
         takeUntilDestroyed(this._dr),
@@ -87,12 +88,12 @@ export class DashboardWarningsComponent extends ApiBase implements OnInit {
     this.addEditModalRef = this._modal.open(this.addUpdateWarning, { centered: true, size: 'lg' });
   }
 
-  handleTableAction(event: TableClickedAction) {
-    if (event.action_to_perform !== 'edit' || !event.data) {
+  openEditModal(warning: DashboardWarning) {
+    if (!warning) {
       return;
     }
 
-    this.selectedWarning.set(event.data as DashboardWarning);
+    this.selectedWarning.set(warning);
     this.addEditModalRef = this._modal.open(this.addUpdateWarning, { centered: true, size: 'lg' });
   }
 
