@@ -1,10 +1,12 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Select2Data, Select2Module } from 'ng-select2-component';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Select2Module, Select2Option } from 'ng-select2-component';
 import { finalize } from 'rxjs';
 import { ApiBase } from '../../../../../shared/bases/api-base';
 import { CardComponent } from '../../../../../shared/components/ui/card/card.component';
+import { ConfirmModalComponent } from '../../../../../shared/components/ui/confirm-modal/confirm-modal.component';
 import { DashboardLockTimeSheetsRequest } from '../../../../../shared/interface/dashboard';
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { RegionsService } from '../../../../../shared/services/regions.service';
@@ -16,28 +18,39 @@ interface CrewTimeSheetMailRequest {
   regionIds: string;
 }
 
+type TimesheetConfirmAction = 'email' | 'lock';
+
 @Component({
   selector: 'app-dashboard-timesheet',
-  imports: [CardComponent, ReactiveFormsModule, Select2Module],
+  imports: [CardComponent, ReactiveFormsModule, Select2Module, ConfirmModalComponent],
   templateUrl: './dashboard-timesheet.component.html',
   styleUrl: './dashboard-timesheet.component.scss'
 })
 export class DashboardTimesheetComponent extends ApiBase implements OnInit {
   private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
+  private readonly _modal = inject(NgbModal);
   private readonly _regionsService = inject(RegionsService);
+
+  @ViewChild('confirmModal') confirmModal!: TemplateRef<unknown>;
 
   form!: FormGroup;
   lockLoading = signal(false);
   emailLoading = signal(false);
+  confirmTitle = signal('');
+  confirmAction = signal<TimesheetConfirmAction | null>(null);
+
+  private confirmModalRef?: NgbModalRef;
 
   regions = toSignal(this._regionsService.regions, { initialValue: [] });
   regionOptions = computed(() =>
-    (this.regions() ?? []).filter(region => region.label !== 'All')
+    (this.regions() ?? []).filter((region): region is Select2Option =>
+      'value' in region && region.label !== 'All'
+    )
   );
 
-  years: Select2Data = [];
-  months: Select2Data = [
+  years: Select2Option[] = [];
+  months: Select2Option[] = [
     { label: 'January', value: 1 },
     { label: 'February', value: 2 },
     { label: 'March', value: 3 },
@@ -82,7 +95,7 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
     });
   }
 
-  sendEmail() {
+  requestSendEmail() {
     if (this.emailLoading() || this.lockLoading()) {
       return;
     }
@@ -91,6 +104,47 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
       return;
     }
 
+    this.openConfirmModal('email');
+  }
+
+  requestLockTimesheets() {
+    if (this.lockLoading() || this.emailLoading()) {
+      return;
+    }
+
+    if (!this.validateRegions()) {
+      return;
+    }
+
+    this.openConfirmModal('lock');
+  }
+
+  openConfirmModal(action: TimesheetConfirmAction) {
+    this.confirmAction.set(action);
+    this.confirmTitle.set(this.buildConfirmTitle(action));
+    this.confirmModalRef = this._modal.open(this.confirmModal, { centered: true, size: 'md' });
+  }
+
+  closeConfirmModal(result: 'ok' | 'cancel') {
+    if (result !== 'ok') {
+      this.confirmModalRef?.close();
+      this.confirmAction.set(null);
+      return;
+    }
+
+    const action = this.confirmAction();
+
+    if (action === 'email') {
+      this.sendEmail();
+      return;
+    }
+
+    if (action === 'lock') {
+      this.lockTimesheets();
+    }
+  }
+
+  private sendEmail() {
     const { year, month, regionIds } = this.getFormPayload();
     const payload: CrewTimeSheetMailRequest = {
       crewId: 0,
@@ -104,7 +158,11 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
     this.post('Crew/SendCrewTimeSheetsByMail', payload)
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.emailLoading.set(false))
+        finalize(() => {
+          this.emailLoading.set(false);
+          this.confirmModalRef?.close();
+          this.confirmAction.set(null);
+        })
       )
       .subscribe({
         next: res => {
@@ -118,15 +176,7 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
       });
   }
 
-  lockTimesheets() {
-    if (this.lockLoading() || this.emailLoading()) {
-      return;
-    }
-
-    if (!this.validateRegions()) {
-      return;
-    }
-
+  private lockTimesheets() {
     const payload: DashboardLockTimeSheetsRequest = this.getFormPayload();
 
     this.lockLoading.set(true);
@@ -134,7 +184,11 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
     this.post('Dashboard/LockTimeSheets', payload)
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.lockLoading.set(false))
+        finalize(() => {
+          this.lockLoading.set(false);
+          this.confirmModalRef?.close();
+          this.confirmAction.set(null);
+        })
       )
       .subscribe({
         next: res => {
@@ -146,6 +200,25 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
           GeneralService.showSuccessMessage('Timesheets locked successfully');
         }
       });
+  }
+
+  private buildConfirmTitle(action: TimesheetConfirmAction): string {
+    const { year, month } = this.form.getRawValue();
+    const monthLabel = this.months.find(item => item.value === +month)?.label ?? month;
+    const regionNames = this.getSelectedRegionNames();
+    const actionLabel = action === 'email' ? 'Email' : 'Lock';
+
+    return `${actionLabel} ${monthLabel} ${year} Timesheets for ${regionNames}?`;
+  }
+
+  private getSelectedRegionNames(): string {
+    const selectedIds = (this.form.get('regions')?.value ?? []) as Array<string | number>;
+    const options = this.regionOptions();
+
+    return selectedIds
+      .map(id => options.find(option => option.value === id || String(option.value) === String(id))?.label)
+      .filter((label): label is string => !!label)
+      .join(', ');
   }
 
   private validateRegions(): boolean {

@@ -57,7 +57,7 @@
         class="btn btn-primary action-button w-30 h-30 p-0"
         title="Send email"
         [disabled]="emailLoading()"
-        (click)="sendEmail()">
+        (click)="requestSendEmail()">
         <i class="fa-solid" [class.fa-envelope]="!emailLoading()" [class.fa-spinner]="emailLoading()" [class.fa-spin]="emailLoading()"></i>
       </button>
 
@@ -66,9 +66,17 @@
         class="btn btn-primary action-button w-30 h-30 p-0"
         title="Lock timesheets"
         [disabled]="lockLoading()"
-        (click)="lockTimesheets()">
+        (click)="requestLockTimesheets()">
         <i class="fa-solid" [class.fa-lock]="!lockLoading()" [class.fa-spinner]="lockLoading()" [class.fa-spin]="lockLoading()"></i>
       </button>
     </div>
   </form>
 </app-card>
+
+<ng-template #confirmModal>
+  <app-confirm-modal
+    [loading]="emailLoading() || lockLoading()"
+    [title]="confirmTitle()"
+    (closeModal)="closeConfirmModal($event)">
+  </app-confirm-modal>
+</ng-template>
