@@ -9,6 +9,13 @@ import { DashboardLockTimeSheetsRequest } from '../../../../../shared/interface/
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { RegionsService } from '../../../../../shared/services/regions.service';
 
+interface CrewTimeSheetMailRequest {
+  crewId: number;
+  month: number;
+  year: number;
+  regionIds: string;
+}
+
 @Component({
   selector: 'app-dashboard-timesheet',
   imports: [CardComponent, ReactiveFormsModule, Select2Module],
@@ -22,6 +29,7 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
 
   form!: FormGroup;
   lockLoading = signal(false);
+  emailLoading = signal(false);
 
   regions = toSignal(this._regionsService.regions, { initialValue: [] });
   regionOptions = computed(() =>
@@ -75,27 +83,51 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
   }
 
   sendEmail() {
-    // UI only — wire later
+    if (this.emailLoading() || this.lockLoading()) {
+      return;
+    }
+
+    if (!this.validateRegions()) {
+      return;
+    }
+
+    const { year, month, regionIds } = this.getFormPayload();
+    const payload: CrewTimeSheetMailRequest = {
+      crewId: 0,
+      year,
+      month,
+      regionIds
+    };
+
+    this.emailLoading.set(true);
+
+    this.post('Crew/SendCrewTimeSheetsByMail', payload)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.emailLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Timesheets emailed successfully');
+        }
+      });
   }
 
   lockTimesheets() {
-    if (this.lockLoading()) {
+    if (this.lockLoading() || this.emailLoading()) {
       return;
     }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      GeneralService.showErrorMessage('Please select at least one region');
+    if (!this.validateRegions()) {
       return;
     }
 
-    const { regions, year, month } = this.form.getRawValue();
-
-    const payload: DashboardLockTimeSheetsRequest = {
-      regionIds: (regions as Array<string | number>).join(','),
-      year: +year,
-      month: +month
-    };
+    const payload: DashboardLockTimeSheetsRequest = this.getFormPayload();
 
     this.lockLoading.set(true);
 
@@ -114,6 +146,26 @@ export class DashboardTimesheetComponent extends ApiBase implements OnInit {
           GeneralService.showSuccessMessage('Timesheets locked successfully');
         }
       });
+  }
+
+  private validateRegions(): boolean {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      GeneralService.showErrorMessage('Please select at least one region');
+      return false;
+    }
+
+    return true;
+  }
+
+  private getFormPayload(): DashboardLockTimeSheetsRequest {
+    const { regions, year, month } = this.form.getRawValue();
+
+    return {
+      regionIds: (regions as Array<string | number>).join(','),
+      year: +year,
+      month: +month
+    };
   }
 
   private readonly requiredRegions = (control: AbstractControl): ValidationErrors | null => {

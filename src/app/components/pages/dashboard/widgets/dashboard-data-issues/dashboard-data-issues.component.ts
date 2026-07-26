@@ -24,7 +24,7 @@ export class DashboardDataIssuesComponent extends ApiBase implements OnInit {
       { title: 'Name', field_value: 'recordName', sort: true },
       { title: 'Area', field_value: 'area', sort: true },
       { title: 'Issue', field_value: 'issue', sort: true },
-      { title: 'Bad Value', field_value: 'postcode', sort: true, type: 'date' },
+      { title: 'Bad Value', field_value: 'postcode', sort: true },
     ],
     data: [] as DashboardDataIssue[]
   };
