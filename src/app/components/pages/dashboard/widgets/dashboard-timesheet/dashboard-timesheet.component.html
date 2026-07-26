@@ -17,6 +17,9 @@
             {{ item }}
           </ng-template>
         </select2>
+        @if (form.get('regions')?.touched && form.get('regions')?.invalid) {
+          <div class="timesheet-field-error text-danger f-12">Please select at least one region</div>
+        }
       </div>
 
       <div class="timesheet-field">
@@ -60,9 +63,10 @@
       <button
         type="button"
         class="btn btn-primary action-button w-30 h-30 p-0"
-        title="Lock"
-        (click)="toggleLock()">
-        <i class="fa-solid fa-lock"></i>
+        title="Lock timesheets"
+        [disabled]="lockLoading()"
+        (click)="lockTimesheets()">
+        <i class="fa-solid" [class.fa-lock]="!lockLoading()" [class.fa-spinner]="lockLoading()" [class.fa-spin]="lockLoading()"></i>
       </button>
     </div>
   </form>

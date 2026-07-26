@@ -110,4 +110,10 @@ export interface DashboardDataIssue {
   postcode: string;
 }
 
+export interface DashboardLockTimeSheetsRequest {
+  regionIds: string | null;
+  year: number;
+  month: number;
+}
+
 

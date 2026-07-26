@@ -1,8 +1,12 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Select2Data, Select2Module } from 'ng-select2-component';
+import { finalize } from 'rxjs';
+import { ApiBase } from '../../../../../shared/bases/api-base';
 import { CardComponent } from '../../../../../shared/components/ui/card/card.component';
+import { DashboardLockTimeSheetsRequest } from '../../../../../shared/interface/dashboard';
+import { GeneralService } from '../../../../../shared/services/general.service';
 import { RegionsService } from '../../../../../shared/services/regions.service';
 
 @Component({
@@ -11,11 +15,13 @@ import { RegionsService } from '../../../../../shared/services/regions.service';
   templateUrl: './dashboard-timesheet.component.html',
   styleUrl: './dashboard-timesheet.component.scss'
 })
-export class DashboardTimesheetComponent implements OnInit {
+export class DashboardTimesheetComponent extends ApiBase implements OnInit {
+  private readonly _dr = inject(DestroyRef);
   private readonly _fb = inject(FormBuilder);
   private readonly _regionsService = inject(RegionsService);
 
   form!: FormGroup;
+  lockLoading = signal(false);
 
   regions = toSignal(this._regionsService.regions, { initialValue: [] });
   regionOptions = computed(() =>
@@ -62,9 +68,9 @@ export class DashboardTimesheetComponent implements OnInit {
       : currentMonth;
 
     this.form = this._fb.group({
-      regions: [[]],
-      year: [now.getFullYear()],
-      month: [defaultMonth]
+      regions: [[], this.requiredRegions],
+      year: [now.getFullYear(), Validators.required],
+      month: [defaultMonth, Validators.required]
     });
   }
 
@@ -72,7 +78,46 @@ export class DashboardTimesheetComponent implements OnInit {
     // UI only — wire later
   }
 
-  toggleLock() {
-    // UI only — wire later
+  lockTimesheets() {
+    if (this.lockLoading()) {
+      return;
+    }
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      GeneralService.showErrorMessage('Please select at least one region');
+      return;
+    }
+
+    const { regions, year, month } = this.form.getRawValue();
+
+    const payload: DashboardLockTimeSheetsRequest = {
+      regionIds: (regions as Array<string | number>).join(','),
+      year: +year,
+      month: +month
+    };
+
+    this.lockLoading.set(true);
+
+    this.post('Dashboard/LockTimeSheets', payload)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.lockLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('Timesheets locked successfully');
+        }
+      });
   }
+
+  private readonly requiredRegions = (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    return Array.isArray(value) && value.length > 0 ? null : { required: true };
+  };
 }
