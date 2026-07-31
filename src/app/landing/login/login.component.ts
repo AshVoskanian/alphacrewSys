@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LayoutService } from "../../shared/services/layout.service";
 import { ApiBase } from "../../shared/bases/api-base";
-import { LocalStorageService } from "../../shared/services/local-storage.service";
 import { AuthService } from "../../shared/services/auth.service";
 
 @Component({
@@ -56,7 +55,7 @@ export class LoginComponent extends ApiBase implements OnInit {
           } else {
             this._authService.setToken(res.data?.token);
             this._authService.userInfo = res.user;
-            this.router.navigateByUrl('dashboard');
+            this.router.navigateByUrl('dashboard').then();
           }
         }
       });

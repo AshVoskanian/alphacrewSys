@@ -4,14 +4,14 @@ export const landingRouts: Routes = [
   {
     path: '',
     redirectTo: 'landing/auth',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'landing/auth',
-    loadComponent: () => import('../landing/login/login.component').then(c => c.LoginComponent)
+    loadComponent: () => import('../landing/login/login.component').then((c) => c.LoginComponent),
   },
   {
     path: 'landing/password-reset',
-    loadComponent: () => import('../landing/password-reset/password-reset.component').then(c => c.PasswordResetComponent)
+    loadComponent: () => import('../landing/password-reset/password-reset.component').then((c) => c.PasswordResetComponent),
   },
 ];

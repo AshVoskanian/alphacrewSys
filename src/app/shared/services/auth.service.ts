@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { SessionStorageService } from "./session-storage.service";
-import { Router } from "@angular/router";
-import { BehaviorSubject, Observable } from "rxjs";
-import { LocalStorageService } from "./local-storage.service";
+import { SessionStorageService } from './session-storage.service';
+import { Router } from '@angular/router';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +19,11 @@ export class AuthService {
 
   getToken(): string | null {
     return this.localStorageService.getItem<string>(this.tokenKey);
+  }
+
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    return !!token?.trim();
   }
 
   logout() {
