@@ -41,18 +41,11 @@
                   {{ schedule.shiftNumber }} of {{ schedule.shiftCount }}
                 </span>
               }
-              @if (isLegacySystem()) {
-                <a [href]="'https://alphacrew.eu/Jobs/Edit/' + schedule.jobId" target="_blank"
-                   class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
-                  {{ schedule.statusText + ' ' + schedule.jobId }}
-                </a>
-              } @else {
-                <a routerLink="/jobs/{{ schedule.jobId }}"
-                   target="_blank"
-                   class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
-                  {{ schedule.statusText + ' ' + schedule.jobId }}
-                </a>
-              }
+              <a routerLink="/jobs/{{ schedule.jobId }}"
+                 target="_blank"
+                 class="text-nowrap pointer text-light f-12" style="line-height: 22px;">
+                {{ schedule.statusText + ' ' + schedule.jobId }}
+              </a>
             </div>
 
             <div class="row g-3 justify-content-between">
@@ -292,15 +285,6 @@
                                       [attr.title]="menuLockedByCrew ? 'Crew changes are locked for this shift.' : null"
                                       (click)="onCrewMenuItemClick($event, menu, crew, schedule)">
                                       @if (menu.href) {
-                                        @if (isLegacySystem() && menu.id === 2) {
-                                          <a class="dropdown-item opacity-100 flex items-center"
-                                             target="_blank"
-                                             [href]="menu.href + crew.crewId"
-                                             ngbDropdownItem>
-                                            <i class="{{menu.icon}} {{menu.color}} me-2"></i>
-                                            {{ menu.text }}
-                                          </a>
-                                        } @else {
                                           <a class="dropdown-item opacity-100 flex items-center"
                                              [routerLink]="'/crew/' + crew.crewId"
                                              target="_blank"
@@ -308,7 +292,6 @@
                                             <i class="{{menu.icon}} {{menu.color}} me-2"></i>
                                             {{ menu.text }}
                                           </a>
-                                        }
                                       } @else {
                                         <a class="dropdown-item opacity-100 flex items-center" ngbDropdownItem>
                                           <i class="{{menu.icon}} {{menu.color}} me-2"></i>

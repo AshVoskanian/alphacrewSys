@@ -16,7 +16,6 @@ import { Region } from "../../interface/header";
 import { filter, finalize, map } from "rxjs";
 import { RegionsService } from "../../services/regions.service";
 import { HeaderMenuComponent } from "./widgets/header-menu/header-menu.component";
-import { LegacySystemService } from "../../services/legacy-system.service";
 import { BreadcrumbService } from '../../services/breadcrumb.service';
 
 @Component({
@@ -39,7 +38,6 @@ export class HeaderComponent extends ApiBase implements OnInit {
   private _localStorageService = inject(LocalStorageService);
 
   public navService: NavService = inject(NavService);
-  readonly legacySystemService = inject(LegacySystemService);
   private _breadcrumbService = inject(BreadcrumbService);
 
   regionLoading = false;

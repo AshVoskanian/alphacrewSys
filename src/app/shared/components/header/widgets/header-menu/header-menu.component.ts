@@ -7,7 +7,6 @@ import { filter } from 'rxjs';
 
 import { menuItems as menuItemsData } from '../../../../data/menu';
 import { Menu } from '../../../../interface/menu';
-import { LegacySystemService } from '../../../../services/legacy-system.service';
 
 @Component({
   selector: 'app-header-menu',
@@ -20,9 +19,6 @@ export class HeaderMenuComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
-
-  readonly legacySystemService = inject(LegacySystemService);
-  readonly isLegacySystem = this.legacySystemService.isLegacySystem;
 
   readonly menuItems: WritableSignal<Menu[]> = signal(
     menuItemsData.filter(item => item.title)
@@ -64,10 +60,6 @@ export class HeaderMenuComponent implements OnInit {
   selectMenuItem(menuItem: Menu): void {
     this.activeMenuItem.set(menuItem);
     this.isDropdownOpen.set(false);
-  }
-
-  getLegacyHref(menuItem: Menu): string {
-    return menuItem.legacyPath ?? menuItem.path ?? '#';
   }
 
   toggleDropdown(event: Event): void {

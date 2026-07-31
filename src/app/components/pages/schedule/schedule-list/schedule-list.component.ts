@@ -65,7 +65,6 @@ import { ActivityComponent } from "./activity/activity.component";
 import { JobPartLog } from "../../../../shared/interface/activity";
 import { ActivatedRoute, NavigationStart, Router, RouterLink } from "@angular/router";
 import { Clipboard, ClipboardModule } from "@angular/cdk/clipboard";
-import { LegacySystemService } from "../../../../shared/services/legacy-system.service";
 import { ScheduleJobPartTagComponent } from "./schedule-job-part-tag/schedule-job-part-tag.component";
 import { ScheduleJobPartOnsiteContactComponent } from './schedule-job-part-onsite-contact/schedule-job-part-onsite-contact.component';
 
@@ -87,7 +86,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   private _offCanvasService = inject(NgbOffcanvas);
   private _activatedRouter = inject(ActivatedRoute);
   private _scheduleService = inject(ScheduleService);
-  readonly legacySystemService = inject(LegacySystemService);
 
   @ViewChild('editModal') editModal: any;
   @ViewChild('vehicleModal') vehicleModal: any;
@@ -213,8 +211,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   isJobScoped = computed(() => {
     return this.queryParams() && this.queryParams().get('jobId')
   })
-
-  readonly isLegacySystem = this.legacySystemService.isLegacySystem;
 
   hideVehicles: boolean = false;
 
