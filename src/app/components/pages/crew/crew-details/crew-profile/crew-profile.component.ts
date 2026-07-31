@@ -87,11 +87,11 @@ export class CrewProfileComponent implements OnInit, OnChanges {
       address: [ '', [ Validators.required ] ],
       isActive: [ '' ],
       isFulltime: [ '' ],
-      regionId: [ 1 ],
+      regionId: [ null, [ Validators.required ] ],
       levelId: [ '' ],
       groupId: [ '' ],
       classificationId: [ '' ],
-      paymentOptionId: [ '' ],
+      paymentOptionId: [ null ],
       pliCoverId: [ '' ],
       checksId: [ '' ],
       pliExpiry: [ '' ],
@@ -103,7 +103,7 @@ export class CrewProfileComponent implements OnInit, OnChanges {
   loadDropdownsAndPatchForm() {
     this.dropdownsLoading.set(true);
 
-    this._crewService.getDropdownsData()
+    this._crewService.getDropdownsData(false)
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.dropdownsLoading.set(false))
@@ -121,6 +121,14 @@ export class CrewProfileComponent implements OnInit, OnChanges {
       });
   }
 
+  private getNoPaymentOptionId(): number | null {
+    const match = this.dropdowns()?.payMethod?.find((option) =>
+      String(option.label).toLowerCase().includes('no payment')
+    );
+
+    return match != null ? Number(match.value) : null;
+  }
+
   patchFormFromCrewDetail(data?: CrewDetail) {
     if (!this.form) return;
 
@@ -134,11 +142,11 @@ export class CrewProfileComponent implements OnInit, OnChanges {
 
   setFormDefaultValues() {
     this.form.patchValue({
-      regionId: 1,
+      regionId: null,
       levelId: 5,
       groupId: 1,
       classificationId: 4,
-      paymentOptionId: 14,
+      paymentOptionId: this.getNoPaymentOptionId(),
       pliCoverId: 1,
       checksId: 1,
       loyaltyBonus: 0,

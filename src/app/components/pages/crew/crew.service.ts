@@ -7,14 +7,16 @@ import { FilterDropdowns } from "../../../shared/interface/crew";
   providedIn: 'root'
 })
 export class CrewService extends ApiBase {
-  getDropdownsData() {
+  getDropdownsData(includeAllOption = true) {
     return this.get<FilterDropdowns>('Crew/GetCrewEditUpdateDropDown')
       .pipe(
         map((res) => {
           const updatedData = Object.fromEntries(
             Object.entries(res.data).map(([ key, value ]) => [
               key,
-              [ { label: 'All', value: 0 }, ...(value || []) ]
+              includeAllOption
+                ? [ { label: 'All', value: 0 }, ...(value || []) ]
+                : (value || [])
             ])
           ) as unknown as FilterDropdowns;
 

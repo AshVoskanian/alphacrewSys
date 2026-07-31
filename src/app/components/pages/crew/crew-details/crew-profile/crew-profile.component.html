@@ -156,7 +156,8 @@
   <div class="row g-3">
     <div class="col col-sm-6 col-md-3">
       <label class="form-label" for="exampleFormControlSelect17">Region</label>
-      <select2 [data]="dropdowns()?.region" [templates]="template" formControlName="regionId">
+      <select2 [data]="dropdowns()?.region" [templates]="template" formControlName="regionId"
+               placeholder="Select Region">
         <ng-template #template let-item="label">
           {{ item }}
         </ng-template>

@@ -200,6 +200,7 @@ export interface JobPartCrewEdit {
   pd: number;
   postcode: string;
   sundries: number;
+  fuelCost: number;
   transport: number;
   skilledCost: number | null;
   travelHoursCost: number;

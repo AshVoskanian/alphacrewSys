@@ -65,6 +65,7 @@ export class EditComponent extends ApiBase implements OnInit {
       skilledCost: [ this.crewInfo?.skilledCost || 0, [Validators.required] ],
       transport: [ this.crewInfo?.transport || 0, [Validators.required] ],
       sundries: [ this.crewInfo?.sundries || 0, [Validators.required] ],
+      fuelCost: [ this.crewInfo?.fuelCost || 0, [Validators.required] ],
       pd: [ this.crewInfo?.pd || 0, [Validators.required] ],
     });
   }
@@ -185,6 +186,7 @@ export class EditComponent extends ApiBase implements OnInit {
       lastMinuteBonus: this.form.get('lastMinuteBonus').value,
       transport: this.form.get('transport').value,
       sundries: this.form.get('sundries').value,
+      fuelCost: this.form.get('fuelCost').value,
       jobPartCrewStatusId: statusId,
       jobPartCrewRoleId: this.form.get('jobPartCrewRoleId').value,
       buddyDown: this.form.get('buddyDown').value,

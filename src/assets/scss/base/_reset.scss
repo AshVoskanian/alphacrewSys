@@ -2265,6 +2265,14 @@ ngb-typeahead-window {
   border-width: 2px !important;
 }
 
+// select2 renders its border on an inner element, so the host-level invalid style is not visible
+select2.ng-invalid.ng-touched {
+  .select2-container .select2-selection {
+    border-color: $danger-color !important;
+    border-width: 2px !important;
+  }
+}
+
 @media (min-width: 1200px) {
   .modal-xl {
     max-width: 1140px;
