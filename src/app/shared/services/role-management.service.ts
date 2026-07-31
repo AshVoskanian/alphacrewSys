@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { LocalStorageService } from './local-storage.service';
 
 const USER_ROLES_KEY = 'userRoles';
+const USER_KEY = 'user';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,6 @@ export class RoleManagementService {
 
   private readonly rolesSignal = signal<string[]>(this.readFromStorage());
 
-  /** Reactive list of current user roles. */
   readonly roles = this.rolesSignal.asReadonly();
 
   setRoles(roles: unknown): void {
@@ -21,13 +21,13 @@ export class RoleManagementService {
   }
 
   getRoles(): string[] {
+
     return this.rolesSignal();
   }
 
   hasRole(role: string): boolean {
-    return this.getRoles().some(
-      (userRole) => userRole.toLowerCase() === role.toLowerCase()
-    );
+    const target = role.trim().toLowerCase();
+    return this.getRoles().some((userRole) => userRole.toLowerCase() === target);
   }
 
   hasAnyRole(roles: string[]): boolean {
@@ -44,11 +44,38 @@ export class RoleManagementService {
   }
 
   private readFromStorage(): string[] {
-    const stored = this.localStorageService.getItem<string[]>(USER_ROLES_KEY);
-    return this.normalizeRoles(stored);
+    const stored = this.normalizeRoles(
+      this.localStorageService.getItem<string[]>(USER_ROLES_KEY)
+    );
+
+    // Sessions created before roles were persisted separately still carry them on the user object.
+    return stored.length ? stored : this.normalizeRoles(this.readUserRoles());
+  }
+
+  private readUserRoles(): unknown {
+    const stored = this.localStorageService.getItem<unknown>(USER_KEY);
+    const user = typeof stored === 'string' ? this.parseJson(stored) : stored;
+
+    if (!user || typeof user !== 'object') {
+      return null;
+    }
+
+    return (user as Record<string, unknown>)['roles'];
+  }
+
+  private parseJson(value: string): unknown {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
   }
 
   private normalizeRoles(roles: unknown): string[] {
+    if (typeof roles === 'string') {
+      return roles.split(',').map((role) => role.trim()).filter(Boolean);
+    }
+
     if (!Array.isArray(roles)) {
       return [];
     }
@@ -61,7 +88,7 @@ export class RoleManagementService {
 
         if (role && typeof role === 'object') {
           const value =
-            (role as { name?: string; roleName?: string; role?: string }).name
+            (role as { name?: string }).name
             ?? (role as { roleName?: string }).roleName
             ?? (role as { role?: string }).role;
 
@@ -70,6 +97,6 @@ export class RoleManagementService {
 
         return '';
       })
-      .filter((role) => !!role);
+      .filter(Boolean);
   }
 }

@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { WebsiteTrafficComponent } from "./widgets/website-traffic/website-traffic.component";
-import { SalesWeekComponent } from "./widgets/sales-week/sales-week.component";
-import { FinanceOverviewComponent } from "./widgets/finance-overview/finance-overview.component";
-import { SocialAnalyticsComponent } from "./widgets/social-analytics/social-analytics.component";
-import { UpcomingQuotesComponent } from "./widgets/upcoming-quotes/upcoming-quotes.component";
-import { DashboardWarningsComponent } from "./widgets/dashboard-warnings/dashboard-warnings.component";
-import { DashboardImportantDatesComponent } from "./widgets/dashboard-important-dates/dashboard-important-dates.component";
-import { DashboardDataIssuesComponent } from "./widgets/dashboard-data-issues/dashboard-data-issues.component";
-import { DashboardTimesheetComponent } from "./widgets/dashboard-timesheet/dashboard-timesheet.component";
+import { WebsiteTrafficComponent } from './widgets/website-traffic/website-traffic.component';
+import { SalesWeekComponent } from './widgets/sales-week/sales-week.component';
+import { FinanceOverviewComponent } from './widgets/finance-overview/finance-overview.component';
+import { SocialAnalyticsComponent } from './widgets/social-analytics/social-analytics.component';
+import { UpcomingQuotesComponent } from './widgets/upcoming-quotes/upcoming-quotes.component';
+import { DashboardWarningsComponent } from './widgets/dashboard-warnings/dashboard-warnings.component';
+import { DashboardImportantDatesComponent } from './widgets/dashboard-important-dates/dashboard-important-dates.component';
+import { DashboardDataIssuesComponent } from './widgets/dashboard-data-issues/dashboard-data-issues.component';
+import { DashboardTimesheetComponent } from './widgets/dashboard-timesheet/dashboard-timesheet.component';
+import { HasRolesDirective } from '../../../shared/directives/has-roles.directive';
+import { DASHBOARD_ROLES } from './dashboard-roles';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,11 +22,12 @@ import { DashboardTimesheetComponent } from "./widgets/dashboard-timesheet/dashb
     DashboardWarningsComponent,
     DashboardImportantDatesComponent,
     DashboardDataIssuesComponent,
-    DashboardTimesheetComponent
+    DashboardTimesheetComponent,
+    HasRolesDirective,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-
 export class DashboardComponent {
+  readonly dashboardRoles = DASHBOARD_ROLES;
 }

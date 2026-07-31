@@ -1,6 +1,7 @@
 <div class="container-fluid dashboard-page default-dashboard">
   <div class="row dashboard-grid">
-    <div class="col-12 col-xl-6 dashboard-widget">
+    <div class="col-12 col-xl-6 dashboard-widget"
+         *appHasRoles="[dashboardRoles.regions]; type: 'any'">
       <app-social-analytics></app-social-analytics>
     </div>
 
@@ -8,35 +9,31 @@
       <app-sales-week></app-sales-week>
     </div>
 
-    <div class="col-12 col-xl-6 dashboard-widget">
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.websiteTraffic]; type: 'any'">
       <app-website-traffic></app-website-traffic>
     </div>
 
-    <div class="col-12 col-xl-6 dashboard-widget">
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.financeOverview]; type: 'any'">
       <app-finance-overview></app-finance-overview>
     </div>
 
-    <div class="col-12 dashboard-widget">
-      <app-dashboard-warnings></app-dashboard-warnings>
-    </div>
-
-    <div class="col-12 col-xxl-5 dashboard-widget">
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.dataIssues]; type: 'any'">
       <app-dashboard-data-issues></app-dashboard-data-issues>
     </div>
 
-    <div class="col-12 col-xxl-7 dashboard-stack">
-      <div class="dashboard-stack__content">
-        <div class="dashboard-widget dashboard-stack__main">
-          <app-dashboard-important-dates></app-dashboard-important-dates>
-        </div>
-
-        <div class="dashboard-widget dashboard-widget--timesheet">
-          <app-dashboard-timesheet></app-dashboard-timesheet>
-        </div>
-      </div>
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.warnings]; type: 'any'">
+      <app-dashboard-warnings></app-dashboard-warnings>
     </div>
 
-    <div class="col-12 dashboard-widget">
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.importantDates]; type: 'any'">
+      <app-dashboard-important-dates></app-dashboard-important-dates>
+    </div>
+
+    <div class="col-12 col-xl-6 dashboard-widget dashboard-widget--timesheet" *appHasRoles="[dashboardRoles.timesheet]; type: 'any'">
+      <app-dashboard-timesheet></app-dashboard-timesheet>
+    </div>
+
+    <div class="col-12 dashboard-widget" *appHasRoles="[dashboardRoles.upcomingQuotes]; type: 'any'">
       <app-upcoming-quotes></app-upcoming-quotes>
     </div>
   </div>

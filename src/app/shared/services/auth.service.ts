@@ -17,7 +17,7 @@ export class AuthService {
 
   set userInfo(user: any) {
     this.localStorageService.setItem<string>('user', JSON.stringify(user));
-    this.roleManagementService.setRoles(user?.roles);
+    this.roleManagementService.setRoles(user?.userRole);
   }
 
   getToken(): string | null {
