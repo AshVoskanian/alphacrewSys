@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { SessionStorageService } from './session-storage.service';
 import { Router } from '@angular/router';
 import { LocalStorageService } from './local-storage.service';
+import { RoleManagementService } from './role-management.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,9 +13,11 @@ export class AuthService {
   private router = inject(Router);
   private sessionStorageService = inject(SessionStorageService);
   private localStorageService = inject(LocalStorageService);
+  private roleManagementService = inject(RoleManagementService);
 
   set userInfo(user: any) {
     this.localStorageService.setItem<string>('user', JSON.stringify(user));
+    this.roleManagementService.setRoles(user?.roles);
   }
 
   getToken(): string | null {
@@ -27,6 +30,7 @@ export class AuthService {
   }
 
   logout() {
+    this.roleManagementService.clear();
     this.sessionStorageService.clear();
     this.localStorageService.clear();
     this.router.navigateByUrl('landing/auth').then();
