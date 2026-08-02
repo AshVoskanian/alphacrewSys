@@ -26,7 +26,7 @@ export class DashboardImportantDatesComponent extends ApiBase implements OnInit 
       { title: 'Starts', field_value: 'startDate', sort: true, type: 'date' },
       { title: 'Parts', field_value: 'parts', sort: true },
       { title: 'Entered', field_value: 'editedBy', sort: true },
-      { title: 'Ordered By', field_value: 'orderedBy', sort: true },
+      { title: 'Ordered By', field_value: 'orderedBy', sort: true, min_width: 130 },
     ],
     data: [] as DashboardImportantDate[]
   };

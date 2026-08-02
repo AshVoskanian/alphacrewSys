@@ -34,7 +34,7 @@ export class DashboardWarningsComponent extends ApiBase implements OnInit {
     columns: [
       { title: 'Name', field_value: 'name', sort: true, type: 'action' },
       { title: 'CrewID', field_value: 'crewId', sort: true },
-      { title: 'Warning Date', field_value: 'strikeDate', sort: true, type: 'date' },
+      { title: 'Warning Date', field_value: 'strikeDate', sort: true, type: 'date', min_width: 150 },
       { title: 'Severity', field_value: 'text', sort: true },
       { title: 'Reason', field_value: 'strikeReason', sort: true }
     ],
