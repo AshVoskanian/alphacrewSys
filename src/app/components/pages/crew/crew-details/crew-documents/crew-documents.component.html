@@ -44,8 +44,7 @@
         </div>
       </div>
 
-      <input class="hidden" hidden #file (change)="uploadFile($event)" type="file">
-      <button type="button" class="btn btn-primary w-300 h-36" (click)="file.click()">
+      <button type="button" class="btn btn-primary w-300 h-36" (click)="openUploadModal()">
         Upload New Document
       </button>
       @if (tableConfig() && tableConfig().data.length) {
@@ -70,3 +69,10 @@
     </div>
   }
 </div>
+
+<ng-template #uploadDocument>
+  <app-document-upload
+    [loading]="modalLoading()"
+    (closeModal)="closeUploadModal($event)"
+  ></app-document-upload>
+</ng-template>

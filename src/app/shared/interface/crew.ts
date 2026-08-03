@@ -166,6 +166,18 @@ export interface CrewPayment {
   comments: string | null;
 }
 
+export interface CrewDocumentType {
+  documentId: number;
+  documentName: string;
+}
+
+export interface CrewDocumentUploadPayload {
+  documentType: string;
+  expireDate: string;
+  fileName: string;
+  file: File;
+}
+
 export interface CrewAdjustment {
   adjustmentId: number;
   crewId: number;
