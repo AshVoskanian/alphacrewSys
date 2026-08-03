@@ -28,7 +28,7 @@
       <app-dashboard-important-dates></app-dashboard-important-dates>
     </div>
 
-    <div class="col-12 col-xl-6 dashboard-widget dashboard-widget--timesheet" *appHasRoles="[dashboardRoles.timesheet]; type: 'any'">
+    <div class="col-12 col-xl-6 dashboard-widget dashboard-widget--timesheet" *appHasRoles="[dashboardRoles.timesheet, dashboardRoles.dashboardTimesheet]; type: 'any'">
       <app-dashboard-timesheet></app-dashboard-timesheet>
     </div>
 
