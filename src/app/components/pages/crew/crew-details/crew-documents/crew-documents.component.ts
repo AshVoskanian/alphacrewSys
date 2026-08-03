@@ -204,7 +204,7 @@ export class CrewDocumentsComponent extends ApiBase {
   }
 
   private shouldDownloadFile(fileName: string): boolean {
-    return /\.(xlsx|xls|xlsm|xlsb)$/i.test(fileName);
+    return /\.(xlsx|xls|xlsm|xlsb|doc|docx)$/i.test(fileName);
   }
 
   private withMimeType(blob: Blob, fileName: string): Blob {
@@ -237,6 +237,10 @@ export class CrewDocumentsComponent extends ApiBase {
         return 'image/bmp';
       case 'pdf':
         return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       case 'xls':
         return 'application/vnd.ms-excel';
       case 'xlsx':
