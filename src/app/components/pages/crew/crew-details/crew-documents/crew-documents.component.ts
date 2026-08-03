@@ -15,7 +15,11 @@ import { TableClickedAction, TableConfigs } from '../../../../../shared/interfac
 import { ApiBase } from '../../../../../shared/bases/api-base';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GeneralService } from '../../../../../shared/services/general.service';
-import { CrewDetail, CrewDocumentUploadPayload } from '../../../../../shared/interface/crew';
+import {
+  CrewDetail,
+  CrewDocumentRow,
+  CrewDocumentUploadPayload
+} from '../../../../../shared/interface/crew';
 import { finalize } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CrewService } from '../../crew.service';
@@ -46,18 +50,22 @@ export class CrewDocumentsComponent extends ApiBase {
   modalLoading = signal<boolean>(false);
   commentDraft = signal<string>('');
   commentSaving = signal<boolean>(false);
-  downloadingDocument = signal<string | null>(null);
+  openingDocument = signal<string | null>(null);
 
   private uploadModalRef!: NgbModalRef;
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
-      { title: 'File Name', field_value: 'fileName', sort: true, type: 'template' },
+      { title: 'DL', field_value: 'dl', sort: false, type: 'template' },
+      { title: 'File Name', field_value: 'displayFileName', sort: true },
+      { title: 'Document Type', field_value: 'documentType', sort: true },
+      { title: 'ExpiryDate', field_value: 'expiryDate', sort: true },
+      { title: 'Version', field_value: 'version', sort: true },
     ],
     row_action: [
       { label: 'Delete', action_to_perform: 'delete', icon: 'trash1', modal: true }
     ],
-    data: [] as any[]
+    data: [] as CrewDocumentRow[]
   });
 
   constructor(http: HttpClient) {
@@ -133,10 +141,9 @@ export class CrewDocumentsComponent extends ApiBase {
           this.tableConfig().data = [];
           this._cdr.detectChanges();
 
-          this.tableConfig().data = res.data.map((item: { fileName: string }, index) => ({
-            ...item,
-            id: index + 1
-          }));
+          this.tableConfig().data = (res.data ?? []).map((item, index) =>
+            this.mapDocumentRow(item.fileName, index + 1)
+          );
 
           this._cdr.detectChanges();
         }
@@ -149,21 +156,78 @@ export class CrewDocumentsComponent extends ApiBase {
     }
   }
 
-  downloadDocument(fileName: string) {
-    if (this.downloadingDocument()) {
+  openDocument(fileName: string) {
+    if (this.openingDocument()) {
       return;
     }
 
-    this.downloadingDocument.set(fileName);
+    this.openingDocument.set(fileName);
 
-    this._generalService.downloadFile(`Crew/download/${ encodeURIComponent(fileName) }`, fileName)
+    this.getFile(`Crew/download/${ encodeURIComponent(fileName) }`, 'blob')
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.downloadingDocument.set(null))
+        finalize(() => this.openingDocument.set(null))
       )
       .subscribe({
-        error: () => GeneralService.showErrorMessage('Download failed')
+        next: (blob) => {
+          const typedBlob = this.withMimeType(blob, fileName);
+
+          if (this.shouldDownloadFile(fileName)) {
+            this._generalService.downloadBlob(typedBlob, fileName);
+            return;
+          }
+
+          this._generalService.openBlobInNewTab(typedBlob);
+        },
+        error: () => GeneralService.showErrorMessage('Failed to open document')
       });
+  }
+
+  private shouldDownloadFile(fileName: string): boolean {
+    return /\.(xlsx|xls|xlsm|xlsb)$/i.test(fileName);
+  }
+
+  private withMimeType(blob: Blob, fileName: string): Blob {
+    const mimeType = this.getMimeType(fileName);
+    if (!mimeType) {
+      return blob;
+    }
+
+    if (blob.type && blob.type !== 'application/octet-stream') {
+      return blob;
+    }
+
+    return new Blob([blob], { type: mimeType });
+  }
+
+  private getMimeType(fileName: string): string | null {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'bmp':
+        return 'image/bmp';
+      case 'pdf':
+        return 'application/pdf';
+      case 'xls':
+        return 'application/vnd.ms-excel';
+      case 'xlsx':
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      case 'xlsm':
+        return 'application/vnd.ms-excel.sheet.macroEnabled.12';
+      case 'xlsb':
+        return 'application/vnd.ms-excel.sheet.binary.macroEnabled.12';
+      default:
+        return null;
+    }
   }
 
   deleteDocument(fileName: string) {
@@ -254,5 +318,64 @@ export class CrewDocumentsComponent extends ApiBase {
     };
 
     reader.readAsDataURL(data.file);
+  }
+
+  private mapDocumentRow(fileName: string, id: number): CrewDocumentRow {
+    const parsed = this.parseDocumentFileName(fileName);
+
+    return {
+      id,
+      fileName,
+      displayFileName: parsed.displayFileName,
+      documentType: parsed.documentType,
+      expiryDate: parsed.expiryDate,
+      version: parsed.version,
+    };
+  }
+
+  private parseDocumentFileName(fileName: string): Omit<CrewDocumentRow, 'id' | 'fileName'> {
+    const extensionMatch = fileName.match(/(\.[^.]+)$/);
+    const extension = extensionMatch?.[1] ?? '';
+    const nameWithoutExtension = extension
+      ? fileName.slice(0, -extension.length)
+      : fileName;
+
+    const dateMatch = nameWithoutExtension.match(/_(\d{8})_/);
+    if (!dateMatch || dateMatch.index == null) {
+      return {
+        displayFileName: fileName,
+        documentType: '',
+        expiryDate: '',
+        version: '',
+      };
+    }
+
+    const rawDate = dateMatch[1];
+    const beforeDate = nameWithoutExtension.slice(0, dateMatch.index);
+    const afterDate = nameWithoutExtension.slice(dateMatch.index + dateMatch[0].length);
+
+    const firstUnderscoreIndex = beforeDate.indexOf('_');
+    const documentType = firstUnderscoreIndex >= 0
+      ? beforeDate.slice(firstUnderscoreIndex + 1)
+      : '';
+
+    const versionMatch = afterDate.match(/^(.*)_(\d+)$/);
+    const baseName = versionMatch ? versionMatch[1] : afterDate;
+    const version = versionMatch ? versionMatch[2] : '';
+
+    return {
+      displayFileName: `${baseName}${extension}`,
+      documentType,
+      expiryDate: this.formatExpiryDate(rawDate),
+      version,
+    };
+  }
+
+  private formatExpiryDate(rawDate: string): string {
+    if (!/^\d{8}$/.test(rawDate)) {
+      return rawDate;
+    }
+
+    return `${rawDate.slice(0, 4)}-${rawDate.slice(4, 6)}-${rawDate.slice(6, 8)}`;
   }
 }

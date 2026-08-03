@@ -178,6 +178,15 @@ export interface CrewDocumentUploadPayload {
   file: File;
 }
 
+export interface CrewDocumentRow {
+  id: number;
+  fileName: string;
+  displayFileName: string;
+  documentType: string;
+  expiryDate: string;
+  version: string;
+}
+
 export interface CrewAdjustment {
   adjustmentId: number;
   crewId: number;

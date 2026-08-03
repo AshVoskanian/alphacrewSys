@@ -48,21 +48,20 @@
         Upload New Document
       </button>
       @if (tableConfig() && tableConfig().data.length) {
-        <ng-template #fileNameCell let-details>
-          <div class="d-inline-flex align-items-center gap-8">
-            @if (downloadingDocument() === details.fileName) {
+        <ng-template #dlCell let-details>
+          <div class="d-inline-flex align-items-center">
+            @if (openingDocument() === details.fileName) {
               <i class="fa-solid fa-spinner fa-spin txt-primary f-12"></i>
             } @else {
-              <i class="fa-solid pointer fa-download txt-primary f-12 cursor-pointer"
-                 (click)="downloadDocument(details.fileName)"
-                 title="Download"></i>
+              <i class="fa-solid fa-up-right-from-square txt-primary f-12 cursor-pointer"
+                 (click)="openDocument(details.fileName)"
+                 title="Open"></i>
             }
-            <span>{{ details.fileName }}</span>
           </div>
         </ng-template>
 
         <app-table [tableConfig]="tableConfig()"
-                   [columnTemplates]="{ fileName: fileNameCell }"
+                   [columnTemplates]="{ dl: dlCell }"
                    (action)="handleAction($event)">
         </app-table>
       }
