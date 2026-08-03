@@ -73,6 +73,7 @@
 <ng-template #uploadDocument>
   <app-document-upload
     [loading]="modalLoading()"
+    [crewId]="crewDetail()?.crewId ?? null"
     (closeModal)="closeUploadModal($event)"
   ></app-document-upload>
 </ng-template>

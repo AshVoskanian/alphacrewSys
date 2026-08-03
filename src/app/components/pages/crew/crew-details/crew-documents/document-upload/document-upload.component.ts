@@ -12,7 +12,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Select2Data, Select2Module } from 'ng-select2-component';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
+import { finalize, startWith } from 'rxjs';
 import { ApiBase } from '../../../../../../shared/bases/api-base';
 import { GeneralService } from '../../../../../../shared/services/general.service';
 import { CrewDocumentType, CrewDocumentUploadPayload } from '../../../../../../shared/interface/crew';
@@ -32,11 +32,13 @@ export class DocumentUploadComponent extends ApiBase implements OnInit {
   @Output() closeModal: EventEmitter<CrewDocumentUploadPayload | null> = new EventEmitter();
 
   @Input() loading = false;
+  @Input() crewId: number | null = null;
 
   form: FormGroup;
   documentTypes = signal<Select2Data>([]);
   documentTypesLoading = signal(false);
   selectedFileName = signal('');
+  fullFileNamePreview = signal('');
 
   constructor(http: HttpClient) {
     super(http);
@@ -45,6 +47,7 @@ export class DocumentUploadComponent extends ApiBase implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.loadDocumentTypes();
+    this.watchFullFileNamePreview();
   }
 
   initForm(): void {
@@ -91,6 +94,7 @@ export class DocumentUploadComponent extends ApiBase implements OnInit {
     this.form.patchValue({ file });
     this.form.get('file')?.markAsTouched();
     this.selectedFileName.set(file?.name ?? '');
+    this.updateFullFileNamePreview();
   }
 
   save(): void {
@@ -109,19 +113,60 @@ export class DocumentUploadComponent extends ApiBase implements OnInit {
     this.closeModal.emit({
       documentType,
       expireDate: new Date(`${expireDate}T00:00:00.000Z`).toISOString(),
-      fileName: this.buildFileName(String(fileName).trim(), file.name),
+      fileName: this.buildFullFileName(String(fileName).trim(), documentType, expireDate, file.name),
       file,
     });
   }
 
-  private buildFileName(name: string, uploadedFileName: string): string {
-    const extension = this.getFileExtension(uploadedFileName);
-    if (!extension) {
-      return name;
+  private watchFullFileNamePreview(): void {
+    this.form.valueChanges
+      .pipe(
+        startWith(this.form.getRawValue()),
+        takeUntilDestroyed(this._dr)
+      )
+      .subscribe(() => this.updateFullFileNamePreview());
+  }
+
+  private updateFullFileNamePreview(): void {
+    const { documentType, expireDate, fileName, file } = this.form.getRawValue() as {
+      documentType: string | null;
+      expireDate: string;
+      fileName: string;
+      file: File | null;
+    };
+
+    const typedName = String(fileName ?? '').trim();
+    if (!typedName) {
+      this.fullFileNamePreview.set('');
+      return;
     }
 
+    this.fullFileNamePreview.set(
+      this.buildFullFileName(typedName, documentType, expireDate, file?.name ?? '')
+    );
+  }
+
+  private buildFullFileName(
+    name: string,
+    documentType: string | null | undefined,
+    expireDate: string | null | undefined,
+    uploadedFileName: string
+  ): string {
+    const extension = this.getFileExtension(uploadedFileName);
     const baseName = this.stripFileExtension(name);
-    return `${baseName}${extension}`;
+    const crewIdPart = this.crewId != null ? String(this.crewId) : '';
+    const typePart = documentType?.trim() || '';
+    const datePart = this.formatExpireDate(expireDate);
+
+    return `${crewIdPart}_${typePart}_${datePart}_${baseName}${extension}`;
+  }
+
+  private formatExpireDate(expireDate: string | null | undefined): string {
+    if (!expireDate) {
+      return '';
+    }
+
+    return expireDate.replace(/-/g, '');
   }
 
   private getFileExtension(fileName: string): string {
