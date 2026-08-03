@@ -175,13 +175,15 @@ export interface CrewDocumentUploadPayload {
   documentType: string;
   expireDate: string;
   fileName: string;
-  file: File;
+  file: File | null;
+  oldFileName?: string;
 }
 
 export interface CrewDocumentRow {
   id: number;
   fileName: string;
   displayFileName: string;
+  name: string;
   documentType: string;
   expiryDate: string;
   version: string;

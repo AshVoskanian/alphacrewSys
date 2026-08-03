@@ -73,6 +73,17 @@
   <app-document-upload
     [loading]="modalLoading()"
     [crewId]="crewDetail()?.crewId ?? null"
-    (closeModal)="closeUploadModal($event)"
+    (closeModal)="closeDocumentModal($event)"
   ></app-document-upload>
+</ng-template>
+
+<ng-template #editDocument>
+  @if (selectedDocument(); as document) {
+    <app-document-edit
+      [loading]="modalLoading()"
+      [crewId]="crewDetail()?.crewId ?? null"
+      [document]="document"
+      (closeModal)="closeDocumentModal($event)"
+    ></app-document-edit>
+  }
 </ng-template>

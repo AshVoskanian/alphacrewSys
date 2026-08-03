@@ -25,12 +25,14 @@ import { HttpClient } from '@angular/common/http';
 import { CrewService } from '../../crew.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentUploadComponent } from './document-upload/document-upload.component';
+import { DocumentEditComponent } from './document-edit/document-edit.component';
 
 @Component({
   selector: 'app-crew-documents',
   imports: [
     TableComponent,
     DocumentUploadComponent,
+    DocumentEditComponent,
   ],
   templateUrl: './crew-documents.component.html',
   styleUrl: './crew-documents.component.scss'
@@ -43,6 +45,7 @@ export class CrewDocumentsComponent extends ApiBase {
   private readonly _modal = inject(NgbModal);
 
   @ViewChild('uploadDocument') uploadDocument: TemplateRef<unknown>;
+  @ViewChild('editDocument') editDocument: TemplateRef<unknown>;
 
   crewDetail = input<CrewDetail>();
 
@@ -51,8 +54,9 @@ export class CrewDocumentsComponent extends ApiBase {
   commentDraft = signal<string>('');
   commentSaving = signal<boolean>(false);
   openingDocument = signal<string | null>(null);
+  selectedDocument = signal<CrewDocumentRow | null>(null);
 
-  private uploadModalRef!: NgbModalRef;
+  private documentModalRef!: NgbModalRef;
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
@@ -63,7 +67,18 @@ export class CrewDocumentsComponent extends ApiBase {
       { title: 'Version', field_value: 'version', sort: true },
     ],
     row_action: [
-      { label: 'Delete', action_to_perform: 'delete', icon: 'trash1', modal: true }
+      {
+        label: 'Edit',
+        action_to_perform: 'edit',
+        icon: 'fa-solid fa-pen-to-square txt-primary',
+        class: 'square-white'
+      },
+      {
+        label: 'Delete',
+        action_to_perform: 'delete',
+        icon: 'trash1',
+        modal: true
+      }
     ],
     data: [] as CrewDocumentRow[]
   });
@@ -151,6 +166,11 @@ export class CrewDocumentsComponent extends ApiBase {
   }
 
   handleAction(value: TableClickedAction) {
+    if (value.action_to_perform === 'edit' && value.data) {
+      this.openEditModal(value.data as CrewDocumentRow);
+      return;
+    }
+
     if (value.action_to_perform === 'delete' && value.data) {
       this.deleteDocument(value?.data?.fileName);
     }
@@ -252,19 +272,27 @@ export class CrewDocumentsComponent extends ApiBase {
   }
 
   openUploadModal(): void {
-    this.uploadModalRef = this._modal.open(this.uploadDocument, { centered: true, size: 'lg' });
+    this.selectedDocument.set(null);
+    this.documentModalRef = this._modal.open(this.uploadDocument, { centered: true, size: 'lg' });
   }
 
-  closeUploadModal(data: CrewDocumentUploadPayload | null): void {
+  openEditModal(document: CrewDocumentRow): void {
+    this.selectedDocument.set(document);
+    this._cdr.detectChanges();
+    this.documentModalRef = this._modal.open(this.editDocument, { centered: true, size: 'lg' });
+  }
+
+  closeDocumentModal(data: CrewDocumentUploadPayload | null): void {
     if (!data) {
-      this.uploadModalRef?.close();
+      this.documentModalRef?.close();
+      this.selectedDocument.set(null);
       return;
     }
 
-    this.uploadDocumentFile(data);
+    this.saveDocument(data);
   }
 
-  private uploadDocumentFile(data: CrewDocumentUploadPayload): void {
+  private saveDocument(data: CrewDocumentUploadPayload): void {
     if (this.modalLoading()) {
       return;
     }
@@ -277,47 +305,95 @@ export class CrewDocumentsComponent extends ApiBase {
 
     this.modalLoading.set(true);
 
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const base64 = (reader.result as string).split(',')[1];
-
-      const payload = {
-        crewId,
-        fileName: data.fileName,
-        fileBase64: base64,
-        documentType: data.documentType,
-        expireDate: data.expireDate,
-      };
-
-      this._crewService.post('Crew/UploadCrewDocumentAsync', payload)
-        .pipe(
-          takeUntilDestroyed(this._dr),
-          finalize(() => this.modalLoading.set(false))
-        )
-        .subscribe({
-          next: res => {
-            if (res.errors && res.errors.errorCode) {
-              GeneralService.showErrorMessage(res.errors.message);
-              return;
-            }
-
-            this.uploadModalRef?.close();
-            this.getDocuments(this.crewDetail());
-            this._cdr.detectChanges();
-          },
-          error: () => {
-            GeneralService.showErrorMessage('Failed to upload document');
-          }
+    if (data.file) {
+      this.readFileAsBase64(data.file)
+        .then((fileBase64) => this.submitDocument(crewId, data, fileBase64))
+        .catch(() => {
+          this.modalLoading.set(false);
+          GeneralService.showErrorMessage('Failed to read file');
         });
-    };
+      return;
+    }
 
-    reader.onerror = () => {
+    if (!data.oldFileName) {
       this.modalLoading.set(false);
-      GeneralService.showErrorMessage('Failed to read file');
+      GeneralService.showErrorMessage('File is required.');
+      return;
+    }
+
+    this.getFile(`Crew/download/${ encodeURIComponent(data.oldFileName) }`, 'blob')
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (blob) => {
+          this.readFileAsBase64(blob)
+            .then((fileBase64) => this.submitDocument(crewId, data, fileBase64))
+            .catch(() => {
+              this.modalLoading.set(false);
+              GeneralService.showErrorMessage('Failed to read file');
+            });
+        },
+        error: () => {
+          this.modalLoading.set(false);
+          GeneralService.showErrorMessage('Failed to load existing document');
+        }
+      });
+  }
+
+  private submitDocument(
+    crewId: number,
+    data: CrewDocumentUploadPayload,
+    fileBase64: string
+  ): void {
+    const isEdit = !!data.oldFileName;
+    const endpoint = isEdit
+      ? 'Crew/UpdateCrewDocumentAsync'
+      : 'Crew/UploadCrewDocumentAsync';
+
+    const payload = {
+      crewId,
+      fileName: data.fileName,
+      fileBase64,
+      documentType: data.documentType,
+      expireDate: data.expireDate,
+      ...(isEdit ? { jobId: 0, oldFileName: data.oldFileName } : {}),
     };
 
-    reader.readAsDataURL(data.file);
+    this._crewService.post(endpoint, payload)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.modalLoading.set(false))
+      )
+      .subscribe({
+        next: res => {
+          if (res.errors && res.errors.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.documentModalRef?.close();
+          this.selectedDocument.set(null);
+          this.getDocuments(this.crewDetail());
+          this._cdr.detectChanges();
+        },
+        error: () => {
+          GeneralService.showErrorMessage(
+            isEdit ? 'Failed to update document' : 'Failed to upload document'
+          );
+        }
+      });
+  }
+
+  private readFileAsBase64(file: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.includes(',') ? result.split(',')[1] : result);
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
   }
 
   private mapDocumentRow(fileName: string, id: number): CrewDocumentRow {
@@ -327,6 +403,7 @@ export class CrewDocumentsComponent extends ApiBase {
       id,
       fileName,
       displayFileName: parsed.displayFileName,
+      name: parsed.name,
       documentType: parsed.documentType,
       expiryDate: parsed.expiryDate,
       version: parsed.version,
@@ -340,35 +417,51 @@ export class CrewDocumentsComponent extends ApiBase {
       ? fileName.slice(0, -extension.length)
       : fileName;
 
-    const dateMatch = nameWithoutExtension.match(/_(\d{8})_/);
-    if (!dateMatch || dateMatch.index == null) {
+    const dateMatches = [ ...nameWithoutExtension.matchAll(/_(\d{8})_/g) ];
+    if (!dateMatches.length) {
       return {
         displayFileName: fileName,
+        name: this.stripExtension(fileName),
         documentType: '',
         expiryDate: '',
         version: '',
       };
     }
 
-    const rawDate = dateMatch[1];
-    const beforeDate = nameWithoutExtension.slice(0, dateMatch.index);
-    const afterDate = nameWithoutExtension.slice(dateMatch.index + dateMatch[0].length);
+    const firstDateMatch = dateMatches[0];
+    const lastDateMatch = dateMatches[dateMatches.length - 1];
+    const firstIndex = firstDateMatch.index ?? 0;
+    const lastIndex = lastDateMatch.index ?? 0;
 
-    const firstUnderscoreIndex = beforeDate.indexOf('_');
+    const beforeFirstDate = nameWithoutExtension.slice(0, firstIndex);
+    const afterLastDate = nameWithoutExtension.slice(lastIndex + lastDateMatch[0].length);
+    const rawDate = firstDateMatch[1];
+
+    const firstUnderscoreIndex = beforeFirstDate.indexOf('_');
     const documentType = firstUnderscoreIndex >= 0
-      ? beforeDate.slice(firstUnderscoreIndex + 1)
+      ? beforeFirstDate.slice(firstUnderscoreIndex + 1)
       : '';
 
-    const versionMatch = afterDate.match(/^(.*)_(\d+)$/);
-    const baseName = versionMatch ? versionMatch[1] : afterDate;
+    const versionMatch = afterLastDate.match(/^(.*)_(\d+)$/);
+    const baseName = versionMatch ? versionMatch[1] : afterLastDate;
     const version = versionMatch ? versionMatch[2] : '';
 
     return {
       displayFileName: `${baseName}${extension}`,
+      name: baseName,
       documentType,
       expiryDate: this.formatExpiryDate(rawDate),
       version,
     };
+  }
+
+  private stripExtension(fileName: string): string {
+    const lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex <= 0) {
+      return fileName;
+    }
+
+    return fileName.slice(0, lastDotIndex);
   }
 
   private formatExpiryDate(rawDate: string): string {

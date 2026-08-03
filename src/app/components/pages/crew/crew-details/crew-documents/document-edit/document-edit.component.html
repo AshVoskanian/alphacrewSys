@@ -2,7 +2,7 @@
   <div class="modal-body social-profile text-start dark-sign-up">
     <div class="modal-toggle-wrapper">
       <div class="common-flex justify-content-between align-items-center m-b-10">
-        <h6 class="text-primary">Upload New Document</h6>
+        <h6 class="text-primary">Edit Document</h6>
 
         <div class="common-flex align-items-center gap-3">
           <button class="btn-close py-0 float-end" type="button" (click)="closeModal.emit(null)"></button>
@@ -11,11 +11,11 @@
 
       <div class="flex flex-col gap-12">
         <div>
-          <label class="form-label" for="documentType">
+          <label class="form-label" for="editDocumentType">
             Document Type <span class="text-danger" aria-hidden="true">*</span>
           </label>
           <select2
-            id="documentType"
+            id="editDocumentType"
             [data]="documentTypes()"
             [templates]="template"
             formControlName="documentType"
@@ -28,11 +28,11 @@
         </div>
 
         <div>
-          <label class="form-label" for="expireDate">
+          <label class="form-label" for="editExpireDate">
             Expiry Date <span class="text-danger" aria-hidden="true">*</span>
           </label>
           <input
-            id="expireDate"
+            id="editExpireDate"
             class="form-control digits"
             type="date"
             formControlName="expireDate"
@@ -40,12 +40,12 @@
         </div>
 
         <div>
-          <label class="form-label" for="documentName">
+          <label class="form-label" for="editDocumentName">
             Name <span class="text-danger" aria-hidden="true">*</span>
           </label>
           <div class="flex flex-col gap-6">
             <input
-              id="documentName"
+              id="editDocumentName"
               class="form-control"
               type="text"
               maxlength="100"
@@ -59,9 +59,7 @@
         </div>
 
         <div>
-          <label class="form-label">
-            File <span class="text-danger" aria-hidden="true">*</span>
-          </label>
+          <label class="form-label">File</label>
           <div class="flex items-center gap-12">
             <input
               #fileInput
@@ -90,7 +88,7 @@
           class="btn btn-primary text-center position-relative"
           [disabled]="form.invalid || loading"
         >
-          Upload
+          Save
           @if (loading) {
             <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
           }
