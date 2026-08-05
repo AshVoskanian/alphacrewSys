@@ -231,7 +231,10 @@ export interface Timesheet {
   pd: number;
   skilledPay: number;
   bonus: number;
+  fuel: number;
   oot: number;
+  transport: number;
+  sundries: number;
   lateNightShift: number;
   lastMinutBonus: number;
   drivingBonus: number;
