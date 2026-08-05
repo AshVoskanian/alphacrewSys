@@ -10,12 +10,9 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
-import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
-import { ApiBase } from '../../../../../../shared/bases/api-base';
-import { GeneralService } from '../../../../../../shared/services/general.service';
-import { CrewDocumentType, CrewDocumentUploadPayload } from '../../../../../../shared/interface/crew';
+import { CrewDocumentUploadPayload } from '../../../../../../shared/interface/crew';
 import {
   buildFullFileNamePreview,
   buildSimpleFileName,
@@ -31,26 +28,21 @@ import {
   templateUrl: './document-upload.component.html',
   styleUrl: './document-upload.component.scss'
 })
-export class DocumentUploadComponent extends ApiBase implements OnInit {
+export class DocumentUploadComponent implements OnInit {
   private readonly _dr = inject(DestroyRef);
 
   @Output() closeModal: EventEmitter<CrewDocumentUploadPayload | null> = new EventEmitter();
 
   @Input() loading = false;
   @Input() crewId: number | null = null;
+  @Input() documentTypes: Select2Option[] = [];
 
   form: FormGroup;
-  documentTypes = signal<Select2Option[]>([]);
   selectedFileName = signal('');
   fullFileNamePreview = signal('');
 
-  constructor(http: HttpClient) {
-    super(http);
-  }
-
   ngOnInit(): void {
     this.initForm();
-    this.loadDocumentTypes();
     this.watchFullFileNamePreview();
   }
 
@@ -61,29 +53,6 @@ export class DocumentUploadComponent extends ApiBase implements OnInit {
       fileName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       file: new FormControl<File | null>(null, Validators.required),
     });
-  }
-
-  loadDocumentTypes(): void {
-    this.get<CrewDocumentType[]>('Crew/GetDocumentTypes')
-      .pipe(takeUntilDestroyed(this._dr))
-      .subscribe({
-        next: (res) => {
-          if (res.errors?.errorCode) {
-            GeneralService.showErrorMessage(res.errors.message);
-            return;
-          }
-
-          this.documentTypes.set(
-            (res.data ?? []).map((item) => ({
-              value: item.documentName,
-              label: item.documentName,
-            }))
-          );
-        },
-        error: () => {
-          GeneralService.showErrorMessage('Failed to load document types');
-        },
-      });
   }
 
   onFileSelected(event: Event): void {

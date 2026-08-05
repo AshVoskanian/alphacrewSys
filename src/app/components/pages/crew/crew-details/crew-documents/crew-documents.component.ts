@@ -18,12 +18,14 @@ import { GeneralService } from '../../../../../shared/services/general.service';
 import {
   CrewDetail,
   CrewDocumentRow,
+  CrewDocumentType,
   CrewDocumentUploadPayload
 } from '../../../../../shared/interface/crew';
 import { finalize } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CrewService } from '../../crew.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Select2Option } from 'ng-select2-component';
 import { DocumentUploadComponent } from './document-upload/document-upload.component';
 import { DocumentEditComponent } from './document-edit/document-edit.component';
 
@@ -55,8 +57,11 @@ export class CrewDocumentsComponent extends ApiBase {
   commentSaving = signal<boolean>(false);
   openingDocument = signal<string | null>(null);
   selectedDocument = signal<CrewDocumentRow | null>(null);
+  documentTypes = signal<Select2Option[]>([]);
 
   private documentModalRef!: NgbModalRef;
+  private documentTypesLoaded = false;
+  private documentTypesLoading = false;
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
@@ -85,6 +90,7 @@ export class CrewDocumentsComponent extends ApiBase {
 
   constructor(http: HttpClient) {
     super(http);
+    this.loadDocumentTypes();
     effect(() => {
       const detail = this.crewDetail();
       if (!detail) {
@@ -96,6 +102,39 @@ export class CrewDocumentsComponent extends ApiBase {
         this.getDocuments(detail);
       }
     });
+  }
+
+  private loadDocumentTypes(): void {
+    if (this.documentTypesLoaded || this.documentTypesLoading) {
+      return;
+    }
+
+    this.documentTypesLoading = true;
+
+    this.get<CrewDocumentType[]>('Crew/GetDocumentTypes')
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.documentTypesLoading = false)
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          this.documentTypes.set(
+            (res.data ?? []).map((item) => ({
+              value: item.documentName,
+              label: item.documentName,
+            }))
+          );
+          this.documentTypesLoaded = true;
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Failed to load document types');
+        },
+      });
   }
 
   saveComment(): void {

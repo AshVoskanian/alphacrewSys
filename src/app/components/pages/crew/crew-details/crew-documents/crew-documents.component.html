@@ -73,6 +73,7 @@
   <app-document-upload
     [loading]="modalLoading()"
     [crewId]="crewDetail()?.crewId ?? null"
+    [documentTypes]="documentTypes()"
     (closeModal)="closeDocumentModal($event)"
   ></app-document-upload>
 </ng-template>
@@ -83,6 +84,7 @@
       [loading]="modalLoading()"
       [crewId]="crewDetail()?.crewId ?? null"
       [document]="document"
+      [documentTypes]="documentTypes()"
       (closeModal)="closeDocumentModal($event)"
     ></app-document-edit>
   }
