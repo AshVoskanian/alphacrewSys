@@ -23,19 +23,19 @@
     @if (isScheduleRoute) {
       <form class="flex gap-10 align-items-center max-w-300" [formGroup]="form" (ngSubmit)="submit()">
         <div class="flex gap-4">
-          <div class="col date-input">
+          <div class="col date-input w-i-110">
             <input class="form-control digits" id="datetime-local"
                    placeholder="yyyy-mm-dd" name="from"
                    formControlName="date"
                    ngbDatepicker #fromDate="ngbDatepicker"
                    (click)="fromDate.toggle()">
           </div>
-          <div class="col-auto d-flex justify-content-start align-items-center">
+          <div class="col-auto d-flex justify-content-start align-items-center d-none d-lg-flex">
             <button class="btn p-x-14 btn-primary" type="submit"><i class="fa-solid fa-arrows-rotate"></i></button>
           </div>
         </div>
 
-        <div class="flex gap-2">
+        <div class="gap-2 d-none d-sm-flex">
           <button type="button"
                   [class.btn-primary]="navService.days === 2"
                   [class.btn-secondary]="navService.days !== 2"
@@ -61,10 +61,10 @@
 
         <div class="flex gap-2">
           @if (regionLoading) {
-            <div class="col-md rounded-md h-35 w-110 bg-gray-200 animate-pulse"></div>
+            <div class="col-md rounded-md h-35 w-90 bg-gray-200 animate-pulse"></div>
           } @else {
             <select2 [data]="regions" [value]="0" [templates]="template" [displaySearchStatus]="'hidden'"
-                     (update)="setRegion($event)" class="w-130 bg-light-secondary">
+                     (update)="setRegion($event)" class="w-115 bg-light-secondary">
               <ng-template #template let-item="label">
                 {{ item }}
               </ng-template>
@@ -98,7 +98,7 @@
       </li>
 
       @if (isScheduleRoute) {
-        <li>
+        <li class="d-none d-lg-block">
           <div class="flex">
             <div class="square-product-setting flex items-center" (click)="setListView('list')">
               <a href="javascript:void(0)" class="icon-grid grid-layout-view m-0">

@@ -332,6 +332,7 @@
               <label class="form-check-label txt-warring mb-0 pointer" (click)="selectCrewForSMS(crew)">
                 {{ crew.name }}
                 <span class="m-l-10">({{ crew.levelShortText }})</span>
+                <span class="m-l-4 txt-primary">({{ crew.regionText |  shortRegion }})</span>
               </label>
             </div>
 
@@ -465,6 +466,7 @@
               <label class="form-check-label txt-warring mb-0 pointer" (click)="selectCrewForSMS(crew)">
                 {{ crew.name }}
                 <span class="m-l-10">({{ crew.levelShortText }})</span>
+                <span class="m-l-4 txt-primary">({{ crew.regionText |  shortRegion }})</span>
               </label>
             </div>
 

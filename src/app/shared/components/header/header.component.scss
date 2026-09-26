@@ -1,15 +1,29 @@
-.breadcrumb-custom {
-  @media screen and (max-width: 1000px){
-    & {
-      display: none !important;
-    }
-  }
-}
-.nav-right {
-  //margin: auto;
-  width: fit-content !important;
-}
-.header-wrapper {
-  border-bottom: 7px transparent solid;
-}
-
+.breadcrumb-custom {
+
+  @media screen and (max-width: 1000px){
+
+    & {
+
+      display: none !important;
+
+    }
+
+  }
+
+}
+
+.nav-right {
+
+  //margin: auto;
+
+  width: fit-content !important;
+
+}
+
+.header-wrapper {
+
+  border-bottom: 7px transparent solid;
+
+}
+
+

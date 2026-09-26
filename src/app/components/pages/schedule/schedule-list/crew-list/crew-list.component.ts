@@ -50,12 +50,13 @@ import { finalize, Observable } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
 import { ConfirmModalComponent } from "../../../../../shared/components/ui/confirm-modal/confirm-modal.component";
+import { ShortRegionPipe } from "../../../../../shared/pipes/short-region.pipe";
 
 @Component({
   selector: 'app-crew-list',
   imports: [
     CardComponent, DatePipe, AsyncPipe, FilterPipe, NgClass,
-    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, NgStyle, ConfirmModalComponent
+    FormsModule, NgbPopoverModule, NgbTooltipModule, NgbDropdownModule, NgStyle, ConfirmModalComponent, ShortRegionPipe
   ],
   providers: [CrewFilterPipe],
   templateUrl: './crew-list.component.html',
