@@ -50,6 +50,7 @@ import { AddEditJobPartComponent } from "../add-edit-job-part/add-edit-job-part.
 import { JobPartsComponent } from "../job-parts/job-parts.component";
 import { ActivityComponent } from "../../schedule/schedule-list/activity/activity.component";
 import { JobPartLog } from "../../../../shared/interface/activity";
+import { ConfirmModalComponent } from "../../../../shared/components/ui/confirm-modal/confirm-modal.component";
 
 @Component({
   selector: 'app-edit-job',
@@ -64,15 +65,19 @@ import { JobPartLog } from "../../../../shared/interface/activity";
     AddEditJobPartComponent,
     ActivityComponent,
     NgbPopoverModule,
-    JobPartsComponent
+    JobPartsComponent,
+    ConfirmModalComponent
   ],
   providers: [ DatePipe ],
   templateUrl: './edit-job.component.html',
   styleUrl: './edit-job.component.scss'
 })
 export class EditJobComponent extends ApiBase implements OnInit {
+  private static readonly CONFIRMED_STATUS_ID = 3;
+
   @ViewChild('venueInstance', { static: true }) venueInstance: NgbTypeahead;
   @ViewChild('addJobPartModal') addJobPartModalRef: TemplateRef<NgbModal>;
+  @ViewChild('overUtilisationConfirmModal') overUtilisationConfirmModal: TemplateRef<unknown>;
 
   jobDetails = input<JobDetails>();
   jobWarnings = input<JobScheduleWarning[]>();
@@ -80,6 +85,10 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
   partialPaymentsUpdated = output<AddPaymentResponse>();
   jobPartsUpdated = output<void>();
+
+  readonly overUtilisationWarningTitle = 'You are confirming client job over the allowed Credit!';
+  readonly overUtilisationWarningSubTitle =
+    '1) Please seek permission for Accounts\n2) Inform the client to pay upfront prior to confirming';
 
   /** Start date (ISO) of the job part that starts last; used as base for new part default (last + 24h). */
   lastJobPartStartDate = computed(() => {
@@ -104,6 +113,9 @@ export class EditJobComponent extends ApiBase implements OnInit {
   private readonly _generalService = inject(GeneralService);
 
   private modalRef: NgbModalRef;
+  private overUtilisationModalRef?: NgbModalRef;
+  private _previousStatusId: number | null = null;
+  private _skipStatusGuard = false;
 
   /** Initial values when form was loaded from jobDetails (for tooltip old vs new). */
   private _initialCurrencyId: number | null = null;
@@ -166,6 +178,15 @@ export class EditJobComponent extends ApiBase implements OnInit {
     if (this.jobDetails()) {
       this.setFormData();
     }
+  }
+
+  get overUtilisation(): boolean {
+    const details = this.jobDetails();
+    const limit = details?.clientLimit;
+    const outstanding = details?.jobCost?.outstanding ?? 0;
+    const utilisation = limit?.clientUtilisation ?? 0;
+    const creditLimit = limit?.creditLimit ?? 0;
+    return (outstanding + utilisation) > creditLimit;
   }
 
   get prePaymentBadgeValue(): number {
@@ -281,6 +302,63 @@ export class EditJobComponent extends ApiBase implements OnInit {
 
     this.subToClientChange();
     this.subToJobRegionAccessChange();
+    this.subToStatusChange();
+  }
+
+  subToStatusChange() {
+    this.form.get('statusId')?.valueChanges
+      .pipe(takeUntilDestroyed(this._dr))
+      .subscribe({
+        next: (statusId: number) => {
+          if (this._skipStatusGuard) return;
+
+          const nextStatusId = +statusId;
+          const savedStatusId = this.jobDetails()?.statusId ?? null;
+          const confirmedId = EditJobComponent.CONFIRMED_STATUS_ID;
+
+          // Refresh / select2 rebind of an already-saved Confirmed status — no warning
+          if (
+            nextStatusId === confirmedId &&
+            savedStatusId === confirmedId &&
+            (this._previousStatusId == null || this._previousStatusId === confirmedId)
+          ) {
+            this._previousStatusId = nextStatusId;
+            return;
+          }
+
+          const isConfirming =
+            nextStatusId === confirmedId &&
+            this._previousStatusId != null &&
+            this._previousStatusId !== confirmedId;
+
+          if (isConfirming && this.overUtilisation) {
+            this.openOverUtilisationConfirm();
+            return;
+          }
+
+          this._previousStatusId = nextStatusId;
+        }
+      });
+  }
+
+  openOverUtilisationConfirm() {
+    this.overUtilisationModalRef = this._modal.open(this.overUtilisationConfirmModal, {
+      centered: true,
+      size: 'md',
+      backdrop: 'static'
+    });
+  }
+
+  closeOverUtilisationConfirm(result: 'ok' | 'cancel') {
+    if (result === 'cancel') {
+      this._skipStatusGuard = true;
+      this.form.patchValue({ statusId: this._previousStatusId });
+      this._skipStatusGuard = false;
+    } else {
+      this._previousStatusId = EditJobComponent.CONFIRMED_STATUS_ID;
+    }
+
+    this.overUtilisationModalRef?.close();
   }
 
   subToClientChange() {
@@ -462,6 +540,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
       publish: details.publish,
       purchaseOrder: details.purchaseOrder
     }, { emitEvent: false });
+
+    this._previousStatusId = details.statusId;
 
     // Load venues only if clientId exists and is valid
     // Set venue after venues are loaded

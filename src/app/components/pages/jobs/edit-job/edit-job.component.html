@@ -366,3 +366,13 @@
 <ng-template #activities>
   <app-activity [activityList]="activityList()"></app-activity>
 </ng-template>
+
+<ng-template #overUtilisationConfirmModal>
+  <app-confirm-modal
+    [title]="overUtilisationWarningTitle"
+    [subTitle]="overUtilisationWarningSubTitle"
+    [confirmText]="'OK Proceed'"
+    [cancelText]="'Cancel'"
+    (closeModal)="closeOverUtilisationConfirm($event)">
+  </app-confirm-modal>
+</ng-template>

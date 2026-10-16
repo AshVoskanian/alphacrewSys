@@ -5,17 +5,21 @@
         <li> <img [ngSrc]="'assets/images/gif/danger.gif'" alt="error" height="500" width="500"></li>
       </ul>
       <h4 class="text-center pb-2">{{title}}</h4>
-      <p class="text-center c-light">
-        {{subTitle}}
-      </p>
+      @if (subTitle) {
+        <p class="text-center c-light confirm-modal__subtitle">
+          {{subTitle}}
+        </p>
+      }
       <div class="flex gap-10 m-t-10">
         <button class="btn btn-primary flex-grow-1" type="button" (click)="closeModal.emit('ok')">
-          ok
+          {{ confirmText }}
           @if (loading) {
             <i class="inherit-params t-10 r-10 position-absolute fa-solid fa-circle-notch fa-spin"></i>
           }
         </button>
-        <button class="btn btn-secondary flex-grow-1" type="button" (click)="closeModal.emit('cancel')">Cancel</button>
+        <button class="btn btn-secondary flex-grow-1" type="button" (click)="closeModal.emit('cancel')">
+          {{ cancelText }}
+        </button>
       </div>
     </div>
   </div>
