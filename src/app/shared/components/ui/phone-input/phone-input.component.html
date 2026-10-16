@@ -1,0 +1,62 @@
+<div class="phone-input">
+  <div class="phone-input__prefix-wrap">
+    <button
+      type="button"
+      class="btn phone-input__prefix"
+      [disabled]="disabled()"
+      [attr.aria-expanded]="dropdownOpen()"
+      aria-haspopup="listbox"
+      aria-label="Phone country prefix"
+      (click)="toggleDropdown()">
+      <span [class]="selectedCountry()?.flagClass"></span>
+      <span class="phone-input__dial">{{ selectedCountry()?.label }}</span>
+      <i class="fa-solid fa-chevron-down phone-input__caret"></i>
+    </button>
+
+    @if (dropdownOpen()) {
+      <div class="phone-input__dropdown" role="listbox">
+        <input
+          class="form-control form-control-sm phone-input__search"
+          type="text"
+          placeholder="Search country"
+          [ngModel]="countrySearch()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="countrySearch.set($event)"
+          (click)="$event.stopPropagation()">
+
+        <div class="phone-input__list">
+          @for (item of filteredCountries(); track item.iso2) {
+            <button
+              type="button"
+              class="phone-input__option"
+              role="option"
+              [class.is-active]="item.iso2 === country()"
+              (click)="selectCountry(item.iso2)">
+              <span [class]="item.flagClass"></span>
+              <span class="phone-input__option-name">{{ item.name }}</span>
+              <span class="phone-input__option-dial">{{ item.label }}</span>
+            </button>
+          } @empty {
+            <div class="phone-input__empty">No countries found</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <input
+    class="form-control"
+    type="tel"
+    inputmode="tel"
+    autocomplete="tel-national"
+    placeholder="Phone number"
+    [disabled]="disabled()"
+    [ngModel]="nationalNumber()"
+    [ngModelOptions]="{ standalone: true }"
+    (ngModelChange)="onNationalInput($event)"
+    (blur)="onBlur()">
+
+  <span class="phone-input__addon">
+    <i class="fa-solid fa-phone txt-secondary"></i>
+  </span>
+</div>

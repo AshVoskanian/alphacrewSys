@@ -30,12 +30,10 @@
 
     <div class="col col-sm-6 col-md-4">
       <label class="form-label">Contact Number</label>
-      <div class="input-group">
-        <input class="form-control" type="text" formControlName="phoneNumber">
-        <span class="input-group-text bg-light-secondary">
-        <i class="fa-solid fa-phone txt-secondary"></i>
-      </span>
-      </div>
+      <app-phone-input formControlName="phoneNumber"></app-phone-input>
+      @if (form.get('phoneNumber')?.touched && form.get('phoneNumber')?.errors?.['phoneInvalid']) {
+        <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+      }
     </div>
 
     <div class="col col-sm-6 col-md-4">

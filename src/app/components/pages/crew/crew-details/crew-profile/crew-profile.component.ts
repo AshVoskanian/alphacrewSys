@@ -18,11 +18,12 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
 import { ClipboardModule } from "@angular/cdk/clipboard";
 import { GeneralService } from "../../../../../shared/services/general.service";
+import { PhoneInputComponent } from "../../../../../shared/components/ui/phone-input/phone-input.component";
 import { finalize } from "rxjs";
 
 @Component({
   selector: 'app-crew-profile',
-  imports: [ Select2Module, ReactiveFormsModule, ClipboardModule ],
+  imports: [ Select2Module, ReactiveFormsModule, ClipboardModule, PhoneInputComponent ],
   templateUrl: './crew-profile.component.html',
   styleUrl: './crew-profile.component.scss',
   providers: [ DatePipe ]
