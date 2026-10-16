@@ -60,8 +60,20 @@
           </div>
         </ng-template>
 
+        <ng-template #downloadCell let-details>
+          <div class="d-inline-flex align-items-center">
+            @if (downloadingDocument() === details.fileName) {
+              <i class="fa-solid fa-spinner fa-spin txt-primary f-12"></i>
+            } @else {
+              <i class="fa-solid fa-download txt-primary f-12 cursor-pointer"
+                 (click)="downloadDocument(details)"
+                 title="Download"></i>
+            }
+          </div>
+        </ng-template>
+
         <app-table [tableConfig]="tableConfig()"
-                   [columnTemplates]="{ dl: dlCell }"
+                   [columnTemplates]="{ dl: dlCell, download: downloadCell }"
                    (action)="handleAction($event)">
         </app-table>
       }

@@ -56,6 +56,7 @@ export class CrewDocumentsComponent extends ApiBase {
   commentDraft = signal<string>('');
   commentSaving = signal<boolean>(false);
   openingDocument = signal<string | null>(null);
+  downloadingDocument = signal<string | null>(null);
   selectedDocument = signal<CrewDocumentRow | null>(null);
   documentTypes = signal<Select2Option[]>([]);
 
@@ -66,6 +67,7 @@ export class CrewDocumentsComponent extends ApiBase {
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
       { title: 'DL', field_value: 'dl', sort: false, type: 'template' },
+      { title: 'Download', field_value: 'download', sort: false, type: 'template' },
       { title: 'File Name', field_value: 'displayFileName', sort: true },
       { title: 'Document Type', field_value: 'documentType', sort: true },
       { title: 'ExpiryDate', field_value: 'expiryDate', sort: true },
@@ -239,6 +241,29 @@ export class CrewDocumentsComponent extends ApiBase {
           this._generalService.openBlobInNewTab(typedBlob);
         },
         error: () => GeneralService.showErrorMessage('Failed to open document')
+      });
+  }
+
+  downloadDocument(document: CrewDocumentRow) {
+    if (this.downloadingDocument()) {
+      return;
+    }
+
+    const { fileName, displayFileName } = document;
+    this.downloadingDocument.set(fileName);
+
+    this.getFile(`Crew/download/${ encodeURIComponent(fileName) }`, 'blob')
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.downloadingDocument.set(null))
+      )
+      .subscribe({
+        next: (blob) => {
+          const downloadName = displayFileName || fileName;
+          const typedBlob = this.withMimeType(blob, downloadName);
+          this._generalService.downloadBlob(typedBlob, downloadName);
+        },
+        error: () => GeneralService.showErrorMessage('Download failed')
       });
   }
 
