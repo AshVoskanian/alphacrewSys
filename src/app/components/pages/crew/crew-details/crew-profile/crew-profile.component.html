@@ -95,7 +95,16 @@
 
     <div class="col col-sm-6 col-md-4">
       <label class="form-label">Date of Birth</label>
-      <input class="form-control digits" type="date" formControlName="doB">
+      <div class="input-group">
+        <input class="form-control digits" type="date" formControlName="doB">
+        <span
+          class="input-group-text bg-light-secondary pointer"
+          title="Copy date of birth"
+          [cdkCopyToClipboard]="doBForCopy"
+          (click)="copyDoB()">
+          <i class="fa-solid fa-copy txt-secondary"></i>
+        </span>
+      </div>
     </div>
 
     <div class="col col-sm-6 col-md-4">

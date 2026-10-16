@@ -16,12 +16,13 @@ import { CrewDetail, FilterDropdowns } from "../../../../../shared/interface/cre
 import { CrewService } from "../../crew.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
+import { ClipboardModule } from "@angular/cdk/clipboard";
 import { GeneralService } from "../../../../../shared/services/general.service";
 import { finalize } from "rxjs";
 
 @Component({
   selector: 'app-crew-profile',
-  imports: [ Select2Module, ReactiveFormsModule ],
+  imports: [ Select2Module, ReactiveFormsModule, ClipboardModule ],
   templateUrl: './crew-profile.component.html',
   styleUrl: './crew-profile.component.scss',
   providers: [ DatePipe ]
@@ -187,6 +188,22 @@ export class CrewProfileComponent implements OnInit, OnChanges {
       passportExpiry: this._date.transform(data.passportExpiry, 'yyyy-MM-dd')
     });
     this.form.updateValueAndValidity();
+  }
+
+  get doBForCopy(): string {
+    const doB = this.form?.get('doB')?.value;
+    if (!doB) return '';
+
+    const [year, month, day] = String(doB).split('T')[0].split('-');
+    if (!year || !month || !day) return '';
+
+    return `${day}/${month}/${year}`;
+  }
+
+  copyDoB(): void {
+    if (!this.doBForCopy) return;
+
+    GeneralService.showSuccessMessage('Copied to clipboard');
   }
 
   submit() {
