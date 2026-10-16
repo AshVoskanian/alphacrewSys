@@ -222,7 +222,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   ngOnInit() {
-    this.getCrewList();
+    this.subToCrewListRefresh();
     this.checkIfCrewUpdate();
     this.getInfo();
     this.getStatistics();
@@ -235,6 +235,15 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
         takeUntilDestroyed(this._dr)
       )
       .subscribe(() => this.closeCrewOffcanvas());
+  }
+
+  subToCrewListRefresh() {
+    this._navService.filterParams
+      .pipe(
+        filter(params => !!params),
+        takeUntilDestroyed(this._dr)
+      )
+      .subscribe(() => this.getCrewList());
   }
 
   ngAfterViewInit() {
@@ -387,7 +396,6 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
   }
 
   getCrewList() {
-    if (this.crewList()?.length !== 0) return;
     this._scheduleService.crewListLoading.next(true);
 
     this.get<Array<Crew>>('Crew/GetCrewList', {})

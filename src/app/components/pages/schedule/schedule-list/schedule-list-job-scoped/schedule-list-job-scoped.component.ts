@@ -54,7 +54,7 @@ import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { VehiclesComponent } from "../vehicles/vehicles.component";
 import { SendSmsComponent } from "../send-sms/send-sms.component";
 import { FilterPipe } from "../../../../../shared/pipes/filter.pipe";
-import { finalize, forkJoin, switchMap, take, timer } from "rxjs";
+import { finalize, filter, forkJoin, switchMap, take, timer } from "rxjs";
 import { NavService } from "../../../../../shared/services/nav.service";
 import { UpdatesNotesComponent } from "../updates-notes/updates-notes.component";
 import { SendSmsToCrewComponent } from "../send-sms-to-crew/send-sms-to-crew.component";
@@ -216,12 +216,21 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   ngOnInit() {
-    this.getCrewList();
+    this.subToCrewListRefresh();
     this.checkIfCrewUpdate();
     this.getInfo();
     this.getStatistics();
     this.getInfoMultiple();
     this.getJobPartCrewAdditionalDetails();
+  }
+
+  subToCrewListRefresh() {
+    this._navService.filterParams
+      .pipe(
+        filter(params => !!params),
+        takeUntilDestroyed(this._dr)
+      )
+      .subscribe(() => this.getCrewList());
   }
 
   ngAfterViewInit() {
@@ -366,7 +375,6 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
   }
 
   getCrewList() {
-    if (this.crewList()?.length !== 0) return;
     this._scheduleService.crewListLoading.next(true);
 
     this.get<Array<Crew>>('Crew/GetCrewList', {})
