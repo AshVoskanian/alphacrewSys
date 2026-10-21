@@ -83,8 +83,14 @@ Alpha Crew
 
 
   setOnsiteContact(): void {
-    // const phoneNumber = parsePhoneNumber(this.scheduleInfo.onsiteContact, "GB");
-    this.onSiteContact = this.extractAllPhoneNumbers(this.scheduleInfo.onsiteContact || '');
+    const dedicatedPhone = (this.scheduleInfo?.onsitePhone ?? '').trim();
+    if (dedicatedPhone) {
+      this.onSiteContact = dedicatedPhone;
+      return;
+    }
+
+    // Legacy fallback: phone may still live in free-text onsiteContact
+    this.onSiteContact = this.extractAllPhoneNumbers(this.scheduleInfo?.onsiteContact || '');
   }
 
   getCombinedPhoneNumbers(): string {
