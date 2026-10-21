@@ -1,7 +1,7 @@
 .timesheet-bar {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
@@ -9,7 +9,7 @@
 .timesheet-fields {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 12px;
   flex: 1 1 auto;
   min-width: 0;
@@ -22,7 +22,9 @@
   padding-bottom: 18px;
 
   .form-label {
+    display: block;
     margin-bottom: 4px;
+    line-height: 1.2;
   }
 
   &--regions {
@@ -43,7 +45,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 20px;
+  // Match label height + margin so icons sit level with the selects
+  padding-top: calc(1.2em + 4px);
+  padding-bottom: 18px;
 }
 
 .action-button {
@@ -53,13 +57,19 @@
 }
 
 :host ::ng-deep {
+  .timesheet-field {
+    .select2-container .select2-selection {
+      min-height: 38px;
+    }
+  }
+
   .timesheet-field--regions {
     .select2-container--default .select2-selection--multiple {
       display: flex !important;
       align-items: center !important;
-      min-height: 47px;
+      min-height: 38px;
       height: auto !important;
-      padding: 6px 10px !important;
+      padding: 4px 10px !important;
 
       .select2-selection__rendered {
         display: flex !important;
