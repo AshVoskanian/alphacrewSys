@@ -30,6 +30,18 @@
   width: min(26rem, calc(100vw - 2rem));
 }
 
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
 .popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__save-btn {
   width: 2rem;
   min-width: 2rem;

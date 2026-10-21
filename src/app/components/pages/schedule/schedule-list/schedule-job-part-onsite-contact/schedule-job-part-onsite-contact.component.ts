@@ -1,5 +1,5 @@
 import { afterNextRender, Component, DestroyRef, inject, Injector, Input, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
@@ -7,11 +7,12 @@ import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { ApiBase } from '../../../../../shared/bases/api-base';
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { Schedule } from '../../../../../shared/interface/schedule';
+import { PhoneInputComponent } from '../../../../../shared/components/ui/phone-input/phone-input.component';
 
 @Component({
   selector: 'app-schedule-job-part-onsite-contact',
   standalone: true,
-  imports: [ FormsModule, NgbPopoverModule ],
+  imports: [ ReactiveFormsModule, NgbPopoverModule, PhoneInputComponent ],
   templateUrl: './schedule-job-part-onsite-contact.component.html',
   styleUrl: './schedule-job-part-onsite-contact.component.scss'
 })
@@ -20,14 +21,20 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
 
   private readonly _dr = inject(DestroyRef);
   private readonly _injector = inject(Injector);
+  private readonly _fb = inject(FormBuilder);
 
   savingOnsiteContact = signal(false);
 
-  onsiteContactEditDraft = '';
-  private onsiteContactPopoverInitial = '';
+  private onsiteContactPopoverInitial = { onsiteContact: '', onsiteEmail: '', onsitePhone: '' };
   private onsiteContactPopoverCommitted = false;
   private activeOnsiteContactPopover: NgbPopover | null = null;
   onsiteContactPopoverOpen = signal(false);
+
+  readonly form = this._fb.group({
+    onsiteContact: [ '', [ Validators.maxLength(200) ] ],
+    onsiteEmail: [ '', [ Validators.email, Validators.maxLength(254) ] ],
+    onsitePhone: [ null as string | null ]
+  });
 
   constructor() {
     const http = inject(HttpClient);
@@ -38,15 +45,36 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
     return (this.schedule.onsiteContact ?? '').trim();
   }
 
-  private preparePopover(): void {
-    const synced = this.onsiteContactDisplay;
-    this.onsiteContactPopoverInitial = synced;
-    this.onsiteContactEditDraft = synced;
-    this.onsiteContactPopoverOpen.set(true);
+  get onsiteEmailDisplay(): string {
+    return (this.schedule.onsiteEmail ?? '').trim();
   }
 
-  onOnsiteContactDraftChange(value: string): void {
-    this.onsiteContactEditDraft = value;
+  get onsitePhoneDisplay(): string {
+    return (this.schedule.onsitePhone ?? '').trim();
+  }
+
+  get hasOnsiteInfo(): boolean {
+    return !!(this.onsiteContactDisplay || this.onsiteEmailDisplay || this.onsitePhoneDisplay);
+  }
+
+  get onsiteSummaryDisplay(): string {
+    return [ this.onsiteContactDisplay, this.onsiteEmailDisplay, this.onsitePhoneDisplay ]
+      .filter(Boolean)
+      .join(' · ');
+  }
+
+  private preparePopover(): void {
+    this.onsiteContactPopoverInitial = {
+      onsiteContact: this.onsiteContactDisplay,
+      onsiteEmail: this.onsiteEmailDisplay,
+      onsitePhone: this.onsitePhoneDisplay
+    };
+    this.form.reset({
+      onsiteContact: this.onsiteContactPopoverInitial.onsiteContact,
+      onsiteEmail: this.onsiteContactPopoverInitial.onsiteEmail,
+      onsitePhone: this.onsiteContactPopoverInitial.onsitePhone || null
+    }, { emitEvent: false });
+    this.onsiteContactPopoverOpen.set(true);
   }
 
   onOnsiteContactTriggerClick(popover: NgbPopover, event: Event): void {
@@ -103,21 +131,44 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
       return;
     }
 
-    const initialTrim = (this.onsiteContactPopoverInitial ?? '').trim();
-    const value = (this.onsiteContactEditDraft ?? '').trim();
+    if (this.form.invalid) {
+      GeneralService.markFormGroupTouched(this.form);
+      return;
+    }
 
-    if (value === initialTrim) {
+    const raw = this.form.getRawValue();
+    const next = {
+      onsiteContact: (raw.onsiteContact ?? '').trim(),
+      onsiteEmail: (raw.onsiteEmail ?? '').trim(),
+      onsitePhone: (raw.onsitePhone ?? '').trim()
+    };
+    const initial = this.onsiteContactPopoverInitial;
+
+    if (
+      next.onsiteContact === initial.onsiteContact &&
+      next.onsiteEmail === initial.onsiteEmail &&
+      next.onsitePhone === initial.onsitePhone
+    ) {
       this.onsiteContactPopoverCommitted = true;
       popover.close();
       return;
     }
 
     this.savingOnsiteContact.set(true);
+    this.form.disable({ emitEvent: false });
 
-    this.get<unknown>('Schedule/UpdateJobPartOnsiteContact', { jobPartId, onsiteContact: value })
+    this.get<unknown>('Schedule/UpdateJobPartOnsiteContact', {
+      jobPartId,
+      onsiteContact: next.onsiteContact,
+      onsiteEmail: next.onsiteEmail,
+      onsitePhone: next.onsitePhone
+    })
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.savingOnsiteContact.set(false))
+        finalize(() => {
+          this.savingOnsiteContact.set(false);
+          this.form.enable({ emitEvent: false });
+        })
       )
       .subscribe({
         next: res => {
@@ -126,7 +177,9 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
             return;
           }
 
-          this.schedule.onsiteContact = value;
+          this.schedule.onsiteContact = next.onsiteContact;
+          this.schedule.onsiteEmail = next.onsiteEmail;
+          this.schedule.onsitePhone = next.onsitePhone;
           this.onsiteContactPopoverCommitted = true;
           GeneralService.showSuccessMessage('Onsite contact saved');
           popover.close();
@@ -137,7 +190,13 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
       });
   }
 
-  private revertOnsiteContactDisplay(initialRaw: string): void {
-    this.schedule.onsiteContact = initialRaw;
+  private revertOnsiteContactDisplay(initial: {
+    onsiteContact: string;
+    onsiteEmail: string;
+    onsitePhone: string;
+  }): void {
+    this.schedule.onsiteContact = initial.onsiteContact;
+    this.schedule.onsiteEmail = initial.onsiteEmail;
+    this.schedule.onsitePhone = initial.onsitePhone;
   }
 }

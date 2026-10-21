@@ -995,7 +995,9 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
           schedule.smsStatusColour !== status.smsStatusColour ||
           schedule.smsStatusTitle !== status.smsStatusTitle ||
           schedule.editedBy !== status.editedBy ||
-          schedule.onsiteContact !== status.onsiteContact
+          schedule.onsiteContact !== status.onsiteContact ||
+          schedule.onsiteEmail !== status.onsiteEmail ||
+          schedule.onsitePhone !== status.onsitePhone
         );
 
         return {
@@ -1005,6 +1007,8 @@ export class ScheduleListJobScopedComponent extends ApiBase implements OnInit, A
           smsStatusTitle: status.smsStatusTitle,
           editedBy: status.editedBy,
           onsiteContact: status.onsiteContact,
+          onsiteEmail: status.onsiteEmail,
+          onsitePhone: status.onsitePhone,
           changed,
         };
       });

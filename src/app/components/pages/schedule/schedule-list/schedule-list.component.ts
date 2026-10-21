@@ -1024,7 +1024,9 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           schedule.smsStatusColour !== status.smsStatusColour ||
           schedule.smsStatusTitle !== status.smsStatusTitle ||
           schedule.editedBy !== status.editedBy ||
-          schedule.onsiteContact !== status.onsiteContact
+          schedule.onsiteContact !== status.onsiteContact ||
+          schedule.onsiteEmail !== status.onsiteEmail ||
+          schedule.onsitePhone !== status.onsitePhone
         );
 
         return {
@@ -1034,6 +1036,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           smsStatusTitle: status.smsStatusTitle,
           editedBy: status.editedBy,
           onsiteContact: status.onsiteContact,
+          onsiteEmail: status.onsiteEmail,
+          onsitePhone: status.onsitePhone,
           changed,
         };
       });

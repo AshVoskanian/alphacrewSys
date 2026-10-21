@@ -21,9 +21,16 @@
   padding: 0.15rem;
 }
 
-.job-part-onsite-contact-popover__input {
-  flex: 1 1 auto;
-  min-width: 0;
+.job-part-onsite-contact-popover__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.job-part-onsite-contact-popover__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
 }
 
 .job-part-onsite-contact-popover__save-btn {

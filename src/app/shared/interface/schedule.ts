@@ -41,6 +41,8 @@ export interface Schedule {
   ootCost: number;
   notes: string;
   onsiteContact: string;
+  onsiteEmail: string;
+  onsitePhone: string;
   postCode: string | null;
   startDate: string;
   endDate: string;
@@ -351,6 +353,8 @@ export interface JobMessageStatus {
   smsStatusColour: string;
   smsStatusTitle: string;
   onsiteContact: string;
+  onsiteEmail: string;
+  onsitePhone: string;
   lastModified: string;
   editedBy: string;
 }

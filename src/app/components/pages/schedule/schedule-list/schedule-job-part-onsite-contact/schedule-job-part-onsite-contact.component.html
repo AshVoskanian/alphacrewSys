@@ -3,9 +3,9 @@
     type="button"
     class="btn p-0 m-0 job-part-onsite-contact-cell__btn text-start"
     [class.fw-bold]="true"
-    [class.fst-italic]="!!onsiteContactDisplay"
-    [class.text-danger]="!onsiteContactDisplay"
-    [class.pulse]="!onsiteContactDisplay"
+    [class.fst-italic]="hasOnsiteInfo"
+    [class.text-danger]="!hasOnsiteInfo"
+    [class.pulse]="!hasOnsiteInfo"
     #onsiteContactPop="ngbPopover"
     [ngbPopover]="onsiteContactPopoverTpl"
     triggers="manual"
@@ -16,8 +16,8 @@
     (click)="onOnsiteContactTriggerClick(onsiteContactPop, $event)"
     (hidden)="onOnsiteContactPopoverHidden()"
   >
-    @if (onsiteContactDisplay) {
-      <span>Onsite: {{ onsiteContactDisplay }}</span>
+    @if (hasOnsiteInfo) {
+      <span>Onsite: {{ onsiteSummaryDisplay }}</span>
     } @else {
       <span class="job-part-onsite-contact-cell__missing" title="Add onsite contact">
         <i class="fa-solid fa-warning text-danger" aria-hidden="true"></i>
@@ -28,22 +28,61 @@
 </h6>
 
 <ng-template #onsiteContactPopoverTpl>
-  <div class="job-part-onsite-contact-popover__body">
-    <div class="d-flex align-items-stretch gap-1">
-      <input
-        type="text"
-        class="form-control form-control-sm job-part-onsite-contact-popover__input"
-        name="onsiteContactDraft"
-        [ngModel]="onsiteContactEditDraft"
-        [ngModelOptions]="{ standalone: true }"
-        (ngModelChange)="onOnsiteContactDraftChange($event)"
-        (keydown)="onOnsiteContactInputKeydown($event)"
-        [disabled]="savingOnsiteContact()"
-        placeholder="Type onsite contact"
-      />
+  <div class="job-part-onsite-contact-popover__body" [formGroup]="form">
+    <div class="job-part-onsite-contact-popover__fields">
+      <div>
+        <label class="form-label form-label-sm m-b-4" for="onsiteContactDraft">Name</label>
+        <input
+          id="onsiteContactDraft"
+          type="text"
+          class="form-control form-control-sm"
+          name="onsiteContactDraft"
+          formControlName="onsiteContact"
+          [class.is-invalid]="form.get('onsiteContact')?.touched && form.get('onsiteContact')?.invalid"
+          (keydown)="onOnsiteContactInputKeydown($event)"
+          maxlength="200"
+          placeholder="Contact name"
+          autocomplete="name"
+        />
+        @if (form.get('onsiteContact')?.touched && form.get('onsiteContact')?.errors?.['maxlength']) {
+          <div class="text-danger f-12 m-t-4">Name must be at most 200 characters</div>
+        }
+      </div>
+
+      <div>
+        <label class="form-label form-label-sm m-b-4" for="onsiteEmailDraft">Email</label>
+        <input
+          id="onsiteEmailDraft"
+          type="email"
+          class="form-control form-control-sm"
+          formControlName="onsiteEmail"
+          [class.is-invalid]="form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.invalid"
+          (keydown)="onOnsiteContactInputKeydown($event)"
+          maxlength="254"
+          placeholder="Email"
+          autocomplete="email"
+        />
+        @if (form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.errors?.['email']) {
+          <div class="text-danger f-12 m-t-4">Enter a valid email address</div>
+        }
+        @if (form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.errors?.['maxlength']) {
+          <div class="text-danger f-12 m-t-4">Email must be at most 254 characters</div>
+        }
+      </div>
+
+      <div>
+        <label class="form-label form-label-sm m-b-4" for="onsitePhoneDraft">Phone</label>
+        <app-phone-input id="onsitePhoneDraft" formControlName="onsitePhone"></app-phone-input>
+        @if (form.get('onsitePhone')?.touched && form.get('onsitePhone')?.errors?.['phoneInvalid']) {
+          <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+        }
+      </div>
+    </div>
+
+    <div class="job-part-onsite-contact-popover__actions">
       <button
         type="button"
-        class="btn btn-light border btn-sm job-part-onsite-contact-popover__save-btn d-flex align-items-center justify-content-center txt-primary flex-shrink-0"
+        class="btn btn-light border btn-sm job-part-onsite-contact-popover__save-btn d-flex align-items-center justify-content-center txt-primary"
         [disabled]="savingOnsiteContact()"
         (click)="commitOnsiteContactFromPopover($event)"
         title="Save onsite contact"
