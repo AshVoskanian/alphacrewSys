@@ -180,7 +180,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
     }
 
     const selectedCrewIds = new Set(schedule.crews.map(c => c.crewId));
-    const selectedCrewRegionIds = new Set(schedule.crews.map(c => c.regionId));
+    const selectedCrewRegionIds = new Set([...schedule.crews.map(c => c.regionId), schedule.jobRegionId]);
     const selectedCrewLevelIds = new Set(schedule.crews.map(c => c.levelCrewingWeighting));
 
     this.crewList.forEach(crew => {
@@ -360,7 +360,7 @@ export class CrewListComponent extends ApiBase implements OnInit, OnChanges {
       jobId: this.selectedSchedule.jobId,
       jobPartId: type === 'checkedShifts' ? 0 : this.selectedSchedule?.jobPartId,
       jobPartIds: type === 'checkedShifts' ? jobPartIds : [],
-      crewId: this.getSelectedData('crew'),
+      crewId: this.getSelectedData(newCrewOnly ? 'onlyNewCrew' : 'crew'),
       newCrewOnly,
     }
 
