@@ -229,7 +229,7 @@
 
     <!-- Bottom Fields Row -->
     <div class="row g-3 m-b-20">
-      <div class="col-12 col-md-3">
+      <div class="col-12 col-md-4">
         <label class="form-label">Alternative venue:</label>
         <input type="text" class="form-control" formControlName="jobPartVenueName">
       </div>
@@ -237,17 +237,58 @@
         <label class="form-label">Postcode:</label>
         <input type="text" class="form-control" formControlName="jobPartVenuePostcode">
       </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label">Onsite contact:</label>
-        <input type="text" class="form-control" formControlName="onsiteContact">
-      </div>
-      <div class="col-6 col-md-1">
+      <div class="col-6 col-md-2">
         <label class="form-label">AlpDr:</label>
         <input type="number" class="form-control" formControlName="alphaDrivers">
       </div>
-      <div class="col-6 col-md-3 d-flex align-items-end justify-content-end">
+      <div class="col-6 col-md-4 d-flex align-items-end justify-content-end">
         <div class="total-amount-box">
           <span class="total-cost text-center">{{ total | currency:currency():'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onsite contact group -->
+    <div class="onsite-contact-group m-b-20">
+      <div class="onsite-contact-group__title">Onsite contact</div>
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="onsiteContact">Name:</label>
+          <input
+            id="onsiteContact"
+            type="text"
+            class="form-control"
+            formControlName="onsiteContact"
+            [class.is-invalid]="form.get('onsiteContact')?.touched && form.get('onsiteContact')?.invalid"
+            maxlength="200"
+            autocomplete="name">
+          @if (form.get('onsiteContact')?.touched && form.get('onsiteContact')?.errors?.['maxlength']) {
+            <div class="text-danger f-12 m-t-4">Name must be at most 200 characters</div>
+          }
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="onsiteEmail">Email:</label>
+          <input
+            id="onsiteEmail"
+            type="email"
+            class="form-control"
+            formControlName="onsiteEmail"
+            [class.is-invalid]="form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.invalid"
+            maxlength="254"
+            autocomplete="email">
+          @if (form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.errors?.['email']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid email address</div>
+          }
+          @if (form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.errors?.['maxlength']) {
+            <div class="text-danger f-12 m-t-4">Email must be at most 254 characters</div>
+          }
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="onsitePhone">Phone:</label>
+          <app-phone-input id="onsitePhone" formControlName="onsitePhone"></app-phone-input>
+          @if (form.get('onsitePhone')?.touched && form.get('onsitePhone')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+          }
         </div>
       </div>
     </div>

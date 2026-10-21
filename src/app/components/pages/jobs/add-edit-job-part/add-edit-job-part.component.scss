@@ -124,6 +124,23 @@
   }
 }
 
+// Onsite contact fields grouped together
+.onsite-contact-group {
+  padding: 12px 16px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+
+  &__title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #6c757d;
+    margin-bottom: 10px;
+  }
+}
+
 // Total amount - visually separated box
 .total-amount-box {
   display: flex;

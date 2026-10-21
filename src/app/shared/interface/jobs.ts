@@ -268,6 +268,8 @@ export interface AddOrUpdateJobPartRequest {
   jobPartSkillsAddRequests: JobPartSkillAddRequest[];
   skillSupplement: number;
   onsiteContact: string;
+  onsiteEmail: string;
+  onsitePhone: string;
   editedBy?: string;
   lastModified?: string;
   updateHistory?: string;
@@ -326,6 +328,8 @@ export interface JobPartDetailsResponse {
   jobPartSkills?: JobPartSkillItem[];
   skillSupplement: number;
   onsiteContact: string;
+  onsiteEmail: string;
+  onsitePhone: string;
   editedBy?: string;
   lastModified?: string;
   updateHistory?: string;

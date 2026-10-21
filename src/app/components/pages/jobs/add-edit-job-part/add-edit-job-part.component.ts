@@ -13,7 +13,7 @@ import {
   signal,
   WritableSignal
 } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -32,6 +32,7 @@ import { ChipCountSelectComponent } from '../../../../shared/components/ui/chip-
 import type { ChipCountItem, ChipCountOption } from '../../../../shared/components/ui/chip-count-select';
 import { NumericInputDirective } from '../../../../shared/directives/numeric-input.directive';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { PhoneInputComponent } from '../../../../shared/components/ui/phone-input/phone-input.component';
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -43,7 +44,8 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     CurrencyPipe,
     ChipCountSelectComponent,
     NgxMaterialTimepickerModule,
-    NumericInputDirective
+    NumericInputDirective,
+    PhoneInputComponent
   ],
   providers: [ CurrencyPipe ],
   templateUrl: './add-edit-job-part.component.html',
@@ -243,7 +245,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     // Venue / Contact
     jobPartVenueName: [ null ],
     jobPartVenuePostcode: [ null ],
-    onsiteContact: [ null ],
+    onsiteContact: [ null, [ Validators.maxLength(200) ] ],
+    onsiteEmail: [ null, [ Validators.email, Validators.maxLength(254) ] ],
+    onsitePhone: [ null ],
     alphaDrivers: [ 0 ],
 
     // Notes
@@ -616,6 +620,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       jobPartVenueName: part.jobPartVenueName ?? '',
       jobPartVenuePostcode: part.jobPartVenuePostcode ?? '',
       onsiteContact: part.onsiteContact ?? '',
+      onsiteEmail: part.onsiteEmail ?? '',
+      onsitePhone: part.onsitePhone ?? '',
       alphaDrivers: part.alphaDrivers,
       importantNotes: part.importantNotes,
       notes: part.notes ?? '',
@@ -770,7 +776,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
         count: item.count
       })),
       skillSupplement: Number(v.skillSupplement ?? 0),
-      onsiteContact: v.onsiteContact ?? ''
+      onsiteContact: v.onsiteContact ?? '',
+      onsiteEmail: v.onsiteEmail ?? '',
+      onsitePhone: v.onsitePhone ?? ''
     };
   }
 
