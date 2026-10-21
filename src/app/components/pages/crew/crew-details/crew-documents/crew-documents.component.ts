@@ -66,7 +66,7 @@ export class CrewDocumentsComponent extends ApiBase {
 
   public tableConfig: WritableSignal<TableConfigs> = signal({
     columns: [
-      { title: 'DL', field_value: 'dl', sort: false, type: 'template' },
+      { title: 'DL', field_value: 'dl', sort: false, type: 'template', min_width: 45, max_width: 45 },
       { title: 'Download', field_value: 'download', sort: false, type: 'template' },
       { title: 'File Name', field_value: 'displayFileName', sort: true },
       { title: 'Document Type', field_value: 'documentType', sort: true },
