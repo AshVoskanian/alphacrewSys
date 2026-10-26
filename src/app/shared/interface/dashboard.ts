@@ -116,4 +116,13 @@ export interface DashboardLockTimeSheetsRequest {
   month: number;
 }
 
+export interface DashboardDaySms {
+  jobId: number;
+  client: string;
+  onsiteContact: string;
+  primaryContact: string;
+  secondaryContact: string;
+  sms: string;
+}
+
 

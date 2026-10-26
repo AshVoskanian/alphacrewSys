@@ -8,6 +8,7 @@ import { DashboardWarningsComponent } from './widgets/dashboard-warnings/dashboa
 import { DashboardImportantDatesComponent } from './widgets/dashboard-important-dates/dashboard-important-dates.component';
 import { DashboardDataIssuesComponent } from './widgets/dashboard-data-issues/dashboard-data-issues.component';
 import { DashboardTimesheetComponent } from './widgets/dashboard-timesheet/dashboard-timesheet.component';
+import { DashboardDailySmsComponent } from './widgets/dashboard-daily-sms/dashboard-daily-sms.component';
 import { HasRolesDirective } from '../../../shared/directives/has-roles.directive';
 import { DASHBOARD_ROLES } from './dashboard-roles';
 
@@ -23,6 +24,7 @@ import { DASHBOARD_ROLES } from './dashboard-roles';
     DashboardImportantDatesComponent,
     DashboardDataIssuesComponent,
     DashboardTimesheetComponent,
+    DashboardDailySmsComponent,
     HasRolesDirective,
   ],
   templateUrl: './dashboard.component.html',

@@ -1,0 +1,162 @@
+<app-card
+  [headerTitle]="'Daily SMS'"
+  [padding]="false"
+  [cardBodyClass]="'p-15'">
+
+  <div class="daily-sms">
+    <div class="daily-sms-toolbar">
+      <div class="daily-sms-filters">
+        <div class="daily-sms-date">
+          <label class="form-label m-b-0" for="dailySmsCommsDate">Date</label>
+          <input
+            id="dailySmsCommsDate"
+            class="form-control digits"
+            type="date"
+            [value]="commsDate()"
+            (change)="onDateChange($any($event.target).value)"
+          >
+        </div>
+
+        <div class="daily-sms-region">
+          <label class="form-label m-b-0">Region</label>
+          @if (regions().length) {
+            <select2
+              [data]="regions()"
+              [value]="0"
+              [templates]="regionTemplate"
+              [displaySearchStatus]="'hidden'"
+              (update)="onRegionChange($event)"
+            >
+              <ng-template #regionTemplate let-item="label">
+                {{ item }}
+              </ng-template>
+            </select2>
+          } @else {
+            <div class="form-control daily-sms-region-skeleton"></div>
+          }
+        </div>
+      </div>
+
+      <div class="daily-sms-actions">
+        <label class="daily-sms-select-all form-check-label">
+          <input
+            class="form-check-input m-0"
+            type="checkbox"
+            [checked]="allSelected()"
+            [disabled]="loading() || !rows().length"
+            (change)="toggleSelectAll($any($event.target).checked)"
+          >
+          <span>Select All</span>
+        </label>
+
+        <button
+          type="button"
+          class="btn btn-primary h-36"
+          [disabled]="loading() || !someSelected()"
+          (click)="sendSelected()"
+        >
+          Send
+          @if (selectedCount()) {
+            ({{ selectedCount() }})
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="daily-sms-loading flex items-center justify-content-center">
+        <p class="text-primary f-18 m-0">Loading...</p>
+      </div>
+    } @else if (!rows().length) {
+      <div class="daily-sms-empty flex items-center justify-content-center">
+        <p class="text-muted f-16 m-0">No SMS for selected date</p>
+      </div>
+    } @else {
+      <div class="accordion daily-sms-accordion" ngbAccordion [closeOthers]="false">
+        @for (row of rows(); track row.rowId) {
+          <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+            <h2 class="accordion-header" ngbAccordionHeader>
+              <button class="accordion-button daily-sms-header-btn" type="button" ngbAccordionButton>
+                <span
+                  class="daily-sms-row-check"
+                  (click)="$event.stopPropagation()"
+                  (keydown)="$event.stopPropagation()"
+                >
+                  <input
+                    class="form-check-input m-0"
+                    type="checkbox"
+                    [checked]="row.selected"
+                    (click)="$event.stopPropagation()"
+                    (change)="toggleRow(row.rowId, $any($event.target).checked, $event)"
+                  >
+                </span>
+                <span class="daily-sms-summary">
+                  <span class="daily-sms-summary-item">
+                    <span class="daily-sms-summary-label">Client</span>
+                    <span class="daily-sms-summary-value">{{ row.client || '—' }}</span>
+                  </span>
+                  <span class="daily-sms-summary-item">
+                    <span class="daily-sms-summary-label">Primary</span>
+                    <span class="daily-sms-summary-value">{{ row.primaryContact || '—' }}</span>
+                  </span>
+                  <span class="daily-sms-summary-item">
+                    <span class="daily-sms-summary-label">Secondary</span>
+                    <span class="daily-sms-summary-value">{{ row.secondaryContact || '—' }}</span>
+                  </span>
+                </span>
+              </button>
+            </h2>
+
+            <div ngbAccordionCollapse>
+              <div ngbAccordionBody>
+                <ng-template>
+                  <div class="daily-sms-body flex flex-col gap-12">
+                    <div>
+                      <label class="form-label m-b-0">Client</label>
+                      <p class="daily-sms-client-text m-0">{{ row.client || '—' }}</p>
+                    </div>
+
+                    <div class="row g-3">
+                      <div class="col col-sm-6">
+                        <label class="form-label" [attr.for]="'dailySmsPrimary-' + row.rowId">Primary Contact</label>
+                        <input
+                          class="form-control"
+                          type="text"
+                          [id]="'dailySmsPrimary-' + row.rowId"
+                          [(ngModel)]="row.primaryContact"
+                          placeholder="Primary Contact"
+                        >
+                      </div>
+                      <div class="col col-sm-6">
+                        <label class="form-label" [attr.for]="'dailySmsSecondary-' + row.rowId">Secondary Contact</label>
+                        <input
+                          class="form-control"
+                          type="text"
+                          [id]="'dailySmsSecondary-' + row.rowId"
+                          [(ngModel)]="row.secondaryContact"
+                          placeholder="Secondary Contact"
+                        >
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="form-label">SMS</label>
+                      <div class="NgxEditor__Wrapper ngx-editor daily-sms-editor custom-scrollbar">
+                        <ngx-editor
+                          [editor]="row.editor"
+                          outputFormat="html"
+                          [(ngModel)]="row.sms"
+                          [placeholder]="'SMS...'"
+                        ></ngx-editor>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-card>

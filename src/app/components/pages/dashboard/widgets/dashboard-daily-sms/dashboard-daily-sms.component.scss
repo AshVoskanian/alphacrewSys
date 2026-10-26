@@ -1,0 +1,205 @@
+.daily-sms {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.daily-sms-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.daily-sms-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.daily-sms-date {
+  flex: 0 0 200px;
+  width: 200px;
+
+  .form-label {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+.daily-sms-region {
+  flex: 0 0 200px;
+  width: 200px;
+
+  .form-label {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+.daily-sms-region-skeleton {
+  min-height: 38px;
+  background: #e9ecef;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+:host ::ng-deep .daily-sms-region {
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .select2-container .select2-selection {
+    min-height: 38px;
+  }
+}
+
+.daily-sms-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.daily-sms-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.daily-sms-loading,
+.daily-sms-empty {
+  min-height: 160px;
+}
+
+.daily-sms-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.daily-sms-row-check {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.daily-sms-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.daily-sms-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.daily-sms-summary-label {
+  font-size: 11px;
+  line-height: 1.2;
+  opacity: 0.7;
+}
+
+.daily-sms-summary-value {
+  font-size: 13px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.daily-sms-client-text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.daily-sms-editor {
+  border: 1px solid #d7dde5;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+:host ::ng-deep .daily-sms-editor {
+  .NgxEditor {
+    min-height: 160px;
+  }
+
+  .NgxEditor__Content {
+    min-height: 140px;
+    padding: 12px;
+    line-height: 1.5;
+  }
+}
+
+:host ::ng-deep {
+  .daily-sms-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .accordion-item {
+      border: 1px solid #d7dde5;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+
+      &:not(:first-of-type) {
+        border-top: 1px solid #d7dde5;
+      }
+
+      &:has(.accordion-button:not(.collapsed)) {
+        border-color: #b8c4d4;
+        box-shadow: 0 4px 14px rgba(16, 24, 40, 0.1);
+      }
+    }
+
+    .accordion-header {
+      margin: 0;
+    }
+
+    .accordion-button {
+      padding: 14px 16px;
+      background: #f5f7fa;
+      color: inherit;
+      box-shadow: none;
+      font-weight: 500;
+
+      &:not(.collapsed) {
+        background: #e8eef6;
+        color: inherit;
+        box-shadow: none;
+        border-bottom: 1px solid #c9d4e2;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+
+      &::after {
+        margin-left: 12px;
+      }
+    }
+
+    .accordion-collapse {
+      border-top: 0;
+    }
+
+    .accordion-body {
+      padding: 18px 16px;
+      background: #fff;
+      border-top: 2px solid #d0dae8;
+    }
+  }
+}
