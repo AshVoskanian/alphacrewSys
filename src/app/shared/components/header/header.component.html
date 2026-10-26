@@ -115,9 +115,16 @@
       }
 
       <li class="p-0">
-        <div class="flex items-center">
+        <div class="flex items-center gap-12">
+          <a href="javascript:void(0)"
+             class="icon-grid grid-layout-view m-0"
+             title="Calendar"
+             (click)="openCalendarModal()">
+            <i class="fas fa-calendar-days f-18"></i>
+          </a>
           <a href="https://www.google.com/maps/d/edit?mid=1oD0qsmJ-e0txZgNo1g8bBrLz8ezGmhU&usp=sharing"
-             target="_blank" class="icon-grid grid-layout-view m-0">
+             target="_blank" class="icon-grid grid-layout-view m-0"
+             title="Location">
             <i class="fas fa-location-pin f-18"></i>
           </a>
         </div>
@@ -129,3 +136,13 @@
     </ul>
   </div>
 </div>
+
+<ng-template #calendarModal>
+  <div class="modal-header">
+    <h4 class="modal-title mb-0">Calendar</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeCalendarModal()"></button>
+  </div>
+  <div class="modal-body">
+    <app-calendar-events></app-calendar-events>
+  </div>
+</ng-template>

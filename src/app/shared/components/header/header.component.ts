@@ -1,8 +1,8 @@
-import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { HeaderLogoComponent } from "./widgets/header-logo/header-logo.component";
 import { NavService } from '../../services/nav.service';
 import { ProfileComponent } from "./widgets/profile/profile.component";
-import { NgbDateStruct, NgbInputDatepicker } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDateStruct, NgbInputDatepicker, NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from "@angular/router";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from "ng-select2-component";
@@ -17,13 +17,14 @@ import { filter, finalize, map } from "rxjs";
 import { RegionsService } from "../../services/regions.service";
 import { HeaderMenuComponent } from "./widgets/header-menu/header-menu.component";
 import { BreadcrumbService } from '../../services/breadcrumb.service';
+import { CalendarEventsComponent } from '../calendar-events/calendar-events.component';
 
 @Component({
   selector: 'app-header',
   imports: [
     RouterModule,
     HeaderLogoComponent, HeaderMenuComponent, Select2Module, ReactiveFormsModule,
-    ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent
+    ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent, CalendarEventsComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -33,12 +34,16 @@ export class HeaderComponent extends ApiBase implements OnInit {
   private _router = inject(Router);
   private _dr = inject(DestroyRef);
   private _fb = inject(FormBuilder);
+  private _modal = inject(NgbModal);
   private _regionsService = inject(RegionsService);
   private _activatedRouter = inject(ActivatedRoute);
   private _localStorageService = inject(LocalStorageService);
 
   public navService: NavService = inject(NavService);
   private _breadcrumbService = inject(BreadcrumbService);
+
+  @ViewChild('calendarModal') calendarModal!: TemplateRef<unknown>;
+  private calendarModalRef?: NgbModalRef;
 
   regionLoading = false;
   isScheduleRoute = false;
@@ -178,6 +183,18 @@ export class HeaderComponent extends ApiBase implements OnInit {
   setListView(viewType: 'list' | 'grid') {
     this._localStorageService.setItem('listView', viewType);
     this.navService.listView$.next(viewType);
+  }
+
+  openCalendarModal(): void {
+    this.calendarModalRef = this._modal.open(this.calendarModal, {
+      centered: true,
+      size: 'xl',
+      scrollable: true,
+    });
+  }
+
+  closeCalendarModal(): void {
+    this.calendarModalRef?.close();
   }
 
   resetJobIdFilter() {

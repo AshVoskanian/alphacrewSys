@@ -2,6 +2,8 @@
 export const DASHBOARD_ROLES = {
   regions: 'DashboardRegions',
   crewByHour: 'DashboardCrewByHour',
+  dailySms: 'DashboardDailySms',
+  calendar: 'DashboardCalendar',
   websiteTraffic: 'DashboardWebsiteTraffic',
   financeOverview: 'DashboardFinanceOverview',
   warnings: 'DashboardWarnings',
@@ -15,6 +17,8 @@ export const DASHBOARD_ROLES = {
 // export const DASHBOARD_ROLES = {
 //   regions: 'Schedule',
 //   crewByHour: 'Schedule',
+//   dailySms: 'Schedule',
+//   calendar: 'Schedule',
 //   websiteTraffic: 'Schedule',
 //   financeOverview: 'Schedule',
 //   warnings: 'Schedule',

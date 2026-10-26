@@ -9,6 +9,8 @@ import { DashboardImportantDatesComponent } from './widgets/dashboard-important-
 import { DashboardDataIssuesComponent } from './widgets/dashboard-data-issues/dashboard-data-issues.component';
 import { DashboardTimesheetComponent } from './widgets/dashboard-timesheet/dashboard-timesheet.component';
 import { DashboardDailySmsComponent } from './widgets/dashboard-daily-sms/dashboard-daily-sms.component';
+import { CalendarEventsComponent } from '../../../shared/components/calendar-events/calendar-events.component';
+import { CardComponent } from '../../../shared/components/ui/card/card.component';
 import { HasRolesDirective } from '../../../shared/directives/has-roles.directive';
 import { DASHBOARD_ROLES } from './dashboard-roles';
 
@@ -25,6 +27,8 @@ import { DASHBOARD_ROLES } from './dashboard-roles';
     DashboardDataIssuesComponent,
     DashboardTimesheetComponent,
     DashboardDailySmsComponent,
+    CalendarEventsComponent,
+    CardComponent,
     HasRolesDirective,
   ],
   templateUrl: './dashboard.component.html',

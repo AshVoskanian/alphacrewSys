@@ -1,0 +1,49 @@
+<div class="calendar-events">
+  @if (showFilters()) {
+    <div class="calendar-events-filters">
+      <div class="calendar-events-date">
+        <label class="form-label m-b-0" for="calendarEventsDate">Date</label>
+        <input
+          id="calendarEventsDate"
+          class="form-control digits"
+          type="date"
+          [value]="selectedDate()"
+          (change)="onDateChange($any($event.target).value)"
+        >
+      </div>
+
+      <div class="calendar-events-region">
+        <label class="form-label m-b-0">Region</label>
+        @if (regions().length) {
+          <select2
+            [data]="regions()"
+            [value]="initialRegion()"
+            [templates]="regionTemplate"
+            [displaySearchStatus]="'hidden'"
+            (update)="onRegionChange($event)"
+          >
+            <ng-template #regionTemplate let-item="label">
+              {{ item }}
+            </ng-template>
+          </select2>
+        } @else {
+          <div class="form-control calendar-events-region-skeleton"></div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="calendar-events-board position-relative">
+    @if (loading()) {
+      <div class="calendar-events-loading">
+        <i class="fa-solid fa-spinner fa-spin txt-primary"></i>
+      </div>
+    }
+
+    <full-calendar
+      #calendar
+      [options]="calendarOptions"
+      [events]="calendarEvents()"
+    ></full-calendar>
+  </div>
+</div>

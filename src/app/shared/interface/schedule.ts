@@ -421,4 +421,16 @@ export interface Statistics {
   startDate?: string;
 }
 
+export interface CalendarEventsRequest {
+  date: string;
+  region: number;
+}
+
+export interface CalendarEventDay {
+  startDate: string;
+  jobs: number;
+  hours: number;
+  oot: number;
+}
+
 

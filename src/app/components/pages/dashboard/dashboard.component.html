@@ -8,6 +8,19 @@
       <app-sales-week></app-sales-week>
     </div>
 
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.dailySms]; type: 'any'">
+      <app-dashboard-daily-sms></app-dashboard-daily-sms>
+    </div>
+
+    <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.calendar]; type: 'any'">
+      <app-card
+        [headerTitle]="'Calendar'"
+        [padding]="false"
+        [cardBodyClass]="'p-15'">
+        <app-calendar-events></app-calendar-events>
+      </app-card>
+    </div>
+
     <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.websiteTraffic]; type: 'any'">
       <app-website-traffic></app-website-traffic>
     </div>
@@ -30,10 +43,6 @@
 
     <div class="col-12 col-xl-6 dashboard-widget dashboard-widget--timesheet" *appHasRoles="[dashboardRoles.timesheet, dashboardRoles.dashboardTimesheet]; type: 'any'">
       <app-dashboard-timesheet></app-dashboard-timesheet>
-    </div>
-
-    <div class="col-12 dashboard-widget">
-      <app-dashboard-daily-sms></app-dashboard-daily-sms>
     </div>
 
     <div class="col-12 dashboard-widget" *appHasRoles="[dashboardRoles.upcomingQuotes]; type: 'any'">

@@ -1,0 +1,114 @@
+.calendar-events {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calendar-events-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.calendar-events-date,
+.calendar-events-region {
+  flex: 0 0 200px;
+  width: 200px;
+
+  .form-label {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+.calendar-events-region-skeleton {
+  min-height: 38px;
+  background: #e9ecef;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.calendar-events-board {
+  min-height: 420px;
+}
+
+.calendar-events-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+
+  i {
+    font-size: 22px;
+  }
+}
+
+:host ::ng-deep {
+  .calendar-events-region {
+    .select2-container {
+      width: 100% !important;
+    }
+
+    .select2-container .select2-selection {
+      min-height: 38px;
+    }
+  }
+
+  .calendar-events-board {
+    .fc {
+      font-size: 13px;
+    }
+
+    .fc-toolbar-title {
+      font-size: 1.1rem;
+    }
+
+    .fc-daygrid-day-frame {
+      min-height: 92px;
+    }
+
+    .fc-event {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      margin: 2px 4px 0;
+    }
+
+    .fc-event-main {
+      padding: 0;
+    }
+
+    .calendar-day-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: 6px;
+      background: #eef3f8;
+      color: #334155;
+      line-height: 1.25;
+    }
+
+    .calendar-day-metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+
+      span {
+        opacity: 0.75;
+      }
+
+      strong {
+        font-weight: 600;
+      }
+    }
+  }
+}

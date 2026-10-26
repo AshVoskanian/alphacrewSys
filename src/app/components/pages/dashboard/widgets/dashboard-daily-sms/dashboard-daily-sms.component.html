@@ -72,7 +72,7 @@
         <p class="text-muted f-16 m-0">No SMS for selected date</p>
       </div>
     } @else {
-      <div class="accordion daily-sms-accordion" ngbAccordion [closeOthers]="false">
+      <div class="accordion daily-sms-accordion" ngbAccordion [closeOthers]="true">
         @for (row of rows(); track row.rowId) {
           <div class="accordion-item" ngbAccordionItem [collapsed]="true">
             <h2 class="accordion-header" ngbAccordionHeader>
