@@ -116,7 +116,8 @@
 
       <li class="p-0">
         <div class="flex items-center gap-12">
-          <a href="javascript:void(0)"
+          <a *appHasRoles="[calendarRole]; type: 'any'"
+             href="javascript:void(0)"
              class="icon-grid grid-layout-view m-0"
              title="Calendar"
              (click)="openCalendarModal()">

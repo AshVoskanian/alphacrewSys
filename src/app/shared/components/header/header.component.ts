@@ -18,13 +18,15 @@ import { RegionsService } from "../../services/regions.service";
 import { HeaderMenuComponent } from "./widgets/header-menu/header-menu.component";
 import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { CalendarEventsComponent } from '../calendar-events/calendar-events.component';
+import { HasRolesDirective } from '../../directives/has-roles.directive';
 
 @Component({
   selector: 'app-header',
   imports: [
     RouterModule,
     HeaderLogoComponent, HeaderMenuComponent, Select2Module, ReactiveFormsModule,
-    ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent, CalendarEventsComponent
+    ProfileComponent, NgbInputDatepicker, AsyncPipe, FeatherIconComponent, CalendarEventsComponent,
+    HasRolesDirective,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -41,6 +43,8 @@ export class HeaderComponent extends ApiBase implements OnInit {
 
   public navService: NavService = inject(NavService);
   private _breadcrumbService = inject(BreadcrumbService);
+
+  readonly calendarRole = 'DashboardCalendar';
 
   @ViewChild('calendarModal') calendarModal!: TemplateRef<unknown>;
   private calendarModalRef?: NgbModalRef;
