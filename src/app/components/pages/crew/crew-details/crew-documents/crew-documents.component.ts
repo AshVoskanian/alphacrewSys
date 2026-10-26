@@ -53,6 +53,12 @@ export class CrewDocumentsComponent extends ApiBase {
 
   loading = signal<boolean>(false);
   modalLoading = signal<boolean>(false);
+  ninNumber = signal<string>('');
+  utrNumber = signal<string>('');
+  passportNumber = signal<string>('');
+  dietaryPreference = signal<string>('');
+  legalName = signal<string>('');
+  nextOfKin = signal<string>('');
   commentDraft = signal<string>('');
   commentSaving = signal<boolean>(false);
   openingDocument = signal<string | null>(null);
@@ -96,14 +102,30 @@ export class CrewDocumentsComponent extends ApiBase {
     effect(() => {
       const detail = this.crewDetail();
       if (!detail) {
-        this.commentDraft.set('');
+        this.resetDocumentFields();
         return;
       }
+      this.ninNumber.set(detail.ninNumber ?? '');
+      this.utrNumber.set(detail.utrNumber ?? '');
+      this.passportNumber.set(detail.passportNumber ?? '');
+      this.dietaryPreference.set(detail.dietaryPreference ?? '');
+      this.legalName.set(detail.legalName ?? '');
+      this.nextOfKin.set(detail.nextOfKin ?? '');
       this.commentDraft.set(detail.documents ?? '');
       if (detail.crewId != null && detail.crewId > 0) {
         this.getDocuments(detail);
       }
     });
+  }
+
+  private resetDocumentFields(): void {
+    this.ninNumber.set('');
+    this.utrNumber.set('');
+    this.passportNumber.set('');
+    this.dietaryPreference.set('');
+    this.legalName.set('');
+    this.nextOfKin.set('');
+    this.commentDraft.set('');
   }
 
   private loadDocumentTypes(): void {
@@ -159,7 +181,16 @@ export class CrewDocumentsComponent extends ApiBase {
 
     this.commentSaving.set(true);
 
-    this.post<unknown>('Crew/AddCrewDocumentsNote', { crewId, documentNote })
+    this.post<unknown>('Crew/AddCrewDocumentsNote', {
+      crewId,
+      documentNote,
+      ninNumber: this.ninNumber().trim() || null,
+      utrNumber: this.utrNumber().trim() || null,
+      passportNumber: this.passportNumber().trim() || null,
+      dietaryPreference: this.dietaryPreference().trim() || null,
+      legalName: this.legalName().trim() || null,
+      nextOfKin: this.nextOfKin().trim() || null,
+    })
       .pipe(
         takeUntilDestroyed(this._dr),
         finalize(() => this.commentSaving.set(false))

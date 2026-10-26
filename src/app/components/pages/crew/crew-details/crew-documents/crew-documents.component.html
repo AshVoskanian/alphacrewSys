@@ -16,6 +16,75 @@
   } @else {
     <div class="flex flex-col p-t-30 gap-20 justify-content-end">
       <div class="flex flex-col gap-12 w-100">
+        <div class="row g-3">
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label m-b-0" for="crewDocumentsNinNumber">NIN Number</label>
+            <input
+              id="crewDocumentsNinNumber"
+              class="form-control"
+              type="text"
+              [value]="ninNumber()"
+              (input)="ninNumber.set($any($event.target).value)"
+              placeholder="NIN Number"
+            >
+          </div>
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label m-b-0" for="crewDocumentsUtrNumber">UTR Number</label>
+            <input
+              id="crewDocumentsUtrNumber"
+              class="form-control"
+              type="text"
+              [value]="utrNumber()"
+              (input)="utrNumber.set($any($event.target).value)"
+              placeholder="UTR Number"
+            >
+          </div>
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label m-b-0" for="crewDocumentsPassportNumber">Passport Number</label>
+            <input
+              id="crewDocumentsPassportNumber"
+              class="form-control"
+              type="text"
+              [value]="passportNumber()"
+              (input)="passportNumber.set($any($event.target).value)"
+              placeholder="Passport Number"
+            >
+          </div>
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label m-b-0" for="crewDocumentsDietaryPreference">Dietary Preference</label>
+            <input
+              id="crewDocumentsDietaryPreference"
+              class="form-control"
+              type="text"
+              [value]="dietaryPreference()"
+              (input)="dietaryPreference.set($any($event.target).value)"
+              placeholder="Dietary Preference"
+            >
+          </div>
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label m-b-0" for="crewDocumentsLegalName">Legal Name</label>
+            <input
+              id="crewDocumentsLegalName"
+              class="form-control"
+              type="text"
+              [value]="legalName()"
+              (input)="legalName.set($any($event.target).value)"
+              placeholder="Legal Name"
+            >
+          </div>
+          <div class="col col-sm-6 col-md-4">
+            <label class="form-label m-b-0" for="crewDocumentsNextOfKin">Next Of Kin</label>
+            <input
+              id="crewDocumentsNextOfKin"
+              class="form-control"
+              type="text"
+              [value]="nextOfKin()"
+              (input)="nextOfKin.set($any($event.target).value)"
+              placeholder="Next Of Kin"
+            >
+          </div>
+        </div>
+
         <label class="form-label m-b-0" for="crewDocumentsComment">
           Comment <span class="text-danger" aria-hidden="true">*</span>
         </label>

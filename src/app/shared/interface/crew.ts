@@ -96,6 +96,10 @@ export interface CrewDetail {
   ltdCompanyNumber: string | null;
   utrNumber: string | null;
   ninNumber: string | null;
+  passportNumber: string | null;
+  dietaryPreference: string | null;
+  legalName: string | null;
+  nextOfKin: string | null;
   pliProvides: string | null;
   pliExpiry: string | null;
   pliCoverId: string | null;
