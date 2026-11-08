@@ -34,9 +34,11 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
 
   regions = toSignal(this._regionsService.regions, { initialValue: [] });
 
+  selectableRows = computed(() => this.rows().filter((row) => this.isRowSelectable(row)));
+
   allSelected = computed(() => {
-    const items = this.rows();
-    return items.length > 0 && items.every((row) => row.selected);
+    const selectable = this.selectableRows();
+    return selectable.length > 0 && selectable.every((row) => row.selected);
   });
 
   someSelected = computed(() => this.rows().some((row) => row.selected));
@@ -68,7 +70,7 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
 
   toggleSelectAll(checked: boolean): void {
     this.rows().forEach((row) => {
-      row.selected = checked;
+      row.selected = checked && this.isRowSelectable(row);
     });
     this.rows.set([...this.rows()]);
   }
@@ -76,12 +78,22 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
   toggleRow(rowId: number, checked: boolean, event?: Event): void {
     event?.stopPropagation();
     const row = this.rows().find((item) => item.rowId === rowId);
-    if (!row) {
+    if (!row || !this.isRowSelectable(row)) {
       return;
     }
 
     row.selected = checked;
     this.rows.set([...this.rows()]);
+  }
+
+  isRowSelectable(row: DaySmsRow): boolean {
+    const status = (row.status ?? '').trim().toLowerCase();
+    return this.hasPhoneNumber(row) && status !== 'sent';
+  }
+
+  private hasPhoneNumber(row: DaySmsRow): boolean {
+    return [ row.primaryContact, row.secondaryContact ]
+      .some((value) => /\d/.test((value ?? '').trim()));
   }
 
   sendSelected(): void {
@@ -122,6 +134,7 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
               primaryContact: item.primaryContact ?? '',
               secondaryContact: item.secondaryContact ?? '',
               sms: item.sms ?? '',
+              status: item.status?.trim() || '',
               selected: false,
               editor: new Editor(),
             }))

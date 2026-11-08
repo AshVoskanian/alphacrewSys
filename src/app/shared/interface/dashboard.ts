@@ -123,6 +123,8 @@ export interface DashboardDaySms {
   primaryContact: string;
   secondaryContact: string;
   sms: string;
+  /** Coming from backend soon. */
+  status?: string;
 }
 
 

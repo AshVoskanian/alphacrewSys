@@ -43,7 +43,7 @@
             class="form-check-input m-0"
             type="checkbox"
             [checked]="allSelected()"
-            [disabled]="loading() || !rows().length"
+            [disabled]="loading() || !selectableRows().length"
             (change)="toggleSelectAll($any($event.target).checked)"
           >
           <span>Select All</span>
@@ -72,90 +72,91 @@
         <p class="text-muted f-16 m-0">No SMS for selected date</p>
       </div>
     } @else {
-      <div class="accordion daily-sms-accordion" ngbAccordion [closeOthers]="true">
-        @for (row of rows(); track row.rowId) {
-          <div class="accordion-item" ngbAccordionItem [collapsed]="true">
-            <h2 class="accordion-header" ngbAccordionHeader>
-              <button class="accordion-button daily-sms-header-btn" type="button" ngbAccordionButton>
-                <span
-                  class="daily-sms-row-check"
-                  (click)="$event.stopPropagation()"
-                  (keydown)="$event.stopPropagation()"
-                >
-                  <input
-                    class="form-check-input m-0"
-                    type="checkbox"
-                    [checked]="row.selected"
+      <div class="daily-sms-list custom-scrollbar">
+        <div class="accordion daily-sms-accordion" ngbAccordion [closeOthers]="true">
+          @for (row of rows(); track row.rowId) {
+            <div class="accordion-item" ngbAccordionItem [collapsed]="true">
+              <h2 class="accordion-header" ngbAccordionHeader>
+                <button class="accordion-button daily-sms-header-btn" type="button" ngbAccordionButton>
+                  <span
+                    class="daily-sms-row-check"
                     (click)="$event.stopPropagation()"
-                    (change)="toggleRow(row.rowId, $any($event.target).checked, $event)"
+                    (keydown)="$event.stopPropagation()"
                   >
-                </span>
-                <span class="daily-sms-summary">
-                  <span class="daily-sms-summary-item">
-                    <span class="daily-sms-summary-label">Client</span>
-                    <span class="daily-sms-summary-value">{{ row.client || '—' }}</span>
+                    <input
+                      class="form-check-input m-0"
+                      type="checkbox"
+                      [checked]="row.selected"
+                      [disabled]="!isRowSelectable(row)"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleRow(row.rowId, $any($event.target).checked, $event)"
+                    >
                   </span>
-                  <span class="daily-sms-summary-item">
-                    <span class="daily-sms-summary-label">Primary</span>
-                    <span class="daily-sms-summary-value">{{ row.primaryContact || '—' }}</span>
+                  <span class="daily-sms-summary">
+                    <span class="daily-sms-summary-item daily-sms-summary-item--client">
+                      <span class="daily-sms-summary-value">{{ row.client || '—' }}</span>
+                    </span>
+                    <span class="daily-sms-summary-item">
+                      <span class="daily-sms-summary-label">Primary</span>
+                      <span class="daily-sms-summary-value">{{ row.primaryContact || '—' }}</span>
+                    </span>
+                    <span class="daily-sms-summary-item">
+                      <span class="daily-sms-summary-label">Secondary</span>
+                      <span class="daily-sms-summary-value">{{ row.secondaryContact || '—' }}</span>
+                    </span>
+                    <span class="daily-sms-summary-item daily-sms-summary-item--status">
+                      <span class="daily-sms-summary-label">Status</span>
+                      <span class="daily-sms-status">{{ row.status || '—' }}</span>
+                    </span>
                   </span>
-                  <span class="daily-sms-summary-item">
-                    <span class="daily-sms-summary-label">Secondary</span>
-                    <span class="daily-sms-summary-value">{{ row.secondaryContact || '—' }}</span>
-                  </span>
-                </span>
-              </button>
-            </h2>
+                </button>
+              </h2>
 
-            <div ngbAccordionCollapse>
-              <div ngbAccordionBody>
-                <ng-template>
-                  <div class="daily-sms-body flex flex-col gap-12">
-                    <div>
-                      <label class="form-label m-b-0">Client</label>
-                      <p class="daily-sms-client-text m-0">{{ row.client || '—' }}</p>
-                    </div>
-
-                    <div class="row g-3">
-                      <div class="col col-sm-6">
-                        <label class="form-label" [attr.for]="'dailySmsPrimary-' + row.rowId">Primary Contact</label>
-                        <input
-                          class="form-control"
-                          type="text"
-                          [id]="'dailySmsPrimary-' + row.rowId"
-                          [(ngModel)]="row.primaryContact"
-                          placeholder="Primary Contact"
-                        >
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <ng-template>
+                    <div class="daily-sms-body flex flex-col gap-10">
+                      <div class="row g-2">
+                        <div class="col col-sm-6">
+                          <label class="form-label m-b-0" [attr.for]="'dailySmsPrimary-' + row.rowId">Primary Contact</label>
+                          <input
+                            class="form-control form-control-sm"
+                            type="text"
+                            [id]="'dailySmsPrimary-' + row.rowId"
+                            [(ngModel)]="row.primaryContact"
+                            placeholder="Primary Contact"
+                          >
+                        </div>
+                        <div class="col col-sm-6">
+                          <label class="form-label m-b-0" [attr.for]="'dailySmsSecondary-' + row.rowId">Secondary Contact</label>
+                          <input
+                            class="form-control form-control-sm"
+                            type="text"
+                            [id]="'dailySmsSecondary-' + row.rowId"
+                            [(ngModel)]="row.secondaryContact"
+                            placeholder="Secondary Contact"
+                          >
+                        </div>
                       </div>
-                      <div class="col col-sm-6">
-                        <label class="form-label" [attr.for]="'dailySmsSecondary-' + row.rowId">Secondary Contact</label>
-                        <input
-                          class="form-control"
-                          type="text"
-                          [id]="'dailySmsSecondary-' + row.rowId"
-                          [(ngModel)]="row.secondaryContact"
-                          placeholder="Secondary Contact"
-                        >
-                      </div>
-                    </div>
 
-                    <div>
-                      <label class="form-label">SMS</label>
-                      <div class="NgxEditor__Wrapper ngx-editor daily-sms-editor custom-scrollbar">
-                        <ngx-editor
-                          [editor]="row.editor"
-                          outputFormat="html"
-                          [(ngModel)]="row.sms"
-                          [placeholder]="'SMS...'"
-                        ></ngx-editor>
+                      <div>
+                        <label class="form-label m-b-0">SMS</label>
+                        <div class="NgxEditor__Wrapper ngx-editor daily-sms-editor custom-scrollbar">
+                          <ngx-editor
+                            [editor]="row.editor"
+                            outputFormat="html"
+                            [(ngModel)]="row.sms"
+                            [placeholder]="'SMS...'"
+                          ></ngx-editor>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </ng-template>
+                  </ng-template>
+                </div>
               </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       </div>
     }
   </div>
