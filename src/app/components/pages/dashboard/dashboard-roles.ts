@@ -12,6 +12,7 @@ export const DASHBOARD_ROLES = {
   timesheet: 'Accountant',
   dashboardTimesheet: 'DashboardTimesheet',
   upcomingQuotes: 'DashboardUpcomingQuotes',
+  crewFeedback: 'DashboardCrewFeedback',
 } as const;
 
 // export const DASHBOARD_ROLES = {
@@ -26,4 +27,5 @@ export const DASHBOARD_ROLES = {
 //   importantDates: 'Schedule',
 //   timesheet: 'Schedule',
 //   upcomingQuotes: 'Schedule',
+//   crewFeedback: 'Schedule',
 // } as const;

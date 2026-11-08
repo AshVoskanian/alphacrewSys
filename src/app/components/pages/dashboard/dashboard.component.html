@@ -45,6 +45,10 @@
       <app-dashboard-timesheet></app-dashboard-timesheet>
     </div>
 
+    <div class="col-12 dashboard-widget" *appHasRoles="[dashboardRoles.crewFeedback]; type: 'any'">
+      <app-dashboard-crew-feedback></app-dashboard-crew-feedback>
+    </div>
+
     <div class="col-12 dashboard-widget" *appHasRoles="[dashboardRoles.upcomingQuotes]; type: 'any'">
       <app-upcoming-quotes></app-upcoming-quotes>
     </div>

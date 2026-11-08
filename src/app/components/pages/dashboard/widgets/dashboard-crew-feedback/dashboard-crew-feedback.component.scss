@@ -1,0 +1,42 @@
+.crew-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.crew-feedback-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.crew-feedback-crew {
+  flex: 1 1 280px;
+  max-width: 360px;
+
+  .form-label {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+.crew-feedback-crew-skeleton {
+  min-height: 38px;
+  background: #e9ecef;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+:host ::ng-deep .crew-feedback-crew {
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .select2-container .select2-selection {
+    min-height: 38px;
+  }
+}
+
+.crew-feedback-state {
+  min-height: 160px;
+}

@@ -1,0 +1,52 @@
+<app-card
+  [headerTitle]="'Crew Feedback'"
+  [padding]="false"
+  [cardBodyClass]="'p-15'">
+
+  <div class="crew-feedback">
+    <div class="crew-feedback-toolbar">
+      <div class="crew-feedback-crew">
+        <label class="form-label m-b-0">Crew</label>
+        @if (crewListLoading()) {
+          <div class="form-control crew-feedback-crew-skeleton"></div>
+        } @else {
+          <select2
+            [data]="crewOptions()"
+            [value]="selectedCrewId()"
+            [templates]="crewTemplate"
+            placeholder="Select crew..."
+            (update)="onCrewChange($event)"
+          >
+            <ng-template #crewTemplate let-item="label">
+              {{ item }}
+            </ng-template>
+          </select2>
+        }
+      </div>
+    </div>
+
+    @if (feedbackLoading()) {
+      <div class="crew-feedback-state flex items-center justify-content-center">
+        <p class="text-primary f-18 m-0">Loading...</p>
+      </div>
+    } @else if (!selectedCrewId()) {
+      <div class="crew-feedback-state flex items-center justify-content-center">
+        <p class="text-muted f-16 m-0">Select a crew to view feedback</p>
+      </div>
+    } @else if (!tableConfig().data?.length) {
+      <div class="crew-feedback-state flex items-center justify-content-center">
+        <p class="text-muted f-16 m-0">No feedback found</p>
+      </div>
+    } @else {
+      <div class="recent-table table-responsive currency-table recent-order-table custom-scrollbar">
+        <app-table
+          [tableConfig]="tableConfig()"
+          [pageSize]="tableConfig().data.length"
+          [maxHeight]="400"
+          [search]="false"
+          [pagination]="false">
+        </app-table>
+      </div>
+    }
+  </div>
+</app-card>
