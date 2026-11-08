@@ -105,3 +105,13 @@
     </div>
   </div>
 </div>
+
+<ng-template #copyConfirmModal>
+  <app-confirm-modal
+    [loading]="copyConfirmLoading()"
+    [title]="'Copy this job part?'"
+    [confirmText]="'Copy'"
+    [cancelText]="'Cancel'"
+    (closeModal)="closeCopyConfirmModal($event)">
+  </app-confirm-modal>
+</ng-template>

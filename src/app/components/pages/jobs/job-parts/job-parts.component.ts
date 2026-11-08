@@ -8,6 +8,8 @@ import {
   input,
   output,
   signal,
+  TemplateRef,
+  ViewChild,
   WritableSignal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +26,8 @@ import {
   Subject
 } from 'rxjs';
 import {
+  NgbModal,
+  NgbModalRef,
   NgbPopover,
   NgbPopoverModule,
   NgbTypeahead,
@@ -41,15 +45,18 @@ import {
 } from '../../../../shared/interface/jobs';
 import { TableComponent } from '../../../../shared/components/ui/table/table.component';
 import { TableClickedAction, TableConfigs } from '../../../../shared/interface/common';
+import { ConfirmModalComponent } from '../../../../shared/components/ui/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-job-parts',
   standalone: true,
-  imports: [ FormsModule, NgbTypeahead, NgbPopoverModule, TableComponent ],
+  imports: [ FormsModule, NgbTypeahead, NgbPopoverModule, TableComponent, ConfirmModalComponent ],
   templateUrl: './job-parts.component.html',
   styleUrl: './job-parts.component.scss'
 })
 export class JobPartsComponent extends ApiBase {
+  @ViewChild('copyConfirmModal') copyConfirmModal!: TemplateRef<unknown>;
+
   jobDetails = input<JobDetails | undefined>();
   jobWarnings = input<JobScheduleWarning[] | undefined>();
 
@@ -59,6 +66,11 @@ export class JobPartsComponent extends ApiBase {
 
   private readonly _dr = inject(DestroyRef);
   private readonly _injector = inject(Injector);
+  private readonly _modal = inject(NgbModal);
+  private copyConfirmModalRef?: NgbModalRef;
+  private pendingCopyPart: JobPart | null = null;
+
+  copyConfirmLoading = signal(false);
 
   deletingJobPartTagId = signal<number | null>(null);
   savingJobPartTagId = signal<number | null>(null);
@@ -603,9 +615,30 @@ export class JobPartsComponent extends ApiBase {
         this.editPart.emit(event.data);
         break;
       case 'copy':
-        this.copyJobPart(event.data);
+        this.openCopyConfirmModal(event.data);
         break;
     }
+  }
+
+  openCopyConfirmModal(part: JobPart): void {
+    this.pendingCopyPart = part;
+    this.copyConfirmModalRef = this._modal.open(this.copyConfirmModal, { centered: true, size: 'md' });
+  }
+
+  closeCopyConfirmModal(result: 'ok' | 'cancel'): void {
+    if (result !== 'ok') {
+      this.copyConfirmModalRef?.close();
+      this.pendingCopyPart = null;
+      return;
+    }
+
+    const part = this.pendingCopyPart;
+    if (!part) {
+      this.copyConfirmModalRef?.close();
+      return;
+    }
+
+    this.copyJobPart(part);
   }
 
   deleteJobPart(part: JobPart): void {
@@ -648,14 +681,22 @@ export class JobPartsComponent extends ApiBase {
 
   copyJobPart(part: JobPart): void {
     const jobId = this.jobDetails()?.jobId;
-    if (!jobId) return;
+    if (!jobId) {
+      this.copyConfirmModalRef?.close();
+      this.pendingCopyPart = null;
+      return;
+    }
 
+    this.copyConfirmLoading.set(true);
     this.setPartCopyLoading(part.jobPartId, true);
 
     this.post<JobPartResponse>('Jobs/CopyJobPart', { jobId, jobPartId: part.jobPartId })
       .pipe(
         takeUntilDestroyed(this._dr),
-        finalize(() => this.setPartCopyLoading(part.jobPartId, false))
+        finalize(() => {
+          this.copyConfirmLoading.set(false);
+          this.setPartCopyLoading(part.jobPartId, false);
+        })
       )
       .subscribe({
         next: res => {
@@ -665,6 +706,8 @@ export class JobPartsComponent extends ApiBase {
           }
 
           GeneralService.showSuccessMessage('Job part copied successfully');
+          this.copyConfirmModalRef?.close();
+          this.pendingCopyPart = null;
           this.jobPartsUpdated.emit();
         }
       });
