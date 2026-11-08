@@ -43,8 +43,34 @@
     </div>
   } @else {
     @if (tableConfig().data?.length) {
-      <div class="timesheet-table-wrapper custom-scrollbar max-h-700"
-           [style.--timesheet-min-width.px]="timesheetTableMinWidth">
+      @if (isHeaderStuck()) {
+        <div #fixedHeader
+             class="timesheet-fixed-header"
+             [style.top.px]="headerTop()"
+             [style.left.px]="headerLeft()"
+             [style.width.px]="headerWidth()"
+             (scroll)="onFixedHeaderScroll($event)">
+          <table class="table crew-timesheet-table timesheet-fixed-header-table"
+                 [style.min-width.px]="timesheetTableMinWidth">
+            <thead>
+            <tr>
+              @for (col of tableConfig().columns; track col.field_value; let i = $index) {
+                <th [class]="col.header_class ?? ''"
+                    [style.width.px]="columnWidths()[i] || col.min_width"
+                    [style.min-width.px]="columnWidths()[i] || col.min_width">
+                  {{ col.title }}
+                </th>
+              }
+            </tr>
+            </thead>
+          </table>
+        </div>
+      }
+
+      <div #tableWrapper
+           class="timesheet-table-wrapper custom-scrollbar"
+           [style.--timesheet-min-width.px]="timesheetTableMinWidth"
+           (scroll)="onTableHScroll($event)">
       <ng-template #bookedHoursCell let-details>
         <span class="d-inline-flex align-items-center gap-6">
           {{ details.workHours }}

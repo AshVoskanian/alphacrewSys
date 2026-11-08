@@ -1,12 +1,15 @@
 import {
   Component,
   DestroyRef,
+  ElementRef,
+  HostListener,
   inject,
   input,
   OnChanges,
   OnInit,
   signal,
   SimpleChanges,
+  viewChild,
   WritableSignal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -19,11 +22,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { MONTHS, YEARS } from '../../../../../shared/utils/date';
-import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 const PAY = 'table-column-muted';
+const STICKY_END = 'table-column-sticky-end';
 const DEFAULT_CURRENCY = '£';
+const HEADER_TOP_DESKTOP = 90;
+const HEADER_TOP_MOBILE = 136;
 
 interface TimesheetRow extends Timesheet {
   bookedHoursInfoTitle?: string;
@@ -54,7 +60,16 @@ const TIMESHEET_COLUMNS: TableColumn[] = [
   { title: 'LMB\n(£)', field_value: 'lastMinutBonus', sort: true, type: 'price', decimal_number: true, min_width: 52, header_class: PAY, class: PAY },
   { title: 'DRIVING\n(£)', field_value: 'drivingBonus', sort: true, type: 'price', decimal_number: true, min_width: 64, header_class: PAY, class: PAY },
   { title: 'ADJ\n(£)', field_value: 'adjustment', sort: true, type: 'template', min_width: 52, header_class: PAY, class: PAY },
-  { title: 'TOTAL\n(£)', field_value: 'pay', sort: true, type: 'price', decimal_number: true, min_width: 58, header_class: PAY, class: PAY },
+  {
+    title: 'TOTAL\n(£)',
+    field_value: 'pay',
+    sort: true,
+    type: 'price',
+    decimal_number: true,
+    min_width: 58,
+    header_class: `${PAY} ${STICKY_END}`,
+    class: `${PAY} ${STICKY_END}`
+  },
 ];
 
 const TIMESHEET_TABLE_MIN_WIDTH = TIMESHEET_COLUMNS.reduce((sum, col) => sum + (col.min_width ?? 0), 0);
@@ -108,13 +123,16 @@ const mapTimesheetRow = (item: Timesheet, currency: string): TimesheetRow => {
 
 @Component({
   selector: 'app-crew-timesheets',
-  imports: [ TableComponent, Select2Module, FormsModule, NgbTooltipModule, CommonModule ],
+  imports: [ TableComponent, Select2Module, FormsModule, ReactiveFormsModule, NgbTooltipModule, CommonModule ],
   templateUrl: './crew-timesheets.component.html',
   styleUrl: './crew-timesheets.component.scss'
 })
 export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnInit {
   private _dr: DestroyRef = inject(DestroyRef);
   private _fb: FormBuilder = inject(FormBuilder);
+  private tableWrapper = viewChild<ElementRef<HTMLElement>>('tableWrapper');
+  private fixedHeader = viewChild<ElementRef<HTMLElement>>('fixedHeader');
+  private syncingScroll = false;
 
   crewDetail = input<CrewDetail>();
 
@@ -125,6 +143,12 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
   months = signal<Select2Option[]>(MONTHS);
   timesheetTableMinWidth = TIMESHEET_TABLE_MIN_WIDTH;
   currency = signal(DEFAULT_CURRENCY);
+
+  isHeaderStuck = signal(false);
+  headerTop = signal(HEADER_TOP_DESKTOP);
+  headerLeft = signal(0);
+  headerWidth = signal(0);
+  columnWidths = signal<number[]>([]);
 
   tableConfig: WritableSignal<TableConfigs> = signal(
     {
@@ -172,6 +196,78 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
     }
   }
 
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onViewportChange(): void {
+    this.updateStickyHeader();
+  }
+
+  onTableHScroll(event: Event): void {
+    this.syncHorizontalScroll((event.target as HTMLElement).scrollLeft, 'wrapper');
+  }
+
+  onFixedHeaderScroll(event: Event): void {
+    this.syncHorizontalScroll((event.target as HTMLElement).scrollLeft, 'fixed');
+  }
+
+  private syncHorizontalScroll(scrollLeft: number, source: 'wrapper' | 'fixed'): void {
+    if (this.syncingScroll) {
+      return;
+    }
+
+    this.syncingScroll = true;
+    if (source === 'wrapper') {
+      const fixed = this.fixedHeader()?.nativeElement;
+      if (fixed) {
+        fixed.scrollLeft = scrollLeft;
+      }
+    } else {
+      const wrapper = this.tableWrapper()?.nativeElement;
+      if (wrapper) {
+        wrapper.scrollLeft = scrollLeft;
+      }
+    }
+    this.syncingScroll = false;
+  }
+
+  private updateStickyHeader(): void {
+    const wrapper = this.tableWrapper()?.nativeElement;
+    if (!wrapper) {
+      this.isHeaderStuck.set(false);
+      return;
+    }
+
+    const table = wrapper.querySelector('table');
+    const thead = table?.querySelector('thead');
+    if (!table || !thead) {
+      this.isHeaderStuck.set(false);
+      return;
+    }
+
+    const top = window.innerWidth <= 999 ? HEADER_TOP_MOBILE : HEADER_TOP_DESKTOP;
+    const tableRect = table.getBoundingClientRect();
+    const theadRect = thead.getBoundingClientRect();
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const stuck =
+      tableRect.top < top &&
+      tableRect.bottom > top + theadRect.height;
+
+    this.headerTop.set(top);
+    this.headerLeft.set(wrapperRect.left);
+    this.headerWidth.set(wrapperRect.width);
+    this.columnWidths.set(
+      Array.from(thead.querySelectorAll('th')).map(th => th.getBoundingClientRect().width)
+    );
+    this.isHeaderStuck.set(stuck);
+
+    queueMicrotask(() => {
+      const fixed = this.fixedHeader()?.nativeElement;
+      if (fixed) {
+        fixed.scrollLeft = wrapper.scrollLeft;
+      }
+    });
+  }
+
   getTimesheets(crewDetail: CrewDetail) {
     this.loading.set(true);
     const { crewId } = crewDetail;
@@ -202,6 +298,8 @@ export class CrewTimesheetsComponent extends ApiBase implements OnChanges, OnIni
             columns: withCurrencyTitles(TIMESHEET_COLUMNS, currency),
             data: res.data.map(item => mapTimesheetRow(item, currency))
           }));
+
+          queueMicrotask(() => this.updateStickyHeader());
         }
       })
   }
