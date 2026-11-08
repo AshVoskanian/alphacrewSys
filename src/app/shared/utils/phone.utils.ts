@@ -92,3 +92,34 @@ export function parseStoredPhone(value: string): { country: CountryCode; nationa
     national: parsed.nationalNumber
   };
 }
+
+export function findCountryByDialLabel(dial: string): PhoneCountryOption | undefined {
+  const normalized = dial.trim().replace(/\s/g, '');
+  if (!normalized) {
+    return undefined;
+  }
+
+  const withPlus = normalized.startsWith('+') ? normalized : `+${normalized}`;
+  return PHONE_COUNTRIES.find((c) => c.label === withPlus);
+}
+
+/** Builds a form phone value from dial code (+44) and national number. */
+export function buildPhoneFromDialAndNational(dial: string, national: string): string | null {
+  const nationalTrim = national.trim();
+  const dialTrim = dial.trim();
+  if (!nationalTrim) {
+    return null;
+  }
+
+  const country = findCountryByDialLabel(dialTrim);
+  if (country) {
+    return formatPhoneE164(nationalTrim, country.iso2) ?? `${country.label}${nationalTrim}`;
+  }
+
+  if (!dialTrim) {
+    return nationalTrim;
+  }
+
+  const withPlus = dialTrim.startsWith('+') ? dialTrim : `+${dialTrim}`;
+  return `${withPlus}${nationalTrim}`;
+}

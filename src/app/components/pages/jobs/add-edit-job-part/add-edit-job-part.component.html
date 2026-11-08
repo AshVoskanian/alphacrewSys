@@ -249,10 +249,10 @@
     </div>
 
     <!-- Onsite contact group -->
-    <div class="onsite-contact-group m-b-20">
+    <div class="onsite-contact-group m-b-20" (paste)="onOnsiteContactPaste($event)">
       <div class="onsite-contact-group__title">Onsite contact</div>
-      <div class="row g-3">
-        <div class="col-12 col-md-4">
+      <div class="onsite-contact-fields">
+        <div class="onsite-contact-field">
           <label class="form-label" for="onsiteContact">Name:</label>
           <input
             id="onsiteContact"
@@ -266,14 +266,16 @@
             <div class="text-danger f-12 m-t-4">Name must be at most 200 characters</div>
           }
         </div>
-        <div class="col-12 col-md-4">
+
+        <div class="onsite-contact-field">
           <label class="form-label" for="onsitePhone">Phone:</label>
           <div class="onsite-phone-row">
             <app-phone-input #onsitePhoneInput id="onsitePhone" formControlName="onsitePhone"></app-phone-input>
             <button
               type="button"
               class="onsite-phone-copy"
-              title="Copy phone number"
+              ngbTooltip="Copy phone number with country code"
+              placement="top"
               [disabled]="!form.get('onsitePhone')?.value"
               (click)="copyOnsitePhone()">
               <i class="fa-solid fa-copy txt-secondary"></i>
@@ -283,16 +285,28 @@
             <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
           }
         </div>
-        <div class="col-12 col-md-4">
+
+        <div class="onsite-contact-field onsite-contact-field--email">
           <label class="form-label" for="onsiteEmail">Email:</label>
-          <input
-            id="onsiteEmail"
-            type="email"
-            class="form-control"
-            formControlName="onsiteEmail"
-            [class.is-invalid]="form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.invalid"
-            maxlength="254"
-            autocomplete="email">
+          <div class="onsite-email-row">
+            <input
+              id="onsiteEmail"
+              type="email"
+              class="form-control"
+              formControlName="onsiteEmail"
+              [class.is-invalid]="form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.invalid"
+              maxlength="254"
+              autocomplete="email">
+            <button
+              type="button"
+              class="onsite-phone-copy"
+              ngbTooltip="Copy name, phone and email"
+              placement="top"
+              [disabled]="!canCopyOnsiteContact()"
+              (click)="copyOnsiteContact()">
+              <i class="fa-solid fa-copy txt-secondary"></i>
+            </button>
+          </div>
           @if (form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.errors?.['email']) {
             <div class="text-danger f-12 m-t-4">Enter a valid email address</div>
           }

@@ -153,7 +153,7 @@ export class PhoneInputComponent implements ControlValueAccessor, Validator {
 
   /** Full number for clipboard: E.164 when valid, otherwise dial code + national. */
   getValueForCopy(): string {
-    const national = this.nationalNumber().trim();
+    const { dial, national } = this.getPartsForCopy();
     if (!national) {
       return '';
     }
@@ -163,8 +163,14 @@ export class PhoneInputComponent implements ControlValueAccessor, Validator {
       return e164;
     }
 
-    const dial = this.selectedCountry()?.label ?? '';
     return `${dial}${national}`;
+  }
+
+  getPartsForCopy(): { dial: string; national: string } {
+    return {
+      dial: this.selectedCountry()?.label ?? '',
+      national: this.nationalNumber().trim()
+    };
   }
 
   private emitValue(): void {

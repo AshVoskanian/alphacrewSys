@@ -35,6 +35,94 @@ import type { ChipCountItem, ChipCountOption } from '../../../../shared/componen
 import { NumericInputDirective } from '../../../../shared/directives/numeric-input.directive';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { PhoneInputComponent } from '../../../../shared/components/ui/phone-input/phone-input.component';
+import {
+  buildPhoneFromDialAndNational,
+  getPhoneCountry,
+  parseStoredPhone
+} from '../../../../shared/utils/phone.utils';
+
+interface OnsiteContactClipboardParts {
+  name: string;
+  dial: string;
+  national: string;
+  email: string;
+}
+
+const DIAL_CODE_PATTERN = /^\+\d{1,4}$/;
+const NATIONAL_PATTERN = /^\d[\d\s-]*$/;
+
+const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts | null => {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (!trimmed.includes(';')) {
+    if (trimmed.includes('@')) {
+      return { name: '', dial: '', national: '', email: trimmed };
+    }
+
+    const parsedPhone = parseStoredPhone(trimmed);
+    if (parsedPhone) {
+      return {
+        name: '',
+        dial: getPhoneCountry(parsedPhone.country)?.label ?? '',
+        national: parsedPhone.national,
+        email: ''
+      };
+    }
+
+    if (NATIONAL_PATTERN.test(trimmed) || DIAL_CODE_PATTERN.test(trimmed)) {
+      return null;
+    }
+
+    return { name: trimmed, dial: '', national: '', email: '' };
+  }
+
+  const parts = trimmed.split(';').map(part => part.trim()).filter(part => part.length > 0);
+  if (!parts.length) {
+    return null;
+  }
+
+  let name = '';
+  let dial = '';
+  let national = '';
+  let email = '';
+
+  for (const part of parts) {
+    if (!email && part.includes('@')) {
+      email = part;
+      continue;
+    }
+
+    if (!dial && DIAL_CODE_PATTERN.test(part)) {
+      dial = part;
+      continue;
+    }
+
+    const parsedPhone = parseStoredPhone(part);
+    if (!national && parsedPhone && part.startsWith('+') && part.length > 5) {
+      dial = getPhoneCountry(parsedPhone.country)?.label ?? dial;
+      national = parsedPhone.national;
+      continue;
+    }
+
+    if (!national && NATIONAL_PATTERN.test(part)) {
+      national = part.replace(/[\s-]/g, '');
+      continue;
+    }
+
+    if (!name) {
+      name = part;
+    }
+  }
+
+  if (!name && !dial && !national && !email) {
+    return null;
+  }
+
+  return { name, dial, national, email };
+};
 
 @Component({
   selector: 'app-add-edit-job-part',
@@ -797,6 +885,99 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
     this._clipboard.copy(phone);
     GeneralService.showSuccessMessage('Copied to clipboard');
+  }
+
+  canCopyOnsiteContact(): boolean {
+    const name = (this.form.get('onsiteContact')?.value ?? '').toString().trim();
+    const email = (this.form.get('onsiteEmail')?.value ?? '').toString().trim();
+    const phoneParts = this.onsitePhoneInput()?.getPartsForCopy();
+    const hasPhone = !!(phoneParts?.national || this.form.get('onsitePhone')?.value);
+    return !!(name || email || hasPhone);
+  }
+
+  copyOnsiteContact(): void {
+    if (!this.canCopyOnsiteContact()) {
+      return;
+    }
+
+    const name = (this.form.get('onsiteContact')?.value ?? '').toString().trim();
+    const email = (this.form.get('onsiteEmail')?.value ?? '').toString().trim();
+    const phoneParts = this.onsitePhoneInput()?.getPartsForCopy() ?? { dial: '', national: '' };
+    const hasPhone = !!phoneParts.national;
+    const parts: string[] = [];
+
+    if (name) {
+      parts.push(name);
+    }
+
+    if (hasPhone) {
+      if (!name && !email) {
+        const phoneOnly =
+          this.onsitePhoneInput()?.getValueForCopy() ||
+          this.form.get('onsitePhone')?.value ||
+          '';
+        if (!phoneOnly) {
+          return;
+        }
+        this._clipboard.copy(phoneOnly);
+        GeneralService.showSuccessMessage('Copied to clipboard');
+        return;
+      }
+
+      if (phoneParts.dial) {
+        parts.push(phoneParts.dial);
+      }
+      parts.push(phoneParts.national);
+    }
+
+    if (email) {
+      parts.push(email);
+    }
+
+    if (!parts.length) {
+      return;
+    }
+
+    this._clipboard.copy(parts.join('; '));
+    GeneralService.showSuccessMessage('Copied to clipboard');
+  }
+
+  onOnsiteContactPaste(event: ClipboardEvent): void {
+    const text = event.clipboardData?.getData('text')?.trim() ?? '';
+    const parsed = parseOnsiteContactClipboard(text);
+    if (!parsed) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const patch: {
+      onsiteContact?: string;
+      onsiteEmail?: string;
+      onsitePhone?: string | null;
+    } = {};
+
+    if (parsed.name) {
+      patch.onsiteContact = parsed.name;
+    }
+    if (parsed.email) {
+      patch.onsiteEmail = parsed.email;
+    }
+    if (parsed.national) {
+      patch.onsitePhone = buildPhoneFromDialAndNational(parsed.dial, parsed.national);
+    }
+
+    this.form.patchValue(patch);
+    if (patch.onsiteContact !== undefined) {
+      this.form.get('onsiteContact')?.markAsDirty();
+    }
+    if (patch.onsiteEmail !== undefined) {
+      this.form.get('onsiteEmail')?.markAsDirty();
+    }
+    if (patch.onsitePhone !== undefined) {
+      this.form.get('onsitePhone')?.markAsDirty();
+    }
   }
 
   submit(): void {

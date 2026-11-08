@@ -124,44 +124,55 @@
   }
 }
 
-.onsite-phone-row {
+.onsite-phone-row,
+.onsite-email-row {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   gap: 4px;
 
-  app-phone-input {
+  app-phone-input,
+  .form-control {
     flex: 1 1 auto;
     min-width: 0;
   }
+}
 
-  .onsite-phone-copy {
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--bs-border-color, #ced4da);
-    border-radius: var(--bs-border-radius, 0.375rem);
-    background-color: #fff;
-    color: inherit;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+:host .onsite-phone-copy {
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 36px;
+  width: 36px;
+  min-width: 36px;
+  max-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bs-border-color, #ced4da);
+  border-radius: var(--bs-border-radius, 0.375rem);
+  background-color: #fff;
+  color: inherit;
+  line-height: 1;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 
-    &:hover:not(:disabled) {
-      background-color: rgba(0, 0, 0, 0.03);
-    }
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
 
-    &:focus-visible {
-      outline: none;
-      border-color: var(--bs-primary, #7366ff);
-      box-shadow: 0 0 0 0.2rem rgba(115, 102, 255, 0.15);
-    }
+  &:focus-visible {
+    outline: none;
+    border-color: var(--bs-primary, #7366ff);
+    box-shadow: 0 0 0 0.2rem rgba(115, 102, 255, 0.15);
+  }
 
-    &:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
   }
 }
 
@@ -180,6 +191,18 @@
     color: #6c757d;
     margin-bottom: 10px;
   }
+}
+
+.onsite-contact-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.onsite-contact-field {
+  flex: 1 1 180px;
+  min-width: 0;
 }
 
 // Total amount - visually separated box
