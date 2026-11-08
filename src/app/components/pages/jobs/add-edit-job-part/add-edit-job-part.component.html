@@ -267,6 +267,23 @@
           }
         </div>
         <div class="col-12 col-md-4">
+          <label class="form-label" for="onsitePhone">Phone:</label>
+          <div class="onsite-phone-row">
+            <app-phone-input #onsitePhoneInput id="onsitePhone" formControlName="onsitePhone"></app-phone-input>
+            <button
+              type="button"
+              class="onsite-phone-copy"
+              title="Copy phone number"
+              [disabled]="!form.get('onsitePhone')?.value"
+              (click)="copyOnsitePhone()">
+              <i class="fa-solid fa-copy txt-secondary"></i>
+            </button>
+          </div>
+          @if (form.get('onsitePhone')?.touched && form.get('onsitePhone')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+          }
+        </div>
+        <div class="col-12 col-md-4">
           <label class="form-label" for="onsiteEmail">Email:</label>
           <input
             id="onsiteEmail"
@@ -281,13 +298,6 @@
           }
           @if (form.get('onsiteEmail')?.touched && form.get('onsiteEmail')?.errors?.['maxlength']) {
             <div class="text-danger f-12 m-t-4">Email must be at most 254 characters</div>
-          }
-        </div>
-        <div class="col-12 col-md-4">
-          <label class="form-label" for="onsitePhone">Phone:</label>
-          <app-phone-input id="onsitePhone" formControlName="onsitePhone"></app-phone-input>
-          @if (form.get('onsitePhone')?.touched && form.get('onsitePhone')?.errors?.['phoneInvalid']) {
-            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
           }
         </div>
       </div>

@@ -151,6 +151,22 @@ export class PhoneInputComponent implements ControlValueAccessor, Validator {
     this.onTouched();
   }
 
+  /** Full number for clipboard: E.164 when valid, otherwise dial code + national. */
+  getValueForCopy(): string {
+    const national = this.nationalNumber().trim();
+    if (!national) {
+      return '';
+    }
+
+    const e164 = formatPhoneE164(national, this.country());
+    if (e164) {
+      return e164;
+    }
+
+    const dial = this.selectedCountry()?.label ?? '';
+    return `${dial}${national}`;
+  }
+
   private emitValue(): void {
     const national = this.nationalNumber().trim();
     if (!national) {

@@ -11,6 +11,7 @@ import {
   OnInit,
   output,
   signal,
+  viewChild,
   WritableSignal
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,6 +19,7 @@ import { Select2Module, Select2Option } from 'ng-select2-component';
 import { NgbAccordionModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { Clipboard } from '@angular/cdk/clipboard';
 import { GeneralService } from '../../../../shared/services/general.service';
 import { ApiBase } from '../../../../shared/bases/api-base';
 import {
@@ -56,6 +58,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _dr = inject(DestroyRef);
   private readonly _injector = inject(Injector);
   private readonly _currency = inject(CurrencyPipe);
+  private readonly _clipboard = inject(Clipboard);
+  private readonly onsitePhoneInput = viewChild<PhoneInputComponent>('onsitePhoneInput');
 
   jobId = input<number>();
   jobRegionId = input<number>();
@@ -780,6 +784,19 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       onsiteEmail: v.onsiteEmail ?? '',
       onsitePhone: v.onsitePhone ?? ''
     };
+  }
+
+  copyOnsitePhone(): void {
+    const phone =
+      this.onsitePhoneInput()?.getValueForCopy() ||
+      this.form.get('onsitePhone')?.value;
+
+    if (!phone) {
+      return;
+    }
+
+    this._clipboard.copy(phone);
+    GeneralService.showSuccessMessage('Copied to clipboard');
   }
 
   submit(): void {
