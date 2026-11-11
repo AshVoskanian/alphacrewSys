@@ -28,6 +28,7 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
   private readonly _regionsService = inject(RegionsService);
 
   loading = signal(false);
+  sending = signal(false);
   regionId = signal(0);
   commsDate = signal(this.toDateInputValue(new Date()));
   rows = signal<DaySmsRow[]>([]);
@@ -91,13 +92,63 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
     return this.hasPhoneNumber(row) && status !== 'sent';
   }
 
+  statusClass(status?: string): string {
+    const normalized = (status ?? '').trim().toLowerCase();
+    if (normalized === 'sent') {
+      return 'badge-light-success';
+    }
+    if (normalized.startsWith('pending')) {
+      return 'badge-light-warning';
+    }
+    if (normalized === 'not sent') {
+      return 'badge-light-danger';
+    }
+    return '';
+  }
+
   private hasPhoneNumber(row: DaySmsRow): boolean {
     return [ row.primaryContact, row.secondaryContact ]
       .some((value) => /\d/.test((value ?? '').trim()));
   }
 
   sendSelected(): void {
-    // Send service is not available yet.
+    const selectedRows = this.rows().filter((row) => row.selected && this.isRowSelectable(row));
+    if (!selectedRows.length || this.sending()) {
+      return;
+    }
+
+    const payload: DashboardDaySms[] = selectedRows.map((row) => ({
+      jobId: row.jobId,
+      jobPartId: row.jobPartId,
+      status: row.status ?? '',
+      client: row.client ?? '',
+      onsiteContact: row.onsiteContact ?? '',
+      primaryContact: row.primaryContact ?? '',
+      secondaryContact: row.secondaryContact ?? '',
+      sms: row.sms ?? '',
+    }));
+
+    this.sending.set(true);
+
+    this.post('Dashboard/AddDaySmsInClienCommunication', payload)
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => this.sending.set(false))
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          GeneralService.showSuccessMessage('SMS sent successfully');
+          this.loadDaySms();
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Failed to send SMS');
+        },
+      });
   }
 
   private loadDaySms(): void {
@@ -129,6 +180,7 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
             (res.data ?? []).map((item, index) => ({
               rowId: index + 1,
               jobId: item.jobId,
+              jobPartId: item.jobPartId,
               client: item.client ?? '',
               onsiteContact: item.onsiteContact ?? '',
               primaryContact: item.primaryContact ?? '',

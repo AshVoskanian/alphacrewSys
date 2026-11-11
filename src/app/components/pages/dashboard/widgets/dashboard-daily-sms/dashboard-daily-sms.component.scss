@@ -131,7 +131,8 @@
 .daily-sms-status {
   display: inline-flex;
   align-items: center;
-  max-width: 140px;
+  justify-content: center;
+  width: 5.5rem;
   padding: 1px 8px;
   border-radius: 999px;
   border: 1px solid #c9d4e2;
@@ -142,6 +143,24 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &.badge-light-warning {
+    color: #ffb829;
+    background: #fff7e5;
+    border-color: #ffb829;
+  }
+
+  &.badge-light-danger {
+    color: #fc564a;
+    background: #ffe8e6;
+    border-color: #fc564a;
+  }
+
+  &.badge-light-success {
+    color: #65c15c;
+    background: #dcf1da;
+    border-color: #65c15c;
+  }
 }
 
 .daily-sms-summary-label {

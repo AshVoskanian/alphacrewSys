@@ -118,12 +118,12 @@ export interface DashboardLockTimeSheetsRequest {
 
 export interface DashboardDaySms {
   jobId: number;
+  jobPartId: number;
   client: string;
   onsiteContact: string;
   primaryContact: string;
   secondaryContact: string;
   sms: string;
-  /** Coming from backend soon. */
   status?: string;
 }
 

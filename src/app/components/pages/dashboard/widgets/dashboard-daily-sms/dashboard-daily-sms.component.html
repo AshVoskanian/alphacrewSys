@@ -52,9 +52,12 @@
         <button
           type="button"
           class="btn btn-primary h-36"
-          [disabled]="loading() || !someSelected()"
+          [disabled]="loading() || sending() || !someSelected()"
           (click)="sendSelected()"
         >
+          @if (sending()) {
+            <i class="fa-solid fa-spinner fa-spin m-r-5" aria-hidden="true"></i>
+          }
           Send
           @if (selectedCount()) {
             ({{ selectedCount() }})
@@ -105,8 +108,7 @@
                       <span class="daily-sms-summary-value">{{ row.secondaryContact || '—' }}</span>
                     </span>
                     <span class="daily-sms-summary-item daily-sms-summary-item--status">
-                      <span class="daily-sms-summary-label">Status</span>
-                      <span class="daily-sms-status">{{ row.status || '—' }}</span>
+                      <span class="daily-sms-status {{ statusClass(row.status) }}">{{ row.status || '—' }}</span>
                     </span>
                   </span>
                 </button>
