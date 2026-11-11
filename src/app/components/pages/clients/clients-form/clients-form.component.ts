@@ -12,7 +12,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { Select2Module, Select2Option } from "ng-select2-component";
 import { ApiBase } from "../../../../shared/bases/api-base";
 import { GeneralService } from "../../../../shared/services/general.service";
@@ -96,7 +96,7 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         companyName: [ null, [ Validators.required ] ],
         contactName: [ null, [ Validators.required ] ],
         phoneNumber: [ null, [ Validators.required ] ],
-        emailAddress: [ null, [ Validators.email, Validators.required ] ],
+        emailAddress: [ null, [ Validators.required, this.emailOrDotValidator ] ],
         rateCardId: [ 14, [ Validators.required ] ],
         accountTypeId: [ 1, [ Validators.required ] ],
         creditLimit: [ null, [ Validators.required ] ],
@@ -144,7 +144,7 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         requiresPO: clientDetails.requiresPO,
         address: clientDetails.address,
         postcode: clientDetails.postcode,
-        accountOpenDate: clientDetails.accountOpenDate,
+        accountOpenDate: this.toDateInputValue(clientDetails.accountOpenDate),
         isActive: clientDetails.isActive,
       },
       accountancy: {
@@ -201,6 +201,66 @@ export class ClientsFormComponent extends ApiBase implements OnInit, OnChanges, 
         }
       }
     })
+  }
+
+  private readonly emailOrDotValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const value = String(control.value ?? '').trim();
+    if (!value || value === '.') {
+      return null;
+    }
+
+    return Validators.email(control);
+  };
+
+  private toDateInputValue(value: string | number | null | undefined): string | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    if (typeof value === 'number' || /^\d+$/.test(String(value).trim())) {
+      let timestamp = Number(value);
+      if (!Number.isFinite(timestamp)) {
+        return null;
+      }
+      // Seconds → milliseconds
+      if (timestamp > 0 && timestamp < 1e12) {
+        timestamp *= 1000;
+      }
+      const date = new Date(timestamp);
+      return Number.isNaN(date.getTime()) ? null : this.formatDateInput(date);
+    }
+
+    const raw = String(value).trim();
+    const slashMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+    if (slashMatch) {
+      const day = Number(slashMatch[1]);
+      const month = Number(slashMatch[2]);
+      let year = Number(slashMatch[3]);
+      if (slashMatch[3].length === 2) {
+        year += year >= 70 ? 1900 : 2000;
+      }
+
+      const date = new Date(year, month - 1, day);
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        return null;
+      }
+
+      return this.formatDateInput(date);
+    }
+
+    const parsed = new Date(raw);
+    return Number.isNaN(parsed.getTime()) ? null : this.formatDateInput(parsed);
+  }
+
+  private formatDateInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   submit() {

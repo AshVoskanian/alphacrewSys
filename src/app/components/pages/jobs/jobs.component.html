@@ -9,6 +9,18 @@
                 [headerBtnText]="'Add New Job'"
                 (headerBtnAction)="addNewClient(addJob)"
                 [cardBodyClass]="'common-option'">
+        @if (totalCount()) {
+          <div class="jobs-header-pagination" header5>
+            <pagination-controls
+              (pageChange)="pageChanged($event)"
+              (pageBoundsCorrection)="pageChanged($event)"
+              [maxSize]="9"
+              [directionLinks]="true"
+              [responsive]="true">
+            </pagination-controls>
+          </div>
+        }
+
         @if (loading()) {
           <div class="h-300 w-100 flex items-center justify-content-center">
             <p class="text-primary f-24">Loading...</p>

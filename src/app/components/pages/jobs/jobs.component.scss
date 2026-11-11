@@ -1,3 +1,19 @@
+:host ::ng-deep {
+  .card-header {
+    gap: 12px;
+  }
+
+  .jobs-header-pagination {
+    margin-left: auto;
+    margin-right: 4px;
+
+    .ngx-pagination {
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
+
 .job-id-cell {
   display: inline-flex;
   align-items: stretch;

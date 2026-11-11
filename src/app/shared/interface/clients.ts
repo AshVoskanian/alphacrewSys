@@ -26,7 +26,7 @@ export interface ClientDetails {
   contactName: string;
   contactFirstName: string | null;
 
-  accountOpenDate: string | null;
+  accountOpenDate: string | number | null;
 
   contactAccountsFirstName: string | null;
   contactAccountsFullName: string | null;
