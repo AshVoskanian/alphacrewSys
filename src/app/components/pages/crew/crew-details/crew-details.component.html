@@ -86,7 +86,10 @@
           <li [ngbNavItem]="'documents'">
             <a class="nav-link" ngbNavLink><i class="fa-solid fa-file-lines"></i>Documents</a>
             <ng-template ngbNavContent>
-              <app-crew-documents [crewDetail]="crewDetails()"></app-crew-documents>
+              <app-crew-documents
+                [crewDetail]="crewDetails()"
+                (refreshDetails)="getDetails(false)">
+              </app-crew-documents>
             </ng-template>
           </li>
           <li [ngbNavItem]="'feedback'">

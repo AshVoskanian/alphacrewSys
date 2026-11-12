@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
-import { finalize } from "rxjs";
+import { finalize, take } from "rxjs";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { LayoutService } from "../../../../shared/services/layout.service";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -74,16 +74,25 @@ export class CrewDetailsComponent extends ApiBase implements OnInit, OnDestroy {
     this.getCrewAvatar();
   }
 
-  getDetails() {
-    this.layoutService.loading = true;
+  getDetails(showLoader = true) {
+    if (showLoader) {
+      this.layoutService.loading = true;
+    }
 
-    this._route.paramMap.pipe(takeUntilDestroyed(this._dr))
+    this._route.paramMap.pipe(
+      take(1),
+      takeUntilDestroyed(this._dr)
+    )
       .subscribe({
         next: params => {
           this.get<CrewDetail>(`Crew/GetCrewByCrewId?crewId=${ +params.get('id') }`)
             .pipe(
               takeUntilDestroyed(this._dr),
-              finalize(() => this.layoutService.loading = false)
+              finalize(() => {
+                if (showLoader) {
+                  this.layoutService.loading = false;
+                }
+              })
             )
             .subscribe({
               next: res => {

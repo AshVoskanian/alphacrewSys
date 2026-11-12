@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
   TemplateRef,
   ViewChild,
@@ -50,6 +51,7 @@ export class CrewDocumentsComponent extends ApiBase {
   @ViewChild('editDocument') editDocument: TemplateRef<unknown>;
 
   crewDetail = input<CrewDetail>();
+  refreshDetails = output<void>();
 
   loading = signal<boolean>(false);
   modalLoading = signal<boolean>(false);
@@ -201,6 +203,7 @@ export class CrewDocumentsComponent extends ApiBase {
             GeneralService.showErrorMessage(res.errors.message);
             return;
           }
+          this.refreshDetails.emit();
           GeneralService.showSuccessMessage('Comment saved');
         },
         error: () => {
