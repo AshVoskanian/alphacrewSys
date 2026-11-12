@@ -1026,7 +1026,8 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           schedule.editedBy !== status.editedBy ||
           schedule.onsiteContact !== status.onsiteContact ||
           schedule.onsiteEmail !== status.onsiteEmail ||
-          schedule.onsitePhone !== status.onsitePhone
+          schedule.onsitePhone !== status.onsitePhone ||
+          schedule.onsitePhoneSecondary !== status.onsitePhoneSecondary
         );
 
         return {
@@ -1038,6 +1039,7 @@ export class ScheduleListComponent extends ApiBase implements OnInit, AfterViewI
           onsiteContact: status.onsiteContact,
           onsiteEmail: status.onsiteEmail,
           onsitePhone: status.onsitePhone,
+          onsitePhoneSecondary: status.onsitePhoneSecondary,
           changed,
         };
       });

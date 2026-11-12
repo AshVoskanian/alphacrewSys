@@ -9,6 +9,13 @@ import { GeneralService } from '../../../../../shared/services/general.service';
 import { Schedule } from '../../../../../shared/interface/schedule';
 import { PhoneInputComponent } from '../../../../../shared/components/ui/phone-input/phone-input.component';
 
+type OnsiteContactFields = {
+  onsiteContact: string;
+  onsiteEmail: string;
+  onsitePhone: string;
+  onsitePhoneSecondary: string;
+};
+
 @Component({
   selector: 'app-schedule-job-part-onsite-contact',
   standalone: true,
@@ -25,7 +32,12 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
 
   savingOnsiteContact = signal(false);
 
-  private onsiteContactPopoverInitial = { onsiteContact: '', onsiteEmail: '', onsitePhone: '' };
+  private onsiteContactPopoverInitial: OnsiteContactFields = {
+    onsiteContact: '',
+    onsiteEmail: '',
+    onsitePhone: '',
+    onsitePhoneSecondary: ''
+  };
   private onsiteContactPopoverCommitted = false;
   private activeOnsiteContactPopover: NgbPopover | null = null;
   onsiteContactPopoverOpen = signal(false);
@@ -33,7 +45,8 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
   readonly form = this._fb.group({
     onsiteContact: [ '', [ Validators.maxLength(200) ] ],
     onsiteEmail: [ '', [ Validators.email, Validators.maxLength(254) ] ],
-    onsitePhone: [ null as string | null ]
+    onsitePhone: [ null as string | null ],
+    onsitePhoneSecondary: [ null as string | null ]
   });
 
   constructor() {
@@ -53,12 +66,26 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
     return (this.schedule.onsitePhone ?? '').trim();
   }
 
+  get onsitePhoneSecondaryDisplay(): string {
+    return (this.schedule.onsitePhoneSecondary ?? '').trim();
+  }
+
   get hasOnsiteInfo(): boolean {
-    return !!(this.onsiteContactDisplay || this.onsiteEmailDisplay || this.onsitePhoneDisplay);
+    return !!(
+      this.onsiteContactDisplay ||
+      this.onsiteEmailDisplay ||
+      this.onsitePhoneDisplay ||
+      this.onsitePhoneSecondaryDisplay
+    );
   }
 
   get onsiteSummaryDisplay(): string {
-    return [ this.onsiteContactDisplay, this.onsiteEmailDisplay, this.onsitePhoneDisplay ]
+    return [
+      this.onsiteContactDisplay,
+      this.onsiteEmailDisplay,
+      this.onsitePhoneDisplay,
+      this.onsitePhoneSecondaryDisplay
+    ]
       .filter(Boolean)
       .join(' · ');
   }
@@ -67,12 +94,14 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
     this.onsiteContactPopoverInitial = {
       onsiteContact: this.onsiteContactDisplay,
       onsiteEmail: this.onsiteEmailDisplay,
-      onsitePhone: this.onsitePhoneDisplay
+      onsitePhone: this.onsitePhoneDisplay,
+      onsitePhoneSecondary: this.onsitePhoneSecondaryDisplay
     };
     this.form.reset({
       onsiteContact: this.onsiteContactPopoverInitial.onsiteContact,
       onsiteEmail: this.onsiteContactPopoverInitial.onsiteEmail,
-      onsitePhone: this.onsiteContactPopoverInitial.onsitePhone || null
+      onsitePhone: this.onsiteContactPopoverInitial.onsitePhone || null,
+      onsitePhoneSecondary: this.onsiteContactPopoverInitial.onsitePhoneSecondary || null
     }, { emitEvent: false });
     this.onsiteContactPopoverOpen.set(true);
   }
@@ -137,17 +166,19 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
     }
 
     const raw = this.form.getRawValue();
-    const next = {
+    const next: OnsiteContactFields = {
       onsiteContact: (raw.onsiteContact ?? '').trim(),
       onsiteEmail: (raw.onsiteEmail ?? '').trim(),
-      onsitePhone: (raw.onsitePhone ?? '').trim()
+      onsitePhone: (raw.onsitePhone ?? '').trim(),
+      onsitePhoneSecondary: (raw.onsitePhoneSecondary ?? '').trim()
     };
     const initial = this.onsiteContactPopoverInitial;
 
     if (
       next.onsiteContact === initial.onsiteContact &&
       next.onsiteEmail === initial.onsiteEmail &&
-      next.onsitePhone === initial.onsitePhone
+      next.onsitePhone === initial.onsitePhone &&
+      next.onsitePhoneSecondary === initial.onsitePhoneSecondary
     ) {
       this.onsiteContactPopoverCommitted = true;
       popover.close();
@@ -161,7 +192,8 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
       jobPartId,
       onsiteContact: next.onsiteContact,
       onsiteEmail: next.onsiteEmail,
-      onsitePhone: next.onsitePhone
+      onsitePhone: next.onsitePhone,
+      onsitePhoneSecondary: next.onsitePhoneSecondary
     })
       .pipe(
         takeUntilDestroyed(this._dr),
@@ -180,6 +212,7 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
           this.schedule.onsiteContact = next.onsiteContact;
           this.schedule.onsiteEmail = next.onsiteEmail;
           this.schedule.onsitePhone = next.onsitePhone;
+          this.schedule.onsitePhoneSecondary = next.onsitePhoneSecondary;
           this.onsiteContactPopoverCommitted = true;
           GeneralService.showSuccessMessage('Onsite contact saved');
           popover.close();
@@ -190,13 +223,10 @@ export class ScheduleJobPartOnsiteContactComponent extends ApiBase {
       });
   }
 
-  private revertOnsiteContactDisplay(initial: {
-    onsiteContact: string;
-    onsiteEmail: string;
-    onsitePhone: string;
-  }): void {
+  private revertOnsiteContactDisplay(initial: OnsiteContactFields): void {
     this.schedule.onsiteContact = initial.onsiteContact;
     this.schedule.onsiteEmail = initial.onsiteEmail;
     this.schedule.onsitePhone = initial.onsitePhone;
+    this.schedule.onsitePhoneSecondary = initial.onsitePhoneSecondary;
   }
 }

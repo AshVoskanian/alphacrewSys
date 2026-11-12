@@ -70,12 +70,21 @@
         }
       </div>
 
-      <div>
-        <label class="form-label form-label-sm m-b-4" for="onsitePhoneDraft">Phone</label>
-        <app-phone-input id="onsitePhoneDraft" formControlName="onsitePhone"></app-phone-input>
-        @if (form.get('onsitePhone')?.touched && form.get('onsitePhone')?.errors?.['phoneInvalid']) {
-          <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
-        }
+      <div class="job-part-onsite-contact-popover__phones">
+        <div>
+          <label class="form-label form-label-sm m-b-4" for="onsitePhoneDraft">Phone</label>
+          <app-phone-input id="onsitePhoneDraft" formControlName="onsitePhone"></app-phone-input>
+          @if (form.get('onsitePhone')?.touched && form.get('onsitePhone')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+          }
+        </div>
+        <div>
+          <label class="form-label form-label-sm m-b-4" for="onsitePhoneSecondaryDraft">Secondary phone</label>
+          <app-phone-input id="onsitePhoneSecondaryDraft" formControlName="onsitePhoneSecondary"></app-phone-input>
+          @if (form.get('onsitePhoneSecondary')?.touched && form.get('onsitePhoneSecondary')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+          }
+        </div>
       </div>
     </div>
 

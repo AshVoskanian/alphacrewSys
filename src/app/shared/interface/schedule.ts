@@ -43,6 +43,7 @@ export interface Schedule {
   onsiteContact: string;
   onsiteEmail: string;
   onsitePhone: string;
+  onsitePhoneSecondary: string;
   postCode: string | null;
   startDate: string;
   endDate: string;
@@ -355,6 +356,7 @@ export interface JobMessageStatus {
   onsiteContact: string;
   onsiteEmail: string;
   onsitePhone: string;
+  onsitePhoneSecondary: string;
   lastModified: string;
   editedBy: string;
 }
