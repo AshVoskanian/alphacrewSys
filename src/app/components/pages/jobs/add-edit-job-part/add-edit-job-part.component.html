@@ -250,10 +250,9 @@
 
     <!-- Onsite contact group -->
     <div class="onsite-contact-group m-b-20" (paste)="onOnsiteContactPaste($event)">
-      <div class="onsite-contact-group__title">Onsite contact</div>
       <div class="onsite-contact-fields">
-        <div class="onsite-contact-field">
-          <label class="form-label" for="onsiteContact">Name:</label>
+        <div class="onsite-contact-field onsite-contact-field--narrow">
+          <label class="form-label" for="onsiteContact">Onsite Contact:</label>
           <input
             id="onsiteContact"
             type="text"
@@ -286,7 +285,30 @@
           }
         </div>
 
-        <div class="onsite-contact-field onsite-contact-field--email">
+        <div class="onsite-contact-field">
+          <label class="form-label" for="onsitePhoneSecondary">Secondary Phone:</label>
+          <div class="onsite-phone-row">
+            <app-phone-input
+              #onsitePhoneSecondaryInput
+              id="onsitePhoneSecondary"
+              formControlName="onsitePhoneSecondary">
+            </app-phone-input>
+            <button
+              type="button"
+              class="onsite-phone-copy"
+              ngbTooltip="Copy secondary phone number with country code"
+              placement="top"
+              [disabled]="!form.get('onsitePhoneSecondary')?.value"
+              (click)="copyOnsitePhoneSecondary()">
+              <i class="fa-solid fa-copy txt-secondary"></i>
+            </button>
+          </div>
+          @if (form.get('onsitePhoneSecondary')?.touched && form.get('onsitePhoneSecondary')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid secondary phone number for the selected prefix</div>
+          }
+        </div>
+
+        <div class="onsite-contact-field onsite-contact-field--narrow">
           <label class="form-label" for="onsiteEmail">Email:</label>
           <div class="onsite-email-row">
             <input

@@ -270,6 +270,7 @@ export interface AddOrUpdateJobPartRequest {
   onsiteContact: string;
   onsiteEmail: string;
   onsitePhone: string;
+  onsitePhoneSecondary: string;
   editedBy?: string;
   lastModified?: string;
   updateHistory?: string;
@@ -330,6 +331,7 @@ export interface JobPartDetailsResponse {
   onsiteContact: string;
   onsiteEmail: string;
   onsitePhone: string;
+  onsitePhoneSecondary: string;
   editedBy?: string;
   lastModified?: string;
   updateHistory?: string;

@@ -45,11 +45,22 @@ interface OnsiteContactClipboardParts {
   name: string;
   dial: string;
   national: string;
+  dialSecondary: string;
+  nationalSecondary: string;
   email: string;
 }
 
 const DIAL_CODE_PATTERN = /^\+\d{1,4}$/;
 const NATIONAL_PATTERN = /^\d[\d\s-]*$/;
+
+const emptyOnsiteContactClipboardParts = (): OnsiteContactClipboardParts => ({
+  name: '',
+  dial: '',
+  national: '',
+  dialSecondary: '',
+  nationalSecondary: '',
+  email: ''
+});
 
 const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts | null => {
   const trimmed = text.trim();
@@ -59,16 +70,15 @@ const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts 
 
   if (!trimmed.includes(';')) {
     if (trimmed.includes('@')) {
-      return { name: '', dial: '', national: '', email: trimmed };
+      return { ...emptyOnsiteContactClipboardParts(), email: trimmed };
     }
 
     const parsedPhone = parseStoredPhone(trimmed);
     if (parsedPhone) {
       return {
-        name: '',
+        ...emptyOnsiteContactClipboardParts(),
         dial: getPhoneCountry(parsedPhone.country)?.label ?? '',
-        national: parsedPhone.national,
-        email: ''
+        national: parsedPhone.national
       };
     }
 
@@ -76,7 +86,7 @@ const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts 
       return null;
     }
 
-    return { name: trimmed, dial: '', national: '', email: '' };
+    return { ...emptyOnsiteContactClipboardParts(), name: trimmed };
   }
 
   const parts = trimmed.split(';').map(part => part.trim()).filter(part => part.length > 0);
@@ -87,6 +97,8 @@ const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts 
   let name = '';
   let dial = '';
   let national = '';
+  let dialSecondary = '';
+  let nationalSecondary = '';
   let email = '';
 
   for (const part of parts) {
@@ -95,20 +107,33 @@ const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts 
       continue;
     }
 
-    if (!dial && DIAL_CODE_PATTERN.test(part)) {
-      dial = part;
+    if (DIAL_CODE_PATTERN.test(part)) {
+      if (!dial && !national) {
+        dial = part;
+      } else if (!dialSecondary) {
+        dialSecondary = part;
+      }
       continue;
     }
 
     const parsedPhone = parseStoredPhone(part);
-    if (!national && parsedPhone && part.startsWith('+') && part.length > 5) {
-      dial = getPhoneCountry(parsedPhone.country)?.label ?? dial;
-      national = parsedPhone.national;
+    if (parsedPhone && part.startsWith('+') && part.length > 5) {
+      if (!national) {
+        dial = getPhoneCountry(parsedPhone.country)?.label ?? dial;
+        national = parsedPhone.national;
+      } else if (!nationalSecondary) {
+        dialSecondary = getPhoneCountry(parsedPhone.country)?.label ?? dialSecondary;
+        nationalSecondary = parsedPhone.national;
+      }
       continue;
     }
 
-    if (!national && NATIONAL_PATTERN.test(part)) {
-      national = part.replace(/[\s-]/g, '');
+    if (NATIONAL_PATTERN.test(part)) {
+      if (!national) {
+        national = part.replace(/[\s-]/g, '');
+      } else if (!nationalSecondary) {
+        nationalSecondary = part.replace(/[\s-]/g, '');
+      }
       continue;
     }
 
@@ -117,11 +142,11 @@ const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts 
     }
   }
 
-  if (!name && !dial && !national && !email) {
+  if (!name && !dial && !national && !dialSecondary && !nationalSecondary && !email) {
     return null;
   }
 
-  return { name, dial, national, email };
+  return { name, dial, national, dialSecondary, nationalSecondary, email };
 };
 
 @Component({
@@ -148,6 +173,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
   private readonly _currency = inject(CurrencyPipe);
   private readonly _clipboard = inject(Clipboard);
   private readonly onsitePhoneInput = viewChild<PhoneInputComponent>('onsitePhoneInput');
+  private readonly onsitePhoneSecondaryInput = viewChild<PhoneInputComponent>('onsitePhoneSecondaryInput');
 
   jobId = input<number>();
   jobRegionId = input<number>();
@@ -340,6 +366,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     onsiteContact: [ null, [ Validators.maxLength(200) ] ],
     onsiteEmail: [ null, [ Validators.email, Validators.maxLength(254) ] ],
     onsitePhone: [ null ],
+    onsitePhoneSecondary: [ null ],
     alphaDrivers: [ 0 ],
 
     // Notes
@@ -718,6 +745,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       onsiteContact: part.onsiteContact ?? '',
       onsiteEmail: part.onsiteEmail ?? '',
       onsitePhone: part.onsitePhone ?? '',
+      onsitePhoneSecondary: part.onsitePhoneSecondary ?? '',
       alphaDrivers: part.alphaDrivers,
       importantNotes: part.importantNotes,
       notes: part.notes ?? '',
@@ -875,7 +903,8 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       skillSupplement: Number(v.skillSupplement ?? 0),
       onsiteContact: v.onsiteContact ?? '',
       onsiteEmail: v.onsiteEmail ?? '',
-      onsitePhone: v.onsitePhone ?? ''
+      onsitePhone: v.onsitePhone ?? '',
+      onsitePhoneSecondary: v.onsitePhoneSecondary ?? ''
     };
   }
 
@@ -892,12 +921,29 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     GeneralService.showSuccessMessage('Copied to clipboard');
   }
 
+  copyOnsitePhoneSecondary(): void {
+    const phone =
+      this.onsitePhoneSecondaryInput()?.getValueForCopy() ||
+      this.form.get('onsitePhoneSecondary')?.value;
+
+    if (!phone) {
+      return;
+    }
+
+    this._clipboard.copy(phone);
+    GeneralService.showSuccessMessage('Copied to clipboard');
+  }
+
   canCopyOnsiteContact(): boolean {
     const name = (this.form.get('onsiteContact')?.value ?? '').toString().trim();
     const email = (this.form.get('onsiteEmail')?.value ?? '').toString().trim();
     const phoneParts = this.onsitePhoneInput()?.getPartsForCopy();
+    const secondaryPhoneParts = this.onsitePhoneSecondaryInput()?.getPartsForCopy();
     const hasPhone = !!(phoneParts?.national || this.form.get('onsitePhone')?.value);
-    return !!(name || email || hasPhone);
+    const hasSecondaryPhone = !!(
+      secondaryPhoneParts?.national || this.form.get('onsitePhoneSecondary')?.value
+    );
+    return !!(name || email || hasPhone || hasSecondaryPhone);
   }
 
   copyOnsiteContact(): void {
@@ -908,31 +954,45 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     const name = (this.form.get('onsiteContact')?.value ?? '').toString().trim();
     const email = (this.form.get('onsiteEmail')?.value ?? '').toString().trim();
     const phoneParts = this.onsitePhoneInput()?.getPartsForCopy() ?? { dial: '', national: '' };
+    const secondaryPhoneParts =
+      this.onsitePhoneSecondaryInput()?.getPartsForCopy() ?? { dial: '', national: '' };
     const hasPhone = !!phoneParts.national;
+    const hasSecondaryPhone = !!secondaryPhoneParts.national;
     const parts: string[] = [];
 
     if (name) {
       parts.push(name);
     }
 
-    if (hasPhone) {
-      if (!name && !email) {
-        const phoneOnly =
-          this.onsitePhoneInput()?.getValueForCopy() ||
-          this.form.get('onsitePhone')?.value ||
-          '';
-        if (!phoneOnly) {
-          return;
-        }
-        this._clipboard.copy(phoneOnly);
-        GeneralService.showSuccessMessage('Copied to clipboard');
+    if ((hasPhone || hasSecondaryPhone) && !name && !email) {
+      const phones = [
+        this.onsitePhoneInput()?.getValueForCopy() || this.form.get('onsitePhone')?.value || '',
+        this.onsitePhoneSecondaryInput()?.getValueForCopy() ||
+          this.form.get('onsitePhoneSecondary')?.value ||
+          ''
+      ].filter(Boolean);
+
+      if (!phones.length) {
         return;
       }
 
+      this._clipboard.copy(phones.join('; '));
+      GeneralService.showSuccessMessage('Copied to clipboard');
+      return;
+    }
+
+    if (hasPhone) {
       if (phoneParts.dial) {
         parts.push(phoneParts.dial);
       }
       parts.push(phoneParts.national);
+    }
+
+    if (hasSecondaryPhone) {
+      if (secondaryPhoneParts.dial) {
+        parts.push(secondaryPhoneParts.dial);
+      }
+      parts.push(secondaryPhoneParts.national);
     }
 
     if (email) {
@@ -961,6 +1021,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
       onsiteContact?: string;
       onsiteEmail?: string;
       onsitePhone?: string | null;
+      onsitePhoneSecondary?: string | null;
     } = {};
 
     if (parsed.name) {
@@ -972,6 +1033,12 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     if (parsed.national) {
       patch.onsitePhone = buildPhoneFromDialAndNational(parsed.dial, parsed.national);
     }
+    if (parsed.nationalSecondary) {
+      patch.onsitePhoneSecondary = buildPhoneFromDialAndNational(
+        parsed.dialSecondary,
+        parsed.nationalSecondary
+      );
+    }
 
     this.form.patchValue(patch);
     if (patch.onsiteContact !== undefined) {
@@ -982,6 +1049,9 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     }
     if (patch.onsitePhone !== undefined) {
       this.form.get('onsitePhone')?.markAsDirty();
+    }
+    if (patch.onsitePhoneSecondary !== undefined) {
+      this.form.get('onsitePhoneSecondary')?.markAsDirty();
     }
   }
 
