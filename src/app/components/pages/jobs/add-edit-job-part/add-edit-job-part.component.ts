@@ -953,52 +953,16 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
     const name = (this.form.get('onsiteContact')?.value ?? '').toString().trim();
     const email = (this.form.get('onsiteEmail')?.value ?? '').toString().trim();
-    const phoneParts = this.onsitePhoneInput()?.getPartsForCopy() ?? { dial: '', national: '' };
-    const secondaryPhoneParts =
-      this.onsitePhoneSecondaryInput()?.getPartsForCopy() ?? { dial: '', national: '' };
-    const hasPhone = !!phoneParts.national;
-    const hasSecondaryPhone = !!secondaryPhoneParts.national;
-    const parts: string[] = [];
+    const phone =
+      this.onsitePhoneInput()?.getValueForCopy() ||
+      this.form.get('onsitePhone')?.value ||
+      '';
+    const secondaryPhone =
+      this.onsitePhoneSecondaryInput()?.getValueForCopy() ||
+      this.form.get('onsitePhoneSecondary')?.value ||
+      '';
 
-    if (name) {
-      parts.push(name);
-    }
-
-    if ((hasPhone || hasSecondaryPhone) && !name && !email) {
-      const phones = [
-        this.onsitePhoneInput()?.getValueForCopy() || this.form.get('onsitePhone')?.value || '',
-        this.onsitePhoneSecondaryInput()?.getValueForCopy() ||
-          this.form.get('onsitePhoneSecondary')?.value ||
-          ''
-      ].filter(Boolean);
-
-      if (!phones.length) {
-        return;
-      }
-
-      this._clipboard.copy(phones.join('; '));
-      GeneralService.showSuccessMessage('Copied to clipboard');
-      return;
-    }
-
-    if (hasPhone) {
-      if (phoneParts.dial) {
-        parts.push(phoneParts.dial);
-      }
-      parts.push(phoneParts.national);
-    }
-
-    if (hasSecondaryPhone) {
-      if (secondaryPhoneParts.dial) {
-        parts.push(secondaryPhoneParts.dial);
-      }
-      parts.push(secondaryPhoneParts.national);
-    }
-
-    if (email) {
-      parts.push(email);
-    }
-
+    const parts = [ name, phone, secondaryPhone, email ].filter(Boolean);
     if (!parts.length) {
       return;
     }
