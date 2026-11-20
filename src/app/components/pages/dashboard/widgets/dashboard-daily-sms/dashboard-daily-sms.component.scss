@@ -125,7 +125,61 @@
     max-width: none;
     flex: 0 0 auto;
     align-items: center;
+    gap: 8px;
   }
+}
+
+.daily-sms-edit-contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+  color: #6c7a89;
+  cursor: pointer;
+  flex: 0 0 auto;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--theme-default, #7366ff);
+    background: rgba(0, 0, 0, 0.04);
+    outline: none;
+  }
+
+  i {
+    font-size: 12px;
+  }
+}
+
+.daily-sms-contact-popover__body {
+  min-width: 20rem;
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 0.15rem;
+}
+
+.daily-sms-contact-popover__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.daily-sms-contact-popover__phones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.daily-sms-contact-popover__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.daily-sms-contact-popover__save-btn {
+  width: 2rem;
+  min-width: 2rem;
+  padding: 0.25rem 0;
 }
 
 .daily-sms-status {

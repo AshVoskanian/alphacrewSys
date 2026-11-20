@@ -121,6 +121,7 @@ export interface DashboardDaySms {
   jobPartId: number;
   client: string;
   onsiteContact: string;
+  onsiteEmail?: string;
   primaryContact: string;
   secondaryContact: string;
   sms: string;

@@ -109,6 +109,25 @@
                     </span>
                     <span class="daily-sms-summary-item daily-sms-summary-item--status">
                       <span class="daily-sms-status {{ statusClass(displayStatus(row)) }}">{{ displayStatus(row) }}</span>
+                      <span
+                        class="daily-sms-edit-contact"
+                        role="button"
+                        tabindex="0"
+                        title="Edit contacts"
+                        #contactPop="ngbPopover"
+                        [ngbPopover]="contactPopoverTpl"
+                        triggers="manual"
+                        [placement]="['left-top', 'left', 'bottom-end', 'top-end']"
+                        [autoClose]="'outside'"
+                        container="body"
+                        popoverClass="daily-sms-contact-popover"
+                        (click)="onContactEditClick(row, contactPop, $event)"
+                        (keydown.enter)="onContactEditClick(row, contactPop, $event)"
+                        (keydown.space)="onContactEditClick(row, contactPop, $event); $event.preventDefault()"
+                        (hidden)="onContactPopoverHidden()"
+                      >
+                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                      </span>
                     </span>
                   </span>
                 </button>
@@ -163,3 +182,82 @@
     }
   </div>
 </app-card>
+
+<ng-template #contactPopoverTpl>
+  <div class="daily-sms-contact-popover__body" [formGroup]="contactForm">
+    <div class="daily-sms-contact-popover__fields">
+      <div>
+        <label class="form-label form-label-sm m-b-4" for="dailySmsOnsiteContactDraft">Name</label>
+        <input
+          id="dailySmsOnsiteContactDraft"
+          type="text"
+          class="form-control form-control-sm"
+          name="onsiteContactDraft"
+          formControlName="onsiteContact"
+          [class.is-invalid]="contactForm.get('onsiteContact')?.touched && contactForm.get('onsiteContact')?.invalid"
+          (keydown)="onContactInputKeydown($event)"
+          maxlength="200"
+          placeholder="Contact name"
+          autocomplete="name"
+        >
+        @if (contactForm.get('onsiteContact')?.touched && contactForm.get('onsiteContact')?.errors?.['maxlength']) {
+          <div class="text-danger f-12 m-t-4">Name must be at most 200 characters</div>
+        }
+      </div>
+
+      <div>
+        <label class="form-label form-label-sm m-b-4" for="dailySmsOnsiteEmailDraft">Email</label>
+        <input
+          id="dailySmsOnsiteEmailDraft"
+          type="email"
+          class="form-control form-control-sm"
+          formControlName="onsiteEmail"
+          [class.is-invalid]="contactForm.get('onsiteEmail')?.touched && contactForm.get('onsiteEmail')?.invalid"
+          (keydown)="onContactInputKeydown($event)"
+          maxlength="254"
+          placeholder="Email"
+          autocomplete="email"
+        >
+        @if (contactForm.get('onsiteEmail')?.touched && contactForm.get('onsiteEmail')?.errors?.['email']) {
+          <div class="text-danger f-12 m-t-4">Enter a valid email address</div>
+        }
+        @if (contactForm.get('onsiteEmail')?.touched && contactForm.get('onsiteEmail')?.errors?.['maxlength']) {
+          <div class="text-danger f-12 m-t-4">Email must be at most 254 characters</div>
+        }
+      </div>
+
+      <div class="daily-sms-contact-popover__phones">
+        <div>
+          <label class="form-label form-label-sm m-b-4" for="dailySmsOnsitePhoneDraft">Primary</label>
+          <app-phone-input id="dailySmsOnsitePhoneDraft" formControlName="onsitePhone"></app-phone-input>
+          @if (contactForm.get('onsitePhone')?.touched && contactForm.get('onsitePhone')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+          }
+        </div>
+        <div>
+          <label class="form-label form-label-sm m-b-4" for="dailySmsOnsitePhoneSecondaryDraft">Secondary</label>
+          <app-phone-input id="dailySmsOnsitePhoneSecondaryDraft" formControlName="onsitePhoneSecondary"></app-phone-input>
+          @if (contactForm.get('onsitePhoneSecondary')?.touched && contactForm.get('onsitePhoneSecondary')?.errors?.['phoneInvalid']) {
+            <div class="text-danger f-12 m-t-4">Enter a valid phone number for the selected prefix</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="daily-sms-contact-popover__actions">
+      <button
+        type="button"
+        class="btn btn-light border btn-sm daily-sms-contact-popover__save-btn d-flex align-items-center justify-content-center txt-primary"
+        [disabled]="savingContact()"
+        (click)="commitContactFromPopover($event)"
+        title="Save contacts"
+      >
+        @if (savingContact()) {
+          <i class="fa-solid fa-spinner fa-spin f-14"></i>
+        } @else {
+          <i class="fa-solid fa-check f-14"></i>
+        }
+      </button>
+    </div>
+  </div>
+</ng-template>

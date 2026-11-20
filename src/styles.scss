@@ -15,7 +15,8 @@
 
 // Job part tag popover: keep typeahead dropdown visible (not clipped by popover body)
 .popover.job-part-tag-popover,
-.popover.job-part-onsite-contact-popover {
+.popover.job-part-onsite-contact-popover,
+.popover.daily-sms-contact-popover {
   overflow: visible;
   max-width: none;
 
@@ -25,24 +26,28 @@
   }
 }
 
-.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__body {
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__body,
+.popover.daily-sms-contact-popover .daily-sms-contact-popover__body {
   min-width: 20rem;
   width: min(26rem, calc(100vw - 2rem));
 }
 
-.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__fields {
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__fields,
+.popover.daily-sms-contact-popover .daily-sms-contact-popover__fields {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
 }
 
-.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__actions {
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__actions,
+.popover.daily-sms-contact-popover .daily-sms-contact-popover__actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 0.75rem;
 }
 
-.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__save-btn {
+.popover.job-part-onsite-contact-popover .job-part-onsite-contact-popover__save-btn,
+.popover.daily-sms-contact-popover .daily-sms-contact-popover__save-btn {
   width: 2rem;
   min-width: 2rem;
 }

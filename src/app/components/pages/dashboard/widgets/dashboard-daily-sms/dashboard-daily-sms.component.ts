@@ -1,12 +1,13 @@
-import { Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { afterNextRender, Component, computed, DestroyRef, inject, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgbAccordionModule, NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { Select2Module, Select2UpdateEvent, Select2UpdateValue } from 'ng-select2-component';
 import { Editor, NgxEditorModule } from 'ngx-editor';
 import { finalize } from 'rxjs';
 import { ApiBase } from '../../../../../shared/bases/api-base';
 import { CardComponent } from '../../../../../shared/components/ui/card/card.component';
+import { PhoneInputComponent } from '../../../../../shared/components/ui/phone-input/phone-input.component';
 import { DashboardDaySms } from '../../../../../shared/interface/dashboard';
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { RegionsService } from '../../../../../shared/services/regions.service';
@@ -17,18 +18,37 @@ interface DaySmsRow extends DashboardDaySms {
   editor: Editor;
 }
 
+type ContactEditFields = {
+  onsiteContact: string;
+  onsiteEmail: string;
+  onsitePhone: string;
+  onsitePhoneSecondary: string;
+};
+
 @Component({
   selector: 'app-dashboard-daily-sms',
-  imports: [CardComponent, FormsModule, NgbAccordionModule, NgxEditorModule, Select2Module],
+  imports: [
+    CardComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbAccordionModule,
+    NgbPopoverModule,
+    NgxEditorModule,
+    Select2Module,
+    PhoneInputComponent,
+  ],
   templateUrl: './dashboard-daily-sms.component.html',
   styleUrl: './dashboard-daily-sms.component.scss'
 })
 export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDestroy {
   private readonly _dr = inject(DestroyRef);
+  private readonly _injector = inject(Injector);
+  private readonly _fb = inject(FormBuilder);
   private readonly _regionsService = inject(RegionsService);
 
   loading = signal(false);
   sending = signal(false);
+  savingContact = signal(false);
   regionId = signal(0);
   commsDate = signal(this.toDateInputValue(new Date()));
   rows = signal<DaySmsRow[]>([]);
@@ -45,6 +65,22 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
   someSelected = computed(() => this.rows().some((row) => row.selected));
 
   selectedCount = computed(() => this.rows().filter((row) => row.selected).length);
+
+  readonly contactForm = this._fb.group({
+    onsiteContact: [ '', [ Validators.maxLength(200) ] ],
+    onsiteEmail: [ '', [ Validators.email, Validators.maxLength(254) ] ],
+    onsitePhone: [ null as string | null ],
+    onsitePhoneSecondary: [ null as string | null ],
+  });
+
+  private contactPopoverInitial: ContactEditFields = {
+    onsiteContact: '',
+    onsiteEmail: '',
+    onsitePhone: '',
+    onsitePhoneSecondary: '',
+  };
+  private activeContactPopover: NgbPopover | null = null;
+  private editingRow: DaySmsRow | null = null;
 
   ngOnInit(): void {
     this.loadDaySms();
@@ -117,6 +153,150 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
     return '';
   }
 
+  onContactEditClick(row: DaySmsRow, popover: NgbPopover, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (popover.isOpen()) {
+      this.activeContactPopover = null;
+      this.editingRow = null;
+      popover.close();
+      return;
+    }
+
+    if (this.activeContactPopover && this.activeContactPopover !== popover) {
+      this.activeContactPopover.close();
+    }
+
+    this.editingRow = row;
+    this.prepareContactPopover(row);
+    this.activeContactPopover = popover;
+    popover.open();
+
+    afterNextRender(
+      () => {
+        queueMicrotask(() => {
+          const el = document.querySelector<HTMLInputElement>(
+            '.daily-sms-contact-popover input[name="onsiteContactDraft"]'
+          );
+          el?.focus();
+          el?.select();
+        });
+      },
+      { injector: this._injector }
+    );
+  }
+
+  onContactPopoverHidden(): void {
+    this.activeContactPopover = null;
+    this.editingRow = null;
+    this.contactForm.reset({
+      onsiteContact: '',
+      onsiteEmail: '',
+      onsitePhone: null,
+      onsitePhoneSecondary: null,
+    }, { emitEvent: false });
+  }
+
+  commitContactFromPopover(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.persistContactFromPopover();
+  }
+
+  onContactInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.persistContactFromPopover();
+    }
+  }
+
+  private prepareContactPopover(row: DaySmsRow): void {
+    this.contactPopoverInitial = {
+      onsiteContact: (row.onsiteContact ?? '').trim(),
+      onsiteEmail: (row.onsiteEmail ?? '').trim(),
+      onsitePhone: (row.primaryContact ?? '').trim(),
+      onsitePhoneSecondary: (row.secondaryContact ?? '').trim(),
+    };
+    this.contactForm.reset({
+      onsiteContact: this.contactPopoverInitial.onsiteContact,
+      onsiteEmail: this.contactPopoverInitial.onsiteEmail,
+      onsitePhone: this.contactPopoverInitial.onsitePhone || null,
+      onsitePhoneSecondary: this.contactPopoverInitial.onsitePhoneSecondary || null,
+    }, { emitEvent: false });
+  }
+
+  private persistContactFromPopover(): void {
+    const row = this.editingRow;
+    const popover = this.activeContactPopover;
+    if (!row || row.jobPartId == null || !popover) {
+      return;
+    }
+
+    if (this.contactForm.invalid) {
+      GeneralService.markFormGroupTouched(this.contactForm);
+      return;
+    }
+
+    const raw = this.contactForm.getRawValue();
+    const next: ContactEditFields = {
+      onsiteContact: (raw.onsiteContact ?? '').trim(),
+      onsiteEmail: (raw.onsiteEmail ?? '').trim(),
+      onsitePhone: (raw.onsitePhone ?? '').trim(),
+      onsitePhoneSecondary: (raw.onsitePhoneSecondary ?? '').trim(),
+    };
+    const initial = this.contactPopoverInitial;
+
+    if (
+      next.onsiteContact === initial.onsiteContact &&
+      next.onsiteEmail === initial.onsiteEmail &&
+      next.onsitePhone === initial.onsitePhone &&
+      next.onsitePhoneSecondary === initial.onsitePhoneSecondary
+    ) {
+      popover.close();
+      return;
+    }
+
+    this.savingContact.set(true);
+    this.contactForm.disable({ emitEvent: false });
+
+    this.get<unknown>('Schedule/UpdateJobPartOnsiteContact', {
+      jobPartId: row.jobPartId,
+      onsiteContact: next.onsiteContact,
+      onsiteEmail: next.onsiteEmail,
+      onsitePhone: next.onsitePhone,
+      onsitePhoneSecondary: next.onsitePhoneSecondary,
+    })
+      .pipe(
+        takeUntilDestroyed(this._dr),
+        finalize(() => {
+          this.savingContact.set(false);
+          this.contactForm.enable({ emitEvent: false });
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.errors?.errorCode) {
+            GeneralService.showErrorMessage(res.errors.message);
+            return;
+          }
+
+          row.onsiteContact = next.onsiteContact;
+          row.onsiteEmail = next.onsiteEmail;
+          row.primaryContact = next.onsitePhone;
+          row.secondaryContact = next.onsitePhoneSecondary;
+          row.selected = row.selected && this.isRowSelectable(row);
+
+          GeneralService.showSuccessMessage('Onsite contact saved');
+          this.rows.set(this.sortRows([ ...this.rows() ]));
+          popover.close();
+        },
+        error: () => {
+          GeneralService.showErrorMessage('Could not save onsite contact');
+        },
+      });
+  }
+
   private areBothContactsMissing(row: DaySmsRow): boolean {
     return !this.hasPhoneNumber(row);
   }
@@ -166,6 +346,7 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
       status: row.status ?? '',
       client: row.client ?? '',
       onsiteContact: row.onsiteContact ?? '',
+      onsiteEmail: row.onsiteEmail ?? '',
       primaryContact: row.primaryContact ?? '',
       secondaryContact: row.secondaryContact ?? '',
       sms: row.sms ?? '',
@@ -225,6 +406,7 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
             jobPartId: item.jobPartId,
             client: item.client ?? '',
             onsiteContact: item.onsiteContact ?? '',
+            onsiteEmail: item.onsiteEmail ?? '',
             primaryContact: item.primaryContact ?? '',
             secondaryContact: item.secondaryContact ?? '',
             sms: item.sms ?? '',
