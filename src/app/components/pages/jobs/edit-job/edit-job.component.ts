@@ -74,6 +74,8 @@ import { ConfirmModalComponent } from "../../../../shared/components/ui/confirm-
 })
 export class EditJobComponent extends ApiBase implements OnInit {
   private static readonly CONFIRMED_STATUS_ID = 3;
+  private static readonly INVOICED_STATUS_ID = 7;
+  private static readonly PAID_STATUS_ID = 8;
 
   @ViewChild('venueInstance', { static: true }) venueInstance: NgbTypeahead;
   @ViewChild('addJobPartModal') addJobPartModalRef: TemplateRef<NgbModal>;
@@ -116,6 +118,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
   private overUtilisationModalRef?: NgbModalRef;
   private _previousStatusId: number | null = null;
   private _skipStatusGuard = false;
+  private _autoFilledInvoiceDate = false;
+  private _autoFilledPaidDate = false;
 
   /** Initial values when form was loaded from jobDetails (for tooltip old vs new). */
   private _initialCurrencyId: number | null = null;
@@ -336,9 +340,39 @@ export class EditJobComponent extends ApiBase implements OnInit {
             return;
           }
 
+          this.applyStatusDateDefaults(nextStatusId);
           this._previousStatusId = nextStatusId;
         }
       });
+  }
+
+  private applyStatusDateDefaults(statusId: number): void {
+    const today = this._datePipe.transform(new Date(), 'yyyy-MM-dd');
+    const patch: { invoiceDate?: string | null; paidDate?: string | null } = {};
+
+    if (statusId === EditJobComponent.INVOICED_STATUS_ID) {
+      if (!this.form.get('invoiceDate')?.value && today) {
+        patch.invoiceDate = today;
+        this._autoFilledInvoiceDate = true;
+      }
+    } else if (this._autoFilledInvoiceDate) {
+      patch.invoiceDate = null;
+      this._autoFilledInvoiceDate = false;
+    }
+
+    if (statusId === EditJobComponent.PAID_STATUS_ID) {
+      if (!this.form.get('paidDate')?.value && today) {
+        patch.paidDate = today;
+        this._autoFilledPaidDate = true;
+      }
+    } else if (this._autoFilledPaidDate) {
+      patch.paidDate = null;
+      this._autoFilledPaidDate = false;
+    }
+
+    if (Object.keys(patch).length) {
+      this.form.patchValue(patch, { emitEvent: false });
+    }
   }
 
   openOverUtilisationConfirm() {
@@ -542,6 +576,8 @@ export class EditJobComponent extends ApiBase implements OnInit {
     }, { emitEvent: false });
 
     this._previousStatusId = details.statusId;
+    this._autoFilledInvoiceDate = false;
+    this._autoFilledPaidDate = false;
 
     // Load venues only if clientId exists and is valid
     // Set venue after venues are loaded
