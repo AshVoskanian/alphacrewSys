@@ -88,8 +88,16 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
   }
 
   isRowSelectable(row: DaySmsRow): boolean {
-    const status = (row.status ?? '').trim().toLowerCase();
-    return this.hasPhoneNumber(row) && status !== 'sent';
+    const status = this.displayStatus(row).toLowerCase();
+    return this.hasPhoneNumber(row) && status !== 'sent' && status !== 'missing';
+  }
+
+  displayStatus(row: DaySmsRow): string {
+    if (this.areBothContactsMissing(row)) {
+      return 'Missing';
+    }
+
+    return (row.status ?? '').trim() || '—';
   }
 
   statusClass(status?: string): string {
@@ -100,15 +108,50 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
     if (normalized.startsWith('pending')) {
       return 'badge-light-warning';
     }
+    if (normalized === 'missing') {
+      return 'badge-missing';
+    }
     if (normalized === 'not sent') {
       return 'badge-light-danger';
     }
     return '';
   }
 
+  private areBothContactsMissing(row: DaySmsRow): boolean {
+    return !this.hasPhoneNumber(row);
+  }
+
   private hasPhoneNumber(row: DaySmsRow): boolean {
     return [ row.primaryContact, row.secondaryContact ]
       .some((value) => /\d/.test((value ?? '').trim()));
+  }
+
+  private statusSortOrder(status: string): number {
+    const normalized = status.trim().toLowerCase();
+    if (normalized === 'missing') {
+      return 0;
+    }
+    if (normalized === 'not sent') {
+      return 1;
+    }
+    if (normalized.startsWith('pending')) {
+      return 2;
+    }
+    if (normalized === 'sent') {
+      return 3;
+    }
+    return 4;
+  }
+
+  private sortRows(rows: DaySmsRow[]): DaySmsRow[] {
+    return [ ...rows ].sort((a, b) => {
+      const statusDiff = this.statusSortOrder(this.displayStatus(a)) - this.statusSortOrder(this.displayStatus(b));
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+
+      return (a.client ?? '').localeCompare(b.client ?? '', undefined, { sensitivity: 'base' });
+    });
   }
 
   sendSelected(): void {
@@ -176,21 +219,21 @@ export class DashboardDailySmsComponent extends ApiBase implements OnInit, OnDes
 
           this.destroyEditors();
 
-          this.rows.set(
-            (res.data ?? []).map((item, index) => ({
-              rowId: index + 1,
-              jobId: item.jobId,
-              jobPartId: item.jobPartId,
-              client: item.client ?? '',
-              onsiteContact: item.onsiteContact ?? '',
-              primaryContact: item.primaryContact ?? '',
-              secondaryContact: item.secondaryContact ?? '',
-              sms: item.sms ?? '',
-              status: item.status?.trim() || '',
-              selected: false,
-              editor: new Editor(),
-            }))
-          );
+          const mappedRows = (res.data ?? []).map((item, index) => ({
+            rowId: index + 1,
+            jobId: item.jobId,
+            jobPartId: item.jobPartId,
+            client: item.client ?? '',
+            onsiteContact: item.onsiteContact ?? '',
+            primaryContact: item.primaryContact ?? '',
+            secondaryContact: item.secondaryContact ?? '',
+            sms: item.sms ?? '',
+            status: item.status?.trim() || '',
+            selected: false,
+            editor: new Editor(),
+          }));
+
+          this.rows.set(this.sortRows(mappedRows));
         },
         error: () => {
           GeneralService.showErrorMessage('Failed to load daily SMS');

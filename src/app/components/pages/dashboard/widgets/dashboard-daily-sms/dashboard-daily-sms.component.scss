@@ -156,6 +156,12 @@
     border-color: #fc564a;
   }
 
+  &.badge-missing {
+    color: #fff;
+    background: #e53935;
+    border-color: #c62828;
+  }
+
   &.badge-light-success {
     color: #65c15c;
     background: #dcf1da;

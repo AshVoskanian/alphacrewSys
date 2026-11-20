@@ -108,7 +108,7 @@
                       <span class="daily-sms-summary-value">{{ row.secondaryContact || '—' }}</span>
                     </span>
                     <span class="daily-sms-summary-item daily-sms-summary-item--status">
-                      <span class="daily-sms-status {{ statusClass(row.status) }}">{{ row.status || '—' }}</span>
+                      <span class="daily-sms-status {{ statusClass(displayStatus(row)) }}">{{ displayStatus(row) }}</span>
                     </span>
                   </span>
                 </button>
