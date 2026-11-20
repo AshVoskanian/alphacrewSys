@@ -9,7 +9,7 @@
     </div>
 
     <div class="col-12 col-xl-6 dashboard-widget">
-      <app-dashboard-daily-sms></app-dashboard-daily-sms>
+      <app-dashboard-daily-sms *appHasRoles="[dashboardRoles.dailySms]; type: 'any'"></app-dashboard-daily-sms>
     </div>
 
     <div class="col-12 col-xl-6 dashboard-widget" *appHasRoles="[dashboardRoles.calendar]; type: 'any'">
