@@ -35,118 +35,22 @@ import type { ChipCountItem, ChipCountOption } from '../../../../shared/componen
 import { NumericInputDirective } from '../../../../shared/directives/numeric-input.directive';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { PhoneInputComponent } from '../../../../shared/components/ui/phone-input/phone-input.component';
-import {
-  buildPhoneFromDialAndNational,
-  getPhoneCountry,
-  parseStoredPhone
-} from '../../../../shared/utils/phone.utils';
 
-interface OnsiteContactClipboardParts {
-  name: string;
-  dial: string;
-  national: string;
-  dialSecondary: string;
-  nationalSecondary: string;
-  email: string;
-}
-
-const DIAL_CODE_PATTERN = /^\+\d{1,4}$/;
-const NATIONAL_PATTERN = /^\d[\d\s-]*$/;
-
-const emptyOnsiteContactClipboardParts = (): OnsiteContactClipboardParts => ({
-  name: '',
-  dial: '',
-  national: '',
-  dialSecondary: '',
-  nationalSecondary: '',
-  email: ''
-});
-
-const parseOnsiteContactClipboard = (text: string): OnsiteContactClipboardParts | null => {
-  const trimmed = text.trim();
-  if (!trimmed) {
+/** Full onsite contact clipboard: name; phone; secondaryPhone; email */
+const parseFullOnsiteContactClipboard = (
+  text: string
+): { name: string; phone: string; phoneSecondary: string; email: string } | null => {
+  const parts = text.split(';').map(part => part.trim()).filter(part => part.length > 0);
+  if (parts.length !== 4) {
     return null;
   }
 
-  if (!trimmed.includes(';')) {
-    if (trimmed.includes('@')) {
-      return { ...emptyOnsiteContactClipboardParts(), email: trimmed };
-    }
-
-    const parsedPhone = parseStoredPhone(trimmed);
-    if (parsedPhone) {
-      return {
-        ...emptyOnsiteContactClipboardParts(),
-        dial: getPhoneCountry(parsedPhone.country)?.label ?? '',
-        national: parsedPhone.national
-      };
-    }
-
-    if (NATIONAL_PATTERN.test(trimmed) || DIAL_CODE_PATTERN.test(trimmed)) {
-      return null;
-    }
-
-    return { ...emptyOnsiteContactClipboardParts(), name: trimmed };
-  }
-
-  const parts = trimmed.split(';').map(part => part.trim()).filter(part => part.length > 0);
-  if (!parts.length) {
+  const [ name, phone, phoneSecondary, email ] = parts;
+  if (!phone.startsWith('+') || !phoneSecondary.startsWith('+') || !email.includes('@')) {
     return null;
   }
 
-  let name = '';
-  let dial = '';
-  let national = '';
-  let dialSecondary = '';
-  let nationalSecondary = '';
-  let email = '';
-
-  for (const part of parts) {
-    if (!email && part.includes('@')) {
-      email = part;
-      continue;
-    }
-
-    if (DIAL_CODE_PATTERN.test(part)) {
-      if (!dial && !national) {
-        dial = part;
-      } else if (!dialSecondary) {
-        dialSecondary = part;
-      }
-      continue;
-    }
-
-    const parsedPhone = parseStoredPhone(part);
-    if (parsedPhone && part.startsWith('+') && part.length > 5) {
-      if (!national) {
-        dial = getPhoneCountry(parsedPhone.country)?.label ?? dial;
-        national = parsedPhone.national;
-      } else if (!nationalSecondary) {
-        dialSecondary = getPhoneCountry(parsedPhone.country)?.label ?? dialSecondary;
-        nationalSecondary = parsedPhone.national;
-      }
-      continue;
-    }
-
-    if (NATIONAL_PATTERN.test(part)) {
-      if (!national) {
-        national = part.replace(/[\s-]/g, '');
-      } else if (!nationalSecondary) {
-        nationalSecondary = part.replace(/[\s-]/g, '');
-      }
-      continue;
-    }
-
-    if (!name) {
-      name = part;
-    }
-  }
-
-  if (!name && !dial && !national && !dialSecondary && !nationalSecondary && !email) {
-    return null;
-  }
-
-  return { name, dial, national, dialSecondary, nationalSecondary, email };
+  return { name, phone, phoneSecondary, email };
 };
 
 @Component({
@@ -973,7 +877,7 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
 
   onOnsiteContactPaste(event: ClipboardEvent): void {
     const text = event.clipboardData?.getData('text')?.trim() ?? '';
-    const parsed = parseOnsiteContactClipboard(text);
+    const parsed = parseFullOnsiteContactClipboard(text);
     if (!parsed) {
       return;
     }
@@ -981,42 +885,16 @@ export class AddEditJobPartComponent extends ApiBase implements OnInit {
     event.preventDefault();
     event.stopPropagation();
 
-    const patch: {
-      onsiteContact?: string;
-      onsiteEmail?: string;
-      onsitePhone?: string | null;
-      onsitePhoneSecondary?: string | null;
-    } = {};
-
-    if (parsed.name) {
-      patch.onsiteContact = parsed.name;
-    }
-    if (parsed.email) {
-      patch.onsiteEmail = parsed.email;
-    }
-    if (parsed.national) {
-      patch.onsitePhone = buildPhoneFromDialAndNational(parsed.dial, parsed.national);
-    }
-    if (parsed.nationalSecondary) {
-      patch.onsitePhoneSecondary = buildPhoneFromDialAndNational(
-        parsed.dialSecondary,
-        parsed.nationalSecondary
-      );
-    }
-
-    this.form.patchValue(patch);
-    if (patch.onsiteContact !== undefined) {
-      this.form.get('onsiteContact')?.markAsDirty();
-    }
-    if (patch.onsiteEmail !== undefined) {
-      this.form.get('onsiteEmail')?.markAsDirty();
-    }
-    if (patch.onsitePhone !== undefined) {
-      this.form.get('onsitePhone')?.markAsDirty();
-    }
-    if (patch.onsitePhoneSecondary !== undefined) {
-      this.form.get('onsitePhoneSecondary')?.markAsDirty();
-    }
+    this.form.patchValue({
+      onsiteContact: parsed.name,
+      onsitePhone: parsed.phone,
+      onsitePhoneSecondary: parsed.phoneSecondary,
+      onsiteEmail: parsed.email
+    });
+    this.form.get('onsiteContact')?.markAsDirty();
+    this.form.get('onsitePhone')?.markAsDirty();
+    this.form.get('onsitePhoneSecondary')?.markAsDirty();
+    this.form.get('onsiteEmail')?.markAsDirty();
   }
 
   submit(): void {
